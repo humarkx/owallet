@@ -1,37 +1,37 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect } from 'react';
 import {
   AddressInput,
   FeeButtons,
   CoinInput,
-  MemoInput,
-} from "../../components/form";
-import { useStore } from "../../stores";
+  MemoInput
+} from '../../components/form';
+import { useStore } from '../../stores';
 
-import { HeaderLayout } from "../../layouts";
+import { HeaderLayout } from '../../layouts';
 
-import { observer } from "mobx-react-lite";
+import { observer } from 'mobx-react-lite';
 
-import style from "./style.module.scss";
-import { useNotification } from "../../components/notification";
+import style from './style.module.scss';
+import { useNotification } from '../../components/notification';
 
-import { useIntl } from "react-intl";
-import { Button } from "reactstrap";
+import { useIntl } from 'react-intl';
+import { Button } from 'reactstrap';
 
-import { useHistory, useLocation } from "react-router";
-import queryString from "querystring";
+import { useHistory, useLocation } from 'react-router';
+import queryString from 'querystring';
 
-import { useSendTxConfig } from "@keplr-wallet/hooks";
-import { EthereumEndpoint } from "../../config.ui";
+import { useSendTxConfig } from '@keplr-wallet/hooks';
+import { EthereumEndpoint } from '../../config.ui';
 import {
   fitPopupWindow,
   openPopupWindow,
-  PopupSize,
-} from "@keplr-wallet/popup";
+  PopupSize
+} from '@keplr-wallet/popup';
 
 export const SendPage: FunctionComponent = observer(() => {
   const history = useHistory();
   let search = useLocation().search;
-  if (search.startsWith("?")) {
+  if (search.startsWith('?')) {
     search = search.slice(1);
   }
   const query = queryString.parse(search) as {
@@ -58,7 +58,7 @@ export const SendPage: FunctionComponent = observer(() => {
     accountStore,
     priceStore,
     queriesStore,
-    analyticsStore,
+    analyticsStore
   } = useStore();
   const current = chainStore.current;
 
@@ -85,7 +85,7 @@ export const SendPage: FunctionComponent = observer(() => {
     }
   }, [current.currencies, query.defaultDenom, sendConfigs.amountConfig]);
 
-  const isDetachedPage = query.detached === "true";
+  const isDetachedPage = query.detached === 'true';
 
   useEffect(() => {
     if (isDetachedPage) {
@@ -129,19 +129,19 @@ export const SendPage: FunctionComponent = observer(() => {
         isDetachedPage ? undefined : (
           <div
             style={{
-              height: "64px",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              paddingRight: "20px",
+              height: '64px',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingRight: '20px'
             }}
           >
             <i
               className="fas fa-external-link-alt"
               style={{
-                cursor: "pointer",
-                padding: "4px",
-                color: "#8B8B9A",
+                cursor: 'pointer',
+                padding: '4px',
+                color: '#8B8B9A'
               }}
               onClick={async (e) => {
                 e.preventDefault();
@@ -168,7 +168,7 @@ export const SendPage: FunctionComponent = observer(() => {
                       (windowInfo.left || 0) +
                       (windowInfo.width || 0) -
                       PopupSize.width -
-                      20,
+                      20
                   }
                 );
                 window.close();
@@ -180,13 +180,13 @@ export const SendPage: FunctionComponent = observer(() => {
     >
       <form
         className={style.formContainer}
-        onSubmit={async (e) => {
+        onSubmit={async (e: any) => {
           e.preventDefault();
 
           if (accountInfo.isReadyToSendMsgs && txStateIsValid) {
             try {
               const stdFee = sendConfigs.feeConfig.toStdFee();
-
+              (window as any).accountInfo = accountInfo;
               await accountInfo.sendToken(
                 sendConfigs.amountConfig.amount,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -196,34 +196,34 @@ export const SendPage: FunctionComponent = observer(() => {
                 stdFee,
                 {
                   preferNoSetFee: true,
-                  preferNoSetMemo: true,
+                  preferNoSetMemo: true
                 },
                 {
                   onBroadcasted: () => {
-                    analyticsStore.logEvent("Send token tx broadcasted", {
+                    analyticsStore.logEvent('Send token tx broadcasted', {
                       chainId: chainStore.current.chainId,
                       chainName: chainStore.current.chainName,
-                      feeType: sendConfigs.feeConfig.feeType,
+                      feeType: sendConfigs.feeConfig.feeType
                     });
-                  },
+                  }
                 }
               );
               if (!isDetachedPage) {
-                history.replace("/");
+                history.replace('/');
               }
-            } catch (e) {
+            } catch (e: any) {
               if (!isDetachedPage) {
-                history.replace("/");
+                history.replace('/');
               }
               notification.push({
-                type: "warning",
-                placement: "top-center",
+                type: 'warning',
+                placement: 'top-center',
                 duration: 5,
                 content: `Fail to send token: ${e.message}`,
                 canDelete: true,
                 transition: {
-                  duration: 0.25,
-                },
+                  duration: 0.25
+                }
               });
             } finally {
               // XXX: If the page is in detached state,
@@ -240,32 +240,32 @@ export const SendPage: FunctionComponent = observer(() => {
             <AddressInput
               recipientConfig={sendConfigs.recipientConfig}
               memoConfig={sendConfigs.memoConfig}
-              label={intl.formatMessage({ id: "send.input.recipient" })}
+              label={intl.formatMessage({ id: 'send.input.recipient' })}
             />
             <CoinInput
               amountConfig={sendConfigs.amountConfig}
-              label={intl.formatMessage({ id: "send.input.amount" })}
+              label={intl.formatMessage({ id: 'send.input.amount' })}
               balanceText={intl.formatMessage({
-                id: "send.input-button.balance",
+                id: 'send.input-button.balance'
               })}
             />
             <MemoInput
               memoConfig={sendConfigs.memoConfig}
-              label={intl.formatMessage({ id: "send.input.memo" })}
+              label={intl.formatMessage({ id: 'send.input.memo' })}
             />
             <FeeButtons
               feeConfig={sendConfigs.feeConfig}
               gasConfig={sendConfigs.gasConfig}
               priceStore={priceStore}
-              label={intl.formatMessage({ id: "send.input.fee" })}
+              label={intl.formatMessage({ id: 'send.input.fee' })}
               feeSelectLabels={{
-                low: intl.formatMessage({ id: "fee-buttons.select.low" }),
+                low: intl.formatMessage({ id: 'fee-buttons.select.low' }),
                 average: intl.formatMessage({
-                  id: "fee-buttons.select.average",
+                  id: 'fee-buttons.select.average'
                 }),
-                high: intl.formatMessage({ id: "fee-buttons.select.high" }),
+                high: intl.formatMessage({ id: 'fee-buttons.select.high' })
               }}
-              gasLabel={intl.formatMessage({ id: "send.input.gas" })}
+              gasLabel={intl.formatMessage({ id: 'send.input.gas' })}
             />
           </div>
           <div style={{ flex: 1 }} />
@@ -273,11 +273,11 @@ export const SendPage: FunctionComponent = observer(() => {
             type="submit"
             color="primary"
             block
-            data-loading={accountInfo.isSendingMsg === "send"}
+            data-loading={accountInfo.isSendingMsg === 'send'}
             disabled={!accountInfo.isReadyToSendMsgs || !txStateIsValid}
           >
             {intl.formatMessage({
-              id: "send.button.send",
+              id: 'send.button.send'
             })}
           </Button>
         </div>

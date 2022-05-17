@@ -1,13 +1,13 @@
-import { AccountSetBase, AccountSetOpts, MsgOpt } from "./base";
-import { HasCosmwasmQueries, QueriesSetBase, QueriesStore } from "../query";
-import { ChainGetter, CoinPrimitive } from "../common";
-import { StdFee } from "@cosmjs/launchpad";
-import { DenomHelper } from "@keplr-wallet/common";
-import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { AppCurrency, KeplrSignOptions } from "@keplr-wallet/types";
-import { DeepReadonly, Optional } from "utility-types";
-import { cosmwasm } from "@keplr-wallet/cosmos";
-import { Buffer } from "buffer/";
+import { AccountSetBase, AccountSetOpts, MsgOpt } from './base';
+import { HasCosmwasmQueries, QueriesSetBase, QueriesStore } from '../query';
+import { ChainGetter, CoinPrimitive } from '../common';
+import { StdFee } from '@cosmjs/launchpad';
+import { DenomHelper } from '@keplr-wallet/common';
+import { Dec, DecUtils } from '@keplr-wallet/unit';
+import { AppCurrency, KeplrSignOptions } from '@keplr-wallet/types';
+import { DeepReadonly, Optional } from 'utility-types';
+import { cosmwasm } from '@keplr-wallet/cosmos';
+import { Buffer } from 'buffer/';
 
 export interface HasCosmwasmAccount {
   cosmwasm: DeepReadonly<CosmwasmAccount>;
@@ -15,10 +15,10 @@ export interface HasCosmwasmAccount {
 
 export interface CosmwasmMsgOpts {
   readonly send: {
-    readonly cw20: Pick<MsgOpt, "gas">;
+    readonly cw20: Pick<MsgOpt, 'gas'>;
   };
 
-  readonly executeWasm: Pick<MsgOpt, "type">;
+  readonly executeWasm: Pick<MsgOpt, 'type'>;
 }
 
 export class AccountWithCosmwasm
@@ -29,13 +29,13 @@ export class AccountWithCosmwasm
   static readonly defaultMsgOpts: CosmwasmMsgOpts = {
     send: {
       cw20: {
-        gas: 150000,
-      },
+        gas: 150000
+      }
     },
 
     executeWasm: {
-      type: "wasm/MsgExecuteContract",
-    },
+      type: 'wasm/MsgExecuteContract'
+    }
   };
 
   constructor(
@@ -93,30 +93,32 @@ export class CosmwasmAccount {
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
 
     switch (denomHelper.type) {
-      case "cw20":
+      case 'cw20':
         const actualAmount = (() => {
           let dec = new Dec(amount);
-          dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+          dec = dec.mul(
+            DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+          );
           return dec.truncate().toString();
         })();
 
-        if (!("type" in currency) || currency.type !== "cw20") {
-          throw new Error("Currency is not cw20");
+        if (!('type' in currency) || currency.type !== 'cw20') {
+          throw new Error('Currency is not cw20');
         }
         await this.sendExecuteContractMsg(
-          "send",
+          'send',
           currency.contractAddress,
           {
             transfer: {
               recipient: recipient,
-              amount: actualAmount,
-            },
+              amount: actualAmount
+            }
           },
           [],
           memo,
           {
             amount: stdFee.amount ?? [],
-            gas: stdFee.gas ?? this.base.msgOpts.send.cw20.gas.toString(),
+            gas: stdFee.gas ?? this.base.msgOpts.send.cw20.gas.toString()
           },
           signOptions,
           this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
@@ -144,13 +146,13 @@ export class CosmwasmAccount {
 
   async sendExecuteContractMsg(
     // This arg can be used to override the type of sending tx if needed.
-    type: keyof CosmwasmMsgOpts | "unknown" = "executeWasm",
+    type: keyof CosmwasmMsgOpts | 'unknown' = 'executeWasm',
     contractAddress: string,
     // eslint-disable-next-line @typescript-eslint/ban-types
     obj: object,
     funds: CoinPrimitive[],
-    memo: string = "",
-    stdFee: Optional<StdFee, "amount">,
+    memo: string = '',
+    stdFee: Optional<StdFee, 'amount'>,
     signOptions?: KeplrSignOptions,
     onTxEvents?:
       | ((tx: any) => void)
@@ -165,32 +167,45 @@ export class CosmwasmAccount {
         sender: this.base.bech32Address,
         contract: contractAddress,
         msg: obj,
-        funds,
-      },
+        funds
+      }
     };
+
+    const chainInfo = this.chainGetter.getChain(this.chainId);
+    const protoMsgs = this.hasNoLegacyStdFeature()
+      ? [
+          chainInfo.beta
+            ? {
+                type_url: '/cosmwasm.wasm.v1beta1.MsgExecuteContract',
+                value: cosmwasm.wasm.v1beta1.MsgExecuteContract.encode({
+                  sender: msg.value.sender,
+                  contract: msg.value.contract,
+                  msg: Buffer.from(JSON.stringify(msg.value.msg)),
+                  sent_funds: msg.value.funds
+                }).finish()
+              }
+            : {
+                type_url: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                value: cosmwasm.wasm.v1.MsgExecuteContract.encode({
+                  sender: msg.value.sender,
+                  contract: msg.value.contract,
+                  msg: Buffer.from(JSON.stringify(msg.value.msg)),
+                  funds: msg.value.funds
+                }).finish()
+              }
+        ]
+      : undefined;
 
     await this.base.sendMsgs(
       type,
       {
         aminoMsgs: [msg],
-        protoMsgs: this.hasNoLegacyStdFeature()
-          ? [
-              {
-                type_url: "/cosmwasm.wasm.v1.MsgExecuteContract",
-                value: cosmwasm.wasm.v1.MsgExecuteContract.encode({
-                  sender: msg.value.sender,
-                  contract: msg.value.contract,
-                  msg: Buffer.from(JSON.stringify(msg.value.msg)),
-                  funds: msg.value.funds,
-                }).finish(),
-              },
-            ]
-          : undefined,
+        protoMsgs
       },
       memo,
       {
         amount: stdFee.amount ?? [],
-        gas: stdFee.gas,
+        gas: stdFee.gas
       },
       signOptions,
       this.txEventsWithPreOnFulfill(onTxEvents)
@@ -217,9 +232,9 @@ export class CosmwasmAccount {
     }
 
     const onBroadcasted =
-      typeof onTxEvents === "function" ? undefined : onTxEvents.onBroadcasted;
+      typeof onTxEvents === 'function' ? undefined : onTxEvents.onBroadcasted;
     const onFulfill =
-      typeof onTxEvents === "function" ? onTxEvents : onTxEvents.onFulfill;
+      typeof onTxEvents === 'function' ? onTxEvents : onTxEvents.onFulfill;
 
     return {
       onBroadcasted,
@@ -231,7 +246,7 @@ export class CosmwasmAccount {
 
             onFulfill(tx);
           }
-        : undefined,
+        : undefined
     };
   }
 
@@ -243,7 +258,7 @@ export class CosmwasmAccount {
     const chainInfo = this.chainGetter.getChain(this.chainId);
     return (
       chainInfo.features != null &&
-      chainInfo.features.includes("no-legacy-stdTx")
+      chainInfo.features.includes('no-legacy-stdTx')
     );
   }
 }
