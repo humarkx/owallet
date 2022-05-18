@@ -1,9 +1,9 @@
 import {
   MessageRequester,
   Message,
-  JSONUint8Array,
-} from "@keplr-wallet/router";
-import { getKeplrExtensionRouterId } from "../utils";
+  JSONUint8Array
+} from '@owallet-wallet/router';
+import { getOWalletExtensionRouterId } from '../utils';
 
 export class InExtensionMessageRequester implements MessageRequester {
   async sendMessage<M extends Message<unknown>>(
@@ -15,22 +15,22 @@ export class InExtensionMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg["origin"] = window.location.origin;
+    msg['origin'] = window.location.origin;
     msg.routerMeta = {
       ...msg.routerMeta,
-      routerId: getKeplrExtensionRouterId(),
+      routerId: getOWalletExtensionRouterId()
     };
 
     const result = JSONUint8Array.unwrap(
       await browser.runtime.sendMessage({
         port,
         type: msg.type(),
-        msg: JSONUint8Array.wrap(msg),
+        msg: JSONUint8Array.wrap(msg)
       })
     );
 
     if (!result) {
-      throw new Error("Null result");
+      throw new Error('Null result');
     }
 
     if (result.error) {
@@ -50,22 +50,22 @@ export class InExtensionMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg["origin"] = window.location.origin;
+    msg['origin'] = window.location.origin;
     msg.routerMeta = {
       ...msg.routerMeta,
-      routerId: getKeplrExtensionRouterId(),
+      routerId: getOWalletExtensionRouterId()
     };
 
     const result = JSONUint8Array.unwrap(
       await browser.tabs.sendMessage(tabId, {
         port,
         type: msg.type(),
-        msg: JSONUint8Array.wrap(msg),
+        msg: JSONUint8Array.wrap(msg)
       })
     );
 
     if (!result) {
-      throw new Error("Null result");
+      throw new Error('Null result');
     }
 
     if (result.error) {

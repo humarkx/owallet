@@ -1,9 +1,9 @@
-import { InteractionStore } from "./interaction";
-import { autorun, computed, flow, makeObservable, observable } from "mobx";
-import { StdSignDoc } from "@cosmjs/launchpad";
-import { InteractionWaitingData } from "@keplr-wallet/background";
-import { SignDocWrapper } from "@keplr-wallet/cosmos";
-import { KeplrSignOptions } from "@keplr-wallet/types";
+import { InteractionStore } from './interaction';
+import { autorun, computed, flow, makeObservable, observable } from 'mobx';
+import { StdSignDoc } from '@cosmjs/launchpad';
+import { InteractionWaitingData } from '@owallet-wallet/background';
+import { SignDocWrapper } from '@owallet-wallet/cosmos';
+import { OWalletSignOptions } from '@owallet-wallet/types';
 
 export class SignInteractionStore {
   @observable
@@ -29,22 +29,22 @@ export class SignInteractionStore {
       | {
           msgOrigin: string;
           chainId: string;
-          mode: "amino";
+          mode: 'amino';
           signer: string;
           signDoc: StdSignDoc;
-          signOptions: KeplrSignOptions;
+          signOptions: OWalletSignOptions;
           isADR36SignDoc: boolean;
           isADR36WithString?: boolean;
         }
       | {
           msgOrigin: string;
           chainId: string;
-          mode: "direct";
+          mode: 'direct';
           signer: string;
           signDocBytes: Uint8Array;
-          signOptions: KeplrSignOptions;
+          signOptions: OWalletSignOptions;
         }
-    >("request-sign");
+    >('request-sign');
   }
 
   @computed
@@ -54,7 +54,7 @@ export class SignInteractionStore {
         msgOrigin: string;
         signer: string;
         signDocWrapper: SignDocWrapper;
-        signOptions: KeplrSignOptions;
+        signOptions: OWalletSignOptions;
         isADR36WithString?: boolean;
       }>
     | undefined {
@@ -66,7 +66,7 @@ export class SignInteractionStore {
 
     const data = datas[0];
     const wrapper =
-      data.data.mode === "amino"
+      data.data.mode === 'amino'
         ? SignDocWrapper.fromAminoSignDoc(data.data.signDoc)
         : SignDocWrapper.fromDirectSignDocBytes(data.data.signDocBytes);
 
@@ -81,19 +81,19 @@ export class SignInteractionStore {
         signDocWrapper: wrapper,
         signOptions: data.data.signOptions,
         isADR36WithString:
-          "isADR36WithString" in data.data
+          'isADR36WithString' in data.data
             ? data.data.isADR36WithString
-            : undefined,
-      },
+            : undefined
+      }
     };
   }
 
   protected isEnded(): boolean {
-    return this.interactionStore.getEvents<void>("request-sign-end").length > 0;
+    return this.interactionStore.getEvents<void>('request-sign-end').length > 0;
   }
 
   protected clearEnded() {
-    this.interactionStore.clearEvent("request-sign-end");
+    this.interactionStore.clearEvent('request-sign-end');
   }
 
   protected waitEnd(): Promise<void> {
@@ -122,14 +122,14 @@ export class SignInteractionStore {
     const id = this.waitingDatas[0].id;
     try {
       const newSignDoc =
-        newSignDocWrapper.mode === "amino"
+        newSignDocWrapper.mode === 'amino'
           ? newSignDocWrapper.aminoSignDoc
           : newSignDocWrapper.protoSignDoc.toBytes();
 
       yield this.interactionStore.approveWithoutRemovingData(id, newSignDoc);
     } finally {
       yield this.waitEnd();
-      this.interactionStore.removeData("request-sign", id);
+      this.interactionStore.removeData('request-sign', id);
 
       this._isLoading = false;
     }
@@ -144,7 +144,7 @@ export class SignInteractionStore {
     this._isLoading = true;
     try {
       yield this.interactionStore.reject(
-        "request-sign",
+        'request-sign',
         this.waitingDatas[0].id
       );
     } finally {
@@ -156,7 +156,7 @@ export class SignInteractionStore {
   *rejectAll() {
     this._isLoading = true;
     try {
-      yield this.interactionStore.rejectAll("request-sign");
+      yield this.interactionStore.rejectAll('request-sign');
     } finally {
       this._isLoading = false;
     }
@@ -164,7 +164,7 @@ export class SignInteractionStore {
 
   @flow
   protected *rejectWithId(id: string) {
-    yield this.interactionStore.reject("request-sign", id);
+    yield this.interactionStore.reject('request-sign', id);
   }
 
   get isLoading(): boolean {

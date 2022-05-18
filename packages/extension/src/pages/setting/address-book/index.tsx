@@ -1,9 +1,9 @@
-import React, { FunctionComponent, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { HeaderLayout } from "../../../layouts";
-import { FormattedMessage, useIntl } from "react-intl";
-import { useHistory } from "react-router";
-import style from "../style.module.scss";
+import React, { FunctionComponent, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { HeaderLayout } from '../../../layouts';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { useHistory } from 'react-router';
+import style from '../style.module.scss';
 import {
   Button,
   ButtonDropdown,
@@ -11,23 +11,23 @@ import {
   DropdownMenu,
   DropdownToggle,
   Modal,
-  ModalBody,
-} from "reactstrap";
-import styleAddressBook from "./style.module.scss";
-import { useStore } from "../../../stores";
-import { PageButton } from "../page-button";
-import { AddAddressModal } from "./add-address-modal";
-import { ExtensionKVStore } from "@keplr-wallet/common";
-import { Bech32Address } from "@keplr-wallet/cosmos";
-import { useConfirm } from "../../../components/confirm";
+  ModalBody
+} from 'reactstrap';
+import styleAddressBook from './style.module.scss';
+import { useStore } from '../../../stores';
+import { PageButton } from '../page-button';
+import { AddAddressModal } from './add-address-modal';
+import { ExtensionKVStore } from '@owallet-wallet/common';
+import { Bech32Address } from '@owallet-wallet/cosmos';
+import { useConfirm } from '../../../components/confirm';
 import {
   AddressBookSelectHandler,
   IIBCChannelConfig,
   useAddressBookConfig,
   useMemoConfig,
-  useRecipientConfig,
-} from "@keplr-wallet/hooks";
-import { EthereumEndpoint } from "../../../config.ui";
+  useRecipientConfig
+} from '@owallet-wallet/hooks';
+import { EthereumEndpoint } from '../../../config.ui';
 
 export const AddressBookPage: FunctionComponent<{
   onBackButton?: () => void;
@@ -40,7 +40,7 @@ export const AddressBookPage: FunctionComponent<{
     onBackButton,
     hideChainDropdown,
     selectHandler,
-    ibcChannelConfig,
+    ibcChannelConfig
     //isInTransaction,
   }) => {
     const intl = useIntl();
@@ -63,7 +63,7 @@ export const AddressBookPage: FunctionComponent<{
     const memoConfig = useMemoConfig(chainStore, selectedChainId);
 
     const addressBookConfig = useAddressBookConfig(
-      new ExtensionKVStore("address-book"),
+      new ExtensionKVStore('address-book'),
       chainStore,
       selectedChainId,
       selectHandler
@@ -74,7 +74,7 @@ export const AddressBookPage: FunctionComponent<{
             },
             setMemo: (): void => {
               // noop
-            },
+            }
           }
     );
 
@@ -91,7 +91,7 @@ export const AddressBookPage: FunctionComponent<{
         <i
           key="edit"
           className="fas fa-pen"
-          style={{ cursor: "pointer" }}
+          style={{ cursor: 'pointer' }}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -103,7 +103,7 @@ export const AddressBookPage: FunctionComponent<{
         <i
           key="remove"
           className="fas fa-trash"
-          style={{ cursor: "pointer" }}
+          style={{ cursor: 'pointer' }}
           onClick={async (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -112,16 +112,16 @@ export const AddressBookPage: FunctionComponent<{
               await confirm.confirm({
                 img: (
                   <img
-                    src={require("../../../public/assets/img/trash.svg")}
-                    style={{ height: "80px" }}
+                    src={require('../../../public/assets/img/trash.svg')}
+                    style={{ height: '80px' }}
                   />
                 ),
                 title: intl.formatMessage({
-                  id: "setting.address-book.confirm.delete-address.title",
+                  id: 'setting.address-book.confirm.delete-address.title'
                 }),
                 paragraph: intl.formatMessage({
-                  id: "setting.address-book.confirm.delete-address.paragraph",
-                }),
+                  id: 'setting.address-book.confirm.delete-address.paragraph'
+                })
               })
             ) {
               setAddAddressModalOpen(false);
@@ -129,7 +129,7 @@ export const AddressBookPage: FunctionComponent<{
               await addressBookConfig.removeAddressBook(index);
             }
           }}
-        />,
+        />
       ];
     };
 
@@ -138,7 +138,7 @@ export const AddressBookPage: FunctionComponent<{
         showChainName={false}
         canChangeChainInfo={false}
         alternativeTitle={intl.formatMessage({
-          id: "main.menu.address-book",
+          id: 'main.menu.address-book'
         })}
         onBackButton={
           onBackButton
@@ -173,7 +173,7 @@ export const AddressBookPage: FunctionComponent<{
           <div className={styleAddressBook.innerTopContainer}>
             {hideChainDropdown ? null : (
               <ButtonDropdown isOpen={dropdownOpen} toggle={toggle}>
-                <DropdownToggle caret style={{ boxShadow: "none" }}>
+                <DropdownToggle caret style={{ boxShadow: 'none' }}>
                   {chainStore.getChain(selectedChainId).chainName}
                 </DropdownToggle>
                 <DropdownMenu>
@@ -195,9 +195,9 @@ export const AddressBookPage: FunctionComponent<{
             <div style={{ flex: 1 }} />
             <div
               style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
               }}
             >
               <Button
@@ -212,13 +212,13 @@ export const AddressBookPage: FunctionComponent<{
               >
                 <i
                   className="fas fa-plus"
-                  style={{ marginRight: "4px", fontSize: "8px" }}
+                  style={{ marginRight: '4px', fontSize: '8px' }}
                 />
                 <FormattedMessage id="setting.address-book.button.add" />
               </Button>
             </div>
           </div>
-          <div style={{ flex: "1 1 0", overflowY: "auto" }}>
+          <div style={{ flex: '1 1 0', overflowY: 'auto' }}>
             {addressBookConfig.addressBookDatas.map((data, i) => {
               return (
                 <PageButton
@@ -245,7 +245,7 @@ export const AddressBookPage: FunctionComponent<{
                       onBackButton();
                     }
                   }}
-                  style={{ cursor: selectHandler ? undefined : "auto" }}
+                  style={{ cursor: selectHandler ? undefined : 'auto' }}
                 />
               );
             })}

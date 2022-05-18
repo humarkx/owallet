@@ -2,27 +2,27 @@ import React, {
   FunctionComponent,
   useCallback,
   useEffect,
-  useRef,
-} from "react";
-import { PageWithScrollViewInBottomTabView } from "../../components/page";
-import { AccountCard } from "./account-card";
+  useRef
+} from 'react';
+import { PageWithScrollViewInBottomTabView } from '../../components/page';
+import { AccountCard } from './account-card';
 import {
   AppState,
   AppStateStatus,
   RefreshControl,
-  ScrollView,
-} from "react-native";
-import { useStore } from "../../stores";
-import { StakingInfoCard } from "./staking-info-card";
-import { useStyle } from "../../styles";
-import { GovernanceCard } from "./governance-card";
-import { observer } from "mobx-react-lite";
-import { MyRewardCard } from "./my-reward-card";
-import { TokensCard } from "./tokens-card";
-import { usePrevious } from "../../hooks";
-import { BIP44Selectable } from "./bip44-selectable";
-import { useFocusEffect } from "@react-navigation/native";
-import { ChainUpdaterService } from "@keplr-wallet/background";
+  ScrollView
+} from 'react-native';
+import { useStore } from '../../stores';
+import { StakingInfoCard } from './staking-info-card';
+import { useStyle } from '../../styles';
+import { GovernanceCard } from './governance-card';
+import { observer } from 'mobx-react-lite';
+import { MyRewardCard } from './my-reward-card';
+import { TokensCard } from './tokens-card';
+import { usePrevious } from '../../hooks';
+import { BIP44Selectable } from './bip44-selectable';
+import { useFocusEffect } from '@react-navigation/native';
+import { ChainUpdaterService } from '@owallet-wallet/background';
 
 export const HomeScreen: FunctionComponent = observer(() => {
   const [refreshing, setRefreshing] = React.useState(false);
@@ -57,15 +57,15 @@ export const HomeScreen: FunctionComponent = observer(() => {
 
   useEffect(() => {
     const appStateHandler = (state: AppStateStatus) => {
-      if (state === "active") {
+      if (state === 'active') {
         checkAndUpdateChainInfo();
       }
     };
 
-    AppState.addEventListener("change", appStateHandler);
+    AppState.addEventListener('change', appStateHandler);
 
     return () => {
-      AppState.removeEventListener("change", appStateHandler);
+      AppState.removeEventListener('change', appStateHandler);
     };
   }, [checkAndUpdateChainInfo]);
 
@@ -83,7 +83,7 @@ export const HomeScreen: FunctionComponent = observer(() => {
       previousChainStoreIsInitializing,
       currentChainId,
       previousChainId,
-      checkAndUpdateChainInfo,
+      checkAndUpdateChainInfo
     ])
   );
 
@@ -115,7 +115,7 @@ export const HomeScreen: FunctionComponent = observer(() => {
         .waitFreshResponse(),
       queries.cosmos.queryUnbondingDelegations
         .getQueryBech32Address(account.bech32Address)
-        .waitFreshResponse(),
+        .waitFreshResponse()
     ]);
 
     setRefreshing(false);
@@ -139,20 +139,20 @@ export const HomeScreen: FunctionComponent = observer(() => {
       ref={scrollViewRef}
     >
       <BIP44Selectable />
-      <AccountCard containerStyle={style.flatten(["margin-y-card-gap"])} />
+      <AccountCard containerStyle={style.flatten(['margin-y-card-gap'])} />
       {tokens.length > 0 ? (
         <TokensCard
-          containerStyle={style.flatten(["margin-bottom-card-gap"])}
+          containerStyle={style.flatten(['margin-bottom-card-gap'])}
         />
       ) : null}
       <MyRewardCard
-        containerStyle={style.flatten(["margin-bottom-card-gap"])}
+        containerStyle={style.flatten(['margin-bottom-card-gap'])}
       />
       <StakingInfoCard
-        containerStyle={style.flatten(["margin-bottom-card-gap"])}
+        containerStyle={style.flatten(['margin-bottom-card-gap'])}
       />
       <GovernanceCard
-        containerStyle={style.flatten(["margin-bottom-card-gap"])}
+        containerStyle={style.flatten(['margin-bottom-card-gap'])}
       />
     </PageWithScrollViewInBottomTabView>
   );
