@@ -11,8 +11,8 @@ import { UncontrolledTooltip } from 'reactstrap';
 import { WrongViewingKeyError } from '@owallet-wallet/stores';
 import { useNotification } from '../../components/notification';
 import { useLoadingIndicator } from '../../components/loading-indicator';
-import { DenomHelper } from '@owallet-wallet/common';
-import { Dec } from '@owallet-wallet/unit';
+// import { DenomHelper } from '@owallet-wallet/common';
+// import { Dec } from '@owallet-wallet/unit';
 import { useLanguage } from '../../languages';
 
 const TokenView: FunctionComponent<{
@@ -215,15 +215,15 @@ export const TokensView: FunctionComponent = observer(() => {
   const tokens = queriesStore
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(accountInfo.bech32Address)
-    .unstakables.filter((bal) => {
-      const denomHelper = new DenomHelper(bal.currency.coinMinimalDenom);
-      // Temporary implementation for trimming the 0 balanced native tokens.
-      // TODO: Remove this part.
-      if (denomHelper.type === 'native') {
-        return bal.balance.toDec().gt(new Dec('0'));
-      }
-      return true;
-    })
+    .unstakables// .filter((bal) => {
+    //   const denomHelper = new DenomHelper(bal.currency.coinMinimalDenom);
+    //   // Temporary implementation for trimming the 0 balanced native tokens.
+    //   // TODO: Remove this part.
+    //   if (denomHelper.type === 'native') {
+    //     return bal.balance.toDec().gt(new Dec('0'));
+    //   }
+    //   return true;
+    // })
     .sort((a, b) => {
       const aDecIsZero = a.balance.toDec().isZero();
       const bDecIsZero = b.balance.toDec().isZero();
