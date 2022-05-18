@@ -1,5 +1,5 @@
-import { Guard } from "@keplr-wallet/router";
-import { ExtensionGuards } from "@keplr-wallet/router-extension";
+import { Guard } from '@owallet-wallet/router';
+import { ExtensionGuards } from '@owallet-wallet/router-extension';
 
 export class MockGuards {
   static readonly checkOriginIsValid: Guard =

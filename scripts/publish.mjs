@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies, @typescript-eslint/no-var-requires */
 
-import "zx/globals";
-import semver from "semver";
-import fs from "fs";
+import 'zx/globals';
+import semver from 'semver';
+import fs from 'fs';
 
-const lernaFile = fs.readFileSync("./lerna.json", "utf8");
+const lernaFile = fs.readFileSync('./lerna.json', 'utf8');
 const lerna = JSON.parse(lernaFile);
 
 (async () => {
@@ -14,7 +14,7 @@ const lerna = JSON.parse(lernaFile);
       .map((v) => v.trim())
       .filter((v) => !!v);
 
-    let foundedVersion = "";
+    let foundedVersion = '';
 
     for (const version of versions) {
       // semver.parse will check that the version has the major, minor, patch version (with optional prerelease version).
@@ -56,19 +56,19 @@ const lerna = JSON.parse(lernaFile);
       if (semantic) {
         const isPrelease = semantic.prerelease.length > 0;
 
-        await $`cd packages/extension/prod && zip -r keplr-extension-${foundedVersion}.zip .`;
+        await $`cd packages/extension/prod && zip -r owallet-extension-${foundedVersion}.zip .`;
         if (isPrelease) {
-          await $`gh release create ${foundedVersion} packages/extension/prod/keplr-extension-${foundedVersion}.zip -t ${foundedVersion} --prerelease`;
+          await $`gh release create ${foundedVersion} packages/extension/prod/owallet-extension-${foundedVersion}.zip -t ${foundedVersion} --prerelease`;
         } else {
-          await $`gh release create ${foundedVersion} packages/extension/prod/keplr-extension-${foundedVersion}.zip -t ${foundedVersion}`;
+          await $`gh release create ${foundedVersion} packages/extension/prod/owallet-extension-${foundedVersion}.zip -t ${foundedVersion}`;
         }
 
-        console.log("Release created");
+        console.log('Release created');
       } else {
-        throw new Error("Unexpected error");
+        throw new Error('Unexpected error');
       }
     } else {
-      throw new Error("No version tag found");
+      throw new Error('No version tag found');
     }
   } catch (e) {
     console.log(e);

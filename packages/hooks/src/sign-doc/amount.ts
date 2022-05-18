@@ -1,17 +1,17 @@
-import { IAmountConfig, TxChainSetter } from "../tx";
+import { IAmountConfig, TxChainSetter } from '../tx';
 import {
   ChainGetter,
   CoinPrimitive,
-  CosmosMsgOpts,
-} from "@keplr-wallet/stores";
-import { AppCurrency } from "@keplr-wallet/types";
-import { action, computed, makeObservable, observable } from "mobx";
-import { Coin, CoinPretty, Int } from "@keplr-wallet/unit";
-import { SignDocHelper } from "./index";
-import { useState } from "react";
-import { computedFn } from "mobx-utils";
-import { Msg } from "@cosmjs/launchpad";
-import { cosmos } from "@keplr-wallet/cosmos";
+  CosmosMsgOpts
+} from '@owallet-wallet/stores';
+import { AppCurrency } from '@owallet-wallet/types';
+import { action, computed, makeObservable, observable } from 'mobx';
+import { Coin, CoinPretty, Int } from '@owallet-wallet/unit';
+import { SignDocHelper } from './index';
+import { useState } from 'react';
+import { computedFn } from 'mobx-utils';
+import { Msg } from '@cosmjs/launchpad';
+import { cosmos } from '@owallet-wallet/cosmos';
 
 // This config helps the fee config to calculate that the fee is enough to send with considering
 // the amount in the sign doc.
@@ -95,12 +95,12 @@ export class SignDocAmountConfig
         this.chainInfo.feeCurrencies.length === 0
       ) {
         return {
-          amount: "0",
-          denom: this.sendCurrency.coinMinimalDenom,
+          amount: '0',
+          denom: this.sendCurrency.coinMinimalDenom
         };
       }
 
-      if (this.signDocHelper.signDocWrapper.mode === "amino") {
+      if (this.signDocHelper.signDocWrapper.mode === 'amino') {
         return this.computeAmountInAminoMsgs(
           this.signDocHelper.signDocWrapper.aminoSignDoc.msgs
         );
@@ -124,8 +124,8 @@ export class SignDocAmountConfig
               msg.value.from_address !== this.sender
             ) {
               return {
-                amount: "0",
-                denom: this.sendCurrency.coinMinimalDenom,
+                amount: '0',
+                denom: this.sendCurrency.coinMinimalDenom
               };
             }
             if (msg.value.amount && Array.isArray(msg.value.amount)) {
@@ -144,8 +144,8 @@ export class SignDocAmountConfig
               msg.value.delegator_address !== this.sender
             ) {
               return {
-                amount: "0",
-                denom: this.sendCurrency.coinMinimalDenom,
+                amount: '0',
+                denom: this.sendCurrency.coinMinimalDenom
               };
             }
             if (msg.value.amount && msg.value.amount.denom === amount.denom) {
@@ -164,7 +164,7 @@ export class SignDocAmountConfig
 
     return {
       amount: amount.amount.toString(),
-      denom: amount.denom,
+      denom: amount.denom
     };
   }
 
@@ -178,8 +178,8 @@ export class SignDocAmountConfig
             const sendMsg = msg as cosmos.bank.v1beta1.MsgSend;
             if (sendMsg.fromAddress && sendMsg.fromAddress !== this.sender) {
               return {
-                amount: "0",
-                denom: this.sendCurrency.coinMinimalDenom,
+                amount: '0',
+                denom: this.sendCurrency.coinMinimalDenom
               };
             }
             for (const amountInMsg of sendMsg.amount) {
@@ -195,8 +195,8 @@ export class SignDocAmountConfig
               delegateMsg.delegatorAddress !== this.sender
             ) {
               return {
-                amount: "0",
-                denom: this.sendCurrency.coinMinimalDenom,
+                amount: '0',
+                denom: this.sendCurrency.coinMinimalDenom
               };
             }
             if (
@@ -218,7 +218,7 @@ export class SignDocAmountConfig
 
     return {
       amount: amount.amount.toString(),
-      denom: amount.denom,
+      denom: amount.denom
     };
   }
 

@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import { ToolTip } from "../tooltip";
-import { Bech32Address } from "@keplr-wallet/cosmos";
+import { ToolTip } from '../tooltip';
+import { Bech32Address } from '@owallet-wallet/cosmos';
 
 export interface AddressProps {
   children: string;
@@ -26,13 +26,13 @@ export class Address extends React.Component<
 
   componentDidMount(): void {
     if (this.copyRef.current) {
-      this.copyRef.current.addEventListener("copy", this.onCopy);
+      this.copyRef.current.addEventListener('copy', this.onCopy);
     }
   }
 
   componentWillUnmount(): void {
     if (this.copyRef.current) {
-      this.copyRef.current.removeEventListener("copy", this.onCopy);
+      this.copyRef.current.removeEventListener('copy', this.onCopy);
     }
   }
 
@@ -42,13 +42,13 @@ export class Address extends React.Component<
       ? this.props.tooltipAddress
       : children;
 
-    if ("maxCharacters" in this.props) {
+    if ('maxCharacters' in this.props) {
       const { lineBreakBeforePrefix } = this.props;
 
       return (
         <ToolTip
           trigger="hover"
-          options={{ placement: "top" }}
+          options={{ placement: 'top' }}
           tooltip={
             <div
               ref={this.copyRef}
@@ -56,9 +56,9 @@ export class Address extends React.Component<
               style={{ fontSize: tooltipFontSize }}
             >
               {lineBreakBeforePrefix && tooltipAddress.length > 0
-                ? tooltipAddress.split("1").map((item, i) => {
+                ? tooltipAddress.split('1').map((item, i) => {
                     if (i === 0) {
-                      return <div key={i}>{item + "1"}</div>;
+                      return <div key={i}>{item + '1'}</div>;
                     }
                     return <div key={i}>{item}</div>;
                   })
@@ -73,7 +73,7 @@ export class Address extends React.Component<
       return (
         <ToolTip
           trigger="hover"
-          options={{ placement: "top" }}
+          options={{ placement: 'top' }}
           tooltip={
             <div
               ref={this.copyRef}
@@ -94,7 +94,7 @@ export class Address extends React.Component<
     if (e.clipboardData) {
       // Remove line breaks.
       const pre = await navigator.clipboard.readText();
-      await navigator.clipboard.writeText(pre.replace(/(\r\n|\n|\r)/gm, ""));
+      await navigator.clipboard.writeText(pre.replace(/(\r\n|\n|\r)/gm, ''));
     }
   };
 }
