@@ -57,6 +57,7 @@ import { OWallet } from '@owallet-wallet/provider';
 import { InExtensionMessageRequester } from '@owallet-wallet/router-extension';
 import { ExportToMobilePage } from './pages/setting/export-to-mobile';
 import { LogPageViewWrapper } from './components/analytics';
+import { ValidatorListPage } from './pages/stake/validator-list';
 
 window.owallet = new OWallet(
   manifest.version,
@@ -223,6 +224,11 @@ ReactDOM.render(
                     exact
                     path="/setting/token/manage"
                     component={ManageTokenPage}
+                  />
+                  <Route
+                    exact
+                    path="/stake/validator-list/:chainId"
+                    component={ValidatorListPage}
                   />
                   <Route path="/sign" component={SignPage} />
                   <Route path="/suggest-chain" component={ChainSuggestedPage} />
