@@ -1,10 +1,10 @@
-import { ObservableChainQuery } from "../chain-query";
-import { KVStore } from "@keplr-wallet/common";
-import { ChainGetter } from "../../common";
-import { CancelToken } from "axios";
-import { QueryResponse } from "../../common";
+import { ObservableChainQuery } from '../chain-query';
+import { KVStore } from '@owallet-wallet/common';
+import { ChainGetter } from '../../common';
+import { CancelToken } from 'axios';
+import { QueryResponse } from '../../common';
 
-import { Buffer } from "buffer/";
+import { Buffer } from 'buffer/';
 
 export class ObservableCosmwasmContractChainQuery<
   T
@@ -21,16 +21,26 @@ export class ObservableCosmwasmContractChainQuery<
       kvStore,
       chainId,
       chainGetter,
-      ObservableCosmwasmContractChainQuery.getUrlFromObj(contractAddress, obj)
+      ObservableCosmwasmContractChainQuery.getUrlFromObj(
+        contractAddress,
+        obj,
+        chainGetter.getChain(chainId).beta
+      )
     );
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  protected static getUrlFromObj(contractAddress: string, obj: object): string {
+  protected static getUrlFromObj(
+    contractAddress: string,
+    obj: object,
+    beta?: boolean
+  ): string {
     const msg = JSON.stringify(obj);
-    const query = Buffer.from(msg).toString("base64");
+    const query = Buffer.from(msg).toString('base64');
 
-    return `/wasm/v1/contract/${contractAddress}/smart/${query}`;
+    return `/wasm/${
+      beta ? 'v1beta1' : 'v1'
+    }/contract/${contractAddress}/smart/${query}`;
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -40,7 +50,8 @@ export class ObservableCosmwasmContractChainQuery<
     this.setUrl(
       ObservableCosmwasmContractChainQuery.getUrlFromObj(
         this.contractAddress,
-        this.obj
+        this.obj,
+        this.beta
       )
     );
   }
@@ -61,14 +72,14 @@ export class ObservableCosmwasmContractChainQuery<
       | undefined;
 
     if (!wasmResult) {
-      throw new Error("Failed to get the response from the contract");
+      throw new Error('Failed to get the response from the contract');
     }
 
     return {
       data: wasmResult.data as T,
       status: response.status,
       staled: false,
-      timestamp: Date.now(),
+      timestamp: Date.now()
     };
   }
 }

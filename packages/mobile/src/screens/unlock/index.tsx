@@ -16,9 +16,9 @@ import delay from 'delay';
 import { useStore } from '../../stores';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StackActions, useNavigation } from '@react-navigation/native';
-import { KeyRingStatus } from '@keplr-wallet/background';
+import { KeyRingStatus } from '@owallet-wallet/background';
 import { KeychainStore } from '../../stores/keychain';
-import { AccountStore } from '@keplr-wallet/stores';
+import { AccountStore } from '@owallet-wallet/stores';
 import { autorun } from 'mobx';
 
 let splashScreenHided = false;
@@ -283,7 +283,7 @@ export const UnlockScreen: FunctionComponent = observer(() => {
           <View style={style.get('flex-7')} />
         </KeyboardAwareScrollView>
       </View>
-      {/* <Animated.View
+      <Animated.View
         style={StyleSheet.flatten([
           style.flatten(['absolute-fill']),
           {
@@ -297,7 +297,7 @@ export const UnlockScreen: FunctionComponent = observer(() => {
             setIsSplashEnd(true);
           }}
         />
-      </Animated.View> */}
+      </Animated.View>
     </React.Fragment>
   );
 });

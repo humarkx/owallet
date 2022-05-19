@@ -1,6 +1,6 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from "react";
-import { registerModal } from "../base";
-import { CardModal } from "../card";
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { registerModal } from '../base';
+import { CardModal } from '../card';
 import {
   AppState,
   AppStateStatus,
@@ -8,22 +8,22 @@ import {
   PermissionsAndroid,
   Platform,
   Text,
-  View,
-} from "react-native";
-import { useStyle } from "../../styles";
-import { useStore } from "../../stores";
-import { observer } from "mobx-react-lite";
-import { State } from "react-native-ble-plx";
+  View
+} from 'react-native';
+import { useStyle } from '../../styles';
+import { useStore } from '../../stores';
+import { observer } from 'mobx-react-lite';
+import { State } from 'react-native-ble-plx';
 import TransportBLE, {
-  bleManager,
-} from "@ledgerhq/react-native-hw-transport-ble";
-import { LoadingSpinner } from "../../components/spinner";
-import { Ledger, LedgerInitErrorOn } from "@keplr-wallet/background";
-import { getLastUsedLedgerDeviceId } from "../../utils/ledger";
-import { RectButton } from "../../components/rect-button";
-import { useUnmount } from "../../hooks";
-import Svg, { Path } from "react-native-svg";
-import { Button } from "../../components/button";
+  bleManager
+} from '@ledgerhq/react-native-hw-transport-ble';
+import { LoadingSpinner } from '../../components/spinner';
+import { Ledger, LedgerInitErrorOn } from '@owallet-wallet/background';
+import { getLastUsedLedgerDeviceId } from '../../utils/ledger';
+import { RectButton } from '../../components/rect-button';
+import { useUnmount } from '../../hooks';
+import Svg, { Path } from 'react-native-svg';
+import { Button } from '../../components/button';
 
 const AlertIcon: FunctionComponent<{
   size: number;
@@ -53,12 +53,12 @@ const AlertIcon: FunctionComponent<{
 };
 
 enum BLEPermissionGrantStatus {
-  NotInit = "notInit",
-  Failed = "failed",
+  NotInit = 'notInit',
+  Failed = 'failed',
   // When it failed but need to try again.
   // For example, when the bluetooth permission is turned off, but user allows the permission in the app setting page and return to the app.
-  FailedAndRetry = "failed-and-retry",
-  Granted = "granted",
+  FailedAndRetry = 'failed-and-retry',
+  Granted = 'granted'
 }
 
 export const LedgerGranterModal: FunctionComponent<{
@@ -107,7 +107,7 @@ export const LedgerGranterModal: FunctionComponent<{
     }, []);
 
     useEffect(() => {
-      if (Platform.OS === "android" && !isBLEAvailable) {
+      if (Platform.OS === 'android' && !isBLEAvailable) {
         // If the platform is android and can't use the bluetooth,
         // try to turn on the bluetooth.
         // Below API can be called only in android.
@@ -127,9 +127,9 @@ export const LedgerGranterModal: FunctionComponent<{
 
     const [
       permissionStatus,
-      setPermissionStatus,
+      setPermissionStatus
     ] = useState<BLEPermissionGrantStatus>(() => {
-      if (Platform.OS === "android") {
+      if (Platform.OS === 'android') {
         // If android, there is need to request the permission.
         // You should ask for the permission on next effect.
         return BLEPermissionGrantStatus.NotInit;
@@ -142,7 +142,7 @@ export const LedgerGranterModal: FunctionComponent<{
     useEffect(() => {
       const listener = (state: AppStateStatus) => {
         if (
-          state === "active" &&
+          state === 'active' &&
           permissionStatus === BLEPermissionGrantStatus.Failed
         ) {
           // When the app becomes active, the user may have granted permission on the setting page, so request the grant again.
@@ -150,10 +150,10 @@ export const LedgerGranterModal: FunctionComponent<{
         }
       };
 
-      AppState.addEventListener("change", listener);
+      AppState.addEventListener('change', listener);
 
       return () => {
-        AppState.removeEventListener("change", listener);
+        AppState.removeEventListener('change', listener);
       };
     }, [permissionStatus]);
 
@@ -163,7 +163,7 @@ export const LedgerGranterModal: FunctionComponent<{
         permissionStatus === BLEPermissionGrantStatus.NotInit ||
         permissionStatus === BLEPermissionGrantStatus.FailedAndRetry
       ) {
-        if (Platform.OS === "android") {
+        if (Platform.OS === 'android') {
           PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
           ).then((granted) => {
@@ -197,7 +197,7 @@ export const LedgerGranterModal: FunctionComponent<{
               setIsFinding(false);
             },
             next: (e: { type: string; descriptor: any }) => {
-              if (e.type === "add") {
+              if (e.type === 'add') {
                 const device = e.descriptor;
 
                 if (!_devices.find((d) => d.id === device.id)) {
@@ -208,8 +208,8 @@ export const LedgerGranterModal: FunctionComponent<{
                     ..._devices,
                     {
                       id: device.id,
-                      name: device.name,
-                    },
+                      name: device.name
+                    }
                   ];
                   setDevices(_devices);
                 }
@@ -217,18 +217,18 @@ export const LedgerGranterModal: FunctionComponent<{
             },
             error: (e?: Error | any) => {
               if (!e) {
-                setErrorOnListen("Unknown error");
+                setErrorOnListen('Unknown error');
               } else {
-                if ("message" in e && typeof e.message === "string") {
+                if ('message' in e && typeof e.message === 'string') {
                   setErrorOnListen(e.message);
-                } else if ("toString" in e) {
+                } else if ('toString' in e) {
                   setErrorOnListen(e.toString());
                 } else {
-                  setErrorOnListen("Unknown error");
+                  setErrorOnListen('Unknown error');
                 }
               }
               setIsFinding(false);
-            },
+            }
           }).unsubscribe;
         })();
       } else {
@@ -249,19 +249,19 @@ export const LedgerGranterModal: FunctionComponent<{
         title="Pair Hardware Wallet"
         right={
           isFinding ? (
-            <View style={style.flatten(["margin-left-8"])}>
+            <View style={style.flatten(['margin-left-8'])}>
               {/* Styling trick for positioning in the middle without occupying space */}
               <View
                 style={style.flatten([
-                  "absolute",
-                  "height-1",
-                  "flex-row",
-                  "items-center",
+                  'absolute',
+                  'height-1',
+                  'flex-row',
+                  'items-center'
                 ])}
               >
                 <LoadingSpinner
                   size={20}
-                  color={style.get("color-primary").color}
+                  color={style.get('color-primary').color}
                 />
               </View>
             </View>
@@ -276,12 +276,12 @@ export const LedgerGranterModal: FunctionComponent<{
             ) : (
               <React.Fragment>
                 <Text
-                  style={style.flatten(["subtitle3", "color-text-black-high"])}
+                  style={style.flatten(['subtitle3', 'color-text-black-high'])}
                 >
                   1. Open the Cosmos app on your Ledger device
                 </Text>
                 <Text
-                  style={style.flatten(["subtitle3", "color-text-black-high"])}
+                  style={style.flatten(['subtitle3', 'color-text-black-high'])}
                 >
                   2. Select the hardware wallet you’d like to pair
                 </Text>
@@ -304,10 +304,10 @@ export const LedgerGranterModal: FunctionComponent<{
           </React.Fragment>
         ) : permissionStatus === BLEPermissionGrantStatus.Failed ||
           BLEPermissionGrantStatus.FailedAndRetry ? (
-          <LedgerErrorView text="Keplr doesn't have permission to use bluetooth">
+          <LedgerErrorView text="OWallet doesn't have permission to use bluetooth">
             <Button
-              containerStyle={style.flatten(["margin-top-16"])}
-              textStyle={style.flatten(["margin-x-8", "normal-case"])}
+              containerStyle={style.flatten(['margin-top-16'])}
+              textStyle={style.flatten(['margin-x-8', 'normal-case'])}
               text="Open app setting"
               size="small"
               onPress={() => {
@@ -316,7 +316,7 @@ export const LedgerGranterModal: FunctionComponent<{
             />
           </LedgerErrorView>
         ) : (
-          <Text style={style.flatten(["subtitle3", "color-text-black-high"])}>
+          <Text style={style.flatten(['subtitle3', 'color-text-black-high'])}>
             Please turn on Bluetooth
           </Text>
         )}
@@ -324,7 +324,7 @@ export const LedgerGranterModal: FunctionComponent<{
     );
   }),
   {
-    disableSafeArea: true,
+    disableSafeArea: true
   }
 );
 
@@ -334,14 +334,14 @@ const LedgerErrorView: FunctionComponent<{
   const style = useStyle();
 
   return (
-    <View style={style.flatten(["items-center"])}>
-      <AlertIcon size={100} color={style.get("color-danger").color} />
-      <Text style={style.flatten(["h4", "color-danger"])}>Error</Text>
+    <View style={style.flatten(['items-center'])}>
+      <AlertIcon size={100} color={style.get('color-danger').color} />
+      <Text style={style.flatten(['h4', 'color-danger'])}>Error</Text>
       <Text
         style={style.flatten([
-          "subtitle3",
-          "color-text-black-medium",
-          "margin-top-16",
+          'subtitle3',
+          'color-text-black-medium',
+          'margin-top-16'
         ])}
       >
         {text}
@@ -392,34 +392,34 @@ const LedgerNanoBLESelector: FunctionComponent<{
 
   return (
     <RectButton
-      style={style.flatten(["padding-y-12"])}
+      style={style.flatten(['padding-y-12'])}
       onPress={async () => {
         if (await testLedgerConnection()) {
           onCanResume();
         }
       }}
     >
-      <View style={style.flatten(["min-height-44"])}>
-        <Text style={style.flatten(["h5", "color-text-black-medium"])}>
+      <View style={style.flatten(['min-height-44'])}>
+        <Text style={style.flatten(['h5', 'color-text-black-medium'])}>
           {name}
         </Text>
         {isConnecting ? (
-          <Text style={style.flatten(["subtitle3", "color-text-black-low"])}>
+          <Text style={style.flatten(['subtitle3', 'color-text-black-low'])}>
             Connecting...
           </Text>
         ) : null}
         {!isConnecting && initErrorOn === LedgerInitErrorOn.Transport ? (
-          <Text style={style.flatten(["subtitle3", "color-text-black-low"])}>
+          <Text style={style.flatten(['subtitle3', 'color-text-black-low'])}>
             Please unlock ledger nano X
           </Text>
         ) : null}
         {!isConnecting && initErrorOn === LedgerInitErrorOn.App ? (
-          <Text style={style.flatten(["subtitle3", "color-text-black-low"])}>
+          <Text style={style.flatten(['subtitle3', 'color-text-black-low'])}>
             Please open Cosmos App
           </Text>
         ) : null}
         {!isConnecting && initErrorOn === LedgerInitErrorOn.Unknown ? (
-          <Text style={style.flatten(["subtitle3", "color-text-black-low"])}>
+          <Text style={style.flatten(['subtitle3', 'color-text-black-low'])}>
             Unknown error
           </Text>
         ) : null}

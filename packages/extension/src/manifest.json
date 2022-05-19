@@ -1,12 +1,11 @@
 {
   "manifest_version": 2,
-
-  "name": "Keplr",
-  "description": "Keplr is a browser extension wallet for the Inter blockchain ecosystem.",
+  "name": "OWallet",
+  "description": "OWallet is a browser extension wallet for the Inter blockchain ecosystem.",
   "version": "0.9.16",
   "applications": {
     "gecko": {
-      "id": "keplr-extension@keplr.app",
+      "id": "owallet-extension@owallet.app",
       "strict_min_version": "56.0"
     }
   },
@@ -18,7 +17,7 @@
 
   "browser_action": {
     "default_popup": "popup.html",
-    "default_title": "Keplr"
+    "default_title": "OWallet"
   },
   "background": {
     "scripts": ["browser-polyfill.js", "background.bundle.js"],
@@ -35,6 +34,6 @@
   ],
   "web_accessible_resources": [
     "injectedScript.bundle.js",
-    "assets/temp-icon.svg"
+    "assets/orai_wallet_logo.png"
   ]
 }

@@ -1,8 +1,8 @@
-import { Message, Router } from "@keplr-wallet/router";
+import { Message, Router } from '@owallet-wallet/router';
 
 class PushEventDataMsg extends Message<void> {
   public static type() {
-    return "push-event-data";
+    return 'push-event-data';
   }
 
   constructor(
@@ -16,12 +16,12 @@ class PushEventDataMsg extends Message<void> {
 
   validateBasic(): void {
     if (!this.data.type) {
-      throw new Error("Type should not be empty");
+      throw new Error('Type should not be empty');
     }
   }
 
   route(): string {
-    return "interaction-foreground";
+    return 'interaction-foreground';
   }
 
   type(): string {
@@ -32,15 +32,15 @@ class PushEventDataMsg extends Message<void> {
 export function initEvents(router: Router) {
   router.registerMessage(PushEventDataMsg);
 
-  router.addHandler("interaction-foreground", (_, msg) => {
+  router.addHandler('interaction-foreground', (_, msg) => {
     switch (msg.constructor) {
       case PushEventDataMsg:
-        if ((msg as PushEventDataMsg).data.type === "keystore-changed") {
-          window.dispatchEvent(new Event("keplr_keystorechange"));
+        if ((msg as PushEventDataMsg).data.type === 'keystore-changed') {
+          window.dispatchEvent(new Event('owallet_keystorechange'));
         }
         return;
       default:
-        throw new Error("Unknown msg type");
+        throw new Error('Unknown msg type');
     }
   });
 }

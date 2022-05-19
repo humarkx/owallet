@@ -3,9 +3,9 @@
 $container-width: 420px;
 
 :global(body)[data-centered="true"] {
-  height: 85vh;
-  background-color: white;
-
+  margin: auto;    
+  background-color: $background-color;
+  height: 100%;
   overflow: visible !important;
 
   :global(#app) {
@@ -15,6 +15,7 @@ $container-width: 420px;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      background-color: transparent!important;
     }
   }
 }
@@ -25,7 +26,7 @@ $container-width: 420px;
 
   display: flex;
   flex-direction: column;
-  background-color: white;
+  
 
   :global(.btn) {
     margin-left: 0;
@@ -54,6 +55,8 @@ $container-width: 420px;
 
       .logo {
         height: 50px;
+        max-width: 100%;
+        margin-bottom: 5px;
       }
 
       .paragraph {
@@ -68,7 +71,7 @@ $container-width: 420px;
     letter-spacing: -1.07px;
     margin-bottom: 24px;
 
-    color: #525f7f;
+    color: #F6F7FB;
   }
 
   .mnemonic {
@@ -80,11 +83,11 @@ $container-width: 420px;
     text-align: center;
 
     &:read-only {
-      background-color: white;
+      background-color: $background-color-lighter;
     }
 
     &[readonly] {
-      background-color: white;
+      color: $color-lighter;
     }
   }
 

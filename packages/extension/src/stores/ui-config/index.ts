@@ -1,8 +1,8 @@
 /**
  * Store the config related to UI.
  */
-import { action, makeObservable, observable, runInAction, toJS } from "mobx";
-import { KVStore } from "@keplr-wallet/common";
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { KVStore } from '@owallet-wallet/common';
 
 export interface UIConfigOptions {
   showAdvancedIBCTransfer: boolean;
@@ -11,7 +11,7 @@ export interface UIConfigOptions {
 export class UIConfigStore {
   @observable.deep
   protected options: UIConfigOptions = {
-    showAdvancedIBCTransfer: false,
+    showAdvancedIBCTransfer: true
   };
 
   constructor(protected readonly kvStore: KVStore) {
@@ -22,18 +22,18 @@ export class UIConfigStore {
 
   protected async init() {
     // There is no guarantee that this value will contain all options fields, as the options field may be added later.
-    const data = await this.kvStore.get<Partial<UIConfigOptions>>("options");
+    const data = await this.kvStore.get<Partial<UIConfigOptions>>('options');
 
     runInAction(() => {
       this.options = {
         ...this.options,
-        ...data,
+        ...data
       };
     });
   }
 
   /**
-   * Currently, keplr only supports the IBC UI which the users should set the counterparty channel manually.
+   * Currently, owallet only supports the IBC UI which the users should set the counterparty channel manually.
    * However, it makes the normal users take a mistake.
    * So, to reduce this problem, show the IBC UI to users who only turns on the `showAdvancedIBCTransfer` explicitly.
    */
@@ -51,6 +51,6 @@ export class UIConfigStore {
 
   async save() {
     const data = toJS(this.options);
-    await this.kvStore.set("options", data);
+    await this.kvStore.set('options', data);
   }
 }

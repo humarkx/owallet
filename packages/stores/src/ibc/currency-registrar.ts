@@ -1,8 +1,8 @@
-import { flow, makeObservable, observable, runInAction } from "mobx";
-import { AppCurrency, ChainInfo } from "@keplr-wallet/types";
-import { ChainInfoInner, ChainStore } from "../chain";
-import { HasCosmosQueries, HasCosmwasmQueries, QueriesSetBase } from "../query";
-import { DenomHelper, KVStore, toGenerator } from "@keplr-wallet/common";
+import { flow, makeObservable, observable, runInAction } from 'mobx';
+import { AppCurrency, ChainInfo } from '@owallet-wallet/types';
+import { ChainInfoInner, ChainStore } from '../chain';
+import { HasCosmosQueries, HasCosmwasmQueries, QueriesSetBase } from '../query';
+import { DenomHelper, KVStore, toGenerator } from '@owallet-wallet/common';
 
 type CacheIBCDenomData = {
   denomTrace: {
@@ -111,7 +111,7 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
   ) {
     this.cacheDenomTracePaths.set(denomTraceHash, {
       ...data,
-      timestamp: Date.now(),
+      timestamp: Date.now()
     });
 
     const obj: Record<string, CacheIBCDenomData> = {};
@@ -129,8 +129,8 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
   ): [AppCurrency | undefined, boolean] | undefined {
     const denomHelper = new DenomHelper(coinMinimalDenom);
     if (
-      denomHelper.type !== "native" ||
-      !denomHelper.denom.startsWith("ibc/")
+      denomHelper.type !== 'native' ||
+      !denomHelper.denom.startsWith('ibc/')
     ) {
       // IBC Currency's denom should start with "ibc/"
       return;
@@ -147,7 +147,7 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
 
     const queries = this.queriesStore.get(this.chainInfoInner.chainId);
 
-    const hash = denomHelper.denom.replace("ibc/", "");
+    const hash = denomHelper.denom.replace('ibc/', '');
 
     const cached = this.getCacheIBCDenomData(hash);
 
@@ -220,7 +220,7 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
           this.setCacheIBCDenomData(hash, {
             counterpartyChainId: counterpartyChainInfo?.chainId,
             denomTrace,
-            originChainId: originChainInfo.chainId,
+            originChainId: originChainInfo.chainId
           });
         }
       }
@@ -237,7 +237,7 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
           const cosmwasmQuries = this.cosmwasmQueriesStore.get(
             originChainInfo.chainId
           );
-          const contractAddress = denomTrace.denom.replace("cw20:", "");
+          const contractAddress = denomTrace.denom.replace('cw20:', '');
           const contractInfo = cosmwasmQuries.cosmwasm.querycw20ContractInfo.getQueryContract(
             contractAddress
           );
@@ -245,7 +245,7 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
             cw20Currency = {
               coinDecimals: contractInfo.response.data.decimals,
               coinDenom: contractInfo.response.data.symbol,
-              coinMinimalDenom: `cw20:${contractAddress}:${contractInfo.response.data.name}`,
+              coinMinimalDenom: `cw20:${contractAddress}:${contractInfo.response.data.name}`
             };
             originChainInfo.addCurrencies(cw20Currency);
           }
@@ -266,15 +266,15 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
               ),
               paths: denomTrace.paths,
               originChainId: originChainInfo.chainId,
-              originCurrency: cw20Currency,
+              originCurrency: cw20Currency
             },
-            true,
+            true
           ];
         }
       } else {
         const currency = originChainInfo.forceFindCurrency(denomTrace.denom);
 
-        if (!("paths" in currency)) {
+        if (!('paths' in currency)) {
           return [
             {
               coinDecimals: currency.coinDecimals,
@@ -289,9 +289,9 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
               ),
               paths: denomTrace.paths,
               originChainId: originChainInfo.chainId,
-              originCurrency: currency,
+              originCurrency: currency
             },
-            true,
+            true
           ];
         }
       }
@@ -311,9 +311,9 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
           ),
           paths: denomTrace.paths,
           originChainId: undefined,
-          originCurrency: undefined,
+          originCurrency: undefined
         },
-        false,
+        false
       ];
     }
 
@@ -348,11 +348,11 @@ export class IBCCurrencyRegsitrar<C extends ChainInfo = ChainInfo> {
   ): string {
     if (originCurrency) {
       return `${originCurrency.coinDenom} (${
-        counterpartyChainInfo ? counterpartyChainInfo.chainName : "Unknown"
+        counterpartyChainInfo ? counterpartyChainInfo.chainName : 'Unknown'
       }/${denomTrace.paths[0].channelId})`;
     } else {
       return `${denomTrace.denom} (${
-        counterpartyChainInfo ? counterpartyChainInfo.chainName : "Unknown"
+        counterpartyChainInfo ? counterpartyChainInfo.chainName : 'Unknown'
       }/${denomTrace.paths[0].channelId})`;
     }
   }

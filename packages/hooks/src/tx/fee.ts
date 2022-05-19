@@ -3,18 +3,18 @@ import {
   FeeType,
   IAmountConfig,
   IFeeConfig,
-  IGasConfig,
-} from "./types";
-import { TxChainSetter } from "./chain";
-import { ChainGetter, CoinPrimitive } from "@keplr-wallet/stores";
-import { action, computed, makeObservable, observable } from "mobx";
-import { Coin, CoinPretty, Dec, DecUtils, Int } from "@keplr-wallet/unit";
-import { Currency } from "@keplr-wallet/types";
-import { computedFn } from "mobx-utils";
-import { StdFee } from "@cosmjs/launchpad";
-import { useState } from "react";
-import { ObservableQueryBalances } from "@keplr-wallet/stores/build/query/balances";
-import { InsufficientFeeError, NotLoadedFeeError } from "./errors";
+  IGasConfig
+} from './types';
+import { TxChainSetter } from './chain';
+import { ChainGetter, CoinPrimitive } from '@owallet-wallet/stores';
+import { action, computed, makeObservable, observable } from 'mobx';
+import { Coin, CoinPretty, Dec, DecUtils, Int } from '@owallet-wallet/unit';
+import { Currency } from '@owallet-wallet/types';
+import { computedFn } from 'mobx-utils';
+import { StdFee } from '@cosmjs/launchpad';
+import { useState } from 'react';
+import { ObservableQueryBalances } from '@owallet-wallet/stores/build/query/balances';
+import { InsufficientFeeError, NotLoadedFeeError } from './errors';
 
 export class FeeConfig extends TxChainSetter implements IFeeConfig {
   @observable.ref
@@ -108,13 +108,13 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
     if (!amount) {
       return {
         gas: this.gasConfig.gas.toString(),
-        amount: [],
+        amount: []
       };
     }
 
     return {
       gas: this.gasConfig.gas.toString(),
-      amount: [amount],
+      amount: [amount]
     };
   }
 
@@ -152,7 +152,7 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
 
   protected getFeeTypePrimitive(feeType: FeeType): CoinPrimitive {
     if (!this.feeCurrency) {
-      throw new Error("Fee currency not set");
+      throw new Error('Fee currency not set');
     }
 
     const gasPriceStep = this.chainInfo.gasPriceStep
@@ -164,13 +164,13 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
 
     return {
       denom: this.feeCurrency.coinMinimalDenom,
-      amount: feeAmount.roundUp().toString(),
+      amount: feeAmount.roundUp().toString()
     };
   }
 
   readonly getFeeTypePretty = computedFn((feeType: FeeType) => {
     if (!this.feeCurrency) {
-      throw new Error("Fee currency not set");
+      throw new Error('Fee currency not set');
     }
 
     const feeTypePrimitive = this.getFeeTypePrimitive(feeType);
@@ -216,7 +216,7 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
         });
 
       if (!bal) {
-        return new InsufficientFeeError("insufficient fee");
+        return new InsufficientFeeError('insufficient fee');
       } else if (!bal.response && !bal.error) {
         // If fetching balance doesn't have the response nor error,
         // assume it is not loaded from KVStore(cache).
@@ -230,7 +230,7 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
           .truncate()
           .lt(need.amount)
       ) {
-        return new InsufficientFeeError("insufficient fee");
+        return new InsufficientFeeError('insufficient fee');
       }
     }
   }
