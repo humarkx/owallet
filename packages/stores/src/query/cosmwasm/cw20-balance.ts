@@ -1,10 +1,10 @@
-import { computed, makeObservable, override } from "mobx";
-import { DenomHelper, KVStore } from "@keplr-wallet/common";
-import { ChainGetter } from "../../common";
-import { CoinPretty, Int } from "@keplr-wallet/unit";
-import { BalanceRegistry, ObservableQueryBalanceInner } from "../balances";
-import { Cw20ContractBalance } from "./types";
-import { ObservableCosmwasmContractChainQuery } from "./contract-query";
+import { computed, makeObservable, override } from 'mobx';
+import { DenomHelper, KVStore } from '@owallet-wallet/common';
+import { ChainGetter } from '../../common';
+import { CoinPretty, Int } from '@owallet-wallet/unit';
+import { BalanceRegistry, ObservableQueryBalanceInner } from '../balances';
+import { Cw20ContractBalance } from './types';
+import { ObservableCosmwasmContractChainQuery } from './contract-query';
 
 export class ObservableQueryCw20Balance extends ObservableCosmwasmContractChainQuery<Cw20ContractBalance> {
   constructor(
@@ -15,12 +15,12 @@ export class ObservableQueryCw20Balance extends ObservableCosmwasmContractChainQ
     protected readonly bech32Address: string
   ) {
     super(kvStore, chainId, chainGetter, contractAddress, {
-      balance: { address: bech32Address },
+      balance: { address: bech32Address }
     });
   }
 
   protected canFetch(): boolean {
-    return super.canFetch() && this.bech32Address !== "";
+    return super.canFetch() && this.bech32Address !== '';
   }
 }
 
@@ -39,7 +39,7 @@ export class ObservableQueryCw20BalanceInner extends ObservableQueryBalanceInner
       chainId,
       chainGetter,
       // No need to set the url at initial.
-      "",
+      '',
       denomHelper
     );
 
@@ -102,7 +102,7 @@ export class ObservableQueryCw20BalanceRegistry implements BalanceRegistry {
     minimalDenom: string
   ): ObservableQueryBalanceInner | undefined {
     const denomHelper = new DenomHelper(minimalDenom);
-    if (denomHelper.type === "cw20") {
+    if (denomHelper.type === 'cw20') {
       return new ObservableQueryCw20BalanceInner(
         this.kvStore,
         chainId,

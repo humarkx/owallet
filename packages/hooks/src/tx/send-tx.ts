@@ -2,19 +2,19 @@ import {
   ChainGetter,
   CosmosMsgOpts,
   CosmwasmMsgOpts,
-  SecretMsgOpts,
-} from "@keplr-wallet/stores";
-import { ObservableQueryBalances } from "@keplr-wallet/stores/build/query/balances";
-import { useFeeConfig, useMemoConfig, useRecipientConfig } from "./index";
-import { useSendGasConfig } from "./send-gas";
-import { useAmountConfig } from "./amount";
+  SecretMsgOpts
+} from '@owallet-wallet/stores';
+import { ObservableQueryBalances } from '@owallet-wallet/stores/build/query/balances';
+import { useFeeConfig, useMemoConfig, useRecipientConfig } from './index';
+import { useSendGasConfig } from './send-gas';
+import { useAmountConfig } from './amount';
 
 type MsgOpts = CosmosMsgOpts & SecretMsgOpts & CosmwasmMsgOpts;
 
 export const useSendTxConfig = (
   chainGetter: ChainGetter,
   chainId: string,
-  sendMsgOpts: MsgOpts["send"],
+  sendMsgOpts: MsgOpts['send'],
   sender: string,
   queryBalances: ObservableQueryBalances,
   ensEndpoint?: string
@@ -52,6 +52,6 @@ export const useSendTxConfig = (
     memoConfig,
     gasConfig,
     feeConfig,
-    recipientConfig,
+    recipientConfig
   };
 };
