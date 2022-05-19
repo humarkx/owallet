@@ -283,7 +283,7 @@ export const UnlockScreen: FunctionComponent = observer(() => {
           <View style={style.get('flex-7')} />
         </KeyboardAwareScrollView>
       </View>
-      {/* <Animated.View
+      <Animated.View
         style={StyleSheet.flatten([
           style.flatten(['absolute-fill']),
           {
@@ -297,7 +297,7 @@ export const UnlockScreen: FunctionComponent = observer(() => {
             setIsSplashEnd(true);
           }}
         />
-      </Animated.View> */}
+      </Animated.View>
     </React.Fragment>
   );
 });
