@@ -28,7 +28,7 @@ import { configure } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { StoreProvider, useStore } from './stores';
-import { KeyRingStatus } from '@owallet-wallet/background';
+import { KeyRingStatus } from '@owallet/background';
 import { SignPage } from './pages/sign';
 import { ChainSuggestedPage } from './pages/chain/suggest';
 import Modal from 'react-modal';
@@ -53,10 +53,11 @@ import { ManageTokenPage } from './pages/setting/token/manage';
 import { AdditonalIntlMessages, LanguageToFiatCurrency } from './config.ui';
 
 import manifest from './manifest.json';
-import { OWallet } from '@owallet-wallet/provider';
-import { InExtensionMessageRequester } from '@owallet-wallet/router-extension';
+import { OWallet } from '@owallet/provider';
+import { InExtensionMessageRequester } from '@owallet/router-extension';
 import { ExportToMobilePage } from './pages/setting/export-to-mobile';
 import { LogPageViewWrapper } from './components/analytics';
+import { ValidatorListPage } from './pages/stake/validator-list';
 
 window.owallet = new OWallet(
   manifest.version,
@@ -223,6 +224,11 @@ ReactDOM.render(
                     exact
                     path="/setting/token/manage"
                     component={ManageTokenPage}
+                  />
+                  <Route
+                    exact
+                    path="/stake/validator-list"
+                    component={ValidatorListPage}
                   />
                   <Route path="/sign" component={SignPage} />
                   <Route path="/suggest-chain" component={ChainSuggestedPage} />

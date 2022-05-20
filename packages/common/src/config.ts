@@ -1,20 +1,15 @@
-import { Bech32Address } from '@owallet-wallet/cosmos';
-import { ChainInfo } from '@owallet-wallet/types';
+import { Bech32Address } from '@owallet/cosmos';
+import { AppChainInfo } from '@owallet/types';
 
+// coingecko api for both evm and cosmos based networks
 export const CoinGeckoAPIEndPoint = 'https://api.coingecko.com/api/v3';
 
 export const EthereumEndpoint =
   'https://mainnet.infura.io/v3/eeb00e81cdb2410098d5a270eff9b341';
 
-export interface AppChainInfo extends ChainInfo {
-  readonly chainSymbolImageUrl?: string;
-  readonly hideInUI?: boolean;
-  readonly txExplorer?: {
-    readonly name: string;
-    readonly txUrl: string;
-  };
-}
+export const CoinGeckoGetPrice = '/simple/price';
 
+// default networks
 export const EmbedChainInfos: AppChainInfo[] = [
   {
     rpc: 'https://rpc.orai.io',
@@ -29,7 +24,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
       coinImageUrl:
         'https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png'
     },
-    walletUrl: 'https://api.wallet.orai.io',
+
     bip44: {
       coinType: 118
     },
@@ -57,7 +52,12 @@ export const EmbedChainInfos: AppChainInfo[] = [
       high: 0.00004
     },
     features: ['stargate', 'no-legacy-stdTx', 'ibc-transfer', 'cosmwasm'],
-    chainSymbolImageUrl: 'https://orai.io/images/logos/logomark-dark.png'
+    chainSymbolImageUrl: 'https://orai.io/images/logos/logomark-dark.png',
+    txExplorer: {
+      name: 'Oraiscan',
+      txUrl: 'https://scan.orai.io/txs/{txHash}',
+      accountUrl: 'https://scan.orai.io/account/{address}'
+    }
   },
   {
     rpc: 'https://rpc-cosmoshub.owallet.app',
@@ -1038,14 +1038,6 @@ export const EmbedChainInfos: AppChainInfo[] = [
       coinGeckoId: 'sentinel',
       coinImageUrl: 'https://dhj8dql1kzq2v.cloudfront.net/white/sentinel.png'
     },
-    walletUrl:
-      process.env.NODE_ENV === 'production'
-        ? 'https://wallet.owallet.app/#/sentinel/stake'
-        : 'http://localhost:8081/#/sentinel/stake',
-    walletUrlForStaking:
-      process.env.NODE_ENV === 'production'
-        ? 'https://wallet.owallet.app/#/sentinel/stake'
-        : 'http://localhost:8081/#/sentinel/stake',
     bip44: {
       coinType: 118
     },
@@ -1089,14 +1081,6 @@ export const EmbedChainInfos: AppChainInfo[] = [
       coinDecimals: 6,
       coinImageUrl: 'https://dhj8dql1kzq2v.cloudfront.net/white/ixo.png'
     },
-    walletUrl:
-      process.env.NODE_ENV === 'production'
-        ? 'https://wallet.owallet.app/#/ixo/stake'
-        : 'http://localhost:8081/#/ixo/stake',
-    walletUrlForStaking:
-      process.env.NODE_ENV === 'production'
-        ? 'https://wallet.owallet.app/#/ixo/stake'
-        : 'http://localhost:8081/#/ixo/stake',
     bip44: {
       coinType: 118
     },
@@ -1133,14 +1117,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
       coinGeckoId: 'e-money',
       coinImageUrl: 'https://dhj8dql1kzq2v.cloudfront.net/white/ngm.png'
     },
-    walletUrl:
-      process.env.NODE_ENV === 'production'
-        ? 'https://wallet.owallet.app/#/emoney/stake'
-        : 'http://localhost:8080/#/emoney/stake',
-    walletUrlForStaking:
-      process.env.NODE_ENV === 'production'
-        ? 'https://wallet.owallet.app/#/emoney/stake'
-        : 'http://localhost:8080/#/emoney/stake',
+
     bip44: {
       coinType: 118
     },
@@ -1295,37 +1272,6 @@ export const EmbedChainInfos: AppChainInfo[] = [
         coinMinimalDenom: 'nanolike',
         coinDecimals: 9,
         coinGeckoId: 'likecoin'
-      }
-    ],
-    features: ['stargate', 'ibc-transfer'],
-    hideInUI: true
-  },
-  {
-    rpc: 'https://rpc-impacthub.owallet.app',
-    rest: 'https://lcd-impacthub.owallet.app',
-    chainId: 'impacthub-3',
-    chainName: 'IXO',
-    stakeCurrency: {
-      coinDenom: 'IXO',
-      coinMinimalDenom: 'uixo',
-      coinDecimals: 6
-    },
-    bip44: {
-      coinType: 118
-    },
-    bech32Config: Bech32Address.defaultBech32Config('ixo'),
-    currencies: [
-      {
-        coinDenom: 'IXO',
-        coinMinimalDenom: 'uixo',
-        coinDecimals: 6
-      }
-    ],
-    feeCurrencies: [
-      {
-        coinDenom: 'IXO',
-        coinMinimalDenom: 'uixo',
-        coinDecimals: 6
       }
     ],
     features: ['stargate', 'ibc-transfer'],
@@ -1737,8 +1683,13 @@ export const EmbedChainInfos: AppChainInfo[] = [
   }
 ];
 
+// The origins that are able to pass any permission that external webpages can have.
+export const PrivilegedOrigins: string[] = [];
+
+// tracking ads
 export const AmplitudeApiKey = 'dbcaf47e30aae5b712bda7f892b2f0c4';
 
+// default thumbnails for fix address
 export const ValidatorThumbnails: { [key: string]: string } = {
   oraivaloper1mxqeldsxg60t2y6gngpdm5jf3k96dnju5el96f:
     'https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png',

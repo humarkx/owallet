@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 
 import styleStake from './stake.module.scss';
 import classnames from 'classnames';
-import { Dec } from '@owallet-wallet/unit';
+import { Dec } from '@owallet/unit';
 
 import { useNotification } from '../../components/notification';
 
@@ -174,14 +174,12 @@ export const StakeView: FunctionComponent = observer(() => {
           )}
         </div>
         <div style={{ flex: 1 }} />
-        <a
-          href={chainStore.current.walletUrlForStaking}
-          target="_blank"
-          rel="noopener noreferrer"
+        <div
           onClick={(e) => {
             if (!isStakableExist) {
               e.preventDefault();
             } else {
+              history.push('/stake/validator-list');
               analyticsStore.logEvent('Stake button clicked', {
                 chainId: chainStore.current.chainId,
                 chainName: chainStore.current.chainName
@@ -216,7 +214,7 @@ export const StakeView: FunctionComponent = observer(() => {
               <FormattedMessage id="main.stake.tooltip.no-asset" />
             </Tooltip>
           ) : null}
-        </a>
+        </div>
       </div>
     </div>
   );
