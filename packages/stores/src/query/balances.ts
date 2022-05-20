@@ -3,7 +3,7 @@ import { DenomHelper, KVStore } from '@owallet/common';
 import { ChainGetter } from '../common';
 import { computed, makeObservable, observable, runInAction } from 'mobx';
 import { CoinPretty, Dec, Int } from '@owallet/unit';
-import { AppCurrency } from '@owallet/types';
+import { AppCurrency, NetworkType } from '@owallet/types';
 import { HasMapStore } from '../common';
 import { computedFn } from 'mobx-utils';
 
@@ -40,7 +40,10 @@ export abstract class ObservableQueryBalanceInner<
   }
 }
 
+export type BalanceRegistryType = NetworkType | 'erc20' | 'cw20';
+
 export interface BalanceRegistry {
+  type: BalanceRegistryType;
   getBalanceInner(
     chainId: string,
     chainGetter: ChainGetter,
@@ -63,7 +66,6 @@ export class ObservableQueryBalancesInner {
     bech32Address: string
   ) {
     makeObservable(this);
-
     this.bech32Address = bech32Address;
   }
 
@@ -83,14 +85,23 @@ export class ObservableQueryBalancesInner {
     if (!this.balanceMap.has(key)) {
       runInAction(() => {
         let balanceInner: ObservableQueryBalanceInner | undefined;
-
+        const chainInfo = this.chainGetter.getChain(this.chainId);
         for (const registry of this.balanceRegistries) {
+          // if is evm then do not use ObservableQueryBalanceNative
+          if (
+            chainInfo.raw.networkType === 'evm' &&
+            registry.type !== 'erc20'
+          ) {
+            continue;
+          }
+
           balanceInner = registry.getBalanceInner(
             this.chainId,
             this.chainGetter,
             this.bech32Address,
             currency.coinMinimalDenom
           );
+
           if (balanceInner) {
             break;
           }
@@ -99,7 +110,8 @@ export class ObservableQueryBalancesInner {
         if (balanceInner) {
           this.balanceMap.set(key, balanceInner);
         } else {
-          throw new Error(`Failed to get and parse the balance for ${key}`);
+          // throw new Error(`Failed to get and parse the balance for ${key}`);
+          console.log(`Failed to get and parse the balance for ${key}`);
         }
       });
     }
@@ -111,7 +123,6 @@ export class ObservableQueryBalancesInner {
   @computed
   get stakable(): ObservableQueryBalanceInner {
     const chainInfo = this.chainGetter.getChain(this.chainId);
-
     return this.getBalanceInner(chainInfo.stakeCurrency);
   }
 
@@ -175,11 +186,10 @@ export class ObservableQueryBalancesInner {
   get unstakables(): ObservableQueryBalanceInner[] {
     const chainInfo = this.chainGetter.getChain(this.chainId);
 
+    const result = [];
     const currencies = chainInfo.currencies.filter(
       (cur) => cur.coinMinimalDenom !== chainInfo.stakeCurrency.coinMinimalDenom
     );
-
-    const result = [];
 
     for (let i = 0; i < currencies.length; i++) {
       const currency = currencies[i];

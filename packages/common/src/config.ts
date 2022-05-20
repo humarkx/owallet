@@ -102,6 +102,65 @@ export const EmbedChainInfos: AppChainInfo[] = [
     }
   },
   {
+    rest: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+    chainId: '97',
+    chainName: 'Smart Chain - Testnet',
+    bip44: {
+      coinType: 60
+    },
+    stakeCurrency: {
+      coinDenom: 'BNB',
+      coinMinimalDenom: 'bnb',
+      coinDecimals: 18,
+      coinGeckoId: 'bnb',
+      coinImageUrl:
+        'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png'
+    },
+    bech32Config: Bech32Address.defaultBech32Config('evmos'),
+    networkType: 'evm',
+    currencies: [
+      {
+        coinDenom: 'BNB',
+        coinMinimalDenom: 'bnb',
+        coinDecimals: 18,
+        coinGeckoId: 'bnb',
+        coinImageUrl:
+          'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png'
+      },
+      {
+        coinDenom: 'ORAI',
+        coinMinimalDenom:
+          'erc20:0x9ad563929f05bd294d39f26e07b6cbc807b338c3:Oraichain Token',
+        coinDecimals: 18,
+        coinGeckoId: 'oraichain-token',
+        coinImageUrl:
+          'https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png'
+      }
+    ],
+    feeCurrencies: [
+      {
+        coinDenom: 'BNB',
+        coinMinimalDenom: 'bnb',
+        coinDecimals: 18,
+        coinGeckoId: 'bnb',
+        coinImageUrl:
+          'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png'
+      }
+    ],
+    gasPriceStep: {
+      low: 10000000000,
+      average: 25000000000,
+      high: 40000000000
+    },
+    features: [],
+    txExplorer: {
+      name: 'Bsc Scan',
+      txUrl: 'https://testnet.bscscan.com/tx/${txHash}',
+      accountUrl: 'https://testnet.bscscan.com/address/{address}'
+    }
+  },
+
+  {
     rpc: 'https://rpc-osmosis.owallet.app',
     rest: 'https://lcd-osmosis.owallet.app',
     chainId: 'osmosis-1',

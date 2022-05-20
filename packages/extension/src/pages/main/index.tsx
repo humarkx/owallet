@@ -8,7 +8,7 @@ import style from './style.module.scss';
 import { Menu } from './menu';
 import { AccountView } from './account';
 import { TxButtonView } from './tx-button';
-import { AssetView } from './asset';
+import { AssetView, AssetViewEvm } from './asset';
 import { StakeView } from './stake';
 
 import classnames from 'classnames';
@@ -67,19 +67,13 @@ export const MainPage: FunctionComponent = observer(() => {
   }, [chainStore, confirm, chainStore.isInitializing, currentChainId, intl]);
 
   const accountInfo = accountStore.getAccount(chainStore.current.chainId);
+  const chainInfo = chainStore.getChain(chainStore.current.chainId);
 
   const queryBalances = queriesStore
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(accountInfo.bech32Address);
 
-  const tokens = queryBalances.unstakables.filter((bal) => {
-    // Temporary implementation for trimming the 0 balanced native tokens.
-    // TODO: Remove this part.
-    if (new DenomHelper(bal.currency.coinMinimalDenom).type === 'native') {
-      return bal.balance.toDec().gt(new Dec('0'));
-    }
-    return true;
-  });
+  const tokens = queryBalances.unstakables;
 
   const hasTokens = tokens.length > 0;
 
@@ -118,19 +112,25 @@ export const MainPage: FunctionComponent = observer(() => {
         <CardBody>
           <div className={style.containerAccountInner}>
             <AccountView />
-            <AssetView />
+            {chainInfo.raw.networkType === 'evm' ? (
+              <AssetViewEvm />
+            ) : (
+              <AssetView />
+            )}
             <TxButtonView />
           </div>
         </CardBody>
       </Card>
-      <Card className={classnames(style.card, 'shadow')}>
-        <CardBody>
-          <StakeView />
-        </CardBody>
-      </Card>
+      {chainInfo.raw.networkType !== 'evm' && (
+        <Card className={classnames(style.card, 'shadow')}>
+          <CardBody>
+            <StakeView />
+          </CardBody>
+        </Card>
+      )}
       {hasTokens ? (
         <Card className={classnames(style.card, 'shadow')}>
-          <CardBody>{<TokensView />}</CardBody>
+          <CardBody>{<TokensView tokens={tokens} />}</CardBody>
         </Card>
       ) : null}
       {uiConfigStore.showAdvancedIBCTransfer &&

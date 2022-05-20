@@ -15692,7 +15692,7 @@ node-sass-package-importer@5.3.2:
   dependencies:
     node-sass-magic-importer "^5.3.2"
 
-node-sass@4.14.1, node-sass@7.0, "node-sass@file:./etc/noop":
+node-sass@4.14.1, "node-sass@file:./etc/noop":
   version "0.0.1"
 
 node-stream-zip@^1.9.1:

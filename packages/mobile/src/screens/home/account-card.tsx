@@ -11,6 +11,7 @@ import { LoadingSpinner } from '../../components/spinner';
 import { StakedTokenSymbol, TokenSymbol } from '../../components/token-symbol';
 import { useSmartNavigation } from '../../navigation';
 import { NetworkErrorView } from './network-error-view';
+import { FormattedMessage } from 'react-intl';
 
 export const AccountCard: FunctionComponent<{
   containerStyle?: ViewStyle;
@@ -34,9 +35,10 @@ export const AccountCard: FunctionComponent<{
   );
   const delegated = queryDelegated.total;
 
-  const queryUnbonding = queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
-    account.bech32Address
-  );
+  const queryUnbonding =
+    queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
+      account.bech32Address
+    );
   const unbonding = queryUnbonding.total;
 
   const stakedSum = delegated.add(unbonding);
@@ -74,7 +76,7 @@ export const AccountCard: FunctionComponent<{
                   'margin-bottom-4'
                 ])}
               >
-                Total Balance
+                <FormattedMessage id="main.account.chart.total-balance" />
               </Text>
               <Text style={style.flatten(['h3', 'color-text-black-high'])}>
                 {totalPrice
@@ -112,7 +114,7 @@ export const AccountCard: FunctionComponent<{
           >
             <TokenSymbol
               size={44}
-              chainInfo={chainStore.current}
+              chainInfo={{ stakeCurrency: chainStore.current.stakeCurrency }}
               currency={chainStore.current.stakeCurrency}
             />
             <View style={style.flatten(['margin-left-12'])}>
