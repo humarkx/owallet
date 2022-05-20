@@ -1,8 +1,8 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "OWallet",
   "description": "OWallet is a browser extension wallet for the Inter blockchain ecosystem.",
-  "version": "0.9.16",
+  "version": "0.0.1",
   "applications": {
     "gecko": {
       "id": "owallet-extension@owallet.app",
@@ -14,20 +14,31 @@
     "48": "assets/icon-48.png",
     "128": "assets/icon-128.png"
   },
-
   "browser_action": {
     "default_popup": "popup.html",
     "default_title": "OWallet"
   },
   "background": {
-    "scripts": ["browser-polyfill.js", "background.bundle.js"],
+    "scripts": [
+      "browser-polyfill.js",
+      "background.bundle.js"
+    ],
     "persistent": true
   },
-  "permissions": ["storage", "notifications", "identity"],
+  "permissions": [
+    "storage",
+    "notifications",
+    "identity"
+  ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["browser-polyfill.js", "contentScripts.bundle.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "browser-polyfill.js",
+        "contentScripts.bundle.js"
+      ],
       "run_at": "document_start",
       "all_frames": true
     }
