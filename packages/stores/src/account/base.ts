@@ -562,6 +562,7 @@ export class AccountSetBase<MsgOpts, Queries> {
   }
 
   get evmosHexAddress(): string {
+    if (!this.bech32Address) return;
     return evmosToEth(this.bech32Address);
   }
 
