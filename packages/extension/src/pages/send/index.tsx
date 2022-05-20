@@ -122,8 +122,8 @@ export const SendPage: FunctionComponent = observer(() => {
         isDetachedPage
           ? undefined
           : () => {
-              history.goBack();
-            }
+            history.goBack();
+          }
       }
       rightRenderer={
         isDetachedPage ? undefined : (

@@ -66,8 +66,10 @@ export class ExtensionRouter extends Router {
     message: any,
     sender: MessageSender
   ): Promise<Result> {
+    console.log("on message handler: ", message);
     try {
       const result = await this.handleMessage(message, sender);
+      console.log("result handling message: ", result);
       return {
         return: result
       };

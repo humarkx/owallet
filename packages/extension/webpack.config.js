@@ -81,7 +81,7 @@ const extensionConfig = (env, args) => {
     watch: isEnvDevelopment,
     entry: {
       popup: ["./src/index.tsx"],
-      background: ["./src/background/background.ts"],
+      background: ["./src/background/background-v3.ts"],
       contentScripts: ["./src/content-scripts/content-scripts.ts"],
       injectedScript: ["./src/content-scripts/inject/injected-script.ts"],
     },
@@ -100,6 +100,10 @@ const extensionConfig = (env, args) => {
       new ForkTsCheckerWebpackPlugin(),
       new CopyWebpackPlugin(
         [
+          {
+            from: "./src/service-worker.js",
+            to: "./",
+          },
           {
             from: "./src/manifest.json",
             to: "./",

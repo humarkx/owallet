@@ -46,7 +46,7 @@ export class InExtensionMessageRequester implements MessageRequester {
     msg: M
   ): Promise<M extends Message<infer R> ? R : never> {
     msg.validateBasic();
-
+    console.log("window origin msg send to tab: ", window.location.origin);
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
