@@ -7,7 +7,7 @@ import styleAccount from './account.module.scss';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
 import { useNotification } from '../../components/notification';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { WalletStatus } from '@owallet/stores';
 
 export const AccountView: FunctionComponent = observer(() => {
@@ -58,7 +58,9 @@ export const AccountView: FunctionComponent = observer(() => {
               target="_blank"
               href={chainInfo.raw.txExplorer.accountUrl.replace(
                 '{address}',
-                accountInfo.bech32Address
+                chainInfo.raw.networkType === 'cosmos'
+                  ? accountInfo.bech32Address
+                  : accountInfo.evmosHexAddress
               )}
               title={intl.formatMessage({ id: 'setting.explorer' })}
             >
@@ -67,21 +69,23 @@ export const AccountView: FunctionComponent = observer(() => {
           )}
         </div>
       </div>
-      <div className={styleAccount.containerAccount}>
-        <div style={{ flex: 1 }} />
-        <div
-          className={styleAccount.address}
-          onClick={() => copyAddress(accountInfo.bech32Address)}
-        >
-          <Address maxCharacters={22} lineBreakBeforePrefix={false}>
-            {accountInfo.walletStatus === WalletStatus.Loaded &&
-            accountInfo.bech32Address
-              ? accountInfo.bech32Address
-              : '...'}
-          </Address>
+      {chainInfo.raw.networkType !== 'evm' && (
+        <div className={styleAccount.containerAccount}>
+          <div style={{ flex: 1 }} />
+          <div
+            className={styleAccount.address}
+            onClick={() => copyAddress(accountInfo.bech32Address)}
+          >
+            <Address maxCharacters={22} lineBreakBeforePrefix={false}>
+              {accountInfo.walletStatus === WalletStatus.Loaded &&
+              accountInfo.bech32Address
+                ? accountInfo.bech32Address
+                : '...'}
+            </Address>
+          </div>
+          <div style={{ flex: 1 }} />
         </div>
-        <div style={{ flex: 1 }} />
-      </div>
+      )}
       {accountInfo.hasEvmosHexAddress && (
         <div
           className={styleAccount.containerAccount}

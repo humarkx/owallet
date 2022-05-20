@@ -20,11 +20,14 @@ export type QueryOptions = {
   cacheMaxAge: number;
   // millisec
   fetchingInterval: number;
+
+  data: { [key: string]: any };
 };
 
 export const defaultOptions: QueryOptions = {
   cacheMaxAge: Number.MAX_VALUE,
-  fetchingInterval: 0
+  fetchingInterval: 0,
+  data: null
 };
 
 export type QueryError<E> = {
@@ -83,8 +86,8 @@ export abstract class ObservableQueryBase<T = unknown, E = unknown> {
     options: Partial<QueryOptions>
   ) {
     this.options = {
-      ...options,
-      ...defaultOptions
+      ...defaultOptions,
+      ...options
     };
 
     this._instance = instance;
@@ -414,6 +417,9 @@ export class ObservableQuery<
   @observable
   protected _url: string = '';
 
+  @observable
+  protected _data: { [key: string]: any } = null;
+
   constructor(
     protected readonly kvStore: KVStore,
     instance: AxiosInstance,
@@ -423,7 +429,8 @@ export class ObservableQuery<
     super(instance, options);
     makeObservable(this);
 
-    this.setUrl(url);
+    // reload when change url
+    this.setUrl(url, options?.data);
   }
 
   protected onStart() {
@@ -454,9 +461,17 @@ export class ObservableQuery<
   }
 
   @action
-  protected setUrl(url: string) {
+  protected setUrl(url: string, data: { [key: string]: any } = null) {
+    let reFetch = false;
     if (this._url !== url) {
       this._url = url;
+      reFetch = true;
+    }
+    if (this._data !== data) {
+      this._data = data;
+      reFetch = true;
+    }
+    if (reFetch) {
       this.fetch();
     }
   }
@@ -464,9 +479,16 @@ export class ObservableQuery<
   protected async fetchResponse(
     cancelToken: CancelToken
   ): Promise<QueryResponse<T>> {
-    const result = await this.instance.get<T>(this.url, {
-      cancelToken
-    });
+    // may be post method in case of ethereum
+
+    const result = this.options.data
+      ? await this.instance.post<T>(this.url, this.options.data, {
+          cancelToken
+        })
+      : await this.instance.get<T>(this.url, {
+          cancelToken
+        });
+
     return {
       data: result.data,
       status: result.status,
@@ -479,7 +501,8 @@ export class ObservableQuery<
     return `${this.instance.name}-${
       this.instance.defaults.baseURL
     }${this.instance.getUri({
-      url: this.url
+      url: this.url,
+      params: this.options.data
     })}`;
   }
 
@@ -487,6 +510,7 @@ export class ObservableQuery<
     response: Readonly<QueryResponse<T>>
   ): Promise<void> {
     const key = this.getCacheKey();
+
     await this.kvStore.set(key, response);
   }
 

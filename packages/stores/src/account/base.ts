@@ -16,7 +16,8 @@ import {
   makeSignDoc,
   makeStdTx,
   Msg,
-  StdFee
+  StdFee,
+  StdTx
 } from '@cosmjs/launchpad';
 import {
   BaseAccount,
@@ -452,7 +453,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const owallet = (await this.getOWallet())!;
 
-    let signedTx;
+    let signedTx: Uint8Array | StdTx;
 
     if (this.hasNoLegacyStdFeature()) {
       const key = await owallet.getKey(this.chainId);
@@ -561,6 +562,7 @@ export class AccountSetBase<MsgOpts, Queries> {
   }
 
   get evmosHexAddress(): string {
+    if (!this.bech32Address) return;
     return evmosToEth(this.bech32Address);
   }
 
