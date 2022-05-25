@@ -1,17 +1,26 @@
 import React, { FunctionComponent } from "react";
 import { observer } from "mobx-react-lite";
 import { Card, CardBody } from "../../components/card";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import { useStore } from "../../stores";
 import { useStyle } from "../../styles";
 import { AddressCopyable } from "../../components/address-copyable";
-import { DoubleDoughnutChart } from "../../components/svg";
+// import { DoubleDoughnutChart } from "../../components/svg";
 import { Button } from "../../components/button";
 import { LoadingSpinner } from "../../components/spinner";
-import { StakedTokenSymbol, TokenSymbol } from "../../components/token-symbol";
+// import { StakedTokenSymbol, TokenSymbol } from "../../components/token-symbol";
 import { useSmartNavigation } from "../../navigation";
 import { NetworkErrorView } from "./network-error-view";
-
+import { ProgressBar } from "../../components/progress-bar";
+import { Scanner } from "../../components/icon";
+import { useNavigation } from "@react-navigation/native";
 export const AccountCard: FunctionComponent<{
   containerStyle?: ViewStyle;
 }> = observer(({ containerStyle }) => {
@@ -20,6 +29,7 @@ export const AccountCard: FunctionComponent<{
   const style = useStyle();
 
   const smartNavigation = useSmartNavigation();
+  const navigation = useNavigation();
 
   const account = accountStore.getAccount(chainStore.current.chainId);
   const queries = queriesStore.get(chainStore.current.chainId);
@@ -53,13 +63,37 @@ export const AccountCard: FunctionComponent<{
   return (
     <Card style={containerStyle}>
       <CardBody style={style.flatten(["padding-bottom-0"])}>
+        <View style={style.flatten(["flex-row", "justify-between"])}>
+          <Text style={style.flatten(["h4"])}>{account.name || "..."}</Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Others", {
+                screen: "Camera",
+              });
+            }}
+          >
+            <Scanner size={28} color={style.get("color-primary").color} />
+          </TouchableOpacity>
+        </View>
+
         <View style={style.flatten(["flex", "items-center"])}>
-          <Text style={style.flatten(["h4", "margin-bottom-8"])}>
-            {account.name || "..."}
-          </Text>
-          <AddressCopyable address={account.bech32Address} maxCharacters={22} />
-          <View style={style.flatten(["margin-top-28", "margin-bottom-16"])}>
-            <DoubleDoughnutChart data={data} />
+          <View
+            style={style.flatten([
+              "margin-top-28",
+              "margin-bottom-16",
+              "width-full",
+            ])}
+          >
+            {/* <DoubleDoughnutChart data={data} /> */}
+            <ImageBackground
+              resizeMode={"contain"}
+              source={require("../../assets/image/background-card.png")}
+              style={style.flatten(["width-full", "height-214"])}
+            />
+            <ProgressBar
+              progress={(data?.[0] / data?.reduce((a, b) => a + b, 0)) * 100}
+              styles={["margin-top-24"]}
+            />
             <View
               style={style.flatten([
                 "absolute-fill",
@@ -70,13 +104,13 @@ export const AccountCard: FunctionComponent<{
               <Text
                 style={style.flatten([
                   "subtitle2",
-                  "color-text-black-medium",
+                  "color-text-black-very-very-very-low",
                   "margin-bottom-4",
                 ])}
               >
                 Total Balance
               </Text>
-              <Text style={style.flatten(["h3", "color-text-black-high"])}>
+              <Text style={style.flatten(["h1", "color-white"])}>
                 {totalPrice
                   ? totalPrice.toString()
                   : total.shrink(true).maxDecimals(6).toString()}
@@ -96,6 +130,11 @@ export const AccountCard: FunctionComponent<{
                   />
                 </View>
               ) : null}
+              <AddressCopyable
+                style={style.flatten(["margin-24"])}
+                address={account.bech32Address}
+                maxCharacters={22}
+              />
             </View>
           </View>
         </View>
@@ -110,28 +149,45 @@ export const AccountCard: FunctionComponent<{
               "margin-bottom-28",
             ])}
           >
-            <TokenSymbol
+            {/* <TokenSymbol
               size={44}
               chainInfo={chainStore.current}
               currency={chainStore.current.stakeCurrency}
-            />
+            /> */}
             <View style={style.flatten(["margin-left-12"])}>
-              <Text
+              <View
                 style={style.flatten([
-                  "subtitle3",
-                  "color-primary",
+                  "flex-row",
+                  "items-center",
                   "margin-bottom-4",
                 ])}
               >
-                Available
-              </Text>
+                <View
+                  style={style.flatten([
+                    "width-8",
+                    "height-8",
+                    "background-color-primary",
+                    "border-radius-8",
+                    "margin-right-4",
+                  ])}
+                />
+                <Text
+                  style={style.flatten([
+                    "subtitle3",
+                    "color-text-black-very-low",
+                  ])}
+                >
+                  Available
+                </Text>
+              </View>
               <Text style={style.flatten(["h5", "color-text-black-medium"])}>
                 {stakable.maxDecimals(6).trim(true).shrink(true).toString()}
               </Text>
             </View>
             <View style={style.flatten(["flex-1"])} />
             <Button
-              text="Send"
+              text="Deposit"
+              mode="outline"
               size="small"
               containerStyle={style.flatten(["min-width-72"])}
               onPress={() => {
@@ -148,17 +204,33 @@ export const AccountCard: FunctionComponent<{
               "margin-bottom-8",
             ])}
           >
-            <StakedTokenSymbol size={44} />
+            {/* <StakedTokenSymbol size={44} /> */}
             <View style={style.flatten(["margin-left-12"])}>
-              <Text
+              <View
                 style={style.flatten([
-                  "subtitle3",
-                  "color-primary",
+                  "flex-row",
+                  "items-center",
                   "margin-bottom-4",
                 ])}
               >
-                Staking
-              </Text>
+                <View
+                  style={style.flatten([
+                    "width-8",
+                    "height-8",
+                    "background-color-secondary-500",
+                    "border-radius-8",
+                    "margin-right-4",
+                  ])}
+                />
+                <Text
+                  style={style.flatten([
+                    "subtitle3",
+                    "color-text-black-very-low",
+                  ])}
+                >
+                  Staking
+                </Text>
+              </View>
               <Text style={style.flatten(["h5", "color-text-black-medium"])}>
                 {stakedSum.maxDecimals(6).trim(true).shrink(true).toString()}
               </Text>
@@ -166,7 +238,7 @@ export const AccountCard: FunctionComponent<{
             <View style={style.flatten(["flex-1"])} />
             <Button
               text="Stake"
-              mode="light"
+              mode="outline"
               size="small"
               containerStyle={style.flatten(["min-width-72"])}
               onPress={() => {
