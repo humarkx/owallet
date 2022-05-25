@@ -102,7 +102,7 @@ import {
   ImportFromExtensionScreen,
   ImportFromExtensionSetPasswordScreen
 } from './screens/register/import-from-extension';
-import { OsmosisWebpageScreen } from './screens/web/webpages';
+import { DAppWebpageScreen } from './screens/web/webpages';
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
 import Bugsnag from '@bugsnag/react-native';
 
@@ -217,7 +217,7 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       'Web.Intro': {
         upperScreenName: 'Web'
       },
-      'Web.Osmosis': {
+      'Web.dApp': {
         upperScreenName: 'Web'
       }
     }).withParams<{
@@ -732,7 +732,7 @@ export const WebNavigation: FunctionComponent = () => {
         name="Web.Intro"
         component={WebScreen}
       />
-      <Stack.Screen name="Web.Osmosis" component={OsmosisWebpageScreen} />
+      <Stack.Screen name="Web.dApp" component={DAppWebpageScreen} />
     </Stack.Navigator>
   );
 };

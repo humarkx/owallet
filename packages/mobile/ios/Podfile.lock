@@ -19,7 +19,7 @@ PODS:
     - AppCenter/Core (= 4.4.2)
   - Base64 (1.1.2)
   - boost-for-react-native (1.63.0)
-  - BugsnagReactNative (7.16.4):
+  - BugsnagReactNative (7.16.5):
     - React-Core
   - CodePush (7.0.4):
     - Base64 (~> 1.1)
@@ -334,7 +334,7 @@ PODS:
     - React-Core (= 0.63.4)
     - React-cxxreact (= 0.63.4)
     - React-jsi (= 0.63.4)
-  - RNCAsyncStorage (1.17.4):
+  - RNCAsyncStorage (1.17.5):
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
@@ -597,7 +597,7 @@ SPEC CHECKSUMS:
   AppCenterReactNativeShared: 0906af7a6bf95075d6c607189820a2e81fceb6fe
   Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BugsnagReactNative: b9f5f474d0a942cefc5d4811938a8a233666cb5e
+  BugsnagReactNative: 4e3cbdc3561b3fc75fe78d3bbc8c807f45627d37
   CodePush: b51b7ac64c07d4eacfc8cc5750a1dd28adbf2528
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   EXAppleAuthentication: e8c537fcbe80670dd76fde7a07acb94af70ada00
@@ -643,7 +643,7 @@ SPEC CHECKSUMS:
   React-RCTText: 5c51df3f08cb9dedc6e790161195d12bac06101c
   React-RCTVibration: ae4f914cfe8de7d4de95ae1ea6cc8f6315d73d9d
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
-  RNCAsyncStorage: 9367a646dc24e3ab7b6874d79bc1bfd0832dce58
+  RNCAsyncStorage: 81187912cc9a5c2591ddb161e03e587688afb764
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNDeviceInfo: aad3c663b25752a52bf8fce93f2354001dd185aa
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
@@ -664,6 +664,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 2be431101b73604e64fbfffcf759336f9d8fccbb
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: bde47f924a37f54ee87cf0ac5b2ea42667e2eea9
+PODFILE CHECKSUM: bd829a5183ceea75d2a0bb3a373131f9bd655d3e
 
 COCOAPODS: 1.11.3
