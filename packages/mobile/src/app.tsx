@@ -66,7 +66,7 @@ SplashScreen.preventAutoHideAsync()
 
 const AppIntlProviderWithStorage = ({ children }) => {
   const store = useStore();
-  console.log(store);
+
   return (
     <AppIntlProvider
       additionalMessages={AdditonalIntlMessages}
