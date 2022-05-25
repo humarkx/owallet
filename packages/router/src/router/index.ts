@@ -1,8 +1,8 @@
-import { Message } from "../message";
-import { Handler } from "../handler";
-import { EnvProducer, Guard, MessageSender } from "../types";
-import { MessageRegistry } from "../encoding";
-import { JSONUint8Array } from "../json-uint8-array";
+import { Message } from '../message';
+import { Handler } from '../handler';
+import { EnvProducer, Guard, MessageSender } from '../types';
+import { MessageRegistry } from '../encoding';
+import { JSONUint8Array } from '../json-uint8-array';
 
 export abstract class Router {
   protected msgRegistry: MessageRegistry = new MessageRegistry();
@@ -10,7 +10,7 @@ export abstract class Router {
 
   protected guards: Guard[] = [];
 
-  protected port = "";
+  protected port = '';
 
   constructor(protected readonly envProducer: EnvProducer) {}
 
@@ -51,8 +51,9 @@ export abstract class Router {
     msg.validateBasic();
 
     const route = msg.route();
+
     if (!route) {
-      throw new Error("Null router");
+      throw new Error('Null router');
     }
     const handler = this.registeredHandler.get(route);
     if (!handler) {
