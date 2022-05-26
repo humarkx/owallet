@@ -226,7 +226,9 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
       } else if (
         bal.balance
           .toDec()
-          .mul(DecUtils.getPrecisionDec(bal.currency.coinDecimals))
+          .mul(
+            DecUtils.getTenExponentNInPrecisionRange(bal.currency.coinDecimals)
+          )
           .truncate()
           .lt(need.amount)
       ) {
