@@ -1,1 +1,1 @@
-export * from "./osmosis";
+export * from './dapp';
