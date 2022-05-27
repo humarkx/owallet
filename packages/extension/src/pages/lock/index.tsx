@@ -1,22 +1,22 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from "react";
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 
-import { PasswordInput } from "../../components/form";
+import { PasswordInput } from '../../components/form';
 
-import { Button, Form } from "reactstrap";
+import { Button, Form } from 'reactstrap';
 
-import { observer } from "mobx-react-lite";
-import { useStore } from "../../stores";
-import { Banner } from "../../components/banner";
-import useForm from "react-hook-form";
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../stores';
+import { Banner } from '../../components/banner';
+import useForm from 'react-hook-form';
 
-import { EmptyLayout } from "../../layouts/empty-layout";
+import { EmptyLayout } from '../../layouts/empty-layout';
 
-import style from "./style.module.scss";
+import style from './style.module.scss';
 
-import { FormattedMessage, useIntl } from "react-intl";
-import { useInteractionInfo } from "@keplr-wallet/hooks";
-import { useHistory } from "react-router";
-import delay from "delay";
+import { FormattedMessage, useIntl } from 'react-intl';
+import { useInteractionInfo } from '@owallet/hooks';
+import { useHistory } from 'react-router';
+import delay from 'delay';
 
 interface FormData {
   password: string;
@@ -30,8 +30,8 @@ export const LockPage: FunctionComponent = observer(() => {
 
   const { register, handleSubmit, setError, errors } = useForm<FormData>({
     defaultValues: {
-      password: "",
-    },
+      password: ''
+    }
   });
 
   const { keyRingStore } = useStore();
@@ -49,7 +49,7 @@ export const LockPage: FunctionComponent = observer(() => {
   }, []);
 
   return (
-    <EmptyLayout style={{ backgroundColor: "white", height: "100%" }}>
+    <EmptyLayout style={{ height: '100%' }}>
       <Form
         className={style.formContainer}
         onSubmit={handleSubmit(async (data) => {
@@ -65,20 +65,20 @@ export const LockPage: FunctionComponent = observer(() => {
                 //      Unfortunately, I still don't know the exact cause.
                 //      Anyway, for now, to reduce this problem, jsut wait small time, and close the window only if the page is not changed.
                 await delay(100);
-                if (window.location.href.includes("#/unlock")) {
+                if (window.location.href.includes('#/unlock')) {
                   window.close();
                 }
               } else {
-                history.replace("/");
+                history.replace('/');
               }
             }
           } catch (e) {
-            console.log("Fail to decrypt: " + e.message);
+            console.log('Fail to decrypt: ' + e.message);
             setError(
-              "password",
-              "invalid",
+              'password',
+              'invalid',
               intl.formatMessage({
-                id: "lock.input.password.error.invalid",
+                id: 'lock.input.password.error.invalid'
               })
             );
             setLoading(false);
@@ -86,13 +86,13 @@ export const LockPage: FunctionComponent = observer(() => {
         })}
       >
         <Banner
-          icon={require("../../public/assets/temp-icon.svg")}
-          logo={require("../../public/assets/logo-temp.png")}
+          icon={require('../../public/assets/orai_wallet_logo.png')}
+          logo={require('../../public/assets/logo-temp.png')}
           subtitle="Wallet for the Interchain"
         />
         <PasswordInput
           label={intl.formatMessage({
-            id: "lock.input.password",
+            id: 'lock.input.password'
           })}
           name="password"
           error={errors.password && errors.password.message}
@@ -101,8 +101,8 @@ export const LockPage: FunctionComponent = observer(() => {
 
             register({
               required: intl.formatMessage({
-                id: "lock.input.password.error.required",
-              }),
+                id: 'lock.input.password.error.required'
+              })
             })(ref);
           }}
         />

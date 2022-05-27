@@ -1,15 +1,15 @@
 import React, { FunctionComponent } from "react";
 import { useHeaderHeight } from "@react-navigation/stack";
 import { PageWithScrollView } from "../../components/page";
-import { KeplrLogo } from "../../components/svg";
 import { useStyle } from "../../styles";
 import { View, Dimensions } from "react-native";
 import { Button } from "../../components/button";
 import { useSmartNavigation } from "../../navigation";
-import { useRegisterConfig } from "@keplr-wallet/hooks";
+import { useRegisterConfig } from "@owallet/hooks";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../stores";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { OWalletLogo } from "./owallet-logo";
 
 export const RegisterIntroScreen: FunctionComponent = observer(() => {
   const { keyRingStore } = useStore();
@@ -36,7 +36,7 @@ export const RegisterIntroScreen: FunctionComponent = observer(() => {
       <View
         style={style.flatten(["flex-grow-1", "items-center", "padding-x-18"])}
       >
-        <KeplrLogo width="100%" />
+        <OWalletLogo />
       </View>
       <Button
         containerStyle={style.flatten(["margin-bottom-16"])}

@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { RegisterConfig } from "@keplr-wallet/hooks";
+import { RegisterConfig } from "@owallet/hooks";
 import { useStyle } from "../../../styles";
 import { useSmartNavigation } from "../../../navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -62,18 +62,18 @@ const useTorusGoogleSignIn = (): {
         finalUrl.searchParams.append("prompt", "consent select_account");
         finalUrl.searchParams.append(
           "redirect_uri",
-          "https://oauth.keplr.app/google.html"
+          "https://oauth.owallet.app/google.html"
         );
 
         const result = await WebBrowser.openAuthSessionAsync(
           finalUrl.href,
-          "app.keplr.oauth://"
+          "app.owallet.oauth://"
         );
         if (result.type !== "success") {
           throw new Error("Failed to get the oauth");
         }
 
-        if (!result.url.startsWith("app.keplr.oauth://google#")) {
+        if (!result.url.startsWith("app.owallet.oauth://google#")) {
           throw new Error("Invalid redirection");
         }
 
@@ -116,7 +116,7 @@ const useTorusGoogleSignIn = (): {
             torusNodePub,
             torusIndexes,
           } = await nodeDetailManager.getNodeDetails({
-            verifier: "chainapsis-google",
+            verifier: "orai-google",
             verifierId: email.toLowerCase(),
           });
 
@@ -126,7 +126,7 @@ const useTorusGoogleSignIn = (): {
             torusNodeEndpoints,
             torusNodePub,
             {
-              verifier: "chainapsis-google",
+              verifier: "orai-google",
               verifierId: email.toLowerCase(),
             },
             true
@@ -134,7 +134,7 @@ const useTorusGoogleSignIn = (): {
           const data = await torus.retrieveShares(
             torusNodeEndpoints,
             torusIndexes,
-            "chainapsis-google",
+            "orai-google",
             {
               verifier_id: email.toLowerCase(),
             },
@@ -221,7 +221,7 @@ const useTorusAppleSignIn = (): {
           torusNodePub,
           torusIndexes,
         } = await nodeDetailManager.getNodeDetails({
-          verifier: "chainapsis-apple",
+          verifier: "orai-apple",
           verifierId: sub,
         });
 
@@ -231,7 +231,7 @@ const useTorusAppleSignIn = (): {
           torusNodeEndpoints,
           torusNodePub,
           {
-            verifier: "chainapsis-apple",
+            verifier: "orai-apple",
             verifierId: sub,
           },
           true
@@ -239,7 +239,7 @@ const useTorusAppleSignIn = (): {
         const data = await torus.retrieveShares(
           torusNodeEndpoints,
           torusIndexes,
-          "chainapsis-apple",
+          "orai-apple",
           {
             verifier_id: sub,
           },

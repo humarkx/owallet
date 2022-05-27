@@ -1,9 +1,9 @@
-import { InjectedKeplr } from "@keplr-wallet/provider";
-import { KeplrMode } from "@keplr-wallet/types";
+import { InjectedOWallet } from '@owallet/provider';
+import { OWalletMode } from '@owallet/types';
 
-export class RNInjectedKeplr extends InjectedKeplr {
+export class RNInjectedOWallet extends InjectedOWallet {
   static parseWebviewMessage(message: any): any {
-    if (message && typeof message === "string") {
+    if (message && typeof message === 'string') {
       try {
         return JSON.parse(message);
       } catch {
@@ -14,22 +14,22 @@ export class RNInjectedKeplr extends InjectedKeplr {
     return message;
   }
 
-  constructor(version: string, mode: KeplrMode) {
+  constructor(version: string, mode: OWalletMode) {
     super(
       version,
       mode,
       {
         addMessageListener: (fn: (e: any) => void) =>
-          window.addEventListener("message", fn),
+          window.addEventListener('message', fn),
         removeMessageListener: (fn: (e: any) => void) =>
-          window.removeEventListener("message", fn),
+          window.removeEventListener('message', fn),
         postMessage: (message) => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        },
+        }
       },
-      RNInjectedKeplr.parseWebviewMessage
+      RNInjectedOWallet.parseWebviewMessage
     );
   }
 }

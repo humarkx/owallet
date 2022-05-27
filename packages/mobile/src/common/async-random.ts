@@ -1,5 +1,5 @@
-import * as Random from "expo-random";
-import { RNG } from "@keplr-wallet/crypto";
+import * as Random from 'expo-random';
+import { RNG } from '@owallet/crypto';
 
 export const getRandomBytesAsync: RNG = async (array) => {
   if (array) {

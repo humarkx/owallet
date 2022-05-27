@@ -1,9 +1,5 @@
-import {
-  MessageRequester,
-  Message,
-  JSONUint8Array,
-} from "@keplr-wallet/router";
-import { getKeplrExtensionRouterId } from "../utils";
+import { MessageRequester, Message, JSONUint8Array } from '@owallet/router';
+import { getOWalletExtensionRouterId } from '../utils';
 
 // The message requester to send the message to the content scripts.
 // This will send message to the tab with the content script.
@@ -17,19 +13,17 @@ export class ContentScriptMessageRequester implements MessageRequester {
     msg.validateBasic();
 
     // Set message's origin.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    msg["origin"] = window.location.origin;
+    (msg as any).origin = window.location.origin;
     msg.routerMeta = {
       ...msg.routerMeta,
-      routerId: getKeplrExtensionRouterId(),
+      routerId: getOWalletExtensionRouterId()
     };
 
     const wrappedMsg = JSONUint8Array.wrap(msg);
 
     const tabs = await browser.tabs.query({
       discarded: false,
-      status: "complete",
+      status: 'complete'
     });
 
     for (let i = 0; i < tabs.length; i++) {
@@ -39,7 +33,7 @@ export class ContentScriptMessageRequester implements MessageRequester {
           await browser.tabs.sendMessage(tabId, {
             port,
             type: msg.type(),
-            msg: wrappedMsg,
+            msg: wrappedMsg
           });
           // Ignore the failure
         } catch {}

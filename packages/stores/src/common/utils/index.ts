@@ -1,15 +1,16 @@
-import { Currency } from "@keplr-wallet/types";
-import { CoinPrimitive } from "../types";
-import { CoinPretty, Dec, Int } from "@keplr-wallet/unit";
+import { Currency } from '@owallet/types';
+import { CoinPrimitive } from '../types';
+import { CoinPretty, Dec, Int } from '@owallet/unit';
 
 export class StoreUtils {
   public static getBalancesFromCurrencies(
     currenciesMap: {
       [denom: string]: Currency;
     },
-    bals: CoinPrimitive[]
+    bals?: CoinPrimitive[]
   ): CoinPretty[] {
     const result: CoinPretty[] = [];
+    if (!bals) return result;
     for (const bal of bals) {
       const currency = currenciesMap[bal.denom];
       if (currency) {
@@ -29,7 +30,7 @@ export class StoreUtils {
   ): CoinPretty {
     const result = StoreUtils.getBalancesFromCurrencies(
       {
-        [currency.coinMinimalDenom]: currency,
+        [currency.coinMinimalDenom]: currency
       },
       bals
     );

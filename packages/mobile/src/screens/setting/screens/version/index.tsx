@@ -1,12 +1,12 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from "react";
-import { PageWithScrollViewInBottomTabView } from "../../../../components/page";
-import { SettingItem, SettingSectionTitle } from "../../components";
-import DeviceInfo from "react-native-device-info";
-import codePush from "react-native-code-push";
-import { codeBundleId } from "../../../../../bugsnag.env";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { PageWithScrollViewInBottomTabView } from '../../../../components/page';
+import { SettingItem, SettingSectionTitle } from '../../components';
+import DeviceInfo from 'react-native-device-info';
+import codePush from 'react-native-code-push';
+import { codeBundleId } from '../../../../../bugsnag.env';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
-export const KeplrVersionScreen: FunctionComponent = () => {
+export const OWalletVersionScreen: FunctionComponent = () => {
   const [appVersion] = useState(() => DeviceInfo.getVersion());
   const [buildNumber] = useState(() => DeviceInfo.getBuildNumber());
   // "undefined" means that it is on fetching,
@@ -26,7 +26,7 @@ export const KeplrVersionScreen: FunctionComponent = () => {
       if (update) {
         setCurrentCodeVersion(update.label);
       } else {
-        setCurrentCodeVersion("");
+        setCurrentCodeVersion('');
       }
     });
 
@@ -34,7 +34,7 @@ export const KeplrVersionScreen: FunctionComponent = () => {
       if (update) {
         setLatestCodeVersion(update.label);
       } else {
-        setLatestCodeVersion("");
+        setLatestCodeVersion('');
       }
     });
 
@@ -42,18 +42,18 @@ export const KeplrVersionScreen: FunctionComponent = () => {
       if (update) {
         setPendingCodeVersion(update.label);
       } else {
-        setPendingCodeVersion("");
+        setPendingCodeVersion('');
       }
     });
   }, []);
 
   const parseVersion = (version: string | undefined) => {
     if (version === undefined) {
-      return "Fetching...";
+      return 'Fetching...';
     }
 
-    if (version === "") {
-      return "None";
+    if (version === '') {
+      return 'None';
     }
 
     return version;
@@ -65,7 +65,7 @@ export const KeplrVersionScreen: FunctionComponent = () => {
   const [blockRender, setBlockRender] = useState(false);
 
   if (blockRender) {
-    throw new Error("This is an render error for error report test");
+    throw new Error('This is an render error for error report test');
   }
 
   return (
@@ -77,7 +77,7 @@ export const KeplrVersionScreen: FunctionComponent = () => {
 
           if (testErrorReportRef.current === 10) {
             setTimeout(() => {
-              throw new Error("This is an runtime error for error report test");
+              throw new Error('This is an runtime error for error report test');
             }, 200);
           }
 

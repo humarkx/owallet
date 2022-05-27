@@ -1,11 +1,11 @@
-import { RNInjectedKeplr } from "./injected-provider";
-import { init } from "./init";
+import { RNInjectedOWallet } from './injected-provider';
+import { init } from './init';
 
-// TODO: Set the Keplr version properly
-const keplr = new RNInjectedKeplr("0.9.6", "mobile-web");
+// TODO: Set the OWallet version properly
+const owallet = new RNInjectedOWallet('0.9.16', 'mobile-web');
 
 init(
-  keplr,
-  (chainId: string) => keplr.getOfflineSigner(chainId),
-  (chainId: string) => keplr.getEnigmaUtils(chainId)
+  owallet,
+  (chainId: string) => owallet.getOfflineSigner(chainId),
+  (chainId: string) => owallet.getEnigmaUtils(chainId)
 );

@@ -1,18 +1,18 @@
-import { Currency } from "@keplr-wallet/types";
-import { IntlShape } from "react-intl";
-import { cosmos, cosmwasm, UnknownMessage } from "@keplr-wallet/cosmos";
+import { Currency } from '@owallet/types';
+import { IntlShape } from 'react-intl';
+import { cosmos, cosmwasm, UnknownMessage } from '@owallet/cosmos';
 import {
   renderMsgBeginRedelegate,
   renderMsgDelegate,
   renderMsgExecuteContract,
   renderMsgSend,
   renderMsgUndelegate,
-  renderUnknownMessage,
-} from "./messages";
-import { CoinPrimitive } from "@keplr-wallet/stores";
+  renderUnknownMessage
+} from './messages';
+import { CoinPrimitive } from '@owallet/stores';
 
-import { Buffer } from "buffer/";
-import { fromUtf8 } from "@cosmjs/encoding";
+import { Buffer } from 'buffer/';
+import { fromUtf8 } from '@cosmjs/encoding';
 
 export function renderDirectMessage(
   msg: any,
@@ -57,11 +57,16 @@ export function renderDirectMessage(
       );
     }
 
-    if (msg instanceof cosmwasm.wasm.v1.MsgExecuteContract) {
+    if (
+      msg instanceof cosmwasm.wasm.v1.MsgExecuteContract ||
+      msg instanceof cosmwasm.wasm.v1beta1.MsgExecuteContract
+    ) {
       return renderMsgExecuteContract(
         currencies,
         intl,
-        msg.funds as CoinPrimitive[],
+        (msg instanceof cosmwasm.wasm.v1.MsgExecuteContract
+          ? msg.funds
+          : msg.sent_funds) as CoinPrimitive[],
         undefined,
         msg.contract,
         JSON.parse(fromUtf8(msg.msg))
@@ -76,7 +81,7 @@ export function renderDirectMessage(
   }
 
   return renderUnknownMessage({
-    typeUrl: msg.typeUrl || msg.type_url || "Unknown",
-    value: Buffer.from(msg.value).toString("base64"),
+    typeUrl: msg.typeUrl || msg.type_url || 'Unknown',
+    value: Buffer.from(msg.value).toString('base64')
   });
 }

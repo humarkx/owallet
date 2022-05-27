@@ -5,7 +5,7 @@ import {
   BIP44HDPath,
   ExportKeyRingData,
   KeyRingStatus,
-} from "@keplr-wallet/background";
+} from "@owallet/background";
 import {
   DrawerActions,
   NavigationContainer,
@@ -53,7 +53,7 @@ import {
   IMemoConfig,
   IRecipientConfig,
   RegisterConfig,
-} from "@keplr-wallet/hooks";
+} from "@owallet/hooks";
 import {
   DelegateScreen,
   StakingDashboardScreen,
@@ -100,14 +100,14 @@ import {
 } from "./components/header/icon";
 import { BlurredBottomTabBar } from "./components/bottom-tabbar";
 import { UnlockScreen } from "./screens/unlock";
-import { KeplrVersionScreen } from "./screens/setting/screens/version";
+import { OWalletVersionScreen } from "./screens/setting/screens/version";
 import { ManageWalletConnectScreen } from "./screens/manage-wallet-connect";
 import {
   ImportFromExtensionIntroScreen,
   ImportFromExtensionScreen,
   ImportFromExtensionSetPasswordScreen,
 } from "./screens/register/import-from-extension";
-import { OsmosisWebpageScreen } from "./screens/web/webpages";
+import { DAppWebpageScreen } from "./screens/web/webpages";
 import { WebpageScreenScreenOptionsPreset } from "./screens/web/components/webpage-screen";
 import Bugsnag from "@bugsnag/react-native";
 
@@ -224,7 +224,7 @@ const {
     "Web.Intro": {
       upperScreenName: "Web",
     },
-    "Web.Osmosis": {
+    "Web.dApp": {
       upperScreenName: "Web",
     },
   }).withParams<{
@@ -690,7 +690,7 @@ export const SettingStackScreen: FunctionComponent = () => {
           title: "Version",
         }}
         name="Setting.Version"
-        component={KeplrVersionScreen}
+        component={OWalletVersionScreen}
       />
     </Stack.Navigator>
   );
@@ -739,7 +739,7 @@ export const WebNavigation: FunctionComponent = () => {
         name="Web.Intro"
         component={WebScreen}
       />
-      <Stack.Screen name="Web.Osmosis" component={OsmosisWebpageScreen} />
+      <Stack.Screen name="Web.dApp" component={DAppWebpageScreen} />
     </Stack.Navigator>
   );
 };

@@ -3,11 +3,13 @@
 .container {
   height: 100%;
   display: flex;
-  flex-direction: column;
-  background-color: $background-color;
+  flex-direction: column;  
 }
 
 .inner-container {
-  padding: 0 $layout-padding $layout-padding;
+  padding: $layout-padding;
   flex: 1;
+  margin-top: $header-height;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

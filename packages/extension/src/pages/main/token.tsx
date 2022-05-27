@@ -1,44 +1,46 @@
-import React, { FunctionComponent, useMemo, useState } from "react";
+import React, { FunctionComponent, useMemo, useState } from 'react';
 
-import styleToken from "./token.module.scss";
-import { observer } from "mobx-react-lite";
-import { useStore } from "../../stores";
-import { useHistory } from "react-router";
-import { Hash } from "@keplr-wallet/crypto";
-import { ObservableQueryBalanceInner } from "@keplr-wallet/stores/build/query/balances";
-import classmames from "classnames";
-import { UncontrolledTooltip } from "reactstrap";
-import { WrongViewingKeyError } from "@keplr-wallet/stores";
-import { useNotification } from "../../components/notification";
-import { useLoadingIndicator } from "../../components/loading-indicator";
-import { DenomHelper } from "@keplr-wallet/common";
-import { Dec } from "@keplr-wallet/unit";
+import styleToken from './token.module.scss';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../stores';
+import { useHistory } from 'react-router';
+import { Hash } from '@owallet/crypto';
+import { ObservableQueryBalanceInner } from '@owallet/stores/build/query/balances';
+import classmames from 'classnames';
+import { UncontrolledTooltip } from 'reactstrap';
+import { WrongViewingKeyError } from '@owallet/stores';
+import { useNotification } from '../../components/notification';
+import { useLoadingIndicator } from '../../components/loading-indicator';
+import { DenomHelper } from '@owallet/common';
+
+import { useLanguage } from '@owallet/common';
 
 const TokenView: FunctionComponent<{
   balance: ObservableQueryBalanceInner;
   onClick: () => void;
 }> = observer(({ onClick, balance }) => {
-  const { chainStore, accountStore, tokensStore } = useStore();
-
-  const [backgroundColors] = useState([
-    "#5e72e4",
-    "#11cdef",
-    "#2dce89",
-    "#fb6340",
+  const { chainStore, accountStore, tokensStore, priceStore } = useStore();
+  const language = useLanguage();
+  const [colors] = useState([
+    ['#5e72e4', '#ffffff'],
+    ['#11cdef', '#ffffff'],
+    ['#2dce89', '#ffffff'],
+    ['#F6F7FB', '#0e0314']
   ]);
 
-  const name = balance.currency.coinDenom.toUpperCase();
+  let name = balance.currency.coinDenom.toUpperCase();
   const minimalDenom = balance.currency.coinMinimalDenom;
+
   let amount = balance.balance.trim(true).shrink(true);
 
-  const backgroundColor = useMemo(() => {
+  const [backgroundColor, color] = useMemo(() => {
     const hash = Hash.sha256(Buffer.from(minimalDenom));
     if (hash.length > 0) {
-      return backgroundColors[hash[0] % backgroundColors.length];
+      return colors[hash[0] % colors.length];
     } else {
-      return backgroundColors[0];
+      return colors[0];
     }
-  }, [backgroundColors, minimalDenom]);
+  }, [colors, minimalDenom]);
 
   const error = balance.error;
 
@@ -46,8 +48,8 @@ const TokenView: FunctionComponent<{
   // But, it is hard to ensure that the id is valid selector because the currency can be suggested from the webpages.
   // So, just hash the minimal denom and encode it to the hex and remove the numbers.
   const validSelector = Buffer.from(Hash.sha256(Buffer.from(minimalDenom)))
-    .toString("hex")
-    .replace(/\d+/g, "")
+    .toString('hex')
+    .replace(/\d+/g, '')
     .slice(0, 20);
 
   const history = useHistory();
@@ -56,24 +58,25 @@ const TokenView: FunctionComponent<{
   const loadingIndicator = useLoadingIndicator();
 
   const accountInfo = accountStore.getAccount(chainStore.current.chainId);
+
   const createViewingKey = async (): Promise<string | undefined> => {
-    if ("type" in balance.currency && balance.currency.type === "secret20") {
+    if ('type' in balance.currency && balance.currency.type === 'secret20') {
       const contractAddress = balance.currency.contractAddress;
       return new Promise((resolve) => {
         accountInfo.secret
           .createSecret20ViewingKey(
             contractAddress,
-            "",
+            '',
             {},
             {},
             (_, viewingKey) => {
-              loadingIndicator.setIsLoading("create-veiwing-key", false);
+              loadingIndicator.setIsLoading('create-veiwing-key', false);
 
               resolve(viewingKey);
             }
           )
           .then(() => {
-            loadingIndicator.setIsLoading("create-veiwing-key", true);
+            loadingIndicator.setIsLoading('create-veiwing-key', true);
           });
       });
     }
@@ -82,9 +85,14 @@ const TokenView: FunctionComponent<{
   // If the currency is the IBC Currency.
   // Show the amount as slightly different with other currencies.
   // Show the actual coin denom to the top and just show the coin denom without channel info to the bottom.
-  if ("originCurrency" in amount.currency && amount.currency.originCurrency) {
+  if ('originCurrency' in amount.currency && amount.currency.originCurrency) {
     amount = amount.setCurrency(amount.currency.originCurrency);
+  } else {
+    const denomHelper = new DenomHelper(amount.currency.coinMinimalDenom);
+    name += ` (${denomHelper.contractAddress})`;
   }
+
+  const tokenPrice = priceStore.calculatePrice(amount, language.fiatCurrency);
 
   return (
     <div
@@ -98,20 +106,27 @@ const TokenView: FunctionComponent<{
       <div className={styleToken.icon}>
         <div
           style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "100000px",
+            width: '100%',
+            height: '100%',
+            borderRadius: '100000px',
             backgroundColor,
-
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-
-            color: "#FFFFFF",
-            fontSize: "16px",
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: backgroundColor,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color,
+            fontSize: '16px'
           }}
         >
-          {name.length > 0 ? name[0] : "?"}
+          {balance.currency.coinImageUrl ? (
+            <img src={balance.currency.coinImageUrl} />
+          ) : name.length > 0 ? (
+            name[0]
+          ) : (
+            '?'
+          )}
         </div>
       </div>
       <div className={styleToken.innerContainer}>
@@ -123,10 +138,13 @@ const TokenView: FunctionComponent<{
               <i className="fas fa-spinner fa-spin ml-1" />
             ) : null}
           </div>
+          {tokenPrice && (
+            <div className={styleToken.price}>{tokenPrice.toString()}</div>
+          )}
         </div>
         <div style={{ flex: 1 }} />
         {error ? (
-          <div className={classmames(styleToken.rightIcon, "mr-2")}>
+          <div className={classmames(styleToken.rightIcon, 'mr-2')}>
             <i
               className="fas fa-exclamation-circle text-danger"
               id={validSelector}
@@ -138,26 +156,26 @@ const TokenView: FunctionComponent<{
         ) : null}
         {error?.data && error.data instanceof WrongViewingKeyError ? (
           <div
-            className={classmames(styleToken.rightIcon, "mr-2")}
+            className={classmames(styleToken.rightIcon, 'mr-2')}
             onClick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
 
               if (
-                "type" in balance.currency &&
-                balance.currency.type === "secret20"
+                'type' in balance.currency &&
+                balance.currency.type === 'secret20'
               ) {
                 const viewingKey = await createViewingKey();
                 if (!viewingKey) {
                   notification.push({
-                    placement: "top-center",
-                    type: "danger",
+                    placement: 'top-center',
+                    type: 'danger',
                     duration: 2,
-                    content: "Failed to create the viewing key",
+                    content: 'Failed to create the viewing key',
                     canDelete: true,
                     transition: {
-                      duration: 0.25,
-                    },
+                      duration: 0.25
+                    }
                   });
 
                   return;
@@ -169,16 +187,16 @@ const TokenView: FunctionComponent<{
 
                 await tokenOf.addToken({
                   ...balance.currency,
-                  viewingKey,
+                  viewingKey
                 });
 
                 history.push({
-                  pathname: "/",
+                  pathname: '/'
                 });
               }
             }}
           >
-            {accountInfo.isSendingMsg === "createSecret20ViewingKey" ? (
+            {accountInfo.isSendingMsg === 'createSecret20ViewingKey' ? (
               <i className="fa fa-spinner fa-spin fa-fw" />
             ) : (
               <i className="fas fa-wrench" />
@@ -193,22 +211,15 @@ const TokenView: FunctionComponent<{
   );
 });
 
-export const TokensView: FunctionComponent = observer(() => {
-  const { chainStore, accountStore, queriesStore } = useStore();
+export const TokensView: FunctionComponent<{
+  tokens: ObservableQueryBalanceInner[];
+}> = observer(({ tokens }) => {
+  // const { chainStore, accountStore, queriesStore } = useStore();
 
-  const accountInfo = accountStore.getAccount(chainStore.current.chainId);
+  // const accountInfo = accountStore.getAccount(chainStore.current.chainId);
 
-  const tokens = queriesStore
-    .get(chainStore.current.chainId)
-    .queryBalances.getQueryBech32Address(accountInfo.bech32Address)
-    .unstakables.filter((bal) => {
-      // Temporary implementation for trimming the 0 balanced native tokens.
-      // TODO: Remove this part.
-      if (new DenomHelper(bal.currency.coinMinimalDenom).type === "native") {
-        return bal.balance.toDec().gt(new Dec("0"));
-      }
-      return true;
-    })
+  const displayTokens = tokens
+    .filter((token) => token?.balance)
     .sort((a, b) => {
       const aDecIsZero = a.balance.toDec().isZero();
       const bDecIsZero = b.balance.toDec().isZero();
@@ -228,15 +239,15 @@ export const TokensView: FunctionComponent = observer(() => {
   return (
     <div className={styleToken.tokensContainer}>
       <h1 className={styleToken.title}>Tokens</h1>
-      {tokens.map((token, i) => {
+      {displayTokens.map((token, i) => {
         return (
           <TokenView
             key={i.toString()}
             balance={token}
             onClick={() => {
               history.push({
-                pathname: "/send",
-                search: `?defaultDenom=${token.currency.coinMinimalDenom}`,
+                pathname: '/send',
+                search: `?defaultDenom=${token.currency.coinMinimalDenom}`
               });
             }}
           />

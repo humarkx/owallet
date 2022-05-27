@@ -1,28 +1,26 @@
-import React, { FunctionComponent, useEffect, useRef } from "react";
+import React, { FunctionComponent, useEffect, useRef } from 'react';
 
-import { HeaderLayout } from "../../layouts";
+import { HeaderLayout } from '../../layouts';
 
-import { Card, CardBody } from "reactstrap";
+import { Card, CardBody } from 'reactstrap';
 
-import style from "./style.module.scss";
-import { Menu } from "./menu";
-import { AccountView } from "./account";
-import { TxButtonView } from "./tx-button";
-import { AssetView } from "./asset";
-import { StakeView } from "./stake";
+import style from './style.module.scss';
+import { Menu } from './menu';
+import { AccountView } from './account';
+import { TxButtonView } from './tx-button';
+import { AssetView, AssetViewEvm } from './asset';
+import { StakeView } from './stake';
 
-import classnames from "classnames";
-import { useHistory } from "react-router";
-import { observer } from "mobx-react-lite";
-import { useStore } from "../../stores";
-import { TokensView } from "./token";
-import { BIP44SelectModal } from "./bip44-select-modal";
-import { useIntl } from "react-intl";
-import { useConfirm } from "../../components/confirm";
-import { ChainUpdaterService } from "@keplr-wallet/background";
-import { IBCTransferView } from "./ibc-transfer";
-import { DenomHelper } from "@keplr-wallet/common";
-import { Dec } from "@keplr-wallet/unit";
+import classnames from 'classnames';
+import { useHistory } from 'react-router';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../stores';
+import { TokensView } from './token';
+import { BIP44SelectModal } from './bip44-select-modal';
+import { useIntl } from 'react-intl';
+import { useConfirm } from '../../components/confirm';
+import { ChainUpdaterService } from '@owallet/background';
+import { IBCTransferView } from './ibc-transfer';
 
 export const MainPage: FunctionComponent = observer(() => {
   const history = useHistory();
@@ -45,14 +43,14 @@ export const MainPage: FunctionComponent = observer(() => {
           if (
             await confirm.confirm({
               paragraph: intl.formatMessage({
-                id: "main.update-chain.confirm.paragraph",
+                id: 'main.update-chain.confirm.paragraph'
               }),
               yes: intl.formatMessage({
-                id: "main.update-chain.confirm.yes",
+                id: 'main.update-chain.confirm.yes'
               }),
               no: intl.formatMessage({
-                id: "main.update-chain.confirm.no",
-              }),
+                id: 'main.update-chain.confirm.no'
+              })
             })
           ) {
             await chainStore.tryUpdateChain(chainStore.current.chainId);
@@ -72,14 +70,7 @@ export const MainPage: FunctionComponent = observer(() => {
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(accountInfo.bech32Address);
 
-  const tokens = queryBalances.unstakables.filter((bal) => {
-    // Temporary implementation for trimming the 0 balanced native tokens.
-    // TODO: Remove this part.
-    if (new DenomHelper(bal.currency.coinMinimalDenom).type === "native") {
-      return bal.balance.toDec().gt(new Dec("0"));
-    }
-    return true;
-  });
+  const tokens = queryBalances.unstakables;
 
   const hasTokens = tokens.length > 0;
 
@@ -91,53 +82,57 @@ export const MainPage: FunctionComponent = observer(() => {
       rightRenderer={
         <div
           style={{
-            height: "64px",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            paddingRight: "20px",
+            height: '64px',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingRight: '20px'
           }}
         >
           <i
             className="fas fa-user"
             style={{
-              cursor: "pointer",
-              padding: "4px",
+              cursor: 'pointer',
+              padding: '4px'
             }}
             onClick={(e) => {
               e.preventDefault();
 
-              history.push("/setting/set-keyring");
+              history.push('/setting/set-keyring');
             }}
           />
         </div>
       }
     >
       <BIP44SelectModal />
-      <Card className={classnames(style.card, "shadow")}>
+      <Card className={classnames(style.card, 'shadow')}>
         <CardBody>
           <div className={style.containerAccountInner}>
             <AccountView />
-            <AssetView />
+            {chainStore.current.raw.networkType === 'evm' ? (
+              <AssetViewEvm />
+            ) : (
+              <AssetView />
+            )}
             <TxButtonView />
           </div>
         </CardBody>
       </Card>
-      {chainStore.current.walletUrlForStaking ? (
-        <Card className={classnames(style.card, "shadow")}>
+      {chainStore.current.raw.networkType !== 'evm' && (
+        <Card className={classnames(style.card, 'shadow')}>
           <CardBody>
             <StakeView />
           </CardBody>
         </Card>
-      ) : null}
+      )}
       {hasTokens ? (
-        <Card className={classnames(style.card, "shadow")}>
-          <CardBody>{<TokensView />}</CardBody>
+        <Card className={classnames(style.card, 'shadow')}>
+          <CardBody>{<TokensView tokens={tokens} />}</CardBody>
         </Card>
       ) : null}
       {uiConfigStore.showAdvancedIBCTransfer &&
-      chainStore.current.features?.includes("ibc-transfer") ? (
-        <Card className={classnames(style.card, "shadow")}>
+      chainStore.current.features?.includes('ibc-transfer') ? (
+        <Card className={classnames(style.card, 'shadow')}>
           <CardBody>
             <IBCTransferView />
           </CardBody>

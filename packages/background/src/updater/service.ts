@@ -1,11 +1,11 @@
-import { inject, singleton, delay } from "tsyringe";
-import { TYPES } from "../types";
+import { inject, singleton, delay } from 'tsyringe';
+import { TYPES } from '../types';
 
-import { ChainInfo } from "@keplr-wallet/types";
-import Axios from "axios";
-import { KVStore } from "@keplr-wallet/common";
-import { ChainIdHelper } from "@keplr-wallet/cosmos";
-import { ChainsService } from "../chains";
+import { ChainInfo } from '@owallet/types';
+import Axios from 'axios';
+import { KVStore } from '@owallet/common';
+import { ChainIdHelper } from '@owallet/cosmos';
+import { ChainsService } from '../chains';
 
 @singleton()
 export class ChainUpdaterService {
@@ -43,8 +43,8 @@ export class ChainUpdaterService {
       ...chainInfo,
       ...{
         chainId: updatedProperty.chainId || chainInfo.chainId,
-        features,
-      },
+        features
+      }
     };
   }
 
@@ -77,7 +77,7 @@ export class ChainUpdaterService {
           currentVersion.version < fetchedVersion.version
         ) {
           await this.saveChainProperty(currentVersion.identifier, {
-            chainId: fetchedChainId,
+            chainId: fetchedChainId
           });
         }
       }
@@ -96,7 +96,7 @@ export class ChainUpdaterService {
         }
 
         await this.saveChainProperty(currentVersion.identifier, {
-          features: updateFeatures,
+          features: updateFeatures
         });
       }
     }
@@ -118,7 +118,7 @@ export class ChainUpdaterService {
 
     await this.kvStore.set(identifier, {
       ...saved,
-      ...chainInfo,
+      ...chainInfo
     });
 
     this.chainsService.clearCachedChainInfos();
@@ -153,22 +153,22 @@ export class ChainUpdaterService {
     if (!ChainIdHelper.hasChainVersion(chainId)) {
       return {
         explicit: false,
-        slient: false,
+        slient: false
       };
     }
 
     const instance = Axios.create({
-      baseURL: chainInfo.rpc,
+      baseURL: chainInfo.rpc
     });
 
     // Get the status to get the chain id.
     const result = await instance.get<{
       result: {
         node_info: {
-          network: "osmosis-1";
+          network: 'osmosis-1';
         };
       };
-    }>("/status");
+    }>('/status');
 
     const resultChainId = result.data.result.node_info.network;
 
@@ -179,21 +179,21 @@ export class ChainUpdaterService {
     if (version.identifier !== fetchedVersion.identifier) {
       return {
         explicit: false,
-        slient: false,
+        slient: false
       };
     }
 
     const restInstance = Axios.create({
-      baseURL: chainInfo.rest,
+      baseURL: chainInfo.rest
     });
 
     let staragteUpdate = false;
     try {
-      if (!chainInfo.features || !chainInfo.features.includes("stargate")) {
+      if (!chainInfo.features || !chainInfo.features.includes('stargate')) {
         // If the chain doesn't have the stargate feature,
         // but it can use the GRPC HTTP Gateway,
         // assume that it can support the stargate and try to update the features.
-        await restInstance.get("/cosmos/base/tendermint/v1beta1/node_info");
+        await restInstance.get('/cosmos/base/tendermint/v1beta1/node_info');
         staragteUpdate = true;
       }
     } catch {}
@@ -201,9 +201,9 @@ export class ChainUpdaterService {
     let ibcGoUpdates = false;
     try {
       if (
-        (!chainInfo.features || !chainInfo.features.includes("ibc-go")) &&
+        (!chainInfo.features || !chainInfo.features.includes('ibc-go')) &&
         (staragteUpdate ||
-          (chainInfo.features && chainInfo.features.includes("stargate")))
+          (chainInfo.features && chainInfo.features.includes('stargate')))
       ) {
         // If the chain uses the ibc-go module separated from the cosmos-sdk,
         // we need to check it because the REST API is different.
@@ -212,7 +212,7 @@ export class ChainUpdaterService {
             receive_enabled: boolean;
             send_enabled: boolean;
           };
-        }>("/ibc/apps/transfer/v1/params");
+        }>('/ibc/apps/transfer/v1/params');
 
         if (result.status === 200) {
           ibcGoUpdates = true;
@@ -223,13 +223,13 @@ export class ChainUpdaterService {
     let ibcTransferUpdate = false;
     try {
       if (
-        (!chainInfo.features || !chainInfo.features.includes("ibc-transfer")) &&
+        (!chainInfo.features || !chainInfo.features.includes('ibc-transfer')) &&
         (staragteUpdate ||
-          (chainInfo.features && chainInfo.features.includes("stargate")))
+          (chainInfo.features && chainInfo.features.includes('stargate')))
       ) {
         const isIBCGo =
           ibcGoUpdates ||
-          (chainInfo.features && chainInfo.features.includes("ibc-go"));
+          (chainInfo.features && chainInfo.features.includes('ibc-go'));
 
         // If the chain doesn't have the ibc transfer feature,
         // try to fetch the params of ibc transfer module.
@@ -241,8 +241,8 @@ export class ChainUpdaterService {
           };
         }>(
           isIBCGo
-            ? "/ibc/apps/transfer/v1/params"
-            : "/ibc/applications/transfer/v1beta1/params"
+            ? '/ibc/apps/transfer/v1/params'
+            : '/ibc/applications/transfer/v1beta1/params'
         );
         if (
           result.data.params.receive_enabled &&
@@ -257,28 +257,28 @@ export class ChainUpdaterService {
     try {
       if (
         (!chainInfo.features ||
-          !chainInfo.features.includes("no-legacy-stdTx")) &&
+          !chainInfo.features.includes('no-legacy-stdTx')) &&
         (staragteUpdate ||
-          (chainInfo.features && chainInfo.features.includes("stargate")))
+          (chainInfo.features && chainInfo.features.includes('stargate')))
       ) {
         // The chain with above cosmos-sdk@v0.44.0 can't send the legacy stdTx,
         // Assume that it can't send the legacy stdTx if the POST /txs responses "not implemented".
         const result = await restInstance.post<
           | {
               code: 12;
-              message: "Not Implemented";
+              message: 'Not Implemented';
               details: [];
             }
           | any
-        >("/txs", undefined, {
+        >('/txs', undefined, {
           validateStatus: (status) => {
             return (status >= 200 && status < 300) || status === 501;
-          },
+          }
         });
         if (
           result.status === 501 &&
           result.data.code === 12 &&
-          result.data.message === "Not Implemented"
+          result.data.message === 'Not Implemented'
         ) {
           noLegacyStdTxUpdate = true;
         }
@@ -287,16 +287,16 @@ export class ChainUpdaterService {
 
     const features: string[] = [];
     if (staragteUpdate) {
-      features.push("stargate");
+      features.push('stargate');
     }
     if (ibcGoUpdates) {
-      features.push("ibc-go");
+      features.push('ibc-go');
     }
     if (ibcTransferUpdate) {
-      features.push("ibc-transfer");
+      features.push('ibc-transfer');
     }
     if (noLegacyStdTxUpdate) {
-      features.push("no-legacy-stdTx");
+      features.push('no-legacy-stdTx');
     }
 
     return {
@@ -308,7 +308,7 @@ export class ChainUpdaterService {
         noLegacyStdTxUpdate,
 
       chainId: resultChainId,
-      features,
+      features
     };
   }
 }

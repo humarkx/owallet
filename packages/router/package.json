@@ -1,5 +1,5 @@
 {
-  "name": "@keplr-wallet/router",
+  "name": "@owallet/router",
   "version": "0.9.6",
   "main": "build/index.js",
   "author": "chainapsis",

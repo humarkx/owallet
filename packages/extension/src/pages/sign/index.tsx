@@ -1,33 +1,33 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
-import { Button } from "reactstrap";
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { Button } from 'reactstrap';
 
-import { HeaderLayout } from "../../layouts";
+import { HeaderLayout } from '../../layouts';
 
-import style from "./style.module.scss";
+import style from './style.module.scss';
 
-import { useStore } from "../../stores";
+import { useStore } from '../../stores';
 
-import classnames from "classnames";
-import { DataTab } from "./data-tab";
-import { DetailsTab } from "./details-tab";
-import { FormattedMessage, useIntl } from "react-intl";
+import classnames from 'classnames';
+import { DataTab } from './data-tab';
+import { DetailsTab } from './details-tab';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { useHistory } from "react-router";
-import { observer } from "mobx-react-lite";
+import { useHistory } from 'react-router';
+import { observer } from 'mobx-react-lite';
 import {
   useInteractionInfo,
   useSignDocHelper,
   useGasConfig,
   useFeeConfig,
   useMemoConfig,
-  useSignDocAmountConfig,
-} from "@keplr-wallet/hooks";
-import { ADR36SignDocDetailsTab } from "./adr-36";
-import { ChainIdHelper } from "@keplr-wallet/cosmos";
+  useSignDocAmountConfig
+} from '@owallet/hooks';
+import { ADR36SignDocDetailsTab } from './adr-36';
+import { ChainIdHelper } from '@owallet/cosmos';
 
 enum Tab {
   Details,
-  Data,
+  Data
 }
 
 export const SignPage: FunctionComponent = observer(() => {
@@ -42,10 +42,10 @@ export const SignPage: FunctionComponent = observer(() => {
     keyRingStore,
     signInteractionStore,
     accountStore,
-    queriesStore,
+    queriesStore
   } = useStore();
 
-  const [signer, setSigner] = useState("");
+  const [signer, setSigner] = useState('');
   const [origin, setOrigin] = useState<string | undefined>();
   const [isADR36WithString, setIsADR36WithString] = useState<
     boolean | undefined
@@ -87,7 +87,7 @@ export const SignPage: FunctionComponent = observer(() => {
       ) {
         // Validate the requested chain id and the chain id in the sign doc are same.
         // If the sign doc is for ADR-36, there is no chain id in the sign doc, so no need to validate.
-        throw new Error("Chain id unmatched");
+        throw new Error('Chain id unmatched');
       }
       signDocHelper.setSignDocWrapper(data.data.signDocWrapper);
       gasConfig.setGas(data.data.signDocWrapper.gas);
@@ -113,7 +113,7 @@ export const SignPage: FunctionComponent = observer(() => {
     memoConfig,
     feeConfig,
     signDocHelper,
-    signInteractionStore.waitingData,
+    signInteractionStore.waitingData
   ]);
 
   // If the preferNoSetFee or preferNoSetMemo in sign options is true,
@@ -157,21 +157,21 @@ export const SignPage: FunctionComponent = observer(() => {
   }, [
     signDocHelper.signDocWrapper,
     chainStore.current.chainId,
-    chainStore.selectedChainId,
+    chainStore.selectedChainId
   ]);
 
   // If this is undefined, show the chain name on the header.
   // If not, show the alternative title.
   const alternativeTitle = (() => {
     if (!isLoaded) {
-      return "";
+      return '';
     }
 
     if (
       signDocHelper.signDocWrapper &&
       signDocHelper.signDocWrapper.isADR36SignDoc
     ) {
-      return "Prove Ownership";
+      return 'Prove Ownership';
     }
 
     return undefined;
@@ -207,7 +207,6 @@ export const SignPage: FunctionComponent = observer(() => {
             }
           : undefined
       }
-      style={{ background: "white" }}
     >
       {
         /*
@@ -226,7 +225,7 @@ export const SignPage: FunctionComponent = observer(() => {
                     }}
                   >
                     {intl.formatMessage({
-                      id: "sign.tab.details",
+                      id: 'sign.tab.details'
                     })}
                   </a>
                 </li>
@@ -238,7 +237,7 @@ export const SignPage: FunctionComponent = observer(() => {
                     }}
                   >
                     {intl.formatMessage({
-                      id: "sign.tab.data",
+                      id: 'sign.tab.data'
                     })}
                   </a>
                 </li>
@@ -246,7 +245,7 @@ export const SignPage: FunctionComponent = observer(() => {
             </div>
             <div
               className={classnames(style.tabContainer, {
-                [style.dataTab]: tab === Tab.Data,
+                [style.dataTab]: tab === Tab.Data
               })}
             >
               {tab === Tab.Data ? (
@@ -277,7 +276,7 @@ export const SignPage: FunctionComponent = observer(() => {
             </div>
             <div style={{ flex: 1 }} />
             <div className={style.buttons}>
-              {keyRingStore.keyRingType === "ledger" &&
+              {keyRingStore.keyRingType === 'ledger' &&
               signInteractionStore.isLoading ? (
                 <Button
                   className={style.button}
@@ -285,7 +284,7 @@ export const SignPage: FunctionComponent = observer(() => {
                   disabled={true}
                   outline
                 >
-                  <FormattedMessage id="sign.button.confirm-ledger" />{" "}
+                  <FormattedMessage id="sign.button.confirm-ledger" />{' '}
                   <i className="fa fa-spinner fa-spin fa-fw" />
                 </Button>
               ) : (
@@ -314,7 +313,7 @@ export const SignPage: FunctionComponent = observer(() => {
                     outline
                   >
                     {intl.formatMessage({
-                      id: "sign.button.reject",
+                      id: 'sign.button.reject'
                     })}
                   </Button>
                   <Button
@@ -344,7 +343,7 @@ export const SignPage: FunctionComponent = observer(() => {
                     }}
                   >
                     {intl.formatMessage({
-                      id: "sign.button.approve",
+                      id: 'sign.button.approve'
                     })}
                   </Button>
                 </React.Fragment>
@@ -354,11 +353,11 @@ export const SignPage: FunctionComponent = observer(() => {
         ) : (
           <div
             style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
             }}
           >
             <i className="fas fa-spinner fa-spin fa-2x text-gray" />

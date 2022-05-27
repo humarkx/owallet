@@ -1,16 +1,16 @@
 import React, { FunctionComponent } from "react";
 import { useHeaderHeight } from "@react-navigation/stack";
 import { PageWithScrollView } from "../../components/page";
-import { KeplrLogo } from "../../components/svg";
 import { GoogleIcon, AppleIcon } from "../../components/icon";
 import { useStyle } from "../../styles";
 import { View, Text, Dimensions, Platform, StyleSheet } from "react-native";
 import { Button } from "../../components/button";
 import { useSmartNavigation } from "../../navigation";
-import { useRegisterConfig } from "@keplr-wallet/hooks";
+import { useRegisterConfig } from "@owallet/hooks";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../stores";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { OWalletLogo } from "./owallet-logo";
 
 export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
   const { keyRingStore, analyticsStore } = useStore();
@@ -40,7 +40,7 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
       <View
         style={style.flatten(["flex-grow-1", "items-center", "padding-x-18"])}
       >
-        <KeplrLogo width="100%" />
+        <OWalletLogo />
       </View>
       {Platform.OS === "ios" ? (
         <Button
@@ -102,7 +102,7 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
       </Text>
       <Button
         containerStyle={style.flatten(["margin-bottom-16"])}
-        text="Import from Keplr Extension"
+        text="Import from OWallet Extension"
         size="large"
         mode="light"
         onPress={() => {

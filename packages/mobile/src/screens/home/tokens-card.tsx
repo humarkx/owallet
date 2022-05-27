@@ -1,17 +1,12 @@
 import React, { FunctionComponent } from "react";
-import {
-  Card,
-  CardBody,
-  // CardHeader,
-  CardHeaderFullButton,
-} from "../../components/card";
+import { Card, CardBody, CardHeader } from "../../components/card";
 import { Text, View, ViewStyle } from "react-native";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../stores";
 import { useStyle } from "../../styles";
 import { TokenItem } from "../tokens";
 import { useSmartNavigation } from "../../navigation";
-// import { RectButton } from "../../components/rect-button";
+import { RectButton } from "../../components/rect-button";
 
 export const TokensCard: FunctionComponent<{
   containerStyle?: ViewStyle;
@@ -35,25 +30,23 @@ export const TokensCard: FunctionComponent<{
   return (
     <View style={containerStyle}>
       <Card style={style.flatten(["padding-bottom-14"])}>
-        <CardHeaderFullButton
-          title="Tokens"
-          onPress={() => {
-            smartNavigation.navigateSmart("Tokens", {});
-          }}
+        <CardHeader
+          containerStyle={style.flatten(["padding-bottom-6"])}
+          title="Token"
         />
         <CardBody style={style.flatten(["padding-0"])}>
           {tokens.map((token) => {
             return (
               <TokenItem
                 key={token.currency.coinMinimalDenom}
-                chainInfo={chainStore.current}
+                chainInfo={{ stakeCurrency: chainStore.current.stakeCurrency }}
                 balance={token.balance}
               />
             );
           })}
         </CardBody>
       </Card>
-      {/* <RectButton
+      <RectButton
         style={style.flatten(["items-center", "padding-y-11"])}
         onPress={() => {
           smartNavigation.navigateSmart("Tokens", {});
@@ -69,7 +62,7 @@ export const TokensCard: FunctionComponent<{
         >
           View all tokens
         </Text>
-      </RectButton> */}
+      </RectButton>
     </View>
   );
 });

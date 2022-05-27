@@ -4,27 +4,28 @@ import {
   computed,
   makeObservable,
   observable,
-  runInAction,
-} from "mobx";
+  runInAction
+} from 'mobx';
 import {
   AppCurrency,
   Bech32Config,
   BIP44,
   ChainInfo,
-  Currency,
-} from "@keplr-wallet/types";
-import { ChainGetter } from "../common";
-import { ChainIdHelper } from "@keplr-wallet/cosmos";
-import { DeepReadonly } from "utility-types";
-import { AxiosRequestConfig } from "axios";
-import { keepAlive } from "mobx-utils";
+  Currency
+} from '@owallet/types';
+import { ChainGetter } from '../common';
+import { ChainIdHelper } from '@owallet/cosmos';
+import { DeepReadonly } from 'utility-types';
+import { AxiosRequestConfig } from 'axios';
+import { keepAlive } from 'mobx-utils';
 
 type CurrencyRegistrar = (
   coinMinimalDenom: string
 ) => AppCurrency | [AppCurrency | undefined, boolean] | undefined;
 
 export class ChainInfoInner<C extends ChainInfo = ChainInfo>
-  implements ChainInfo {
+  implements ChainInfo
+{
   @observable.ref
   protected _chainInfo: C;
 
@@ -50,7 +51,7 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
 
     makeObservable(this);
 
-    keepAlive(this, "currencyMap");
+    keepAlive(this, 'currencyMap');
   }
 
   protected getCurrencyFromRegistrars(
@@ -61,7 +62,7 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
       const currency = registrar(coinMinimalDenom);
       if (currency) {
         // AppCurrency일 경우
-        if ("coinMinimalDenom" in currency) {
+        if ('coinMinimalDenom' in currency) {
           return [currency, true];
         }
         return currency;
@@ -71,10 +72,10 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
   }
 
   /*
-   * 해당되는 denom의 currency를 모를 때 이 메소드를 사용해서 등록을 요청할 수 있다.
-   * 이미 등록되어 있거나 등록을 시도 중이면 아무 행동도 하지 않는.
-   * 예를들어 네이티브 balance 쿼리에서 모르는 denom이 나오거나
-   * IBC denom의 등록을 요청할 때 쓸 수 있다.
+   * When you do not know the currency of the corresponding denom, you can use this method to request registration.
+   * Do nothing if already registered or attempting to register.
+   * For example, an unknown denom appears in the native balance query, or
+   * Can be used to request registration of IBC denom.
    */
   @action
   addUnknownCurrencies(...coinMinimalDenoms: string[]) {
@@ -191,7 +192,7 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
       return {
         coinMinimalDenom,
         coinDenom: coinMinimalDenom,
-        coinDecimals: 0,
+        coinDecimals: 0
       };
     }
     return currency;
@@ -267,14 +268,6 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
   get rpcConfig(): AxiosRequestConfig | undefined {
     return this.raw.rpcConfig;
   }
-
-  get walletUrl(): string | undefined {
-    return this.raw.walletUrl;
-  }
-
-  get walletUrlForStaking(): string | undefined {
-    return this.raw.walletUrlForStaking;
-  }
 }
 
 export type ChainInfoOverrider<C extends ChainInfo = ChainInfo> = (
@@ -282,7 +275,8 @@ export type ChainInfoOverrider<C extends ChainInfo = ChainInfo> = (
 ) => C;
 
 export class ChainStore<C extends ChainInfo = ChainInfo>
-  implements ChainGetter {
+  implements ChainGetter
+{
   @observable.ref
   protected _chainInfos!: ChainInfoInner<C>[];
 

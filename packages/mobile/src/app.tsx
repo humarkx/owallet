@@ -1,11 +1,10 @@
-import React, { FunctionComponent } from "react";
-import { StoreProvider } from "./stores";
+import React, { FunctionComponent, useEffect } from "react";
+import { StoreProvider, useStore } from "./stores";
 import { StyleProvider } from "./styles";
 import { AppNavigation } from "./navigation";
-import { IntlProvider } from "react-intl";
 import { ModalsProvider } from "./modals/base";
 import { Platform, StatusBar } from "react-native";
-
+import { AdditonalIntlMessages, LanguageToFiatCurrency } from "@owallet/common";
 import codePush from "react-native-code-push";
 import { InteractionModalsProivder } from "./providers/interaction-modals-provider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -13,6 +12,8 @@ import { LoadingScreenProvider } from "./providers/loading-screen";
 import * as SplashScreen from "expo-splash-screen";
 import { ConfirmModalProvider } from "./providers/confirm-modal";
 import Bugsnag from "@bugsnag/react-native";
+import { AppIntlProvider } from "@owallet/common/src/languages";
+import { IntlProvider } from "react-intl";
 
 if (Platform.OS === "android") {
   // https://github.com/web-ridge/react-native-paper-dates/releases/tag/v0.2.15
@@ -63,12 +64,20 @@ SplashScreen.preventAutoHideAsync()
   )
   .catch(console.warn);
 
-const AppBody: FunctionComponent = () => {
+const AppIntlProviderWithStorage = ({ children }) => {
+  const store = useStore();
+
   return (
-    <StyleProvider>
-      <StoreProvider>
+    <AppIntlProvider
+      additionalMessages={AdditonalIntlMessages}
+      languageToFiatCurrency={LanguageToFiatCurrency}
+      storage={store.uiConfigStore.Storage}
+    >
+      {({ language, messages, automatic }) => (
         <IntlProvider
-          locale="en"
+          locale={language}
+          messages={messages}
+          key={`${language}${automatic ? "-auto" : ""}`}
           formats={{
             date: {
               en: {
@@ -86,6 +95,18 @@ const AppBody: FunctionComponent = () => {
             },
           }}
         >
+          {children}
+        </IntlProvider>
+      )}
+    </AppIntlProvider>
+  );
+};
+
+const AppBody: FunctionComponent = () => {
+  return (
+    <StyleProvider>
+      <StoreProvider>
+        <AppIntlProviderWithStorage>
           <StatusBar
             translucent={true}
             backgroundColor="#FFFFFF00"
@@ -102,7 +123,7 @@ const AppBody: FunctionComponent = () => {
               </LoadingScreenProvider>
             </ModalsProvider>
           </SafeAreaProvider>
-        </IntlProvider>
+        </AppIntlProviderWithStorage>
       </StoreProvider>
     </StyleProvider>
   );

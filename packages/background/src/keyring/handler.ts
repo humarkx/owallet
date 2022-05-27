@@ -1,4 +1,4 @@
-import { Env, Handler, InternalHandler, Message } from "@keplr-wallet/router";
+import { Env, Handler, InternalHandler, Message } from '@owallet/router';
 import {
   CreateMnemonicKeyMsg,
   CreatePrivateKeyMsg,
@@ -21,13 +21,13 @@ import {
   GetIsKeyStoreCoinTypeSetMsg,
   CheckPasswordMsg,
   ExportKeyRingDatasMsg,
-  RequestVerifyADR36AminoSignDoc,
-} from "./messages";
-import { KeyRingService } from "./service";
-import { Bech32Address } from "@keplr-wallet/cosmos";
+  RequestVerifyADR36AminoSignDoc
+} from './messages';
+import { KeyRingService } from './service';
+import { Bech32Address } from '@owallet/cosmos';
 
-import { cosmos } from "@keplr-wallet/cosmos";
-import Long from "long";
+import { cosmos } from '@owallet/cosmos';
+import Long from 'long';
 
 export const getHandler: (service: KeyRingService) => Handler = (
   service: KeyRingService
@@ -112,7 +112,7 @@ export const getHandler: (service: KeyRingService) => Handler = (
           msg as ExportKeyRingDatasMsg
         );
       default:
-        throw new Error("Unknown msg type");
+        throw new Error('Unknown msg type');
     }
   };
 };
@@ -224,7 +224,7 @@ const handleLockKeyRingMsg: (
 ) => InternalHandler<LockKeyRingMsg> = (service) => {
   return () => {
     return {
-      status: service.lock(),
+      status: service.lock()
     };
   };
 };
@@ -234,7 +234,7 @@ const handleUnlockKeyRingMsg: (
 ) => InternalHandler<UnlockKeyRingMsg> = (service) => {
   return async (_, msg) => {
     return {
-      status: await service.unlock(msg.password),
+      status: await service.unlock(msg.password)
     };
   };
 };
@@ -252,15 +252,15 @@ const handleGetKeyMsg: (
     const key = await service.getKey(msg.chainId);
 
     return {
-      name: service.getKeyStoreMeta("name"),
-      algo: "secp256k1",
+      name: service.getKeyStoreMeta('name'),
+      algo: 'secp256k1',
       pubKey: key.pubKey,
       address: key.address,
       bech32Address: new Bech32Address(key.address).toBech32(
         (await service.chainsService.getChainInfo(msg.chainId)).bech32Config
           .bech32PrefixAccAddr
       ),
-      isNanoLedger: key.isNanoLedger,
+      isNanoLedger: key.isNanoLedger
     };
   };
 };
@@ -321,7 +321,7 @@ const handleRequestSignDirectMsg: (
       chainId: msg.signDoc.chainId,
       accountNumber: msg.signDoc.accountNumber
         ? Long.fromString(msg.signDoc.accountNumber)
-        : undefined,
+        : undefined
     });
 
     const response = await service.requestSignDirect(
@@ -338,9 +338,9 @@ const handleRequestSignDirectMsg: (
         bodyBytes: response.signed.bodyBytes,
         authInfoBytes: response.signed.authInfoBytes,
         chainId: response.signed.chainId,
-        accountNumber: response.signed.accountNumber.toString(),
+        accountNumber: response.signed.accountNumber.toString()
       },
-      signature: response.signature,
+      signature: response.signature
     };
   };
 };
@@ -350,7 +350,7 @@ const handleGetMultiKeyStoreInfoMsg: (
 ) => InternalHandler<GetMultiKeyStoreInfoMsg> = (service) => {
   return () => {
     return {
-      multiKeyStoreInfo: service.getMultiKeyStoreInfo(),
+      multiKeyStoreInfo: service.getMultiKeyStoreInfo()
     };
   };
 };
