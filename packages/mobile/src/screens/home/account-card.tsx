@@ -28,6 +28,8 @@ export const AccountCard: FunctionComponent<{
   const account = accountStore.getAccount(chainStore.current.chainId);
   const queries = queriesStore.get(chainStore.current.chainId);
 
+  console.log(account);
+
   let data: [number, number];
   let total: CoinPretty;
   let stakedSum: CoinPretty;

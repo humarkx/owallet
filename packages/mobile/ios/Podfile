@@ -22,10 +22,11 @@ target 'mobile' do
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
-  # use_flipper!({ 'Flipper-Folly' => '2.3.0' })
-  # post_install do |installer|
-  #   flipper_post_install(installer)
-  # end
+  # use_flipper!({ 'Flipper' => '0.58.0' })
+  use_flipper!({ 'Flipper' => '0.93.0', 'Flipper-Folly' => '2.6.7', 'Flipper-DoubleConversion' => '3.1.7','OpenSSL-Universal' => '1.1.180' })
+  post_install do |installer|
+    flipper_post_install(installer)
+  end
 end
 
 target 'mobile-tvOS' do

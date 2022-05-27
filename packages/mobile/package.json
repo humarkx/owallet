@@ -48,7 +48,7 @@
     "@owallet/types": "^0.9.12",
     "@owallet/unit": "^0.9.12",
     "@ledgerhq/react-native-hw-transport-ble": "=6.20.0",
-    "@react-native-async-storage/async-storage": "^1.14.1",
+    "@react-native-async-storage/async-storage": "^1.17.5",
     "@react-native-community/blur": "^3.6.0",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/netinfo": "^7.1.9",
@@ -84,10 +84,10 @@
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
-    "react": "^16.14.0",
+    "react": "^18.1.0",
     "react-hook-form": "^7.16.1",
     "react-intl": "^5.20.4",
-    "react-native": "0.63.4",
+    "react-native": "^0.68.2",
     "react-native-ble-plx": "^2.0.3",
     "react-native-camera": "^4.0.1",
     "react-native-code-push": "^7.0.4",
@@ -132,6 +132,9 @@
     "react-native-svg-transformer": "^0.14.3",
     "react-test-renderer": "16.13.1",
     "tinyify": "^3.0.0"
+  },
+  "resolutions": {
+    "react-dom": "^18.1.0"
   },
   "jest": {
     "preset": "react-native",
