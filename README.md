@@ -21,7 +21,7 @@ This repo uses git-secret to encrypt the endpoints and the api keys. **So, you c
 Clone this repo and run:
 ```sh
 yarn bootstrap
-yarn dev
+yarn dev # -d false in second time
 ```
 
 Browser extension's build output is placed in `packages/extension/dist`, and you can check out [this page](https://developer.chrome.com/extensions/getstarted) for installing the developing version.
