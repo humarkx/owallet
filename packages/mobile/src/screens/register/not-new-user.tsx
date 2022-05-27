@@ -100,7 +100,7 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
       >
         Powered by Torus
       </Text>
-      <Button
+      {/* <Button
         containerStyle={style.flatten(["margin-bottom-16"])}
         text="Import from OWallet Extension"
         size="large"
@@ -113,7 +113,7 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
             registerConfig,
           });
         }}
-      />
+      /> */}
       <Button
         text="Import existing wallet"
         size="large"
