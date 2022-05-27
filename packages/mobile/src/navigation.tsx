@@ -656,7 +656,6 @@ export const SettingStackScreen: FunctionComponent = () => {
             style.get("color-setting-screen-background").color
           ),
           headerTitleStyle: style.flatten(["h3", "color-text-black-high"]),
-          headerShown: false,
         }}
         name="Setting"
         component={SettingScreen}
