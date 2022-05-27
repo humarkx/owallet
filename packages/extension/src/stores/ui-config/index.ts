@@ -2,7 +2,7 @@
  * Store the config related to UI.
  */
 import { action, makeObservable, observable, runInAction, toJS } from "mobx";
-import { KVStore } from "@keplr-wallet/common";
+import { KVStore } from "@owallet/common";
 
 export interface UIConfigOptions {
   showAdvancedIBCTransfer: boolean;
@@ -11,7 +11,7 @@ export interface UIConfigOptions {
 export class UIConfigStore {
   @observable.deep
   protected options: UIConfigOptions = {
-    showAdvancedIBCTransfer: false,
+    showAdvancedIBCTransfer: true,
   };
 
   constructor(protected readonly kvStore: KVStore) {
@@ -33,7 +33,7 @@ export class UIConfigStore {
   }
 
   /**
-   * Currently, keplr only supports the IBC UI which the users should set the counterparty channel manually.
+   * Currently, owallet only supports the IBC UI which the users should set the counterparty channel manually.
    * However, it makes the normal users take a mistake.
    * So, to reduce this problem, show the IBC UI to users who only turns on the `showAdvancedIBCTransfer` explicitly.
    */

@@ -1,13 +1,13 @@
-import { AccountSetBase, AccountSetOpts, MsgOpt } from "./base";
-import { HasSecretQueries, QueriesSetBase, QueriesStore } from "../query";
-import { Buffer } from "buffer/";
-import { ChainGetter, CoinPrimitive } from "../common";
-import { StdFee } from "@cosmjs/launchpad";
-import { DenomHelper } from "@keplr-wallet/common";
-import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { AppCurrency, KeplrSignOptions } from "@keplr-wallet/types";
-import { DeepReadonly, Optional } from "utility-types";
-import { cosmos } from "@keplr-wallet/cosmos";
+import { AccountSetBase, AccountSetOpts, MsgOpt } from './base';
+import { HasSecretQueries, QueriesSetBase, QueriesStore } from '../query';
+import { Buffer } from 'buffer/';
+import { ChainGetter, CoinPrimitive } from '../common';
+import { StdFee } from '@cosmjs/launchpad';
+import { DenomHelper } from '@owallet/common';
+import { Dec, DecUtils } from '@owallet/unit';
+import { AppCurrency, OWalletSignOptions } from '@owallet/types';
+import { DeepReadonly, Optional } from 'utility-types';
+import { cosmos } from '@owallet/cosmos';
 
 export interface HasSecretAccount {
   secret: DeepReadonly<SecretAccount>;
@@ -15,32 +15,33 @@ export interface HasSecretAccount {
 
 export interface SecretMsgOpts {
   readonly send: {
-    readonly secret20: Pick<MsgOpt, "gas">;
+    readonly secret20: Pick<MsgOpt, 'gas'>;
   };
 
-  readonly createSecret20ViewingKey: Pick<MsgOpt, "gas">;
-  readonly executeSecretWasm: Pick<MsgOpt, "type">;
+  readonly createSecret20ViewingKey: Pick<MsgOpt, 'gas'>;
+  readonly executeSecretWasm: Pick<MsgOpt, 'type'>;
 }
 
 export class AccountWithSecret
   extends AccountSetBase<SecretMsgOpts, HasSecretQueries>
-  implements HasSecretAccount {
+  implements HasSecretAccount
+{
   public readonly secret: DeepReadonly<SecretAccount>;
 
   static readonly defaultMsgOpts: SecretMsgOpts = {
     send: {
       secret20: {
-        gas: 250000,
-      },
+        gas: 250000
+      }
     },
 
     createSecret20ViewingKey: {
-      gas: 150000,
+      gas: 150000
     },
 
     executeSecretWasm: {
-      type: "wasm/MsgExecuteContract",
-    },
+      type: 'wasm/MsgExecuteContract'
+    }
   };
 
   constructor(
@@ -79,7 +80,7 @@ export class SecretAccount {
     recipient: string,
     memo: string,
     stdFee: Partial<StdFee>,
-    signOptions?: KeplrSignOptions,
+    signOptions?: OWalletSignOptions,
     onTxEvents?:
       | ((tx: any) => void)
       | {
@@ -90,30 +91,32 @@ export class SecretAccount {
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
 
     switch (denomHelper.type) {
-      case "secret20":
+      case 'secret20':
         const actualAmount = (() => {
           let dec = new Dec(amount);
-          dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+          dec = dec.mul(
+            DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+          );
           return dec.truncate().toString();
         })();
 
-        if (!("type" in currency) || currency.type !== "secret20") {
-          throw new Error("Currency is not secret20");
+        if (!('type' in currency) || currency.type !== 'secret20') {
+          throw new Error('Currency is not secret20');
         }
         await this.sendExecuteSecretContractMsg(
-          "send",
+          'send',
           currency.contractAddress,
           {
             transfer: {
               recipient: recipient,
-              amount: actualAmount,
-            },
+              amount: actualAmount
+            }
           },
           [],
           memo,
           {
             amount: stdFee.amount ?? [],
-            gas: stdFee.gas ?? this.base.msgOpts.send.secret20.gas.toString(),
+            gas: stdFee.gas ?? this.base.msgOpts.send.secret20.gas.toString()
           },
           signOptions,
           this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
@@ -141,20 +144,20 @@ export class SecretAccount {
 
   async createSecret20ViewingKey(
     contractAddress: string,
-    memo: string = "",
+    memo: string = '',
     stdFee: Partial<StdFee> = {},
-    signOptions?: KeplrSignOptions,
+    signOptions?: OWalletSignOptions,
     onFulfill?: (tx: any, viewingKey: string) => void
   ) {
     const random = new Uint8Array(15);
     crypto.getRandomValues(random);
-    const entropy = Buffer.from(random).toString("hex");
+    const entropy = Buffer.from(random).toString('hex');
 
     const encrypted = await this.sendExecuteSecretContractMsg(
-      "createSecret20ViewingKey",
+      'createSecret20ViewingKey',
       contractAddress,
       {
-        create_viewing_key: { entropy },
+        create_viewing_key: { entropy }
       },
       [],
       memo,
@@ -162,30 +165,30 @@ export class SecretAccount {
         amount: stdFee.amount ?? [],
         gas:
           stdFee.gas ??
-          this.base.msgOpts.createSecret20ViewingKey.gas.toString(),
+          this.base.msgOpts.createSecret20ViewingKey.gas.toString()
       },
       signOptions,
       async (tx) => {
-        let viewingKey = "";
-        if (tx && "data" in tx && tx.data) {
-          const txData = Buffer.from(tx.data as any, "base64");
+        let viewingKey = '';
+        if (tx && 'data' in tx && tx.data) {
+          const txData = Buffer.from(tx.data as any, 'base64');
           const dataFields = cosmos.base.abci.v1beta1.TxMsgData.decode(txData);
           if (dataFields.data.length !== 1) {
-            throw new Error("Invalid length of data fields");
+            throw new Error('Invalid length of data fields');
           }
 
           const dataField = dataFields.data[0];
           if (!dataField.data) {
-            throw new Error("Empty data");
+            throw new Error('Empty data');
           }
 
-          const keplr = await this.base.getKeplr();
+          const owallet = await this.base.getOWallet();
 
-          if (!keplr) {
-            throw new Error("Can't get the Keplr API");
+          if (!owallet) {
+            throw new Error("Can't get the OWallet API");
           }
 
-          const enigmaUtils = keplr.getEnigmaUtils(this.chainId);
+          const enigmaUtils = owallet.getEnigmaUtils(this.chainId);
 
           const nonce = encrypted.slice(0, 32);
 
@@ -193,12 +196,12 @@ export class SecretAccount {
             Buffer.from(
               await enigmaUtils.decrypt(dataField.data, nonce)
             ).toString(),
-            "base64"
+            'base64'
           ).toString();
 
           // Expected: {"create_viewing_key":{"key":"api_key_1k1T...btJQo="}}
           const data = JSON.parse(dataOutput);
-          viewingKey = data["create_viewing_key"]["key"];
+          viewingKey = data['create_viewing_key']['key'];
         }
 
         if (onFulfill) {
@@ -211,14 +214,14 @@ export class SecretAccount {
 
   async sendExecuteSecretContractMsg(
     // This arg can be used to override the type of sending tx if needed.
-    type: keyof SecretMsgOpts | "unknown" = "executeSecretWasm",
+    type: keyof SecretMsgOpts | 'unknown' = 'executeSecretWasm',
     contractAddress: string,
     // eslint-disable-next-line @typescript-eslint/ban-types
     obj: object,
     sentFunds: CoinPrimitive[],
-    memo: string = "",
-    stdFee: Optional<StdFee, "amount">,
-    signOptions?: KeplrSignOptions,
+    memo: string = '',
+    stdFee: Optional<StdFee, 'amount'>,
+    signOptions?: OWalletSignOptions,
     onTxEvents?:
       | ((tx: any) => void)
       | {
@@ -242,10 +245,10 @@ export class SecretAccount {
             sender: this.base.bech32Address,
             contract: contractAddress,
             // callback_code_hash: "",
-            msg: Buffer.from(encryptedMsg).toString("base64"),
-            sent_funds: sentFunds,
+            msg: Buffer.from(encryptedMsg).toString('base64'),
+            sent_funds: sentFunds
             // callback_sig: null,
-          },
+          }
         };
 
         return [msg];
@@ -253,7 +256,7 @@ export class SecretAccount {
       memo,
       {
         amount: stdFee.amount ?? [],
-        gas: stdFee.gas,
+        gas: stdFee.gas
       },
       signOptions,
       this.txEventsWithPreOnFulfill(onTxEvents)
@@ -268,9 +271,10 @@ export class SecretAccount {
     // eslint-disable-next-line @typescript-eslint/ban-types
     obj: object
   ): Promise<Uint8Array> {
-    const queryContractCodeHashResponse = await this.queries.secret.querySecretContractCodeHash
-      .getQueryContract(contractAddress)
-      .waitResponse();
+    const queryContractCodeHashResponse =
+      await this.queries.secret.querySecretContractCodeHash
+        .getQueryContract(contractAddress)
+        .waitResponse();
 
     if (!queryContractCodeHashResponse) {
       throw new Error(
@@ -280,12 +284,12 @@ export class SecretAccount {
 
     const contractCodeHash = queryContractCodeHashResponse.data.result;
 
-    const keplr = await this.base.getKeplr();
-    if (!keplr) {
-      throw new Error("Can't get the Keplr API");
+    const owallet = await this.base.getOWallet();
+    if (!owallet) {
+      throw new Error("Can't get the OWallet API");
     }
 
-    const enigmaUtils = keplr.getEnigmaUtils(this.chainId);
+    const enigmaUtils = owallet.getEnigmaUtils(this.chainId);
     return await enigmaUtils.encrypt(contractCodeHash, obj);
   }
 
@@ -309,9 +313,9 @@ export class SecretAccount {
     }
 
     const onBroadcasted =
-      typeof onTxEvents === "function" ? undefined : onTxEvents.onBroadcasted;
+      typeof onTxEvents === 'function' ? undefined : onTxEvents.onBroadcasted;
     const onFulfill =
-      typeof onTxEvents === "function" ? onTxEvents : onTxEvents.onFulfill;
+      typeof onTxEvents === 'function' ? onTxEvents : onTxEvents.onFulfill;
 
     return {
       onBroadcasted,
@@ -323,7 +327,7 @@ export class SecretAccount {
 
             onFulfill(tx);
           }
-        : undefined,
+        : undefined
     };
   }
 

@@ -1,14 +1,14 @@
-import React, { FunctionComponent, useCallback } from "react";
+import React, { FunctionComponent, useCallback } from 'react';
 
-import { Address } from "../../components/address";
+import { Address } from '../../components/address';
 
-import styleAccount from "./account.module.scss";
+import styleAccount from './account.module.scss';
 
-import { observer } from "mobx-react-lite";
-import { useStore } from "../../stores";
-import { useNotification } from "../../components/notification";
-import { useIntl } from "react-intl";
-import { WalletStatus } from "@keplr-wallet/stores";
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../stores';
+import { useNotification } from '../../components/notification';
+import { useIntl } from 'react-intl';
+import { WalletStatus } from '@owallet/stores';
 
 export const AccountView: FunctionComponent = observer(() => {
   const { accountStore, chainStore } = useStore();
@@ -23,16 +23,16 @@ export const AccountView: FunctionComponent = observer(() => {
       if (accountInfo.walletStatus === WalletStatus.Loaded) {
         await navigator.clipboard.writeText(address);
         notification.push({
-          placement: "top-center",
-          type: "success",
+          placement: 'top-center',
+          type: 'success',
           duration: 2,
           content: intl.formatMessage({
-            id: "main.address.copied",
+            id: 'main.address.copied'
           }),
           canDelete: true,
           transition: {
-            duration: 0.25,
-          },
+            duration: 0.25
+          }
         });
       }
     },
@@ -47,31 +47,49 @@ export const AccountView: FunctionComponent = observer(() => {
           {accountInfo.walletStatus === WalletStatus.Loaded
             ? accountInfo.name ||
               intl.formatMessage({
-                id: "setting.keyring.unnamed-account",
+                id: 'setting.keyring.unnamed-account'
               })
-            : "Loading..."}
+            : 'Loading...'}
         </div>
-        <div style={{ flex: 1 }} />
-      </div>
-      <div className={styleAccount.containerAccount}>
-        <div style={{ flex: 1 }} />
-        <div
-          className={styleAccount.address}
-          onClick={() => copyAddress(accountInfo.bech32Address)}
-        >
-          <Address maxCharacters={22} lineBreakBeforePrefix={false}>
-            {accountInfo.walletStatus === WalletStatus.Loaded &&
-            accountInfo.bech32Address
-              ? accountInfo.bech32Address
-              : "..."}
-          </Address>
+        <div style={{ flex: 1, textAlign: 'right' }}>
+          {chainStore.current.raw.txExplorer?.accountUrl && (
+            <a
+              target="_blank"
+              href={chainStore.current.raw.txExplorer.accountUrl.replace(
+                '{address}',
+                // accountInfo.bech32Address
+                chainStore.current.raw.networkType === 'evm'
+                  ? accountInfo.evmosHexAddress
+                  : accountInfo.bech32Address
+              )}
+              title={intl.formatMessage({ id: 'setting.explorer' })}
+            >
+              <i className="fas fa-external-link-alt"></i>
+            </a>
+          )}
         </div>
-        <div style={{ flex: 1 }} />
       </div>
+      {chainStore.current.raw.networkType !== 'evm' && (
+        <div className={styleAccount.containerAccount}>
+          <div style={{ flex: 1 }} />
+          <div
+            className={styleAccount.address}
+            onClick={() => copyAddress(accountInfo.bech32Address)}
+          >
+            <Address maxCharacters={22} lineBreakBeforePrefix={false}>
+              {accountInfo.walletStatus === WalletStatus.Loaded &&
+              accountInfo.bech32Address
+                ? accountInfo.bech32Address
+                : '...'}
+            </Address>
+          </div>
+          <div style={{ flex: 1 }} />
+        </div>
+      )}
       {accountInfo.hasEvmosHexAddress && (
         <div
           className={styleAccount.containerAccount}
-          style={{ marginTop: "2px" }}
+          style={{ marginTop: '2px' }}
         >
           <div style={{ flex: 1 }} />
           <div
@@ -87,7 +105,7 @@ export const AccountView: FunctionComponent = observer(() => {
                       10
                     )}...${accountInfo.evmosHexAddress.slice(-8)}`
                   : accountInfo.evmosHexAddress
-                : "..."}
+                : '...'}
             </Address>
           </div>
           <div style={{ flex: 1 }} />

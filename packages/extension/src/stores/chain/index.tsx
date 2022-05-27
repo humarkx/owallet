@@ -1,23 +1,20 @@
-import { observable, action, computed, makeObservable, flow } from "mobx";
+import { observable, action, computed, makeObservable, flow } from 'mobx';
 
-import {
-  ChainInfoInner,
-  ChainStore as BaseChainStore,
-} from "@keplr-wallet/stores";
+import { ChainInfoInner, ChainStore as BaseChainStore } from '@owallet/stores';
 
-import { ChainInfo } from "@keplr-wallet/types";
+import { ChainInfo } from '@owallet/types';
 import {
   ChainInfoWithEmbed,
   SetPersistentMemoryMsg,
   GetPersistentMemoryMsg,
   GetChainInfosMsg,
   RemoveSuggestedChainInfoMsg,
-  TryUpdateChainMsg,
-} from "@keplr-wallet/background";
-import { BACKGROUND_PORT } from "@keplr-wallet/router";
+  TryUpdateChainMsg
+} from '@owallet/background';
+import { BACKGROUND_PORT } from '@owallet/router';
 
-import { MessageRequester } from "@keplr-wallet/router";
-import { toGenerator } from "@keplr-wallet/common";
+import { MessageRequester } from '@owallet/router';
+import { toGenerator } from '@owallet/common';
 
 export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
   @observable
@@ -25,7 +22,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
 
   @observable
   protected _isInitializing: boolean = false;
-  protected deferChainIdSelect: string = "";
+  protected deferChainIdSelect: string = '';
 
   constructor(
     embedChainInfos: ChainInfo[],
@@ -36,8 +33,8 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
         return {
           ...chainInfo,
           ...{
-            embeded: true,
-          },
+            embeded: true
+          }
         };
       })
     );
@@ -78,7 +75,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
   *saveLastViewChainId() {
     // Save last view chain id to persistent background
     const msg = new SetPersistentMemoryMsg({
-      lastViewChainId: this._selectedChainId,
+      lastViewChainId: this._selectedChainId
     });
     yield this.requester.sendMessage(BACKGROUND_PORT, msg);
   }
@@ -103,7 +100,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
 
     if (this.deferChainIdSelect) {
       this.selectChain(this.deferChainIdSelect);
-      this.deferChainIdSelect = "";
+      this.deferChainIdSelect = '';
     }
   }
 

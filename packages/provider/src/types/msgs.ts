@@ -1,10 +1,10 @@
-import { Message } from "@keplr-wallet/router";
-import { ChainInfo, KeplrSignOptions, Key } from "@keplr-wallet/types";
-import { AminoSignResponse, StdSignature, StdSignDoc } from "@cosmjs/launchpad";
+import { Message } from '@owallet/router';
+import { ChainInfo, OWalletSignOptions, Key } from '@owallet/types';
+import { AminoSignResponse, StdSignature, StdSignDoc } from '@cosmjs/launchpad';
 
 export class EnableAccessMsg extends Message<void> {
   public static type() {
-    return "enable-access";
+    return 'enable-access';
   }
 
   constructor(public readonly chainIds: string[]) {
@@ -13,12 +13,12 @@ export class EnableAccessMsg extends Message<void> {
 
   validateBasic(): void {
     if (!this.chainIds || this.chainIds.length === 0) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
   }
 
   route(): string {
-    return "permission";
+    return 'permission';
   }
 
   type(): string {
@@ -28,7 +28,7 @@ export class EnableAccessMsg extends Message<void> {
 
 export class GetKeyMsg extends Message<Key> {
   public static type() {
-    return "get-key";
+    return 'get-key';
   }
 
   constructor(public readonly chainId: string) {
@@ -37,12 +37,12 @@ export class GetKeyMsg extends Message<Key> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
   }
 
   route(): string {
-    return "keyring";
+    return 'keyring';
   }
 
   type(): string {
@@ -52,7 +52,7 @@ export class GetKeyMsg extends Message<Key> {
 
 export class SuggestChainInfoMsg extends Message<void> {
   public static type() {
-    return "suggest-chain-info";
+    return 'suggest-chain-info';
   }
 
   constructor(public readonly chainInfo: ChainInfo) {
@@ -61,12 +61,12 @@ export class SuggestChainInfoMsg extends Message<void> {
 
   validateBasic(): void {
     if (!this.chainInfo) {
-      throw new Error("chain info not set");
+      throw new Error('chain info not set');
     }
   }
 
   route(): string {
-    return "chains";
+    return 'chains';
   }
 
   type(): string {
@@ -76,7 +76,7 @@ export class SuggestChainInfoMsg extends Message<void> {
 
 export class SuggestTokenMsg extends Message<void> {
   public static type() {
-    return "suggest-token";
+    return 'suggest-token';
   }
 
   constructor(
@@ -89,16 +89,16 @@ export class SuggestTokenMsg extends Message<void> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("Chain id is empty");
+      throw new Error('Chain id is empty');
     }
 
     if (!this.contractAddress) {
-      throw new Error("Contract address is empty");
+      throw new Error('Contract address is empty');
     }
   }
 
   route(): string {
-    return "tokens";
+    return 'tokens';
   }
 
   type(): string {
@@ -109,36 +109,36 @@ export class SuggestTokenMsg extends Message<void> {
 // Return the tx hash
 export class SendTxMsg extends Message<Uint8Array> {
   public static type() {
-    return "send-tx-to-background";
+    return 'send-tx-to-background';
   }
 
   constructor(
     public readonly chainId: string,
     public readonly tx: unknown,
-    public readonly mode: "async" | "sync" | "block"
+    public readonly mode: 'async' | 'sync' | 'block'
   ) {
     super();
   }
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id is empty");
+      throw new Error('chain id is empty');
     }
 
     if (!this.tx) {
-      throw new Error("tx is empty");
+      throw new Error('tx is empty');
     }
 
     if (
       !this.mode ||
-      (this.mode !== "sync" && this.mode !== "async" && this.mode !== "block")
+      (this.mode !== 'sync' && this.mode !== 'async' && this.mode !== 'block')
     ) {
-      throw new Error("invalid mode");
+      throw new Error('invalid mode');
     }
   }
 
   route(): string {
-    return "background-tx";
+    return 'background-tx';
   }
 
   type(): string {
@@ -148,7 +148,7 @@ export class SendTxMsg extends Message<Uint8Array> {
 
 export class GetSecret20ViewingKey extends Message<string> {
   public static type() {
-    return "get-secret20-viewing-key";
+    return 'get-secret20-viewing-key';
   }
 
   constructor(
@@ -160,16 +160,16 @@ export class GetSecret20ViewingKey extends Message<string> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("Chain id is empty");
+      throw new Error('Chain id is empty');
     }
 
     if (!this.contractAddress) {
-      throw new Error("Contract address is empty");
+      throw new Error('Contract address is empty');
     }
   }
 
   route(): string {
-    return "tokens";
+    return 'tokens';
   }
 
   type(): string {
@@ -179,14 +179,14 @@ export class GetSecret20ViewingKey extends Message<string> {
 
 export class RequestSignAminoMsg extends Message<AminoSignResponse> {
   public static type() {
-    return "request-sign-amino";
+    return 'request-sign-amino';
   }
 
   constructor(
     public readonly chainId: string,
     public readonly signer: string,
     public readonly signDoc: StdSignDoc,
-    public readonly signOptions: KeplrSignOptions & {
+    public readonly signOptions: OWalletSignOptions & {
       // Hack option field to detect the sign arbitrary for string
       isADR36WithString?: boolean;
     } = {}
@@ -196,11 +196,11 @@ export class RequestSignAminoMsg extends Message<AminoSignResponse> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
 
     if (!this.signer) {
-      throw new Error("signer not set");
+      throw new Error('signer not set');
     }
 
     // It is not important to check this on the client side as opposed to increasing the bundle size.
@@ -219,7 +219,7 @@ export class RequestSignAminoMsg extends Message<AminoSignResponse> {
         signDoc.msgs.length === 1
       ) {
         const msg = signDoc.msgs[0];
-        return msg.type === "sign/MsgSignData";
+        return msg.type === 'sign/MsgSignData';
       } else {
         return false;
       }
@@ -229,17 +229,17 @@ export class RequestSignAminoMsg extends Message<AminoSignResponse> {
     // it doesn't have to have the chain id in the sign doc.
     if (!hasOnlyMsgSignData && signDoc.chain_id !== this.chainId) {
       throw new Error(
-        "Chain id in the message is not matched with the requested chain id"
+        'Chain id in the message is not matched with the requested chain id'
       );
     }
 
     if (!this.signOptions) {
-      throw new Error("Sign options are null");
+      throw new Error('Sign options are null');
     }
   }
 
   route(): string {
-    return "keyring";
+    return 'keyring';
   }
 
   type(): string {
@@ -249,7 +249,7 @@ export class RequestSignAminoMsg extends Message<AminoSignResponse> {
 
 export class RequestVerifyADR36AminoSignDoc extends Message<boolean> {
   public static type() {
-    return "request-verify-adr-36-amino-doc";
+    return 'request-verify-adr-36-amino-doc';
   }
 
   constructor(
@@ -263,15 +263,15 @@ export class RequestVerifyADR36AminoSignDoc extends Message<boolean> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
 
     if (!this.signer) {
-      throw new Error("signer not set");
+      throw new Error('signer not set');
     }
 
     if (!this.signature) {
-      throw new Error("Signature not set");
+      throw new Error('Signature not set');
     }
 
     // It is not important to check this on the client side as opposed to increasing the bundle size.
@@ -280,7 +280,7 @@ export class RequestVerifyADR36AminoSignDoc extends Message<boolean> {
   }
 
   route(): string {
-    return "keyring";
+    return 'keyring';
   }
 
   type(): string {
@@ -298,7 +298,7 @@ export class RequestSignDirectMsg extends Message<{
   readonly signature: StdSignature;
 }> {
   public static type() {
-    return "request-sign-direct";
+    return 'request-sign-direct';
   }
 
   constructor(
@@ -310,18 +310,18 @@ export class RequestSignDirectMsg extends Message<{
       chainId?: string | null;
       accountNumber?: string | null;
     },
-    public readonly signOptions: KeplrSignOptions = {}
+    public readonly signOptions: OWalletSignOptions = {}
   ) {
     super();
   }
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
 
     if (!this.signer) {
-      throw new Error("signer not set");
+      throw new Error('signer not set');
     }
 
     // It is not important to check this on the client side as opposed to increasing the bundle size.
@@ -344,12 +344,12 @@ export class RequestSignDirectMsg extends Message<{
     // }
 
     if (!this.signOptions) {
-      throw new Error("Sign options are null");
+      throw new Error('Sign options are null');
     }
   }
 
   route(): string {
-    return "keyring";
+    return 'keyring';
   }
 
   type(): string {
@@ -359,7 +359,7 @@ export class RequestSignDirectMsg extends Message<{
 
 export class GetPubkeyMsg extends Message<Uint8Array> {
   public static type() {
-    return "get-pubkey-msg";
+    return 'get-pubkey-msg';
   }
 
   constructor(public readonly chainId: string) {
@@ -368,12 +368,12 @@ export class GetPubkeyMsg extends Message<Uint8Array> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
   }
 
   route(): string {
-    return "secret-wasm";
+    return 'secret-wasm';
   }
 
   type(): string {
@@ -383,7 +383,7 @@ export class GetPubkeyMsg extends Message<Uint8Array> {
 
 export class ReqeustEncryptMsg extends Message<Uint8Array> {
   public static type() {
-    return "request-encrypt-msg";
+    return 'request-encrypt-msg';
   }
 
   constructor(
@@ -397,20 +397,20 @@ export class ReqeustEncryptMsg extends Message<Uint8Array> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
 
     if (!this.contractCodeHash) {
-      throw new Error("contract code hash not set");
+      throw new Error('contract code hash not set');
     }
 
     if (!this.msg) {
-      throw new Error("msg not set");
+      throw new Error('msg not set');
     }
   }
 
   route(): string {
-    return "secret-wasm";
+    return 'secret-wasm';
   }
 
   type(): string {
@@ -420,7 +420,7 @@ export class ReqeustEncryptMsg extends Message<Uint8Array> {
 
 export class RequestDecryptMsg extends Message<Uint8Array> {
   public static type() {
-    return "request-decrypt-msg";
+    return 'request-decrypt-msg';
   }
 
   constructor(
@@ -433,20 +433,20 @@ export class RequestDecryptMsg extends Message<Uint8Array> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
 
     if (!this.cipherText || this.cipherText.length === 0) {
-      throw new Error("ciphertext not set");
+      throw new Error('ciphertext not set');
     }
 
     if (!this.nonce || this.nonce.length === 0) {
-      throw new Error("nonce not set");
+      throw new Error('nonce not set');
     }
   }
 
   route(): string {
-    return "secret-wasm";
+    return 'secret-wasm';
   }
 
   type(): string {
@@ -456,7 +456,7 @@ export class RequestDecryptMsg extends Message<Uint8Array> {
 
 export class GetTxEncryptionKeyMsg extends Message<Uint8Array> {
   public static type() {
-    return "get-tx-encryption-key-msg";
+    return 'get-tx-encryption-key-msg';
   }
 
   constructor(
@@ -468,17 +468,17 @@ export class GetTxEncryptionKeyMsg extends Message<Uint8Array> {
 
   validateBasic(): void {
     if (!this.chainId) {
-      throw new Error("chain id not set");
+      throw new Error('chain id not set');
     }
 
     if (!this.nonce) {
       // Nonce of zero length is permitted.
-      throw new Error("nonce is null");
+      throw new Error('nonce is null');
     }
   }
 
   route(): string {
-    return "secret-wasm";
+    return 'secret-wasm';
   }
 
   type(): string {

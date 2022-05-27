@@ -1,17 +1,17 @@
-import { delay, inject, singleton } from "tsyringe";
-import { TYPES } from "../types";
+import { delay, inject, singleton } from 'tsyringe';
+import { TYPES } from '../types';
 
-import { InteractionService } from "../interaction";
-import { Env } from "@keplr-wallet/router";
+import { InteractionService } from '../interaction';
+import { Env } from '@owallet/router';
 import {
   getBasicAccessPermissionType,
   INTERACTION_TYPE_PERMISSION,
-  PermissionData,
-} from "./types";
-import { KVStore } from "@keplr-wallet/common";
-import { ChainsService } from "../chains";
-import { KeyRingService } from "../keyring";
-import { ChainIdHelper } from "@keplr-wallet/cosmos";
+  PermissionData
+} from './types';
+import { KVStore } from '@owallet/common';
+import { ChainsService } from '../chains';
+import { KeyRingService } from '../keyring';
+import { ChainIdHelper } from '@owallet/cosmos';
 
 @singleton()
 export class PermissionService {
@@ -62,7 +62,7 @@ export class PermissionService {
     // Try to unlock the key ring before checking or granting the basic permission.
     await this.keyRingService.enable(env);
 
-    if (typeof chainIds === "string") {
+    if (typeof chainIds === 'string') {
       chainIds = [chainIds];
     }
 
@@ -94,7 +94,7 @@ export class PermissionService {
     const permissionData: PermissionData = {
       chainIds,
       type,
-      origins,
+      origins
     };
 
     await this.interactionService.waitApprove(
@@ -119,7 +119,7 @@ export class PermissionService {
 
     await this.grantPermission(
       env,
-      "/access",
+      '/access',
       chainIds,
       getBasicAccessPermissionType(),
       origins
@@ -160,9 +160,8 @@ export class PermissionService {
       return true;
     }
 
-    const permissionsInChain = this.permissionMap[
-      ChainIdHelper.parse(chainId).identifier
-    ];
+    const permissionsInChain =
+      this.permissionMap[ChainIdHelper.parse(chainId).identifier];
     if (!permissionsInChain) {
       return false;
     }
@@ -174,9 +173,8 @@ export class PermissionService {
   getPermissionOrigins(chainId: string, type: string): string[] {
     const origins = [];
 
-    const permissionsInChain = this.permissionMap[
-      ChainIdHelper.parse(chainId).identifier
-    ];
+    const permissionsInChain =
+      this.permissionMap[ChainIdHelper.parse(chainId).identifier];
     if (!permissionsInChain) {
       return [];
     }
@@ -216,14 +214,12 @@ export class PermissionService {
 
   async addPermission(chainIds: string[], type: string, origins: string[]) {
     for (const chainId of chainIds) {
-      let permissionsInChain = this.permissionMap[
-        ChainIdHelper.parse(chainId).identifier
-      ];
+      let permissionsInChain =
+        this.permissionMap[ChainIdHelper.parse(chainId).identifier];
       if (!permissionsInChain) {
         permissionsInChain = {};
-        this.permissionMap[
-          ChainIdHelper.parse(chainId).identifier
-        ] = permissionsInChain;
+        this.permissionMap[ChainIdHelper.parse(chainId).identifier] =
+          permissionsInChain;
       }
 
       let innerMap = permissionsInChain[type];
@@ -241,9 +237,8 @@ export class PermissionService {
   }
 
   async removePermission(chainId: string, type: string, origins: string[]) {
-    const permissionsInChain = this.permissionMap[
-      ChainIdHelper.parse(chainId).identifier
-    ];
+    const permissionsInChain =
+      this.permissionMap[ChainIdHelper.parse(chainId).identifier];
     if (!permissionsInChain) {
       return;
     }
@@ -267,13 +262,13 @@ export class PermissionService {
   }
 
   protected async restore() {
-    const map = await this.kvStore.get<any>("permissionMap");
+    const map = await this.kvStore.get<any>('permissionMap');
     if (map) {
       this.permissionMap = map;
     }
   }
 
   protected async save() {
-    await this.kvStore.set("permissionMap", this.permissionMap);
+    await this.kvStore.set('permissionMap', this.permissionMap);
   }
 }

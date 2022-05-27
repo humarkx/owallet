@@ -1,4 +1,4 @@
-import { Router } from "@keplr-wallet/router";
+import { Router } from '@owallet/router';
 import {
   CreateMnemonicKeyMsg,
   CreatePrivateKeyMsg,
@@ -21,11 +21,11 @@ import {
   RestoreKeyRingMsg,
   CheckPasswordMsg,
   ExportKeyRingDatasMsg,
-  RequestVerifyADR36AminoSignDoc,
-} from "./messages";
-import { ROUTE } from "./constants";
-import { getHandler } from "./handler";
-import { KeyRingService } from "./service";
+  RequestVerifyADR36AminoSignDoc
+} from './messages';
+import { ROUTE } from './constants';
+import { getHandler } from './handler';
+import { KeyRingService } from './service';
 
 export function init(router: Router, service: KeyRingService): void {
   router.registerMessage(RestoreKeyRingMsg);

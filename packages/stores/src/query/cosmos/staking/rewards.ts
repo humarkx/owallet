@@ -1,15 +1,15 @@
-import { Rewards } from "./types";
-import { KVStore } from "@keplr-wallet/common";
+import { Rewards } from './types';
+import { KVStore } from '@owallet/common';
 import {
   ObservableChainQuery,
-  ObservableChainQueryMap,
-} from "../../chain-query";
-import { ChainGetter } from "../../../common";
-import { computed, makeObservable } from "mobx";
-import { CoinPretty, Dec, Int } from "@keplr-wallet/unit";
-import { Currency } from "@keplr-wallet/types";
-import { StoreUtils } from "../../../common";
-import { computedFn } from "mobx-utils";
+  ObservableChainQueryMap
+} from '../../chain-query';
+import { ChainGetter } from '../../../common';
+import { computed, makeObservable } from 'mobx';
+import { CoinPretty, Dec, Int } from '@owallet/unit';
+import { Currency } from '@owallet/types';
+import { StoreUtils } from '../../../common';
+import { computedFn } from 'mobx-utils';
 
 export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   protected bech32Address: string;
@@ -40,11 +40,15 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   get rewards(): CoinPretty[] {
     const chainInfo = this.chainGetter.getChain(this.chainId);
 
+    if (chainInfo.raw.networkType === 'evm') {
+      return [];
+    }
+
     const currenciesMap = chainInfo.currencies.reduce<{
       [denom: string]: Currency;
     }>((obj, currency) => {
       // TODO: Handle the contract tokens.
-      if (!("type" in currency)) {
+      if (!('type' in currency)) {
         obj[currency.coinMinimalDenom] = currency;
       }
       return obj;
@@ -60,11 +64,15 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
     (validatorAddress: string): CoinPretty[] => {
       const chainInfo = this.chainGetter.getChain(this.chainId);
 
+      if (chainInfo.raw.networkType === 'evm') {
+        return [];
+      }
+
       const currenciesMap = chainInfo.currencies.reduce<{
         [denom: string]: Currency;
       }>((obj, currency) => {
         // TODO: Handle the contract tokens.
-        if (!("type" in currency)) {
+        if (!('type' in currency)) {
           obj[currency.coinMinimalDenom] = currency;
         }
         return obj;
@@ -84,6 +92,9 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   @computed
   get stakableReward(): CoinPretty {
     const chainInfo = this.chainGetter.getChain(this.chainId);
+    if (chainInfo.raw.networkType === 'evm') {
+      return;
+    }
 
     return StoreUtils.getBalanceFromCurrency(
       chainInfo.stakeCurrency,
@@ -94,6 +105,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   readonly getStakableRewardOf = computedFn(
     (validatorAddress: string): CoinPretty => {
       const chainInfo = this.chainGetter.getChain(this.chainId);
+
+      if (chainInfo.raw.networkType === 'evm') {
+        return;
+      }
 
       const reward = this.response?.data.result.rewards?.find((r) => {
         return r.validator_address === validatorAddress;
@@ -110,12 +125,16 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   get unstakableRewards(): CoinPretty[] {
     const chainInfo = this.chainGetter.getChain(this.chainId);
 
+    if (chainInfo.raw.networkType === 'evm') {
+      return [];
+    }
+
     const currenciesMap = chainInfo.currencies.reduce<{
       [denom: string]: Currency;
     }>((obj, currency) => {
       // TODO: Handle the contract tokens.
       if (
-        !("type" in currency) &&
+        !('type' in currency) &&
         currency.coinMinimalDenom !== chainInfo.stakeCurrency.coinMinimalDenom
       ) {
         obj[currency.coinMinimalDenom] = currency;
@@ -133,12 +152,16 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
     (validatorAddress: string): CoinPretty[] => {
       const chainInfo = this.chainGetter.getChain(this.chainId);
 
+      if (chainInfo.raw.networkType === 'evm') {
+        return [];
+      }
+
       const currenciesMap = chainInfo.currencies.reduce<{
         [denom: string]: Currency;
       }>((obj, currency) => {
         // TODO: Handle the contract tokens.
         if (
-          !("type" in currency) &&
+          !('type' in currency) &&
           currency.coinMinimalDenom !== chainInfo.stakeCurrency.coinMinimalDenom
         ) {
           obj[currency.coinMinimalDenom] = currency;
@@ -191,6 +214,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
       }
 
       const chainInfo = this.chainGetter.getChain(this.chainId);
+
+      if (chainInfo.raw.networkType === 'evm') {
+        return [];
+      }
 
       const rewards = this.response.data.result.rewards?.slice() ?? [];
       rewards.sort((reward1, reward2) => {

@@ -1,10 +1,10 @@
 import {
-  Keplr,
-  KeplrIntereactionOptions,
-  KeplrMode,
-  KeplrSignOptions,
-  Key,
-} from "@keplr-wallet/types";
+  OWallet,
+  OWalletIntereactionOptions,
+  OWalletMode,
+  OWalletSignOptions,
+  Key
+} from '@owallet/types';
 import {
   AminoSignResponse,
   BroadcastMode,
@@ -13,19 +13,19 @@ import {
   Secp256k1HdWallet,
   StdSignature,
   StdSignDoc,
-  StdTx,
-} from "@cosmjs/launchpad";
-import { SecretUtils } from "secretjs/types/enigmautils";
-import { Bech32Address } from "@keplr-wallet/cosmos";
-import { OfflineDirectSigner } from "@cosmjs/proto-signing";
-import { CosmJSOfflineSigner } from "@keplr-wallet/provider";
-import { DirectSignResponse } from "@cosmjs/proto-signing/build/signer";
+  StdTx
+} from '@cosmjs/launchpad';
+import { SecretUtils } from 'secretjs/types/enigmautils';
+import { Bech32Address } from '@owallet/cosmos';
+import { OfflineDirectSigner } from '@cosmjs/proto-signing';
+import { CosmJSOfflineSigner } from '@owallet/provider';
+import { DirectSignResponse } from '@cosmjs/proto-signing/build/signer';
 
-export class MockKeplr implements Keplr {
-  readonly version: string = "0.0.1";
-  readonly mode: KeplrMode = "extension";
+export class MockOWallet implements OWallet {
+  readonly version: string = '0.0.1';
+  readonly mode: OWalletMode = 'extension';
 
-  public defaultOptions: KeplrIntereactionOptions = {};
+  public defaultOptions: OWalletIntereactionOptions = {};
 
   public readonly walletMap: {
     [chainId: string]: Secp256k1HdWallet | undefined;
@@ -38,7 +38,7 @@ export class MockKeplr implements Keplr {
       );
 
       if (!chainInfo) {
-        throw new Error("Unknown chain");
+        throw new Error('Unknown chain');
       }
 
       this.walletMap[chainId] = await Secp256k1HdWallet.fromMnemonic(
@@ -73,35 +73,35 @@ export class MockKeplr implements Keplr {
   }
 
   enigmaDecrypt(): Promise<Uint8Array> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   enigmaEncrypt(): Promise<Uint8Array> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   experimentalSuggestChain(): Promise<void> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   getEnigmaPubKey(): Promise<Uint8Array> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   getEnigmaUtils(): SecretUtils {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   async getKey(chainId: string): Promise<Key> {
     const cosmJsKeys = await (await this.getHdWallet(chainId)).getAccounts();
 
     return {
-      name: "",
-      algo: "secp256k1",
+      name: '',
+      algo: 'secp256k1',
       pubKey: cosmJsKeys[0].pubkey,
       address: Bech32Address.fromBech32(cosmJsKeys[0].address).address,
       bech32Address: cosmJsKeys[0].address,
-      isNanoLedger: false,
+      isNanoLedger: false
     };
   }
 
@@ -110,7 +110,7 @@ export class MockKeplr implements Keplr {
     _signer: string,
     _data: string | Uint8Array
   ): Promise<StdSignature> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   verifyArbitrary(
@@ -119,7 +119,7 @@ export class MockKeplr implements Keplr {
     _data: string | Uint8Array,
     _signature: StdSignature
   ): Promise<boolean> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   getOfflineSigner(chainId: string): OfflineSigner & OfflineDirectSigner {
@@ -127,7 +127,7 @@ export class MockKeplr implements Keplr {
   }
 
   getSecret20ViewingKey(): Promise<string> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   sendTx(
@@ -142,40 +142,40 @@ export class MockKeplr implements Keplr {
     chainId: string,
     signer: string,
     signDoc: StdSignDoc,
-    _?: KeplrSignOptions
+    _?: OWalletSignOptions
   ): Promise<AminoSignResponse> {
     const hdWallet = await this.getHdWallet(chainId);
 
     const keys = await hdWallet.getAccounts();
     if (keys[0].address !== signer) {
-      throw new Error("Unmatched signer");
+      throw new Error('Unmatched signer');
     }
 
     return hdWallet.signAmino(signer, signDoc);
   }
 
   signDirect(): Promise<DirectSignResponse> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   suggestToken(): Promise<void> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   getEnigmaTxEncryptionKey(
     _chainId: string,
     _nonce: Uint8Array
   ): Promise<Uint8Array> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   getOfflineSignerAuto(
     _chainId: string
   ): Promise<OfflineSigner | OfflineDirectSigner> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   getOfflineSignerOnlyAmino(_chainId: string): OfflineSigner {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 }

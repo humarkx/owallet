@@ -2,7 +2,7 @@
 
 .inner-top-container {
   display: flex;
-  margin: 0 $layout-padding;
+  margin: 5px $layout-padding;
 
   min-height: 43px;
 }
@@ -15,7 +15,8 @@
   border: 0;
   margin: 0;
   padding: 0;
-
+  color:$color;
+  background-color: $background-color;
   &:global(.modal-content) {
     box-shadow: none;
   }
