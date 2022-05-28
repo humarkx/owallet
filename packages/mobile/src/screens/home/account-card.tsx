@@ -129,7 +129,7 @@ export const AccountCard: FunctionComponent<{
           </View>
         </View>
       </CardBody>
-      {chainStore.current.networkType !== 'evm' && <NetworkErrorView />}
+      {chainStore.current.networkType === 'cosmos' && <NetworkErrorView />}
       <CardBody style={style.flatten(['padding-top-16'])}>
         <View style={style.flatten(['flex', 'items-center'])}>
           <View
@@ -144,7 +144,7 @@ export const AccountCard: FunctionComponent<{
               chainInfo={{ stakeCurrency: chainStore.current.stakeCurrency }}
               currency={chainStore.current.stakeCurrency}
             />
-            {chainStore.current.networkType !== 'evm' && (
+            {chainStore.current.networkType === 'cosmos' && (
               <View style={style.flatten(['margin-left-12'])}>
                 <Text
                   style={style.flatten([
@@ -172,7 +172,7 @@ export const AccountCard: FunctionComponent<{
               }}
             />
           </View>
-          {chainStore.current.networkType !== 'evm' && (
+          {chainStore.current.networkType === 'cosmos' && (
             <View
               style={style.flatten([
                 'flex-row',
