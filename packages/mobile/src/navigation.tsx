@@ -9,7 +9,6 @@ import {
 import {
   DrawerActions,
   NavigationContainer,
-  NavigationContainerRef,
   useNavigation,
 } from "@react-navigation/native";
 import { useStore } from "./stores";
@@ -61,10 +60,11 @@ import {
   ValidatorListScreen,
 } from "./screens/stake";
 import {
-  WalletIcon,
-  DownArrowIcon,
-  SettingIcon,
+  OpenDrawerIcon,
+  ScanIcon,
   SendIcon,
+  SettingIcon,
+  WalletIcon,
 } from "./components/icon";
 import {
   AddAddressBookScreen,
@@ -109,7 +109,6 @@ import {
 } from "./screens/register/import-from-extension";
 import { DAppWebpageScreen } from "./screens/web/webpages";
 import { WebpageScreenScreenOptionsPreset } from "./screens/web/components/webpage-screen";
-import Bugsnag from "@bugsnag/react-native";
 
 const {
   SmartNavigatorProvider,
@@ -330,15 +329,16 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
       }}
     >
       <View style={style.flatten(["flex-row", "items-center"])}>
+        <OpenDrawerIcon size={28} color={style.get("color-primary").color} />
         <Text
-          style={style.flatten(["h4", "color-text-black-low", "margin-left-4"])}
+          style={style.flatten([
+            "h4",
+            "color-text-black-high",
+            "margin-left-4",
+          ])}
         >
-          {chainStore.current.chainName + " "}
+          {chainStore.current.chainName}
         </Text>
-        <DownArrowIcon
-          height={12}
-          color={style.get("color-text-black-low").color}
-        />
       </View>
     </HeaderLeftButton>
   );
@@ -360,7 +360,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
           });
         }}
       >
-        {/* <Scanner size={28} color={style.get("color-primary").color} /> */}
+        <ScanIcon size={28} color={style.get("color-primary").color} />
       </HeaderRightButton>
       {walletConnectStore.sessions.length > 0 ? (
         <HeaderRightButton
@@ -772,7 +772,6 @@ export const MainTabNavigation: FunctionComponent = () => {
               return <SettingIcon color={color} />;
           }
         },
-
         tabBarButton: (props) => (
           <View
             style={{
@@ -806,7 +805,6 @@ export const MainTabNavigation: FunctionComponent = () => {
           elevation: 0,
           paddingLeft: 30,
           paddingRight: 30,
-          height: 100,
         },
         showLabel: false,
       }}
@@ -849,57 +847,14 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
   );
 };
 
-const BugsnagNavigationContainerPlugin = Bugsnag.getPlugin("reactNavigation");
-// The returned BugsnagNavigationContainer has exactly the same usage
-// except now it tracks route information to send with your error reports
-const BugsnagNavigationContainer = (() => {
-  if (BugsnagNavigationContainerPlugin) {
-    console.log("BugsnagNavigationContainerPlugin found");
-    return BugsnagNavigationContainerPlugin.createNavigationContainer(
-      NavigationContainer
-    );
-  } else {
-    console.log(
-      "WARNING: BugsnagNavigationContainerPlugin is null. Fallback to use basic NavigationContainer"
-    );
-    return NavigationContainer;
-  }
-})();
-
 export const AppNavigation: FunctionComponent = observer(() => {
-  const { keyRingStore, analyticsStore } = useStore();
-
-  const navigationRef = useRef<NavigationContainerRef | null>(null);
-  const routeNameRef = useRef<string | null>(null);
+  const { keyRingStore } = useStore();
 
   return (
     <PageScrollPositionProvider>
       <FocusedScreenProvider>
         <SmartNavigatorProvider>
-          <BugsnagNavigationContainer
-            ref={navigationRef}
-            onReady={() => {
-              const routerName = navigationRef.current?.getCurrentRoute();
-              if (routerName) {
-                routeNameRef.current = routerName.name;
-
-                analyticsStore.logPageView(routerName.name);
-              }
-            }}
-            onStateChange={() => {
-              const routerName = navigationRef.current?.getCurrentRoute();
-              if (routerName) {
-                const previousRouteName = routeNameRef.current;
-                const currentRouteName = routerName.name;
-
-                if (previousRouteName !== currentRouteName) {
-                  analyticsStore.logPageView(currentRouteName);
-                }
-
-                routeNameRef.current = currentRouteName;
-              }
-            }}
-          >
+          <NavigationContainer>
             <Stack.Navigator
               initialRouteName={
                 keyRingStore.status !== KeyRingStatus.UNLOCKED
@@ -924,7 +879,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
                 component={AddressBookStackScreen}
               />
             </Stack.Navigator>
-          </BugsnagNavigationContainer>
+          </NavigationContainer>
           {/* <ModalsRenderer /> */}
         </SmartNavigatorProvider>
       </FocusedScreenProvider>
