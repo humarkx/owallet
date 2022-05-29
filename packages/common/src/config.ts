@@ -80,6 +80,7 @@ export const FiatCurrencies: FiatCurrency[] = [
 export const LanguageToFiatCurrency: TypeLanguageToFiatCurrency = {
   default: "usd",
   ko: "krw",
+  vi: "vnd",
 };
 
 export const ADDITIONAL_SIGN_IN_PREPEND:
@@ -117,7 +118,6 @@ export const EmbedChainInfos: AppChainInfo[] = [
       coinImageUrl:
         "https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png",
     },
-
     bip44: {
       coinType: 118,
     },
@@ -126,13 +126,36 @@ export const EmbedChainInfos: AppChainInfo[] = [
       return [
         this.stakeCurrency,
         {
+          type: "cw20",
           coinDenom: "AIRI",
           coinMinimalDenom:
             "cw20:orai10ldgzued6zjp0mkqwsv2mux3ml50l97c74x8sg:aiRight Token",
+          contractAddress: "orai10ldgzued6zjp0mkqwsv2mux3ml50l97c74x8sg",
           coinDecimals: 6,
           coinGeckoId: "airight",
+          coinImageUrl: "https://i.ibb.co/m8mCyMr/airi.png",
+        },
+        {
+          type: "cw20",
+          coinDenom: "ORAIX",
+          coinMinimalDenom:
+            "cw20:orai1lus0f0rhx8s03gdllx2n6vhkmf0536dv57wfge:OraiDex Token",
+          contractAddress: "orai1lus0f0rhx8s03gdllx2n6vhkmf0536dv57wfge",
+          coinDecimals: 6,
+          // coinGeckoId: 'oraix',
+          coinImageUrl: "https://i.ibb.co/VmMJtf7/oraix.png",
+        },
+
+        {
+          type: "cw20",
+          coinDenom: "USDT",
+          coinMinimalDenom:
+            "cw20:orai12hzjxfh77wl572gdzct2fxv2arxcwh6gykc7qh:Tether",
+          contractAddress: "orai12hzjxfh77wl572gdzct2fxv2arxcwh6gykc7qh",
+          coinDecimals: 6,
+          coinGeckoId: "tether",
           coinImageUrl:
-            "https://s2.coinmarketcap.com/static/img/coins/64x64/11563.png",
+            "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
         },
       ];
     },
@@ -151,6 +174,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
       txUrl: "https://scan.orai.io/txs/{txHash}",
       accountUrl: "https://scan.orai.io/account/{address}",
     },
+    beta: true, // use v1beta1
   },
   {
     rpc: "https://testnet-rpc.orai.io/",
