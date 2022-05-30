@@ -60,6 +60,7 @@ import {
   ValidatorListScreen,
 } from "./screens/stake";
 import {
+  DownArrowIcon,
   OpenDrawerIcon,
   ScanIcon,
   SendIcon,
@@ -87,7 +88,7 @@ import {
   FocusedScreenProvider,
   useFocusedScreen,
 } from "./providers/focused-screen";
-import Svg, { Path, Rect } from "react-native-svg";
+// import Svg, { Path, Rect } from "react-native-svg";
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
@@ -329,16 +330,15 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
       }}
     >
       <View style={style.flatten(["flex-row", "items-center"])}>
-        <OpenDrawerIcon size={28} color={style.get("color-primary").color} />
         <Text
-          style={style.flatten([
-            "h4",
-            "color-text-black-high",
-            "margin-left-4",
-          ])}
+          style={style.flatten(["h4", "color-text-black-low", "margin-left-4"])}
         >
-          {chainStore.current.chainName}
+          {chainStore.current.chainName + " "}
         </Text>
+        <DownArrowIcon
+          height={12}
+          color={style.get("color-text-black-low").color}
+        />
       </View>
     </HeaderLeftButton>
   );
@@ -360,7 +360,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
           });
         }}
       >
-        <ScanIcon size={28} color={style.get("color-primary").color} />
+        {/* <ScanIcon size={28} color={style.get("color-primary").color} /> */}
       </HeaderRightButton>
       {walletConnectStore.sessions.length > 0 ? (
         <HeaderRightButton
@@ -805,6 +805,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           elevation: 0,
           paddingLeft: 30,
           paddingRight: 30,
+          height: 70,
         },
         showLabel: false,
       }}

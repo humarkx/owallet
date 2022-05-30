@@ -42,7 +42,7 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
       >
         <OWalletLogo />
       </View>
-      {Platform.OS === "ios" ? (
+      {/* {Platform.OS === "ios" ? (
         <Button
           containerStyle={style.flatten([
             "margin-bottom-20",
@@ -70,8 +70,8 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
             });
           }}
         />
-      ) : null}
-      <Button
+      ) : null} */}
+      {/* <Button
         containerStyle={style.flatten(["margin-bottom-20"])}
         text="Sign in with Google"
         leftIcon={
@@ -82,13 +82,14 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
         size="large"
         mode="light"
         onPress={() => {
-          analyticsStore.logEvent("OAuth sign in started", {
-            registerType: "google",
-          });
-          smartNavigation.navigateSmart("Register.TorusSignIn", {
-            registerConfig,
-            type: "google",
-          });
+          alert("Coming soon");
+          // analyticsStore.logEvent("OAuth sign in started", {
+          //   registerType: "google",
+          // });
+          // smartNavigation.navigateSmart("Register.TorusSignIn", {
+          //   registerConfig,
+          //   type: "google",
+          // });
         }}
       />
       <Text
@@ -99,7 +100,7 @@ export const RegisterNotNewUserScreen: FunctionComponent = observer(() => {
         ])}
       >
         Powered by Torus
-      </Text>
+      </Text> */}
       {/* <Button
         containerStyle={style.flatten(["margin-bottom-16"])}
         text="Import from OWallet Extension"
