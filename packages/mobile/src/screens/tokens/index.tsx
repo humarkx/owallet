@@ -12,6 +12,7 @@ import { RectButton } from '../../components/rect-button';
 import { Currency } from '@owallet/types';
 import { TokenSymbol } from '../../components/token-symbol';
 import { DenomHelper } from '@owallet/common';
+import { Bech32Address } from '@owallet/cosmos';
 
 export const TokensScreen: FunctionComponent = observer(() => {
   const { chainStore, queriesStore, accountStore } = useStore();
@@ -78,8 +79,13 @@ export const TokenItem: FunctionComponent<{
     balanceCoinDenom = balance.currency.originCurrency.coinDenom;
   } else {
     const denomHelper = new DenomHelper(balance.currency.coinMinimalDenom);
-    balanceCoinDenom = name;
-    name += ` (${denomHelper.contractAddress})`;
+    balanceCoinDenom = balance.currency.coinDenom;
+    if (denomHelper.contractAddress) {
+      name += ` (${Bech32Address.shortenAddress(
+        denomHelper.contractAddress,
+        24
+      )})`;
+    }
   }
 
   return (
@@ -110,8 +116,8 @@ export const TokenItem: FunctionComponent<{
           style={style.flatten([
             'subtitle3',
             'color-text-black-low',
-            'margin-bottom-4',
-            'uppercase'
+            'margin-bottom-4'
+            // 'uppercase'
           ])}
         >
           {name}
@@ -120,7 +126,7 @@ export const TokenItem: FunctionComponent<{
           style={style.flatten([
             'h5',
             'color-text-black-medium',
-            'max-width-240'
+            'max-width-300'
           ])}
           numberOfLines={1}
           ellipsizeMode="tail"
