@@ -831,7 +831,6 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
     <Drawer.Navigator
       drawerType="slide"
       drawerContent={(props) => <DrawerContent {...props} />}
-      drawerPosition="right"
       screenOptions={{
         // If the focused screen is not "Home" screen,
         // disable the gesture to open drawer.
