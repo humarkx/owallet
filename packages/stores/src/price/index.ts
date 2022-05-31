@@ -4,7 +4,7 @@ import Axios, { CancelToken } from 'axios';
 import { KVStore, toGenerator } from '@owallet/common';
 import { Dec, CoinPretty, Int } from '@owallet/unit';
 import { FiatCurrency } from '@owallet/types';
-import { PricePretty } from '@owallet/unit/build/price-pretty';
+import { PricePretty } from '@owallet/unit';
 import { DeepReadonly } from 'utility-types';
 import deepmerge from 'deepmerge';
 import { action, flow, makeObservable, observable } from 'mobx';
