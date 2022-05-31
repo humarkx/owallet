@@ -5,7 +5,6 @@ import { AppNavigation } from './navigation';
 import { ModalsProvider } from './modals/base';
 import { Platform, StatusBar } from 'react-native';
 import { AdditonalIntlMessages, LanguageToFiatCurrency } from '@owallet/common';
-import codePush from 'react-native-code-push';
 import { InteractionModalsProivder } from './providers/interaction-modals-provider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { LoadingScreenProvider } from './providers/loading-screen';
@@ -89,9 +88,9 @@ const AppIntlProviderWithStorage = ({ children }) => {
                 hour: '2-digit',
                 hour12: false,
                 minute: '2-digit',
-                timeZoneName: 'short'
-              }
-            }
+                timeZoneName: 'short',
+              },
+            },
           }}
         >
           {children}
@@ -128,4 +127,9 @@ const AppBody: FunctionComponent = () => {
   );
 };
 
-export const App: FunctionComponent = __DEV__ ? AppBody : codePush(AppBody);
+export const App: FunctionComponent = AppBody;
+// ? AppBody
+// : codePush({
+//     installMode: codePush.InstallMode.IMMEDIATE,
+//     checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+//   })(AppBody);

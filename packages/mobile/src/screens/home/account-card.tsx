@@ -7,7 +7,7 @@ import {
   View,
   ViewStyle,
   ImageBackground,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import { useStore } from '../../stores';
 import { useStyle } from '../../styles';
@@ -61,7 +61,7 @@ export const AccountCard: FunctionComponent<{
 
   const data: [number, number] = [
     parseFloat(stakable.toDec().toString()),
-    parseFloat(stakedSum.toDec().toString())
+    parseFloat(stakedSum.toDec().toString()),
   ];
 
   return (
@@ -72,7 +72,7 @@ export const AccountCard: FunctionComponent<{
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('Others', {
-                screen: 'Camera'
+                screen: 'Camera',
               });
             }}
           >
@@ -85,7 +85,7 @@ export const AccountCard: FunctionComponent<{
             style={style.flatten([
               'margin-top-28',
               'margin-bottom-16',
-              'width-full'
+              'width-full',
             ])}
           >
             {/* <DoubleDoughnutChart data={data} /> */}
@@ -102,14 +102,14 @@ export const AccountCard: FunctionComponent<{
               style={style.flatten([
                 'absolute-fill',
                 'items-center',
-                'justify-center'
+                'justify-center',
               ])}
             >
               <Text
                 style={style.flatten([
                   'subtitle2',
                   'color-text-black-very-very-very-low',
-                  'margin-bottom-4'
+                  'margin-bottom-4',
                 ])}
               >
                 Total Balance
@@ -124,8 +124,8 @@ export const AccountCard: FunctionComponent<{
                   style={StyleSheet.flatten([
                     style.flatten(['absolute']),
                     {
-                      bottom: 33
-                    }
+                      bottom: 33,
+                    },
                   ])}
                 >
                   <LoadingSpinner
@@ -150,7 +150,7 @@ export const AccountCard: FunctionComponent<{
             style={style.flatten([
               'flex-row',
               'items-center',
-              'margin-bottom-28'
+              'margin-bottom-28',
             ])}
           >
             {/* <TokenSymbol
@@ -163,7 +163,7 @@ export const AccountCard: FunctionComponent<{
                 style={style.flatten([
                   'flex-row',
                   'items-center',
-                  'margin-bottom-4'
+                  'margin-bottom-4',
                 ])}
               >
                 <View
@@ -172,13 +172,13 @@ export const AccountCard: FunctionComponent<{
                     'height-8',
                     'background-color-primary',
                     'border-radius-8',
-                    'margin-right-4'
+                    'margin-right-4',
                   ])}
                 />
                 <Text
                   style={style.flatten([
                     'subtitle3',
-                    'color-text-black-very-low'
+                    'color-text-black-very-low',
                   ])}
                 >
                   Available
@@ -196,7 +196,7 @@ export const AccountCard: FunctionComponent<{
               containerStyle={style.flatten(['min-width-72'])}
               onPress={() => {
                 smartNavigation.navigateSmart('Send', {
-                  currency: chainStore.current.stakeCurrency.coinMinimalDenom
+                  currency: chainStore.current.stakeCurrency.coinMinimalDenom,
                 });
               }}
             />
@@ -205,7 +205,7 @@ export const AccountCard: FunctionComponent<{
             style={style.flatten([
               'flex-row',
               'items-center',
-              'margin-bottom-8'
+              'margin-bottom-8',
             ])}
           >
             {/* <StakedTokenSymbol size={44} /> */}
@@ -214,7 +214,7 @@ export const AccountCard: FunctionComponent<{
                 style={style.flatten([
                   'flex-row',
                   'items-center',
-                  'margin-bottom-4'
+                  'margin-bottom-4',
                 ])}
               >
                 <View
@@ -223,13 +223,13 @@ export const AccountCard: FunctionComponent<{
                     'height-8',
                     'background-color-secondary-500',
                     'border-radius-8',
-                    'margin-right-4'
+                    'margin-right-4',
                   ])}
                 />
                 <Text
                   style={style.flatten([
                     'subtitle3',
-                    'color-text-black-very-low'
+                    'color-text-black-very-low',
                   ])}
                 >
                   Staking

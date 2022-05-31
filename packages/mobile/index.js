@@ -14,6 +14,8 @@ import { AppRegistry } from 'react-native';
 
 import './init';
 
+import CodePush from 'react-native-code-push';
+
 // The use of "require" is intentional.
 // In case of "import" statement, it is located before execution of the next line,
 // To prevent this, "require" is used.
@@ -22,4 +24,9 @@ const App = require('./src/app').App;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const appName = require('./app.json').name;
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () =>
+  CodePush({
+    installMode: CodePush.InstallMode.IMMEDIATE,
+    checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
+  })(App)
+);
