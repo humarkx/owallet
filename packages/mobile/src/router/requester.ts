@@ -1,5 +1,5 @@
 import { Message, MessageRequester, Result } from '@owallet/router';
-import { JSONUint8Array } from '@owallet/router/build/json-uint8-array';
+import { JSONUint8Array } from '@owallet/router';
 import EventEmitter from 'eventemitter3';
 import { RNRouterBackground, RNRouterUI } from './rn-router';
 
