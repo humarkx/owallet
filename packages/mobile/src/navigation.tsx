@@ -9,8 +9,13 @@ import {
 import {
   DrawerActions,
   NavigationContainer,
+  useNavigationContainerRef,
   useNavigation
 } from '@react-navigation/native';
+import {
+  useFlipper,
+  useReduxDevToolsExtension
+} from '@react-navigation/devtools';
 import { useStore } from './stores';
 import { observer } from 'mobx-react-lite';
 import { HomeScreen } from './screens/home';
@@ -26,7 +31,7 @@ import {
 } from './screens/governance';
 import {
   createDrawerNavigator,
-  useIsDrawerOpen
+  useDrawerStatus
 } from '@react-navigation/drawer';
 import { DrawerContent } from './components/drawer';
 import { useStyle } from './styles';
@@ -386,7 +391,6 @@ export const MainNavigation: FunctionComponent = () => {
         headerTitle: ''
       }}
       initialRouteName="Home"
-      headerMode="screen"
     >
       <Stack.Screen
         options={{
@@ -410,7 +414,6 @@ export const RegisterNavigation: FunctionComponent = () => {
         headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
       }}
       initialRouteName="Register.Intro"
-      headerMode="screen"
     >
       <Stack.Screen
         options={{
@@ -504,7 +507,6 @@ export const OtherNavigation: FunctionComponent = () => {
         ...BlurredHeaderScreenOptionsPreset,
         headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
       }}
-      headerMode="screen"
     >
       <Stack.Screen
         options={{
@@ -645,7 +647,6 @@ export const SettingStackScreen: FunctionComponent = () => {
         ...PlainHeaderScreenOptionsPreset,
         headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
       }}
-      headerMode="screen"
     >
       <Stack.Screen
         options={{
@@ -702,7 +703,6 @@ export const AddressBookStackScreen: FunctionComponent = () => {
         ...BlurredHeaderScreenOptionsPreset,
         headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
       }}
-      headerMode="screen"
     >
       <Stack.Screen
         options={{
@@ -729,7 +729,6 @@ export const WebNavigation: FunctionComponent = () => {
       screenOptions={{
         ...WebpageScreenScreenOptionsPreset
       }}
-      headerMode="screen"
     >
       <Stack.Screen
         options={{ headerShown: false }}
@@ -747,7 +746,7 @@ export const MainTabNavigation: FunctionComponent = () => {
   const navigation = useNavigation();
 
   const focusedScreen = useFocusedScreen();
-  const isDrawerOpen = useIsDrawerOpen();
+  const isDrawerOpen = useDrawerStatus() === 'open';
 
   useEffect(() => {
     // When the focused screen is not "Home" screen and the drawer is open,
@@ -760,6 +759,7 @@ export const MainTabNavigation: FunctionComponent = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ color }) => {
           switch (route.name) {
             case 'Main':
@@ -793,10 +793,11 @@ export const MainTabNavigation: FunctionComponent = () => {
           </View>
         )
       })}
-      tabBarOptions={{
-        activeTintColor: style.get('color-primary').color,
-        inactiveTintColor: style.get('color-text-black-very-very-low').color,
-        style: {
+      options={{
+        tabBarActiveTintColor: style.get('color-primary').color,
+        tabBarInactiveTintColor: style.get('color-text-black-very-very-low')
+          .color,
+        tabBarStyle: {
           borderTopWidth: 0.5,
           borderTopColor: style.get('border-color-border-white').borderColor,
           shadowColor: style.get('color-transparent').color,
@@ -805,7 +806,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           paddingRight: 30,
           height: 70
         },
-        showLabel: false
+        tabBarShowLabel: false
       }}
       tabBar={(props) => (
         <BlurredBottomTabBar {...props} enabledScreens={['Home']} />
@@ -825,17 +826,20 @@ export const MainTabNavigation: FunctionComponent = () => {
 };
 
 export const MainTabNavigationWithDrawer: FunctionComponent = () => {
-  const focused = useFocusedScreen();
+  const homeFocused = useFocusedScreen().name === 'Home';
 
   return (
     <Drawer.Navigator
       drawerType="slide"
       drawerContent={(props) => <DrawerContent {...props} />}
       screenOptions={{
+        headerShown: false,
         // If the focused screen is not "Home" screen,
         // disable the gesture to open drawer.
-        swipeEnabled: focused.name === 'Home',
-        gestureEnabled: focused.name === 'Home'
+        swipeEnabled: homeFocused,
+        gestureHandlerProps: {
+          enabled: homeFocused
+        }
       }}
       gestureHandlerProps={{
         hitSlop: {}
@@ -848,12 +852,14 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
 
 export const AppNavigation: FunctionComponent = observer(() => {
   const { keyRingStore } = useStore();
-
+  const navigationRef = useNavigationContainerRef();
+  useFlipper(navigationRef);
+  useReduxDevToolsExtension(navigationRef);
   return (
     <PageScrollPositionProvider>
       <FocusedScreenProvider>
         <SmartNavigatorProvider>
-          <NavigationContainer>
+          <NavigationContainer ref={navigationRef}>
             <Stack.Navigator
               initialRouteName={
                 keyRingStore.status !== KeyRingStatus.UNLOCKED
@@ -864,7 +870,6 @@ export const AppNavigation: FunctionComponent = observer(() => {
                 headerShown: false,
                 ...TransitionPresets.SlideFromRightIOS
               }}
-              headerMode="screen"
             >
               <Stack.Screen name="Unlock" component={UnlockScreen} />
               <Stack.Screen
