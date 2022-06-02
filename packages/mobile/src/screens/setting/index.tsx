@@ -3,7 +3,7 @@ import { PageWithScrollViewInBottomTabView } from "../../components/page";
 import { RightArrow, SettingItem, SettingSectionTitle } from "./components";
 // import { SettingSelectAccountItem } from "./items/select-account";
 import { useSmartNavigation } from "../../navigation";
-import { SettingFiatCurrencyItem } from "./items/fiat-currency";
+// import { SettingFiatCurrencyItem } from "./items/fiat-currency";
 import { SettingBiometricLockItem } from "./items/biometric-lock";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../stores";
@@ -15,7 +15,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SettingFiatCurrencyTopItem } from "./items/fiat-currency-setting";
 
 export const SettingScreen: FunctionComponent = observer(() => {
-  const { keychainStore, keyRingStore, priceStore } = useStore();
+  const { keychainStore, keyRingStore } = useStore();
 
   const selected = keyRingStore.multiKeyStoreInfo.find(
     (keyStore) => keyStore.selected
@@ -115,7 +115,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
         ) : null}
         {/* <SettingSectionTitle title="Others" /> */}
         <SettingItem
-          label="OWallet version"
+          label="About OWallet"
           // topBorder={true}
           onPress={() => {
             smartNavigation.navigateSmart("Setting.Version", {});

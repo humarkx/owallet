@@ -211,6 +211,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
       txUrl: "https://scan.orai.io/txs/{txHash}",
       accountUrl: "https://scan.orai.io/account/{address}",
     },
+    hideInUI: true
   },
   {
     chainId: "oraibridge-subnet",
@@ -997,6 +998,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     ],
     chainSymbolImageUrl: "https://dhj8dql1kzq2v.cloudfront.net/white/regen.png",
     features: ["stargate", "ibc-transfer", "no-legacy-stdTx", "ibc-go"],
+    hideInUI: true
   },
   {
     rpc: "https://rpc-juno.keplr.app",
@@ -1091,6 +1093,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
       name: "Mintscan",
       txUrl: "https://www.mintscan.io/stargaze/txs/{txHash}",
     },
+    hideInUI: true
   },
   {
     rpc: "https://rpc-persistence.keplr.app",
@@ -1137,6 +1140,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     chainSymbolImageUrl:
       "https://dhj8dql1kzq2v.cloudfront.net/white/persistence.png",
     features: ["stargate", "ibc-transfer"],
+    hideInUI: true
   },
   {
     rpc: "https://rpc-axelar.keplr.app",
@@ -1177,6 +1181,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     features: ["stargate", "ibc-transfer", "no-legacy-stdTx", "ibc-go"],
     chainSymbolImageUrl:
       "https://dhj8dql1kzq2v.cloudfront.net/white/axelar.png",
+      hideInUI: true
   },
   {
     rpc: "https://rpc-sommelier.keplr.app",
@@ -1214,6 +1219,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     ],
     features: ["stargate", "ibc-transfer", "no-legacy-stdTx", "ibc-go"],
     chainSymbolImageUrl: "https://dhj8dql1kzq2v.cloudfront.net/white/somm.png",
+    hideInUI: true
   },
   {
     rpc: "https://rpc-umee.keplr.app",
@@ -1253,6 +1259,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     },
     features: ["stargate", "ibc-transfer", "no-legacy-stdTx", "ibc-go"],
     chainSymbolImageUrl: "https://dhj8dql1kzq2v.cloudfront.net/white/umee.png",
+    hideInUI: true
   },
   {
     rpc: "https://rpc-sentinel.keplr.app",

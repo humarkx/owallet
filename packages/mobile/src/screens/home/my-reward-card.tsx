@@ -2,11 +2,12 @@ import React, { FunctionComponent } from "react";
 import { observer } from "mobx-react-lite";
 import { useStyle } from "../../styles";
 import { Card, CardHeaderWithButton } from "../../components/card";
-import { RewardIcon } from "../../components/icon";
+// import { RewardIcon } from "../../components/icon";
 import { Dec } from "@owallet/unit";
-import { ViewStyle } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { useStore } from "../../stores";
 import { useSmartNavigation } from "../../navigation";
+import { MoneybagIcon } from "../../components/icon/money-bag";
 
 export const MyRewardCard: FunctionComponent<{
   containerStyle?: ViewStyle;
@@ -62,7 +63,19 @@ export const MyRewardCard: FunctionComponent<{
           }
         }}
         icon={
-          <RewardIcon size={44} color={style.get("color-secondary").color} />
+          <View
+            style={style.flatten([
+              "width-44",
+              "height-44",
+              "border-radius-64",
+              "items-center",
+              "justify-center",
+              "background-color-border-white",
+            ])}
+          >
+            <MoneybagIcon />
+          </View>
+          // <RewardIcon size={44} color={style.get("color-secondary").color} />
         }
         buttonText="Claim"
         buttonMode="outline"
