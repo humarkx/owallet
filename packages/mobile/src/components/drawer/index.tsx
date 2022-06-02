@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useCallback, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import {
   DrawerContentComponentProps,
@@ -13,6 +13,7 @@ import { RectButton } from "../rect-button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { VectorCharacter } from "../vector-character";
 import FastImage from "react-native-fast-image";
+import { Hash } from "@owallet/crypto";
 
 export type DrawerContentProps =
   DrawerContentComponentProps<DrawerContentOptions>;
@@ -25,6 +26,34 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
     const safeAreaInsets = useSafeAreaInsets();
 
     const style = useStyle();
+
+    const deterministicNumber = useCallback((chainInfo) => {
+      const bytes = Hash.sha256(
+        Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
+      );
+      return (
+        (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0
+      );
+    }, []);
+
+    const profileColor = useCallback(
+      (chainInfo) => {
+        const colors = [
+          "sky-blue",
+          "mint",
+          "blue-violet",
+          "green",
+          "yellow-green",
+          "purple",
+          "red",
+          "orange",
+          "yellow",
+        ];
+
+        return colors[deterministicNumber(chainInfo) % colors.length];
+      },
+      [deterministicNumber]
+    );
 
     return (
       <DrawerContentScrollView {...props}>
@@ -84,8 +113,11 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
                       "border-radius-64",
                       "items-center",
                       "justify-center",
-                      "background-color-border-gray",
+                      "overflow-hidden",
                       "margin-right-16",
+                      `background-color-profile-${profileColor(
+                        chainInfo
+                      )}` as any,
                     ],
                     [selected && "background-color-black"]
                   )}
@@ -104,8 +136,8 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
                   ) : (
                     <VectorCharacter
                       char={chainInfo.chainName[0]}
-                      color="white"
                       height={15}
+                      color="white"
                     />
                   )}
                 </View>
