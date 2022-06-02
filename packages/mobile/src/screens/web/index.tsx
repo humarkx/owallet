@@ -1,18 +1,18 @@
-import React, { FunctionComponent, useRef, useState } from 'react';
-import { PageWithScrollViewInBottomTabView } from '../../components/page';
+import React, { FunctionComponent, useRef, useState } from "react";
+import { PageWithScrollViewInBottomTabView } from "../../components/page";
 import {
   Image,
   ImageSourcePropType,
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { useStyle } from '../../styles';
-import { useSmartNavigation } from '../../navigation';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { RectButton } from '../../components/rect-button';
-import Svg, { Path, G, Defs, ClipPath } from 'react-native-svg';
-import { DAppInfos } from './config';
+} from "react-native";
+import { useStyle } from "../../styles";
+import { useSmartNavigation } from "../../navigation";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { RectButton } from "../../components/rect-button";
+import Svg, { Path, G, Defs, ClipPath } from "react-native-svg";
+import { DAppInfos } from "./config";
 
 export const WebScreen: FunctionComponent = () => {
   const style = useStyle();
@@ -23,9 +23,9 @@ export const WebScreen: FunctionComponent = () => {
 
   return (
     <PageWithScrollViewInBottomTabView
-      contentContainerStyle={style.get('flex-grow-1')}
+      contentContainerStyle={style.get("flex-grow-1")}
       style={StyleSheet.flatten([
-        style.flatten(['padding-x-20']),
+        style.flatten(["padding-x-20"]),
         {
           marginTop: safeAreaInsets.top,
         },
@@ -33,10 +33,10 @@ export const WebScreen: FunctionComponent = () => {
     >
       <Text
         style={style.flatten([
-          'h3',
-          'color-text-black-high',
-          'margin-top-44',
-          'margin-bottom-20',
+          "h3",
+          "color-text-black-high",
+          "margin-top-44",
+          "margin-bottom-20",
         ])}
       >
         Access dApps
@@ -48,7 +48,7 @@ export const WebScreen: FunctionComponent = () => {
           source={thumbnail}
           logo={logo}
           onPress={() => {
-            smartNavigation.pushSmart('Web.dApp', { name, uri });
+            smartNavigation.pushSmart("Web.dApp", { name, uri });
           }}
         />
       ))}
@@ -96,27 +96,27 @@ export const WebpageImageButton: FunctionComponent<{
     <View
       style={StyleSheet.flatten([
         style.flatten([
-          'flex-row',
-          'items-center',
-          'overflow-hidden',
-          'border-radius-16',
-          'background-color-big-image-placeholder',
-          'margin-bottom-16',
+          "flex-row",
+          "items-center",
+          "overflow-hidden",
+          "border-radius-16",
+          "background-color-big-image-placeholder",
+          "margin-bottom-16",
         ]),
         {
-          height
+          height,
         },
       ])}
     >
       {source ? (
-        <View style={style.flatten(['absolute-fill', 'items-end'])}>
+        <View style={style.flatten(["absolute-fill", "items-end"])}>
           <Image
             ref={imageRef}
             style={
               imageSize
                 ? {
-                    resizeMode: 'stretch',
-                    width: '100%',
+                    resizeMode: "stretch",
+                    width: "100%",
                     height,
                   }
                 : {
@@ -130,22 +130,22 @@ export const WebpageImageButton: FunctionComponent<{
           {imageSize ? (
             <View
               style={style.flatten([
-                'absolute-fill',
-                'background-color-black',
-                'opacity-10',
+                "absolute-fill",
+                "background-color-black",
+                "opacity-10",
               ])}
             />
           ) : null}
         </View>
       ) : null}
-      <View style={style.flatten(['absolute-fill'])}>
+      <View style={style.flatten(["absolute-fill"])}>
         <RectButton
           style={StyleSheet.flatten([
-            style.flatten(['flex-row','padding-x-20','padding-y-20']),
+            style.flatten(["flex-row", "padding-x-20", "padding-y-20"]),
             { height },
           ])}
           activeOpacity={0.2}
-          underlayColor={style.get('color-white').color}
+          underlayColor={style.get("color-white").color}
           enabled={onPress != null}
           onPress={onPress}
         >
@@ -156,13 +156,13 @@ export const WebpageImageButton: FunctionComponent<{
               <View
                 style={[
                   style.flatten([
-                    'flex-row',
-                    'items-center',
-                    'width-160',
-                    'height-44',
-                    'border-radius-32',
-                    'padding-x-12',
-                    'background-color-text-black-very-very-low',
+                    "flex-row",
+                    "items-center",
+                    "width-160",
+                    "height-44",
+                    "border-radius-32",
+                    "padding-x-12",
+                    "background-color-text-black-very-very-low",
                   ]),
                 ]}
               >
@@ -177,27 +177,27 @@ export const WebpageImageButton: FunctionComponent<{
                   source={logo}
                   fadeDuration={0}
                 />
-                <Text style={style.flatten(['font-extrabold', 'subtitle1'])}>
+                <Text style={style.flatten(["font-extrabold", "subtitle1"])}>
                   {name}
                 </Text>
               </View>
 
-              <View style={style.get('flex-1')} />
+              <View style={style.get("flex-1")} />
               <View
                 style={style.flatten([
-                  'flex-row',
-                  'items-center',
-                  'justify-center',
-                  'width-44',
-                  'height-44',
-                  'border-radius-32',
-                  'background-color-text-black-very-very-low',
+                  "flex-row",
+                  "items-center",
+                  "justify-center",
+                  "width-44",
+                  "height-44",
+                  "border-radius-32",
+                  "background-color-text-black-very-very-low",
                 ])}
               >
                 <GoIcon
                   width={20}
                   height={20}
-                  color={style.get('color-black').color}
+                  color={style.get("color-black").color}
                 />
               </View>
             </React.Fragment>
@@ -212,7 +212,7 @@ const GoIcon: FunctionComponent<{
   width?: number;
   height?: number;
   color?: string;
-}> = ({ width = 38, height = 23, color = 'white' }) => {
+}> = ({ width = 38, height = 23, color = "white" }) => {
   return (
     <Svg width={width} height={height} fill="none" viewBox="0 0 38 23">
       <G clipPath="url(#clip0_4026_25847)">
