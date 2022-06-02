@@ -5,7 +5,7 @@ import {
   ImageSourcePropType,
   StyleSheet,
   Text,
-  View
+  View,
 } from 'react-native';
 import { useStyle } from '../../styles';
 import { useSmartNavigation } from '../../navigation';
@@ -27,8 +27,8 @@ export const WebScreen: FunctionComponent = () => {
       style={StyleSheet.flatten([
         style.flatten(['padding-x-20']),
         {
-          marginTop: safeAreaInsets.top
-        }
+          marginTop: safeAreaInsets.top,
+        },
       ])}
     >
       <Text
@@ -36,16 +36,17 @@ export const WebScreen: FunctionComponent = () => {
           'h3',
           'color-text-black-high',
           'margin-top-44',
-          'margin-bottom-20'
+          'margin-bottom-20',
         ])}
       >
-        Discover DeFi
+        Access dApps
       </Text>
-      {DAppInfos.map(({ name, thumbnail, uri }) => (
+      {DAppInfos.map(({ name, thumbnail, uri, logo }) => (
         <WebpageImageButton
           key={uri}
           name={name}
           source={thumbnail}
+          logo={logo}
           onPress={() => {
             smartNavigation.pushSmart('Web.dApp', { name, uri });
           }}
@@ -59,12 +60,12 @@ export const WebpageImageButton: FunctionComponent<{
   name?: string;
   source?: ImageSourcePropType;
   onPress?: () => void;
-
+  logo?: ImageSourcePropType;
   overrideInner?: React.ReactElement;
-}> = ({ name, source, onPress, overrideInner }) => {
+}> = ({ name, source, onPress, logo, overrideInner }) => {
   const style = useStyle();
 
-  const height = 104;
+  const height = 240;
 
   /*
     Adjust the size of image view manually because react native's resize mode doesn't provide the flexible API.
@@ -73,7 +74,7 @@ export const WebpageImageButton: FunctionComponent<{
    */
   const [imageSize, setImageSize] = useState<
     | {
-        width: number;
+        width: number | string;
         height: number;
       }
     | undefined
@@ -85,7 +86,7 @@ export const WebpageImageButton: FunctionComponent<{
       imageRef.current.measure((_x, _y, measureWidth, measureHeight) => {
         setImageSize({
           width: (measureWidth / measureHeight) * height,
-          height
+          height,
         });
       });
     }
@@ -98,13 +99,13 @@ export const WebpageImageButton: FunctionComponent<{
           'flex-row',
           'items-center',
           'overflow-hidden',
-          'border-radius-8',
+          'border-radius-16',
           'background-color-big-image-placeholder',
-          'margin-bottom-16'
+          'margin-bottom-16',
         ]),
         {
           height
-        }
+        },
       ])}
     >
       {source ? (
@@ -114,11 +115,12 @@ export const WebpageImageButton: FunctionComponent<{
             style={
               imageSize
                 ? {
-                    width: imageSize.width,
-                    height: imageSize.height
+                    resizeMode: 'stretch',
+                    width: '100%',
+                    height,
                   }
                 : {
-                    opacity: 0
+                    opacity: 0,
                   }
             }
             onLoadEnd={onImageLoaded}
@@ -130,7 +132,7 @@ export const WebpageImageButton: FunctionComponent<{
               style={style.flatten([
                 'absolute-fill',
                 'background-color-black',
-                'opacity-40'
+                'opacity-10',
               ])}
             />
           ) : null}
@@ -139,8 +141,8 @@ export const WebpageImageButton: FunctionComponent<{
       <View style={style.flatten(['absolute-fill'])}>
         <RectButton
           style={StyleSheet.flatten([
-            style.flatten(['flex-row', 'items-center', 'padding-x-38']),
-            { height }
+            style.flatten(['flex-row','padding-x-20','padding-y-20']),
+            { height },
           ])}
           activeOpacity={0.2}
           underlayColor={style.get('color-white').color}
@@ -151,13 +153,53 @@ export const WebpageImageButton: FunctionComponent<{
             overrideInner
           ) : (
             <React.Fragment>
-              <Text style={style.flatten(['h2', 'color-white'])}>{name}</Text>
+              <View
+                style={[
+                  style.flatten([
+                    'flex-row',
+                    'items-center',
+                    'width-160',
+                    'height-44',
+                    'border-radius-32',
+                    'padding-x-12',
+                    'background-color-text-black-very-very-low',
+                  ]),
+                ]}
+              >
+                <Image
+                  ref={imageRef}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    marginRight: 8,
+                  }}
+                  onLoadEnd={onImageLoaded}
+                  source={logo}
+                  fadeDuration={0}
+                />
+                <Text style={style.flatten(['font-extrabold', 'subtitle1'])}>
+                  {name}
+                </Text>
+              </View>
+
               <View style={style.get('flex-1')} />
-              <GoIcon
-                width={34.7}
-                height={21}
-                color={style.get('color-white').color}
-              />
+              <View
+                style={style.flatten([
+                  'flex-row',
+                  'items-center',
+                  'justify-center',
+                  'width-44',
+                  'height-44',
+                  'border-radius-32',
+                  'background-color-text-black-very-very-low',
+                ])}
+              >
+                <GoIcon
+                  width={20}
+                  height={20}
+                  color={style.get('color-black').color}
+                />
+              </View>
             </React.Fragment>
           )}
         </RectButton>
