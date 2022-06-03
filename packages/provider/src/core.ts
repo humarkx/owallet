@@ -6,7 +6,11 @@ import {
   OWalletSignOptions,
   Key
 } from '@owallet/types';
-import { BACKGROUND_PORT, MessageRequester } from '@owallet/router';
+import {
+  BACKGROUND_PORT,
+  MessageRequester,
+  RequestSignDirectMsg
+} from '@owallet/router';
 import {
   BroadcastMode,
   AminoSignResponse,
@@ -24,7 +28,6 @@ import {
   SendTxMsg,
   GetSecret20ViewingKey,
   RequestSignAminoMsg,
-  RequestSignDirectMsg,
   GetPubkeyMsg,
   ReqeustEncryptMsg,
   RequestDecryptMsg,

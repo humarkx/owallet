@@ -11,7 +11,8 @@ import {
   Bech32Config,
   BIP44,
   ChainInfo,
-  Currency
+  Currency,
+  NetworkType
 } from '@owallet/types';
 import { ChainGetter } from '../common';
 import { ChainIdHelper } from '@owallet/cosmos';
@@ -131,6 +132,10 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
     return this._chainInfo;
   }
 
+  get networkType(): NetworkType {
+    return this._chainInfo.networkType || 'cosmos';
+  }
+
   get chainId(): string {
     return this._chainInfo.chainId;
   }
@@ -188,6 +193,7 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
    */
   forceFindCurrency(coinMinimalDenom: string): AppCurrency {
     const currency = this.findCurrency(coinMinimalDenom);
+
     if (!currency) {
       return {
         coinMinimalDenom,

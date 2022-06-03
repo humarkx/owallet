@@ -480,7 +480,7 @@ export class WalletConnectStore extends WalletConnectManager {
   protected processDeepLinkURL(_url: string) {
     try {
       const url = new URL(_url);
-      if (url.protocol === 'owalletwallet:' && url.host === 'wcV1') {
+      if (url.protocol === 'owallet:' && url.host === 'wcV1') {
         let params = url.search;
         if (params) {
           if (params.startsWith('?')) {

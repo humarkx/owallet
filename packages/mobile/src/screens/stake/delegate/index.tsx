@@ -6,11 +6,11 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import { View } from 'react-native';
 import { useStore } from '../../../stores';
 import { useDelegateTxConfig } from '@owallet/hooks';
-import { EthereumEndpoint } from '../../../config';
+import { EthereumEndpoint } from '@owallet/common';
 import { AmountInput, FeeButtons, MemoInput } from '../../../components/input';
 import { Button } from '../../../components/button';
 import { useSmartNavigation } from '../../../navigation';
-import { BondStatus } from '@owallet/stores/build/query/cosmos/staking/types';
+import { BondStatus } from '@owallet/stores';
 
 export const DelegateScreen: FunctionComponent = observer(() => {
   const route = useRoute<

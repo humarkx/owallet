@@ -9,7 +9,6 @@ import {
 import {
   DrawerActions,
   NavigationContainer,
-  NavigationContainerRef,
   useNavigation
 } from '@react-navigation/native';
 import { useStore } from './stores';
@@ -60,7 +59,14 @@ import {
   ValidatorDetailsScreen,
   ValidatorListScreen
 } from './screens/stake';
-import { OpenDrawerIcon, ScanIcon } from './components/icon';
+import {
+  DownArrowIcon,
+  OpenDrawerIcon,
+  ScanIcon,
+  SendIcon,
+  SettingIcon,
+  WalletIcon
+} from './components/icon';
 import {
   AddAddressBookScreen,
   AddressBookScreen
@@ -82,7 +88,7 @@ import {
   FocusedScreenProvider,
   useFocusedScreen
 } from './providers/focused-screen';
-import Svg, { Path, Rect } from 'react-native-svg';
+// import Svg, { Path, Rect } from "react-native-svg";
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
@@ -102,9 +108,8 @@ import {
   ImportFromExtensionScreen,
   ImportFromExtensionSetPasswordScreen
 } from './screens/register/import-from-extension';
-import { OsmosisWebpageScreen } from './screens/web/webpages';
+import { DAppWebpageScreen } from './screens/web/webpages';
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
-import Bugsnag from '@bugsnag/react-native';
 
 const { SmartNavigatorProvider, useSmartNavigation } =
   createSmartNavigatorProvider(
@@ -217,7 +222,7 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       'Web.Intro': {
         upperScreenName: 'Web'
       },
-      'Web.Osmosis': {
+      'Web.dApp': {
         upperScreenName: 'Web'
       }
     }).withParams<{
@@ -323,16 +328,15 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
       }}
     >
       <View style={style.flatten(['flex-row', 'items-center'])}>
-        <OpenDrawerIcon size={28} color={style.get('color-primary').color} />
         <Text
-          style={style.flatten([
-            'h4',
-            'color-text-black-high',
-            'margin-left-4'
-          ])}
+          style={style.flatten(['h4', 'color-text-black-low', 'margin-left-4'])}
         >
-          {chainStore.current.chainName}
+          {chainStore.current.chainName + ' '}
         </Text>
+        <DownArrowIcon
+          height={12}
+          color={style.get('color-text-black-low').color}
+        />
       </View>
     </HeaderLeftButton>
   );
@@ -354,7 +358,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
           });
         }}
       >
-        <ScanIcon size={28} color={style.get('color-primary').color} />
+        {/* <ScanIcon size={28} color={style.get("color-primary").color} /> */}
       </HeaderRightButton>
       {walletConnectStore.sessions.length > 0 ? (
         <HeaderRightButton
@@ -732,7 +736,7 @@ export const WebNavigation: FunctionComponent = () => {
         name="Web.Intro"
         component={WebScreen}
       />
-      <Stack.Screen name="Web.Osmosis" component={OsmosisWebpageScreen} />
+      <Stack.Screen name="Web.dApp" component={DAppWebpageScreen} />
     </Stack.Navigator>
   );
 };
@@ -757,64 +761,13 @@ export const MainTabNavigation: FunctionComponent = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => {
-          const size = 24;
-
           switch (route.name) {
             case 'Main':
-              return (
-                <Svg width={size} height={size} fill="none" viewBox="0 0 24 24">
-                  <Rect
-                    width="8"
-                    height="8"
-                    x="3"
-                    y="3"
-                    fill={color}
-                    rx="1.5"
-                  />
-                  <Rect
-                    width="8"
-                    height="8"
-                    x="3"
-                    y="13"
-                    fill={color}
-                    rx="1.5"
-                  />
-                  <Rect
-                    width="8"
-                    height="8"
-                    x="13"
-                    y="3"
-                    fill={color}
-                    rx="1.5"
-                  />
-                  <Rect
-                    width="8"
-                    height="8"
-                    x="13"
-                    y="13"
-                    fill={color}
-                    rx="1.5"
-                  />
-                </Svg>
-              );
+              return <WalletIcon color={color} size={24} />;
             case 'Web':
-              return (
-                <Svg width={size} height={size} fill="none" viewBox="0 0 24 24">
-                  <Path
-                    fill={color}
-                    d="M12 2C8.741 2 5.849 3.577 4.021 6H4v.027A9.931 9.931 0 002 12c0 5.511 4.489 10 10 10s10-4.489 10-10S17.511 2 12 2zm3 2.584A7.98 7.98 0 0120 12c0 2.088-.8 3.978-2.102 5.4A1.993 1.993 0 0016 16a1 1 0 01-1-1v-2a1 1 0 00-1-1h-4a1 1 0 010-2 1 1 0 001-1V8a1 1 0 011-1h1a2 2 0 002-2v-.416zM4.207 10.207L9 15v1a2 2 0 002 2v1.932a7.979 7.979 0 01-6.793-9.725z"
-                  />
-                </Svg>
-              );
+              return <SendIcon />;
             case 'Settings':
-              return (
-                <Svg width={size} height={size} fill="none" viewBox="0 0 24 24">
-                  <Path
-                    fill={color}
-                    d="M12 2c-.528 0-1.046.045-1.55.131l-.311 1.302c-.484 2.023-2.544 3.225-4.52 2.635l-1.084-.325A10.124 10.124 0 003 8.598l.805.781a3.663 3.663 0 010 5.242L3 15.402c.36 1.043.882 2.006 1.535 2.855l1.084-.325c1.976-.59 4.036.612 4.52 2.635l.31 1.302a9.187 9.187 0 003.101 0l.311-1.302c.484-2.023 2.544-3.225 4.52-2.635l1.084.325A10.124 10.124 0 0021 15.402l-.805-.781a3.663 3.663 0 010-5.242L21 8.598a10.113 10.113 0 00-1.535-2.855l-1.084.325c-1.976.59-4.036-.612-4.52-2.635l-.31-1.302A9.184 9.184 0 0012 2zm0 7.273c1.491 0 2.7 1.22 2.7 2.727 0 1.506-1.209 2.727-2.7 2.727S9.3 13.507 9.3 12c0-1.506 1.209-2.727 2.7-2.727z"
-                  />
-                </Svg>
-              );
+              return <SettingIcon color={color} />;
           }
         },
         tabBarButton: (props) => (
@@ -849,7 +802,8 @@ export const MainTabNavigation: FunctionComponent = () => {
           shadowColor: style.get('color-transparent').color,
           elevation: 0,
           paddingLeft: 30,
-          paddingRight: 30
+          paddingRight: 30,
+          height: 70
         },
         showLabel: false
       }}
@@ -892,57 +846,14 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
   );
 };
 
-const BugsnagNavigationContainerPlugin = Bugsnag.getPlugin('reactNavigation');
-// The returned BugsnagNavigationContainer has exactly the same usage
-// except now it tracks route information to send with your error reports
-const BugsnagNavigationContainer = (() => {
-  if (BugsnagNavigationContainerPlugin) {
-    console.log('BugsnagNavigationContainerPlugin found');
-    return BugsnagNavigationContainerPlugin.createNavigationContainer(
-      NavigationContainer
-    );
-  } else {
-    console.log(
-      'WARNING: BugsnagNavigationContainerPlugin is null. Fallback to use basic NavigationContainer'
-    );
-    return NavigationContainer;
-  }
-})();
-
 export const AppNavigation: FunctionComponent = observer(() => {
-  const { keyRingStore, analyticsStore } = useStore();
-
-  const navigationRef = useRef<NavigationContainerRef | null>(null);
-  const routeNameRef = useRef<string | null>(null);
+  const { keyRingStore } = useStore();
 
   return (
     <PageScrollPositionProvider>
       <FocusedScreenProvider>
         <SmartNavigatorProvider>
-          <BugsnagNavigationContainer
-            ref={navigationRef}
-            onReady={() => {
-              const routerName = navigationRef.current?.getCurrentRoute();
-              if (routerName) {
-                routeNameRef.current = routerName.name;
-
-                analyticsStore.logPageView(routerName.name);
-              }
-            }}
-            onStateChange={() => {
-              const routerName = navigationRef.current?.getCurrentRoute();
-              if (routerName) {
-                const previousRouteName = routeNameRef.current;
-                const currentRouteName = routerName.name;
-
-                if (previousRouteName !== currentRouteName) {
-                  analyticsStore.logPageView(currentRouteName);
-                }
-
-                routeNameRef.current = currentRouteName;
-              }
-            }}
-          >
+          <NavigationContainer>
             <Stack.Navigator
               initialRouteName={
                 keyRingStore.status !== KeyRingStatus.UNLOCKED
@@ -967,7 +878,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
                 component={AddressBookStackScreen}
               />
             </Stack.Navigator>
-          </BugsnagNavigationContainer>
+          </NavigationContainer>
           {/* <ModalsRenderer /> */}
         </SmartNavigatorProvider>
       </FocusedScreenProvider>

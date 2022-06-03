@@ -30,14 +30,18 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>app.owallet.oauth</string>
-				<string>owalletwallet</string>
+				<string>owallet</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CodePushDeploymentKey</key>
-	<string>Bp7ApGEQu01igCf6axrsaAgi6Mc0X5oBgGjFI</string>
+	<string>ZxkH4o1dYxVWfFeMFAILUj3qEJQnBM3Aam2Tl</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>owallet</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -77,10 +81,5 @@
 	<false/>
 	<key>XSAppIconAssets</key>
 	<string>Images.xcassets/AppIcon.appiconset</string>
-	<key>bugsnag</key>
-	<dict>
-		<key>apiKey</key>
-		<string>f07be1dce2391227e818fbe3e4235bf4</string>
-	</dict>
 </dict>
 </plist>

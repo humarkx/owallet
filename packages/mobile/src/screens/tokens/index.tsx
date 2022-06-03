@@ -11,6 +11,8 @@ import { Card } from '../../components/card';
 import { RectButton } from '../../components/rect-button';
 import { Currency } from '@owallet/types';
 import { TokenSymbol } from '../../components/token-symbol';
+import { DenomHelper } from '@owallet/common';
+import { Bech32Address } from '@owallet/cosmos';
 
 export const TokensScreen: FunctionComponent = observer(() => {
   const { chainStore, queriesStore, accountStore } = useStore();
@@ -70,15 +72,21 @@ export const TokenItem: FunctionComponent<{
 
   // The IBC currency could have long denom (with the origin chain/channel information).
   // Because it is shown in the title, there is no need to show such long denom twice in the actual balance.
-  const balanceCoinDenom = (() => {
-    if (
-      'originCurrency' in balance.currency &&
-      balance.currency.originCurrency
-    ) {
-      return balance.currency.originCurrency.coinDenom;
+  let balanceCoinDenom: string;
+  let name = balance.currency.coinDenom;
+
+  if ('originCurrency' in balance.currency && balance.currency.originCurrency) {
+    balanceCoinDenom = balance.currency.originCurrency.coinDenom;
+  } else {
+    const denomHelper = new DenomHelper(balance.currency.coinMinimalDenom);
+    balanceCoinDenom = balance.currency.coinDenom;
+    if (denomHelper.contractAddress) {
+      name += ` (${Bech32Address.shortenAddress(
+        denomHelper.contractAddress,
+        24
+      )})`;
     }
-    return balance.currency.coinDenom;
-  })();
+  }
 
   return (
     <RectButton
@@ -108,17 +116,17 @@ export const TokenItem: FunctionComponent<{
           style={style.flatten([
             'subtitle3',
             'color-text-black-low',
-            'margin-bottom-4',
-            'uppercase'
+            'margin-bottom-4'
+            // 'uppercase'
           ])}
         >
-          {balance.currency.coinDenom}
+          {name}
         </Text>
         <Text
           style={style.flatten([
             'h5',
             'color-text-black-medium',
-            'max-width-240'
+            'max-width-300'
           ])}
           numberOfLines={1}
           ellipsizeMode="tail"
