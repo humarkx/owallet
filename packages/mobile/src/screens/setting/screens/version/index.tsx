@@ -69,7 +69,7 @@ export const OWalletVersionScreen: FunctionComponent = () => {
 
   return (
     <PageWithScrollViewInBottomTabView>
-      <SettingSectionTitle title="App" />
+      <SettingSectionTitle title="Application" />
       <TouchableWithoutFeedback
         onPress={() => {
           testErrorReportRef.current++;
