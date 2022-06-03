@@ -105,7 +105,10 @@ export class ExtensionEnv {
       });
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const tabId = window.tabs![0].id!;
+      let tabs = await browser.tabs.query({
+        active: true
+      });
+      const tabId = tabs![0].id!;
 
       // Wait until that tab is loaded
       await (async () => {
