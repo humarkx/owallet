@@ -1,6 +1,6 @@
 import { delay, inject, singleton } from 'tsyringe';
 import { TYPES } from '../types';
-
+import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import Axios from 'axios';
 import { ChainsService } from '../chains';
 import { PermissionService } from '../permission';
@@ -43,7 +43,8 @@ export class BackgroundTxService {
       ...{
         baseURL: chainInfo.rest
       },
-      ...chainInfo.restConfig
+      ...chainInfo.restConfig,
+      adapter: fetchAdapter
     });
 
     this.notification.create({

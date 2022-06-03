@@ -1,5 +1,5 @@
 import { MessageRequester, Message, JSONUint8Array } from '@owallet/router';
-import { getOWalletExtensionRouterId } from '../utils';
+import { ExtensionEnv } from '../env';
 
 // The message requester to send the message to the content scripts.
 // This will send message to the tab with the content script.
@@ -16,9 +16,10 @@ export class ContentScriptMessageRequester implements MessageRequester {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     msg['origin'] = `chrome-extension://${browser.runtime.id}`;
+    const routerId = await ExtensionEnv.assignCmd('get-router-id');
     msg.routerMeta = {
       ...msg.routerMeta,
-      routerId: getOWalletExtensionRouterId()
+      routerId
     };
 
     const wrappedMsg = JSONUint8Array.wrap(msg);
