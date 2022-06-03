@@ -53,8 +53,10 @@ export const SettingItem: FunctionComponent<{
   const renderChildren = () => {
     return (
       <React.Fragment>
-        {left}
-        <View>
+        {left} 
+        <View style={StyleSheet.flatten([
+              style.flatten(["flex-row","justify-between","items-center","width-full"]),
+            ])}>
           <Text
             style={StyleSheet.flatten([
               style.flatten(["body1", "color-text-black-medium"]),
@@ -66,7 +68,7 @@ export const SettingItem: FunctionComponent<{
           {paragraph ? (
             <Text
               style={StyleSheet.flatten([
-                style.flatten(["subtitle3", "color-text-black-low"]),
+                style.flatten(["body1", "color-text-black-low"]),
                 paragraphStyle,
               ])}
             >
