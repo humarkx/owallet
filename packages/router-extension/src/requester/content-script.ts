@@ -15,7 +15,7 @@ export class ContentScriptMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg['origin'] = `chrome-extension://${browser.runtime.id}`;
+    msg['origin'] = new URL(browser.runtime.getURL('/')).origin;
     const routerId = await ExtensionEnv.assignCmd('get-router-id');
     msg.routerMeta = {
       ...msg.routerMeta,
