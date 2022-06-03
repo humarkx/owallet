@@ -1,8 +1,8 @@
 /**
  * Store the config related to UI.
  */
-import { action, makeObservable, observable, runInAction, toJS } from "mobx";
-import { KVStore } from "@owallet/common";
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { KVStore } from '../kv-store/interface';
 
 export interface UIConfigOptions {
   showAdvancedIBCTransfer: boolean;
@@ -11,7 +11,7 @@ export interface UIConfigOptions {
 export class UIConfigStore {
   @observable.deep
   protected options: UIConfigOptions = {
-    showAdvancedIBCTransfer: true,
+    showAdvancedIBCTransfer: true
   };
 
   constructor(protected readonly kvStore: KVStore) {
@@ -20,14 +20,18 @@ export class UIConfigStore {
     this.init();
   }
 
+  get Storage() {
+    return this.kvStore;
+  }
+
   protected async init() {
     // There is no guarantee that this value will contain all options fields, as the options field may be added later.
-    const data = await this.kvStore.get<Partial<UIConfigOptions>>("options");
+    const data = await this.kvStore.get<Partial<UIConfigOptions>>('options');
 
     runInAction(() => {
       this.options = {
         ...this.options,
-        ...data,
+        ...data
       };
     });
   }
@@ -51,6 +55,6 @@ export class UIConfigStore {
 
   async save() {
     const data = toJS(this.options);
-    await this.kvStore.set("options", data);
+    await this.kvStore.set('options', data);
   }
 }

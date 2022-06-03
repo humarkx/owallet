@@ -4,7 +4,7 @@ import {
   CosmwasmMsgOpts,
   SecretMsgOpts
 } from '@owallet/stores';
-import { ObservableQueryBalances } from '@owallet/stores/build/query/balances';
+import { ObservableQueryBalances } from '@owallet/stores';
 import { useFeeConfig, useMemoConfig, useRecipientConfig } from './index';
 import { useSendGasConfig } from './send-gas';
 import { useAmountConfig } from './amount';

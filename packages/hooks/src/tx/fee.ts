@@ -13,7 +13,7 @@ import { Currency } from '@owallet/types';
 import { computedFn } from 'mobx-utils';
 import { StdFee } from '@cosmjs/launchpad';
 import { useState } from 'react';
-import { ObservableQueryBalances } from '@owallet/stores/build/query/balances';
+import { ObservableQueryBalances } from '@owallet/stores';
 import { InsufficientFeeError, NotLoadedFeeError } from './errors';
 
 export class FeeConfig extends TxChainSetter implements IFeeConfig {
@@ -226,7 +226,9 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
       } else if (
         bal.balance
           .toDec()
-          .mul(DecUtils.getPrecisionDec(bal.currency.coinDecimals))
+          .mul(
+            DecUtils.getTenExponentNInPrecisionRange(bal.currency.coinDecimals)
+          )
           .truncate()
           .lt(need.amount)
       ) {

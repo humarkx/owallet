@@ -2,7 +2,7 @@ import { IAmountConfig, IFeeConfig } from './types';
 import { TxChainSetter } from './chain';
 import { ChainGetter, CoinPrimitive } from '@owallet/stores';
 import { action, computed, makeObservable, observable } from 'mobx';
-import { ObservableQueryBalances } from '@owallet/stores/build/query/balances';
+import { ObservableQueryBalances } from '@owallet/stores';
 import { AppCurrency } from '@owallet/types';
 import {
   EmptyAmountError,
@@ -150,7 +150,9 @@ export class AmountConfig extends TxChainSetter implements IAmountConfig {
       return {
         denom: sendCurrency.coinMinimalDenom,
         amount: new Dec(amountStr)
-          .mul(DecUtils.getPrecisionDec(sendCurrency.coinDecimals))
+          .mul(
+            DecUtils.getTenExponentNInPrecisionRange(sendCurrency.coinDecimals)
+          )
           .truncate()
           .toString()
       };
