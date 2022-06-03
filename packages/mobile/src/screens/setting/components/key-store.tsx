@@ -102,22 +102,49 @@ export const KeyStoreItem: FunctionComponent<{
 }) => {
   const style = useStyle();
 
+  const renderBall = (selected: boolean) => {
+    if (selected) {
+      return (
+        <View
+          style={style.flatten([
+            'width-24',
+            'height-24',
+            'border-radius-32',
+            'background-color-primary',
+            'items-center',
+            'justify-center',
+          ])}
+        >
+          <View
+            style={style.flatten([
+              'width-12',
+              'height-12',
+              'border-radius-32',
+              'background-color-white',
+            ])}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={style.flatten([
+            'width-24',
+            'height-24',
+            'border-radius-32',
+            'background-color-white',
+            'border-width-1',
+            'border-color-text-black-very-low',
+          ])}
+        />
+      );
+    }
+  };
+
   const renderChildren = () => {
     return (
       <React.Fragment>
-        <Image
-          style={{
-            width: 20,
-            height: 20,
-            marginRight: 8,
-          }}
-          source={
-            right
-              ? require('../../../assets/image/webpage/active.png')
-              : require('../../../assets/image/webpage/not-active.png')
-          }
-          fadeDuration={0}
-        />
+        {renderBall(!!right)}
         <View />
         {left ? (
           left
@@ -183,7 +210,7 @@ export const KeyStoreItem: FunctionComponent<{
               'padding-x-20',
               'background-color-white',
               'margin-y-8',
-              'border-radius-12'
+              'border-radius-12',
             ]),
             containerStyle,
           ])}
