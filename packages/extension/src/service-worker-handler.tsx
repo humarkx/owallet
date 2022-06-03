@@ -7,7 +7,7 @@ const onMesssage = async (
   sendResponse: (response?: any) => void
 ): Promise<Result> => {
   // to be compartible with handler router-extension
-  if ((sender as MessageSender).id !== chrome.runtime.id || !message.cmd) {
+  if ((sender as MessageSender).id !== browser.runtime.id || !message.cmd) {
     return { return: null };
   }
 
@@ -62,8 +62,8 @@ const handleReloadUrl = ({ tabId, routerId, url }: any) => {
 
 export const ServiceWorkerHandler: FunctionComponent = () => {
   useEffect(() => {
-    chrome.runtime.onMessage.addListener(onMesssage);
-    return () => chrome.runtime.onMessage.removeListener(onMesssage);
+    browser.runtime.onMessage.addListener(onMesssage);
+    return () => browser.runtime.onMessage.removeListener(onMesssage);
   }, []);
 
   // show status ?
