@@ -1,5 +1,5 @@
 import { Router, MessageSender, Result, EnvProducer } from '@owallet/router';
-import { ExtensionEnv } from '../env';
+import { getOWalletExtensionRouterId } from '../utils';
 
 export class ExtensionRouter extends Router {
   constructor(envProducer: EnvProducer) {
@@ -47,7 +47,7 @@ export class ExtensionRouter extends Router {
 
     // The receiverRouterId will be set when requesting an interaction from the background to the frontend.
     // If this value exists, it compares this value with the current router id and processes them only if they are the same.
-    const routerId = await ExtensionEnv.assignCmd('get-router-id');
+    const routerId = await getOWalletExtensionRouterId();
     if (
       message.msg?.routerMeta?.receiverRouterId &&
       message.msg.routerMeta.receiverRouterId !== routerId

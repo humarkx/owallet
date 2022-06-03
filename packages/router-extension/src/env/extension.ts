@@ -164,7 +164,6 @@ export class ExtensionEnv {
         }
 
         // post message reload to popup
-
         await this.assignCmd('load-url', {
           tabId: sender.tab?.id,
           routerId: routerMeta.routerId,
