@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react';
 import ReactDOM from 'react-dom';
-
 import { AppIntlProvider } from './languages';
 
 import './styles/global.scss';
@@ -50,7 +49,7 @@ import { ManageTokenPage } from './pages/setting/token/manage';
 
 // import * as BackgroundTxResult from "../../background/tx/foreground";
 
-import { AdditonalIntlMessages, LanguageToFiatCurrency } from './config.ui';
+import { AdditonalIntlMessages, LanguageToFiatCurrency } from '@owallet/common';
 
 import manifest from './manifest.json';
 import { OWallet } from '@owallet/provider';
