@@ -62,13 +62,14 @@ import { ValidatorListPage } from './pages/stake/validator-list';
 import { IntlProvider } from 'react-intl';
 import { ServiceWorkerHandler } from './service-worker-handler';
 
-window.owallet = new OWallet(
+const owallet = new OWallet(
   manifest.version,
   'core',
   new InExtensionMessageRequester()
 );
-// also for keplr
-(window as any).keplr = window.owallet;
+// @ts-ignore
+window.keplr = window.keplr || owallet;
+window.owallet = owallet;
 
 // Make sure that icon file will be included in bundle
 require('./public/assets/orai_wallet_logo.png');
