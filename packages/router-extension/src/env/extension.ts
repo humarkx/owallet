@@ -64,11 +64,15 @@ async function openPopupWindow(
   return await openPopupQueue.enqueue(() => openPopupWindowInner(url, channel));
 }
 
-export const assignCmd = async (cmd: WorkerCmd, params: any): Promise<any> => {
-  return browser.runtime.sendMessage({ cmd, params });
-};
-
 export class ExtensionEnv {
+  static readonly assignCmd = async (
+    cmd: WorkerCmd,
+    params?: any
+  ): Promise<any> => {
+    const ret = await browser.runtime.sendMessage({ cmd, params });
+    return ret;
+  };
+
   static readonly produceEnv = (
     sender: MessageSender,
     routerMeta: Record<string, any>
@@ -157,7 +161,8 @@ export class ExtensionEnv {
         }
 
         // post message reload to popup
-        await assignCmd('reload-url', {
+
+        await this.assignCmd('load-url', {
           tabId: sender.tab?.id,
           routerId: routerMeta.routerId,
           url

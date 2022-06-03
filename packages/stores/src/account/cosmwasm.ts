@@ -196,7 +196,7 @@ export class CosmwasmAccount {
               }
         ]
       : undefined;
-    console.log('protoMsgs', msg.value);
+
     await this.base.sendMsgs(
       type,
       {
