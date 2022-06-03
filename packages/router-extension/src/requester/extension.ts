@@ -11,7 +11,7 @@ export class InExtensionMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg['origin'] = window.location.origin;
+    msg['origin'] = `chrome-extension://${browser.runtime.id}`;
     msg.routerMeta = {
       ...msg.routerMeta,
       routerId: getOWalletExtensionRouterId()
@@ -46,7 +46,7 @@ export class InExtensionMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg['origin'] = window.location.origin;
+    msg['origin'] = `chrome-extension://${browser.runtime.id}`;
     msg.routerMeta = {
       ...msg.routerMeta,
       routerId: getOWalletExtensionRouterId()

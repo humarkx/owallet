@@ -2,9 +2,9 @@ import { ChainStore } from './chain';
 import {
   AmplitudeApiKey,
   EmbedChainInfos,
-  ExtensionKVStore
+  ExtensionKVStore,
+  FiatCurrencies
 } from '@owallet/common';
-import { FiatCurrencies } from '../config.ui';
 import {
   KeyRingStore,
   InteractionStore,
