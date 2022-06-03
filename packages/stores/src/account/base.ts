@@ -10,7 +10,7 @@ import { AppCurrency, OWallet, OWalletSignOptions } from '@owallet/types';
 import { DeepReadonly } from 'utility-types';
 import { ChainGetter } from '../common';
 import { QueriesSetBase, QueriesStore } from '../query';
-import { DenomHelper, toGenerator } from '@owallet/common';
+import { DenomHelper, toGenerator, fetchAdapter } from '@owallet/common';
 import {
   BroadcastMode,
   makeSignDoc,
@@ -538,7 +538,8 @@ export class AccountSetBase<MsgOpts, Queries> {
       ...{
         baseURL: chainInfo.rest
       },
-      ...chainInfo.restConfig
+      ...chainInfo.restConfig,
+      adapter: fetchAdapter
     });
   }
 

@@ -2,6 +2,7 @@ import {
   Env,
   FnRequestInteraction,
   MessageSender,
+  WorkerCmd,
   APP_PORT
 } from '@owallet/router';
 import { openPopupWindow as openPopupWindowInner } from '@owallet/popup';
@@ -64,6 +65,14 @@ async function openPopupWindow(
 }
 
 export class ExtensionEnv {
+  static readonly assignCmd = async (
+    cmd: WorkerCmd,
+    params?: any
+  ): Promise<any> => {
+    const ret = await browser.runtime.sendMessage({ cmd, params });
+    return ret;
+  };
+
   static readonly produceEnv = (
     sender: MessageSender,
     routerMeta: Record<string, any>
@@ -96,7 +105,10 @@ export class ExtensionEnv {
       });
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const tabId = window.tabs![0].id!;
+      let tabs = await browser.tabs.query({
+        active: true
+      });
+      const tabId = tabs![0].id!;
 
       // Wait until that tab is loaded
       await (async () => {
@@ -151,31 +163,13 @@ export class ExtensionEnv {
           url += '?' + queryString;
         }
 
-        const backgroundPage = await browser.runtime.getBackgroundPage();
-        const views = browser.extension
-          .getViews({
-            // Request only for the same tab as the requested frontend.
-            // But the browser popup itself has no information about tab.
-            // Also, if user has multiple windows on, we need another way to distinguish them.
-            // See the comment right below this part.
-            tabId: sender.tab?.id
-          })
-          .filter((window) => {
-            // You need to request interaction with the frontend that requested the message.
-            // It is difficult to achieve this with the browser api alone.
-            // Check the router id under the window of each view
-            // and process only the view that has the same router id of the requested frontend.
-            return (
-              window.location.href !== backgroundPage.location.href &&
-              (routerMeta.routerId == null ||
-                routerMeta.routerId === window.owalletExtensionRouterId)
-            );
-          });
-        if (views.length > 0) {
-          for (const view of views) {
-            view.location.href = url;
-          }
-        }
+        // post message reload to popup
+
+        await this.assignCmd('load-url', {
+          tabId: sender.tab?.id,
+          routerId: routerMeta.routerId,
+          url
+        });
 
         msg.routerMeta = {
           ...msg.routerMeta,

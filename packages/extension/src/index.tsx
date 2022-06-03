@@ -60,6 +60,7 @@ import { ExportToMobilePage } from './pages/setting/export-to-mobile';
 import { LogPageViewWrapper } from './components/analytics';
 import { ValidatorListPage } from './pages/stake/validator-list';
 import { IntlProvider } from 'react-intl';
+import { ServiceWorkerHandler } from './service-worker-handler';
 
 window.owallet = new OWallet(
   manifest.version,
@@ -166,6 +167,7 @@ ReactDOM.render(
         <NotificationStoreProvider>
           <NotificationProvider>
             <ConfirmProvider>
+              <ServiceWorkerHandler />
               <HashRouter>
                 <LogPageViewWrapper>
                   <Route exact path="/" component={StateRenderer} />
