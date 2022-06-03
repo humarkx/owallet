@@ -2,7 +2,7 @@ import { inject, singleton, delay } from 'tsyringe';
 import { TYPES } from '../types';
 
 import { ChainInfo } from '@owallet/types';
-import fetchAdapter from '@vespaiach/axios-fetch-adapter';
+import { fetchAdapter } from '@owallet/common';
 import Axios from 'axios';
 import { KVStore } from '@owallet/common';
 import { ChainIdHelper } from '@owallet/cosmos';
