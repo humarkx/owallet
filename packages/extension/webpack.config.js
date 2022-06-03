@@ -106,8 +106,11 @@ const extensionConfig = (env, args) => {
       new CopyWebpackPlugin(
         [
           {
-            from: './src/manifest.json',
-            to: './'
+            from:
+              process.env.GECKO === 'true'
+                ? './src/manifest-gecko.json'
+                : './src/manifest.json',
+            to: './manifest.json'
           },
           {
             from: './src/service_worker.js',
