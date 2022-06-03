@@ -199,7 +199,7 @@ export class InjectedOWallet implements IOWallet {
     };
 
     return new Promise((resolve, reject) => {
-      const receiveResponse = (e: any) => {
+      const receiveResponse = (e: MessageEvent) => {
         const proxyResponse: ProxyRequestResponse = this.parseMessage
           ? this.parseMessage(e.data)
           : e.data;
@@ -213,7 +213,6 @@ export class InjectedOWallet implements IOWallet {
         }
 
         this.eventListener.removeMessageListener(receiveResponse);
-
         const result = JSONUint8Array.unwrap(proxyResponse.result);
 
         if (!result) {
@@ -230,7 +229,6 @@ export class InjectedOWallet implements IOWallet {
       };
 
       this.eventListener.addMessageListener(receiveResponse);
-
       this.eventListener.postMessage(proxyMessage);
     });
   }
