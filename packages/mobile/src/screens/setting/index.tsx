@@ -11,7 +11,13 @@ import { SettingRemoveAccountItem } from "./items/remove-account";
 import { canShowPrivateData } from "./screens/view-private-data";
 import { SettingViewPrivateDataItem } from "./items/view-private-data";
 import { useStyle } from "../../styles";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { SettingFiatCurrencyTopItem } from "./items/fiat-currency-setting";
 
 export const SettingScreen: FunctionComponent = observer(() => {
@@ -30,15 +36,19 @@ export const SettingScreen: FunctionComponent = observer(() => {
       backgroundColor={style.get("color-setting-screen-background").color}
     >
       <View
-        style={style.flatten([
-          "background-color-primary-400",
-          "padding-24",
-          "padding-top-76",
-          "padding-bottom-101",
-          "margin-bottom-102",
-          "border-radius-top-left-32",
-          "border-radius-top-right-32",
-        ])}
+        style={style.flatten(
+          [
+            "background-color-primary-400",
+            "padding-24",
+            "padding-top-76",
+            "padding-bottom-101",
+            "margin-bottom-102",
+          ],
+          [
+            Platform.OS === "ios" && "border-radius-top-left-32",
+            Platform.OS === "ios" && "border-radius-top-right-32",
+          ]
+        )}
       >
         <Text style={style.flatten(["h1", "color-white"])}>Setting</Text>
         <View

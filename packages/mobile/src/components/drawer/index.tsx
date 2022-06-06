@@ -152,6 +152,39 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
               </RectButton>
             );
           })}
+          <RectButton
+            key={"browser"}
+            onPress={() => {
+              navigation.navigate("Browser");
+            }}
+            style={style.flatten([
+              "flex-row",
+              "height-84",
+              "items-center",
+              "padding-x-20",
+              "border-width-top-1",
+            ])}
+            activeOpacity={1}
+            underlayColor={style.get("color-drawer-rect-button-underlay").color}
+          >
+            <View
+              style={style.flatten([
+                "width-32",
+                "height-32",
+                "border-radius-64",
+                "items-center",
+                "justify-center",
+                "overflow-hidden",
+                "margin-right-16",
+                "background-color-black",
+              ])}
+            >
+              <VectorCharacter char={"B"} height={15} color="white" />
+            </View>
+            <Text style={style.flatten(["h5", "color-text-black-medium"])}>
+              {"Browser"}
+            </Text>
+          </RectButton>
         </View>
       </DrawerContentScrollView>
     );

@@ -15,6 +15,7 @@ import { useStore } from "./stores";
 import { observer } from "mobx-react-lite";
 import { HomeScreen } from "./screens/home";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createStackNavigator,
   TransitionPresets,
@@ -110,6 +111,7 @@ import {
 } from "./screens/register/import-from-extension";
 import { DAppWebpageScreen } from "./screens/web/webpages";
 import { WebpageScreenScreenOptionsPreset } from "./screens/web/components/webpage-screen";
+import { Browser } from "./screens/web/browser";
 
 const { SmartNavigatorProvider, useSmartNavigation } =
   createSmartNavigatorProvider(
@@ -224,6 +226,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       },
       "Web.dApp": {
         upperScreenName: "Web",
+      },
+      Browser: {
+        upperScreenName: "Browser",
       },
     }).withParams<{
       "Register.NewMnemonic": {
@@ -342,10 +347,30 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
   );
 });
 
+const BrowserScreenHeaderLeft: FunctionComponent = observer(() => {
+  const style = useStyle();
+
+  const navigation = useNavigation();
+
+  return (
+    <HeaderLeftButton
+      onPress={() => {
+        navigation.goBack();
+      }}
+    >
+      <View style={style.flatten(["flex-row", "items-center"])}>
+        <Text
+          style={style.flatten(["h4", "color-text-black-low", "margin-left-4"])}
+        >
+          Browser
+        </Text>
+      </View>
+    </HeaderLeftButton>
+  );
+});
+
 const HomeScreenHeaderRight: FunctionComponent = observer(() => {
   const { walletConnectStore } = useStore();
-
-  const style = useStyle();
 
   const navigation = useNavigation();
 
@@ -395,6 +420,21 @@ export const MainNavigation: FunctionComponent = () => {
         }}
         name="Home"
         component={HomeScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: "Browser",
+          headerLeft: () => <BrowserScreenHeaderLeft />,
+        }}
+        name="Browser"
+        component={Browser}
+      />
+      <Stack.Screen
+        options={{
+          title: "Web",
+        }}
+        name="Web"
+        component={WebNavigation}
       />
     </Stack.Navigator>
   );
@@ -746,6 +786,7 @@ export const MainTabNavigation: FunctionComponent = () => {
   const style = useStyle();
 
   const navigation = useNavigation();
+  const { chainStore } = useStore();
 
   const focusedScreen = useFocusedScreen();
   const isDrawerOpen = useIsDrawerOpen();
@@ -765,7 +806,8 @@ export const MainTabNavigation: FunctionComponent = () => {
           switch (route.name) {
             case "Main":
               return <WalletIcon color={color} size={24} />;
-            case "Web":
+            // case "Web":
+            case "Send":
               return <SendIcon />;
             case "Settings":
               return <SettingIcon color={color} />;
@@ -813,7 +855,18 @@ export const MainTabNavigation: FunctionComponent = () => {
       )}
     >
       <Tab.Screen name="Main" component={MainNavigation} />
-      <Tab.Screen name="Web" component={WebNavigation} />
+      {/* <Tab.Screen name="Web" component={WebNavigation} /> */}
+      <Tab.Screen
+        options={{
+          title: "Send",
+        }}
+        name="Send"
+        component={SendScreen}
+        initialParams={{
+          currency: chainStore.current.stakeCurrency.coinMinimalDenom,
+          chainId: chainStore.current.chainId,
+        }}
+      />
       <Tab.Screen
         name="Settings"
         component={SettingStackScreen}
