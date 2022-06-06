@@ -5,6 +5,7 @@ import { useStyle } from "../../styles";
 import { TextInput } from "../../components/input";
 import { Button } from "../../components/button";
 import { useSmartNavigation } from "../../navigation";
+import isValidDomain from "is-valid-domain";
 
 export const Browser: FunctionComponent = () => {
   const style = useStyle();
@@ -13,7 +14,7 @@ export const Browser: FunctionComponent = () => {
   const [url, setUrl] = useState("");
 
   const onHandleUrl = () => {
-    if (url?.toLowerCase().indexOf("http") === 0) {
+    if (isValidDomain(url?.toLowerCase())) {
       smartNavigation.pushSmart("Web.dApp", {
         name: "Browser",
         uri: url,
