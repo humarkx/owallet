@@ -1,6 +1,6 @@
 import { delay, inject, singleton } from 'tsyringe';
 import { TYPES } from '../types';
-
+import { fetchAdapter } from '@owallet/common';
 import Axios from 'axios';
 import { ChainsService } from '../chains';
 import { PermissionService } from '../permission';
@@ -39,11 +39,13 @@ export class BackgroundTxService {
     mode: 'async' | 'sync' | 'block'
   ): Promise<Uint8Array> {
     const chainInfo = await this.chainsService.getChainInfo(chainId);
+
     const restInstance = Axios.create({
       ...{
         baseURL: chainInfo.rest
       },
-      ...chainInfo.restConfig
+      ...chainInfo.restConfig,
+      adapter: fetchAdapter
     });
 
     this.notification.create({

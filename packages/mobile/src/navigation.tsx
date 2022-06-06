@@ -15,7 +15,6 @@ import { useStore } from "./stores";
 import { observer } from "mobx-react-lite";
 import { HomeScreen } from "./screens/home";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createStackNavigator,
   TransitionPresets,
@@ -35,6 +34,7 @@ import { BorderlessButton } from "react-native-gesture-handler";
 import { createSmartNavigatorProvider, SmartNavigator } from "./hooks";
 import { SettingScreen } from "./screens/setting";
 import { SettingSelectAccountScreen } from "./screens/setting/screens/select-account";
+import { SettingSelectLangScreen } from "./screens/setting/screens/select-lang";
 import { ViewPrivateDataScreen } from "./screens/setting/screens/view-private-data";
 import { WebScreen } from "./screens/web";
 import { RegisterIntroScreen } from "./screens/register";
@@ -195,6 +195,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
         upperScreenName: "Settings",
       },
       SettingSelectAccount: {
+        upperScreenName: "Settings",
+      },
+      SettingSelectLang: {
         upperScreenName: "Settings",
       },
       "Setting.ViewPrivateData": {
@@ -718,6 +721,14 @@ export const SettingStackScreen: FunctionComponent = () => {
           ...BlurredHeaderScreenOptionsPreset,
         }}
         component={SettingSelectAccountScreen}
+      />
+      <Stack.Screen
+        name="SettingSelectLang"
+        options={{
+          title: "Select Currency",
+          ...BlurredHeaderScreenOptionsPreset,
+        }}
+        component={SettingSelectLangScreen}
       />
       <Stack.Screen
         name="Setting.ViewPrivateData"

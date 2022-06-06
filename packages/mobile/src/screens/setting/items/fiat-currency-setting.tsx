@@ -51,7 +51,7 @@ export const SettingFiatCurrencyTopItem: FunctionComponent<{
           </Text>
           <Text
             style={style.flatten(["text-caption2", "color-black", "body1"])}
-          >
+          > 
             {priceStore.defaultVsCurrency.toUpperCase()}
           </Text>
         </View>

@@ -18,10 +18,9 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { SettingFiatCurrencyTopItem } from "./items/fiat-currency-setting";
 
 export const SettingScreen: FunctionComponent = observer(() => {
-  const { keychainStore, keyRingStore } = useStore();
+  const { keychainStore, keyRingStore, priceStore } = useStore();
 
   const selected = keyRingStore.multiKeyStoreInfo.find(
     (keyStore) => keyStore.selected
@@ -99,7 +98,34 @@ export const SettingScreen: FunctionComponent = observer(() => {
             </View>
             <RightArrow />
           </TouchableOpacity>
-          <SettingFiatCurrencyTopItem style={style} />
+          <TouchableOpacity
+            onPress={() =>
+              smartNavigation.navigateSmart("SettingSelectLang", {})
+            }
+            style={style.flatten([
+              "flex-row",
+              "items-center",
+              "justify-between",
+              "padding-top-20",
+            ])}
+          >
+            <View>
+              <Text
+                style={style.flatten([
+                  "text-caption2",
+                  "color-text-black-very-low",
+                ])}
+              >
+                CURRENCY
+              </Text>
+              <Text
+                style={style.flatten(["text-caption2", "color-black", "body1"])}
+              >
+                {priceStore.defaultVsCurrency.toUpperCase()}
+              </Text>
+            </View>
+            <RightArrow />
+          </TouchableOpacity>
         </View>
       </View>
       {/* <SettingSelectAccountItem /> */}
