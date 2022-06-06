@@ -165,55 +165,6 @@ export const EmbedChainInfos: AppChainInfo[] = [
     beta: true // use v1beta1
   },
   {
-    rpc: 'https://testnet-rpc.orai.io/',
-    rest: 'https://testnet-lcd.orai.io/',
-    chainId: 'Oraichain-testnet',
-    chainName: 'Oraichain-testnet',
-    stakeCurrency: {
-      coinDenom: 'ORAI',
-      coinMinimalDenom: 'orai',
-      coinDecimals: 6,
-      coinGeckoId: 'oraichain-token',
-      coinImageUrl:
-        'https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png'
-    },
-
-    bip44: {
-      coinType: 118
-    },
-    bech32Config: Bech32Address.defaultBech32Config('orai'),
-    get currencies() {
-      return [
-        this.stakeCurrency,
-        {
-          coinDenom: 'AIRI',
-          coinMinimalDenom:
-            'cw20:orai10ldgzued6zjp0mkqwsv2mux3ml50l97c74x8sg:aiRight Token',
-          coinDecimals: 6,
-          coinGeckoId: 'airight',
-          coinImageUrl:
-            'https://s2.coinmarketcap.com/static/img/coins/64x64/11563.png'
-        }
-      ];
-    },
-    get feeCurrencies() {
-      return [this.stakeCurrency];
-    },
-    gasPriceStep: {
-      low: 0,
-      average: 0.000025,
-      high: 0.00004
-    },
-    features: ['stargate', 'no-legacy-stdTx', 'ibc-transfer', 'cosmwasm'],
-    chainSymbolImageUrl: 'https://orai.io/images/logos/logomark-dark.png',
-    txExplorer: {
-      name: 'Oraiscan',
-      txUrl: 'https://scan.orai.io/txs/{txHash}',
-      accountUrl: 'https://scan.orai.io/account/{address}'
-    },
-    hideInUI: true
-  },
-  {
     chainId: 'oraibridge-subnet',
     chainName: 'OraiBridge',
     rpc: 'https://bridge.rpc.orai.io',
@@ -280,6 +231,34 @@ export const EmbedChainInfos: AppChainInfo[] = [
       high: 0
     },
     features: ['stargate', 'ibc-transfer', 'cosmwasm']
+  },
+  {
+    rpc: 'https://tendermint1.kawaii.global',
+    rest: 'https://cosmos1.kawaii.global',
+    chainId: 'kawaii_6886-1',
+    chainName: 'Kawaii Islands network',
+    stakeCurrency: {
+      coinDenom: 'ORAIE',
+      coinMinimalDenom: 'oraie',
+      coinDecimals: 18,
+      coinGeckoId: 'oraie'
+    },
+    bip44: {
+      coinType: 60
+    },
+    bech32Config: Bech32Address.defaultBech32Config('oraie'),
+    get currencies() {
+      return [this.stakeCurrency];
+    },
+    get feeCurrencies() {
+      return [this.stakeCurrency];
+    },
+    gasPriceStep: {
+      low: 0,
+      average: 0.000025,
+      high: 0.00004
+    },
+    features: ['ibc-transfer', 'ibc-go', 'stargate']
   },
   {
     rpc: 'https://rpc-cosmoshub.keplr.app',

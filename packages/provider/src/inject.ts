@@ -213,7 +213,6 @@ export class InjectedOWallet implements IOWallet {
         }
 
         this.eventListener.removeMessageListener(receiveResponse);
-
         const result = JSONUint8Array.unwrap(proxyResponse.result);
 
         if (!result) {
@@ -230,7 +229,6 @@ export class InjectedOWallet implements IOWallet {
       };
 
       this.eventListener.addMessageListener(receiveResponse);
-
       this.eventListener.postMessage(proxyMessage);
     });
   }
