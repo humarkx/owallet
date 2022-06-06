@@ -7,7 +7,7 @@ import { TextInput } from "../../components/input";
 import { Button } from "../../components/button";
 import { useSmartNavigation } from "../../navigation";
 import isValidDomain from "is-valid-domain";
-import { PageWithScrollView } from "../../components/page";
+// import { PageWithScrollView } from "../../components/page";
 import { useNavigation } from "@react-navigation/core";
 
 export const Browser: FunctionComponent = () => {
