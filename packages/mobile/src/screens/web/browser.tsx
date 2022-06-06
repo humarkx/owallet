@@ -1,15 +1,30 @@
-import React, { FunctionComponent, useState } from "react";
-import { PageWithScrollViewInBottomTabView } from "../../components/page";
+import React, { FunctionComponent, useEffect, useState } from "react";
+// import { PageWithScrollViewInBottomTabView } from "../../components/page";
+
 import { StyleSheet } from "react-native";
 import { useStyle } from "../../styles";
 import { TextInput } from "../../components/input";
 import { Button } from "../../components/button";
 import { useSmartNavigation } from "../../navigation";
 import isValidDomain from "is-valid-domain";
+import { PageWithScrollView } from "../../components/page";
+import { useNavigation } from "@react-navigation/core";
 
 export const Browser: FunctionComponent = () => {
   const style = useStyle();
   const smartNavigation = useSmartNavigation();
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation
+      .getParent()
+      ?.setOptions({ tabBarStyle: { display: "none" }, tabBarVisible: false });
+    return () =>
+      navigation
+        .getParent()
+        ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
+  }, [navigation]);
 
   const [url, setUrl] = useState("");
 
@@ -29,7 +44,7 @@ export const Browser: FunctionComponent = () => {
   };
 
   return (
-    <PageWithScrollViewInBottomTabView
+    <PageWithScrollView
       contentContainerStyle={[style.get("flex-grow-1")]}
       style={StyleSheet.flatten([style.flatten(["padding-x-20"])])}
     >
@@ -46,6 +61,6 @@ export const Browser: FunctionComponent = () => {
         containerStyle={style.flatten(["min-width-72", "self-center"])}
         onPress={onHandleUrl}
       />
-    </PageWithScrollViewInBottomTabView>
+    </PageWithScrollView>
   );
 };

@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { FunctionComponent, useEffect, useRef } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import { Text, View } from "react-native";
 import {
   BIP44HDPath,
