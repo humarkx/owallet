@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 // import { PageWithScrollViewInBottomTabView } from "../../components/page";
 
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useStyle } from "../../styles";
 import { TextInput } from "../../components/input";
 import { Button } from "../../components/button";
@@ -44,9 +44,11 @@ export const Browser: FunctionComponent = () => {
   };
 
   return (
-    <PageWithScrollView
-      contentContainerStyle={[style.get("flex-grow-1")]}
-      style={StyleSheet.flatten([style.flatten(["padding-x-20"])])}
+    <View
+      // contentContainerStyle={[style.get("flex-grow-1")]}
+      style={StyleSheet.flatten([
+        style.flatten(["padding-x-20", "flex-grow-1"]),
+      ])}
     >
       <TextInput
         containerStyle={style.flatten(["padding-bottom-6", "margin-top-64"])}
@@ -61,6 +63,6 @@ export const Browser: FunctionComponent = () => {
         containerStyle={style.flatten(["min-width-72", "self-center"])}
         onPress={onHandleUrl}
       />
-    </PageWithScrollView>
+    </View>
   );
 };
