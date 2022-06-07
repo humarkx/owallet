@@ -1,5 +1,5 @@
 import { MessageRequester, Message, JSONUint8Array } from '@owallet/router';
-import { getOWalletExtensionRouterId } from '../utils';
+import { ExtensionEnv } from '../env';
 
 export class InExtensionMessageRequester implements MessageRequester {
   async sendMessage<M extends Message<unknown>>(
@@ -16,7 +16,7 @@ export class InExtensionMessageRequester implements MessageRequester {
         ? window.location.origin
         : new URL(browser.runtime.getURL('/')).origin;
 
-    const routerId = getOWalletExtensionRouterId();
+    const routerId = await ExtensionEnv.assignCmd('get-router-id');
     msg.routerMeta = {
       ...msg.routerMeta,
       routerId
@@ -55,7 +55,7 @@ export class InExtensionMessageRequester implements MessageRequester {
       typeof window !== 'undefined'
         ? window.location.origin
         : new URL(browser.runtime.getURL('/')).origin;
-    const routerId = getOWalletExtensionRouterId();
+    const routerId = await ExtensionEnv.assignCmd('get-router-id');
     msg.routerMeta = {
       ...msg.routerMeta,
       routerId

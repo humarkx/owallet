@@ -25,12 +25,6 @@
       "resources": [
         "injectedScript.bundle.js",
         "injectedScript.bundle.js.map",
-        "contentScripts.bundle.js",
-        "contentScripts.bundle.js.map",
-        "popup.bundle.js",
-        "popup.bundle.js.map",
-        "background.bundle.js",
-        "background.bundle.js.map",
         "assets/orai_wallet_logo.png"
       ],
       "matches": ["<all_urls>"]

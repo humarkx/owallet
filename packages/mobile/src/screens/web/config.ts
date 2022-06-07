@@ -22,7 +22,5 @@ export const DAppInfos: DAppInfo[] = [
     thumbnail: require("../../assets/image/webpage/bgomosis.png"),
     uri: "https://app.osmosis.zone",
     logo: require("../../assets/image/webpage/osmosis_logo.png"),
-
   },
 ];
- 
