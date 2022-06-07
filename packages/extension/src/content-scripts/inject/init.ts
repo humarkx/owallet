@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { OWallet } from '@owallet/types';
 import { OfflineSigner } from '@cosmjs/launchpad';
 import { SecretUtils } from 'secretjs/types/enigmautils';
@@ -37,4 +38,5 @@ export function init(
     window.getOfflineSignerAuto = getOfflineSignerAuto;
     window.getEnigmaUtils = getEnigmaUtils;
   }
+  window.keplr = window.keplr || owallet;
 }
