@@ -1,12 +1,14 @@
 import React, { FunctionComponent } from 'react';
-import Svg, {  Circle } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 
 export const ThreeDotsIcon: FunctionComponent<{
   color: string;
   size: number;
-}> = ({ color, size }) => {
+  onPress?: () => void;
+}> = ({ color, size, onPress }) => {
   return (
     <Svg
+      onPress={onPress}
       width={size}
       height={size}
       viewBox="0 0 24 24"

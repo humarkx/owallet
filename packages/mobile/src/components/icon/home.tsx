@@ -4,11 +4,13 @@ import Svg, { Path } from 'react-native-svg';
 export const HomeIcon: FunctionComponent<{
   color: string;
   size: number;
-}> = ({ color, size }) => {
+  onPress?: () => void;
+}> = ({ color, size , onPress }) => {
   return (
     <Svg
-      width="24"
-      height="24"
+    onPress={onPress}
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
     >

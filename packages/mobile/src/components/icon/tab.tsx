@@ -4,10 +4,11 @@ import Svg, { Path, Rect } from 'react-native-svg';
 export const TabIcon: FunctionComponent<{
   color: string;
   size: number;
-}> = ({ color, size }) => {
+  onPress?: () => void;
+}> = ({ color, size, onPress }) => {
   return (
-
     <Svg
+      onPress={onPress}
       width={size}
       height={size}
       viewBox="0 0 24 24"

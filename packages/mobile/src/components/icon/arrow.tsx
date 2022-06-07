@@ -5,11 +5,13 @@ export const RightArrowIcon: FunctionComponent<{
   color: string;
   height: number;
   type?: string;
-}> = ({ color, height, type }) => {
+  onPress?: () => void;
+}> = ({ color, height, type, onPress }) => {
   let transfromCss =
     type === 'left' ? { transform: [{ rotate: '180deg' }] } : {};
   return (
     <Svg
+      onPress={onPress}
       fillRule="evenodd"
       strokeLinecap="round"
       strokeLinejoin="round"

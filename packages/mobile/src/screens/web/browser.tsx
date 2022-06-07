@@ -9,7 +9,10 @@ import { useSmartNavigation } from '../../navigation';
 import isValidDomain from 'is-valid-domain';
 import { PageWithScrollView } from '../../components/page';
 import { useNavigation } from '@react-navigation/core';
-import { BrowserSectionTitle } from './components/section-title';
+import {
+  BrowserSectionTitle,
+  BrowserSectionModal,
+} from './components/section-title';
 import {
   SearchIcon,
   RightArrowIcon,
@@ -21,21 +24,47 @@ import {
 export const Browser: FunctionComponent = () => {
   const style = useStyle();
   const smartNavigation = useSmartNavigation();
-
+  const [isOpenSetting, setIsOpenSetting] = useState(false);
   const navigation = useNavigation();
+
   const arrayIcon = ['back', 'next', 'tabs', 'home', 'settings'];
+
   const renderIcon = (type, tabNum = 0) => {
     switch (type) {
       case 'back':
-        return <RightArrowIcon type={'left'} color={'white'} height={18} />;
+        return (
+          <RightArrowIcon
+            onPress={() => onPress(type)}
+            type={'left'}
+            color={'white'}
+            height={18}
+          />
+        );
       case 'next':
-        return <RightArrowIcon type={'right'} color={'white'} height={18} />;
+        return (
+          <RightArrowIcon
+            onPress={() => onPress(type)}
+            type={'right'}
+            color={'white'}
+            height={18}
+          />
+        );
       case 'tabs':
-        return <TabIcon color={'white'} size={24} />;
+        return (
+          <TabIcon onPress={() => onPress(type)} color={'white'} size={24} />
+        );
       case 'home':
-        return <HomeIcon color={'white'} size={18} />;
+        return (
+          <HomeIcon onPress={() => onPress(type)} color={'white'} size={18} />
+        );
       case 'settings':
-        return <ThreeDotsIcon color={'white'} size={18} />;
+        return (
+          <ThreeDotsIcon
+            onPress={() => onPress(type)}
+            color={'white'}
+            size={18}
+          />
+        );
     }
   };
   useEffect(() => {
@@ -65,11 +94,31 @@ export const Browser: FunctionComponent = () => {
     }
   };
 
+  const onPress = (type) => {
+    console.log({ type });
+
+    try {
+      switch (type) {
+        case 'settings':
+          return setIsOpenSetting(!isOpenSetting);
+        case 'back':
+          return smartNavigation.goBack();
+        case 'next':
+          return;
+        case 'tabs':
+          return;
+        case 'home':
+          return smartNavigation.navigateSmart('Home', {});
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
   return (
     <View
       style={style.flatten(['flex-column', 'justify-between', 'height-full'])}
     >
-      <View>
+      <View style={{ opacity: isOpenSetting ? 0.8 : 1 }}>
         <BrowserSectionTitle title="Browser" />
         <View style={{ height: 260 }}>
           <Image
@@ -105,6 +154,26 @@ export const Browser: FunctionComponent = () => {
           />
         </View>
       </View>
+      {isOpenSetting && (
+        <View
+          style={{
+            backgroundColor: '#132340',
+            height: 200,
+            width: 200,
+            position: 'absolute',
+            right: 0,
+            bottom: 80,
+            borderRadius: 4,
+            zIndex: 1,
+            padding: 10,
+          }}
+        >
+          <BrowserSectionModal
+            onClose={() => setIsOpenSetting(false)}
+            title="Setting"
+          />
+        </View>
+      )}
       <View
         style={style.flatten([
           'width-full',
