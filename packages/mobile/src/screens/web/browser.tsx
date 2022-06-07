@@ -6,9 +6,16 @@ import { useStyle } from "../../styles";
 import { TextInput } from "../../components/input";
 import { Button } from "../../components/button";
 import { useSmartNavigation } from "../../navigation";
-import isValidDomain from "is-valid-domain";
 // import { PageWithScrollView } from "../../components/page";
 import { useNavigation } from "@react-navigation/core";
+
+const isValidDomain = (url) => {
+  const reg =
+    /^(http(s)?:\/\/.)?(www\.)?[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
+  if (reg.test(url)) {
+    return true;
+  }
+};
 
 export const Browser: FunctionComponent = () => {
   const style = useStyle();

@@ -127,13 +127,7 @@ export const WebpageImageButton: FunctionComponent<{
             source={source}
             fadeDuration={0}
           />
-          {imageSize ? (
-            <View
-              style={style.flatten([
-                "absolute-fill",
-              ])}
-            />
-          ) : null}
+          {imageSize ? <View style={style.flatten(["absolute-fill"])} /> : null}
         </View>
       ) : null}
       <View style={style.flatten(["absolute-fill"])}>
@@ -190,7 +184,7 @@ export const WebpageImageButton: FunctionComponent<{
                   "height-44",
                   "border-radius-32",
                   "background-color-white",
-                  "font-bold"
+                  "font-bold",
                 ])}
               >
                 <GoIcon

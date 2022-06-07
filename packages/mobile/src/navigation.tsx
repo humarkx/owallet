@@ -435,6 +435,7 @@ export const MainNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: "Web",
+          headerShown: false,
         }}
         name="Web"
         component={WebNavigation}
