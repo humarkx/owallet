@@ -13,7 +13,9 @@ import { RNMessageRequesterExternal } from "../../../../router";
 import { RNInjectedOWallet } from "../../../../injected/injected-provider";
 import RNFS from "react-native-fs";
 import EventEmitter from "eventemitter3";
-import { PageWithViewInBottomTabView } from "../../../../components/page";
+// import { PageWithViewInBottomTabView } from "../../../../components/page";
+import { PageWithView } from "../../../../components/page";
+
 import { OnScreenWebpageScreenHeader } from "../header";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { WebViewStateContext } from "../context";
@@ -53,8 +55,6 @@ export const WebpageScreen: FunctionComponent<
   const { keyRingStore } = useStore();
 
   const style = useStyle();
-
-  console.log("props.source", props.source);
 
   const webviewRef = useRef<WebView | null>(null);
   const [currentURL, setCurrentURL] = useState(() => {
@@ -182,7 +182,7 @@ export const WebpageScreen: FunctionComponent<
   const sourceCode = useInjectedSourceCode();
 
   return (
-    <PageWithViewInBottomTabView style={style.flatten(["padding-0"])}>
+    <PageWithView style={style.flatten(["padding-0", "padding-bottom-0"])}>
       <WebViewStateContext.Provider
         value={{
           webView: webviewRef.current,
@@ -222,7 +222,7 @@ export const WebpageScreen: FunctionComponent<
           {...props}
         />
       ) : null}
-    </PageWithViewInBottomTabView>
+    </PageWithView>
   );
 });
 

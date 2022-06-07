@@ -208,8 +208,8 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
             activeOpacity={1}
             underlayColor={style.get("color-primary-10").color}
             onPress={() => {
-              // navigation.navigate("Browser");
-              smartNavigation.navigateSmart("Web.Intro", {});
+              navigation.navigate("Browser");
+              // smartNavigation.navigateSmart("Web.Intro", {});
             }}
           >
             <HomeIcon size={32} color={style.get("color-primary").color} />
