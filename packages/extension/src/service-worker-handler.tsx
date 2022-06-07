@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
+import { getOWalletExtensionRouterId } from '@owallet/router-extension';
 import { MessageSender, WorkerCmd, Result } from '@owallet/router';
 
 const onMesssage = async (
@@ -22,17 +23,6 @@ const onMesssage = async (
   }
 
   sendResponse(ret);
-};
-
-/**
- * getOWalletExtensionRouterId returns the `owalletExtensionRouterId`.
- * If the `owalletExtensionRouterId` is not initialized, it will be initialized and returned.
- */
-const getOWalletExtensionRouterId = (): number => {
-  if (window.owalletExtensionRouterId == null) {
-    window.owalletExtensionRouterId = Math.floor(Math.random() * 1000000);
-  }
-  return window.owalletExtensionRouterId;
 };
 
 const handleReloadUrl = ({ tabId, routerId, url }: any) => {

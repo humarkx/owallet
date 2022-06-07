@@ -16,6 +16,7 @@ export class SignInteractionStore {
       // Reject all interactions that is not first one.
       // This interaction can have only one interaction at once.
       const datas = this.waitingDatas.slice();
+
       if (datas.length > 1) {
         for (let i = 1; i < datas.length; i++) {
           this.rejectWithId(datas[i].id);
