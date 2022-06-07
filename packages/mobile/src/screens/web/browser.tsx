@@ -32,7 +32,10 @@ export const Browser: FunctionComponent = () => {
     if (isValidDomain(url?.toLowerCase())) {
       smartNavigation.pushSmart("Web.dApp", {
         name: "Browser",
-        uri: url,
+        uri:
+          url?.toLowerCase().indexOf("http") >= 0
+            ? url?.toLowerCase()
+            : "https://" + url?.toLowerCase(),
       });
       return;
     } else {
