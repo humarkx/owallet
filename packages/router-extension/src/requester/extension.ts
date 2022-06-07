@@ -11,8 +11,12 @@ export class InExtensionMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg['origin'] = new URL(browser.runtime.getURL('/')).origin;
-    const routerId = await getOWalletExtensionRouterId();
+    msg['origin'] =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : new URL(browser.runtime.getURL('/')).origin;
+
+    const routerId = getOWalletExtensionRouterId();
     msg.routerMeta = {
       ...msg.routerMeta,
       routerId
@@ -47,8 +51,11 @@ export class InExtensionMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg['origin'] = new URL(browser.runtime.getURL('/')).origin;
-    const routerId = await getOWalletExtensionRouterId();
+    msg['origin'] =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : new URL(browser.runtime.getURL('/')).origin;
+    const routerId = getOWalletExtensionRouterId();
     msg.routerMeta = {
       ...msg.routerMeta,
       routerId

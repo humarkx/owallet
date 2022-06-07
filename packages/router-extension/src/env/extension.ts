@@ -104,11 +104,17 @@ export class ExtensionEnv {
         populate: true
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      let tabs = await browser.tabs.query({
-        active: true
-      });
-      const tabId = tabs![0].id!;
+      let tabId: number;
+      if (window) {
+        tabId = window.tabs![0].id!;
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
+        let tabs = await browser.tabs.query({
+          active: true
+        });
+        tabId = window.tabs![0].id!;
+      }
 
       // Wait until that tab is loaded
       await (async () => {

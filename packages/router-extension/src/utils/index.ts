@@ -1,12 +1,8 @@
-import { ExtensionEnv } from '../env';
+let owalletExtensionRouterId = null;
 
-export async function getOWalletExtensionRouterId(): Promise<number> {
-  if (typeof window === 'undefined') {
-    return ExtensionEnv.assignCmd('get-router-id');
+export function getOWalletExtensionRouterId(): number {
+  if (owalletExtensionRouterId == null) {
+    owalletExtensionRouterId = Math.floor(Math.random() * 1000000);
   }
-
-  if (window.owalletExtensionRouterId == null) {
-    window.owalletExtensionRouterId = Math.floor(Math.random() * 1000000);
-  }
-  return window.owalletExtensionRouterId;
+  return owalletExtensionRouterId;
 }
