@@ -53,10 +53,12 @@ export const SettingItem: FunctionComponent<{
   const renderChildren = () => {
     return (
       <React.Fragment>
-        {left} 
-        <View style={StyleSheet.flatten([
-              style.flatten(["flex-row","justify-between","items-center","width-full"]),
-            ])}>
+        {left}
+        <View
+          style={StyleSheet.flatten([
+            style.flatten(["flex-row", "justify-between", "items-center"]),
+          ])}
+        >
           <Text
             style={StyleSheet.flatten([
               style.flatten(["body1", "color-text-black-medium"]),
