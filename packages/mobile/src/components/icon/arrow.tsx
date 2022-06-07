@@ -1,12 +1,17 @@
-import React, { FunctionComponent } from "react";
-import Svg, { Path } from "react-native-svg";
+import React, { FunctionComponent } from 'react';
+import Svg, { Path } from 'react-native-svg';
 
 export const RightArrowIcon: FunctionComponent<{
   color: string;
   height: number;
-}> = ({ color, height }) => {
+  type?: string;
+  onPress?: () => void;
+}> = ({ color, height, type, onPress }) => {
+  let transfromCss =
+    type === 'left' ? { transform: [{ rotate: '180deg' }] } : {};
   return (
     <Svg
+      onPress={onPress}
       fillRule="evenodd"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -15,6 +20,7 @@ export const RightArrowIcon: FunctionComponent<{
       style={{
         height,
         aspectRatio: 8 / 14,
+        ...transfromCss,
       }}
     >
       <Path

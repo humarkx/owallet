@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Platform,
   StyleSheet,
@@ -7,8 +7,8 @@ import {
   TextStyle,
   View,
   ViewStyle,
-} from "react-native";
-import { useStyle } from "../../styles";
+} from 'react-native';
+import { useStyle } from '../../styles';
 
 // eslint-disable-next-line react/display-name
 export const TextInput = React.forwardRef<
@@ -18,6 +18,7 @@ export const TextInput = React.forwardRef<
     containerStyle?: ViewStyle;
     inputContainerStyle?: ViewStyle;
     errorLabelStyle?: TextStyle;
+    inputStyle?: TextStyle;
 
     label?: string;
     error?: string;
@@ -38,7 +39,7 @@ export const TextInput = React.forwardRef<
   return (
     <View
       style={StyleSheet.flatten([
-        style.flatten(["padding-bottom-28"]),
+        style.flatten(['padding-bottom-28']),
         props.containerStyle,
       ])}
     >
@@ -46,9 +47,9 @@ export const TextInput = React.forwardRef<
         <Text
           style={StyleSheet.flatten([
             style.flatten([
-              "subtitle3",
-              "color-text-black-medium",
-              "margin-bottom-3",
+              'subtitle3',
+              'color-text-black-medium',
+              'margin-bottom-3',
             ]),
             props.labelStyle,
           ])}
@@ -57,45 +58,49 @@ export const TextInput = React.forwardRef<
         </Text>
       ) : null}
       <View
-        style={StyleSheet.flatten([
-          style.flatten(
-            [
-              "background-color-white",
-              "padding-x-11",
-              "padding-y-12",
-              "border-radius-4",
-              "border-width-1",
-              "border-color-border-white",
-            ],
-            [
-              props.error ? "border-color-error" : undefined,
-              !(props.editable ?? true) && "background-color-disabled",
-            ]
-          ),
-          props.inputContainerStyle,
-        ])}
+        style={StyleSheet.flatten(
+          props.inputStyle
+            ? [props.inputStyle, props.inputContainerStyle]
+            : [
+                style.flatten(
+                  [
+                    'background-color-white',
+                    'padding-x-11',
+                    'padding-y-12',
+                    'border-radius-4',
+                    'border-width-1',
+                    'border-color-border-white',
+                  ],
+                  [
+                    props.error ? 'border-color-error' : undefined,
+                    !(props.editable ?? true) && 'background-color-disabled',
+                  ]
+                ),
+                props.inputContainerStyle,
+              ]
+        )}
       >
         {props.topInInputContainer}
-        <View style={style.flatten(["flex-row", "items-center"])}>
+        <View style={style.flatten(['flex-row', 'items-center'])}>
           {props.inputLeft}
           <NativeTextInput
             placeholderTextColor={
               props.placeholderTextColor ??
-              style.get("color-text-black-low").color
+              style.get('color-text-black-low').color
             }
             style={StyleSheet.flatten([
               style.flatten([
-                "padding-0",
-                "body2-in-text-input",
-                "color-text-black-medium",
-                "flex-1",
+                'padding-0',
+                'body2-in-text-input',
+                'color-text-black-medium',
+                'flex-1',
               ]),
               Platform.select({
                 ios: {},
                 android: {
                   // On android, the text input's height does not equals to the line height by strange.
                   // To fix this problem, set the height explicitly.
-                  height: style.get("body2-in-text-input")?.lineHeight,
+                  height: style.get('body2-in-text-input')?.lineHeight,
                 },
               }),
               propsStyle,
@@ -108,16 +113,16 @@ export const TextInput = React.forwardRef<
         {props.bottomInInputContainer}
       </View>
       {props.paragraph && !props.error ? (
-        typeof props.paragraph === "string" ? (
+        typeof props.paragraph === 'string' ? (
           <View>
             <Text
               style={StyleSheet.flatten([
                 style.flatten([
-                  "absolute",
-                  "text-caption2",
-                  "color-primary",
-                  "margin-top-2",
-                  "margin-left-4",
+                  'absolute',
+                  'text-caption2',
+                  'color-primary',
+                  'margin-top-2',
+                  'margin-left-4',
                 ]),
                 props.errorLabelStyle,
               ])}
@@ -134,11 +139,11 @@ export const TextInput = React.forwardRef<
           <Text
             style={StyleSheet.flatten([
               style.flatten([
-                "absolute",
-                "text-caption2",
-                "color-error",
-                "margin-top-2",
-                "margin-left-4",
+                'absolute',
+                'text-caption2',
+                'color-error',
+                'margin-top-2',
+                'margin-left-4',
               ]),
               props.errorLabelStyle,
             ])}

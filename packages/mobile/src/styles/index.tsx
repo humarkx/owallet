@@ -61,6 +61,7 @@ export const Colors = {
   "text-primary": "#4334F1",
   "border-gray": "#C6C6CD",
   "border-white": "#F5F5F5",
+  "border-pink": "#D7C4F5",
   white: "#fff",
   black: "#000",
   disabled: "#EEEEF3",
