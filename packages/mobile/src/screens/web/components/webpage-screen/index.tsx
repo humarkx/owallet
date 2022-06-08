@@ -3,42 +3,44 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState
-} from 'react';
-import { BackHandler, Platform } from 'react-native';
-import WebView, { WebViewMessageEvent } from 'react-native-webview';
-import { useStyle } from '../../../../styles';
-import { OWallet } from '@owallet/provider';
-import { RNMessageRequesterExternal } from '../../../../router';
-import { RNInjectedOWallet } from '../../../../injected/injected-provider';
-import RNFS from 'react-native-fs';
-import EventEmitter from 'eventemitter3';
-import { PageWithViewInBottomTabView } from '../../../../components/page';
-import { OnScreenWebpageScreenHeader } from '../header';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { WebViewStateContext } from '../context';
-import { URL } from 'react-native-url-polyfill';
-import { observer } from 'mobx-react-lite';
-import { useStore } from '../../../../stores';
-import DeviceInfo from 'react-native-device-info';
-import { ORAIDEX_DEV_URL } from '../../config';
+  useState,
+} from "react";
+import { BackHandler, Platform } from "react-native";
+import WebView, { WebViewMessageEvent } from "react-native-webview";
+import { useStyle } from "../../../../styles";
+import { OWallet } from "@owallet/provider";
+import { RNMessageRequesterExternal } from "../../../../router";
+import { RNInjectedOWallet } from "../../../../injected/injected-provider";
+import RNFS from "react-native-fs";
+import EventEmitter from "eventemitter3";
+// import { PageWithViewInBottomTabView } from "../../../../components/page";
+import { PageWithView } from "../../../../components/page";
+
+import { OnScreenWebpageScreenHeader } from "../header";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { WebViewStateContext } from "../context";
+import { URL } from "react-native-url-polyfill";
+import { observer } from "mobx-react-lite";
+import { useStore } from "../../../../stores";
+import DeviceInfo from "react-native-device-info";
+// import { ORAIDEX_DEV_URL } from "../../config";
 
 export const useInjectedSourceCode = () => {
   const [code, setCode] = useState<string | undefined>();
 
   useEffect(() => {
-    if (__DEV__) {
-      fetch(`${ORAIDEX_DEV_URL}/injected-provider.bundle.js`)
-        .then((res) => res.text())
-        .then(setCode);
-      return;
-    }
-    if (Platform.OS === 'ios') {
+    // if (__DEV__) {
+    //   fetch(`${ORAIDEX_DEV_URL}/injected-provider.bundle.js`)
+    //     .then((res) => res.text())
+    //     .then(setCode);
+    //   return;
+    // }
+    if (Platform.OS === "ios") {
       RNFS.readFile(`${RNFS.MainBundlePath}/injected-provider.bundle.js`).then(
         setCode
       );
     } else {
-      RNFS.readFileAssets('injected-provider.bundle.js').then(setCode);
+      RNFS.readFileAssets("injected-provider.bundle.js").then(setCode);
     }
   }, []);
 
@@ -56,30 +58,30 @@ export const WebpageScreen: FunctionComponent<
 
   const webviewRef = useRef<WebView | null>(null);
   const [currentURL, setCurrentURL] = useState(() => {
-    if (props.source && 'uri' in props.source) {
+    if (props.source && "uri" in props.source) {
       return props.source.uri;
     }
 
-    return '';
+    return "";
   });
 
   const [owallet] = useState(
     () =>
       new OWallet(
         DeviceInfo.getVersion(),
-        'core',
+        "core",
         new RNMessageRequesterExternal(() => {
           if (!webviewRef.current) {
-            throw new Error('Webview not initialized yet');
+            throw new Error("Webview not initialized yet");
           }
 
           if (!currentURL) {
-            throw new Error('Current URL is empty');
+            throw new Error("Current URL is empty");
           }
 
           return {
             url: currentURL,
-            origin: new URL(currentURL).origin
+            origin: new URL(currentURL).origin,
           };
         })
       )
@@ -89,9 +91,9 @@ export const WebpageScreen: FunctionComponent<
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
       if (__DEV__) {
-        console.log('WebViewMessageEvent', event.nativeEvent.data);
+        console.log("WebViewMessageEvent", event.nativeEvent.data);
       }
-      eventEmitter.emit('message', event.nativeEvent);
+      eventEmitter.emit("message", event.nativeEvent);
     },
     [eventEmitter]
   );
@@ -101,7 +103,7 @@ export const WebpageScreen: FunctionComponent<
       owallet,
       {
         addMessageListener: (fn) => {
-          eventEmitter.addListener('message', fn);
+          eventEmitter.addListener("message", fn);
         },
         postMessage: (message) => {
           webviewRef.current?.injectJavaScript(
@@ -112,7 +114,7 @@ export const WebpageScreen: FunctionComponent<
                 true; // note: this is required, or you'll sometimes get silent failures
               `
           );
-        }
+        },
       },
       RNInjectedOWallet.parseWebviewMessage
     );
@@ -155,11 +157,11 @@ export const WebpageScreen: FunctionComponent<
     };
 
     if (isFocused) {
-      BackHandler.addEventListener('hardwareBackPress', backHandler);
+      BackHandler.addEventListener("hardwareBackPress", backHandler);
     }
 
     return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backHandler);
+      BackHandler.removeEventListener("hardwareBackPress", backHandler);
     };
   }, [canGoBack, isFocused]);
 
@@ -170,9 +172,9 @@ export const WebpageScreen: FunctionComponent<
     // If we turn on the gesture manually without checking OS,
     // the gesture will turn on even on Android.
     // So, checking platform is required.
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       navigation.setOptions({
-        gestureEnabled: !canGoBack
+        gestureEnabled: !canGoBack,
       });
     }
   }, [canGoBack, navigation]);
@@ -180,14 +182,14 @@ export const WebpageScreen: FunctionComponent<
   const sourceCode = useInjectedSourceCode();
 
   return (
-    <PageWithViewInBottomTabView style={style.flatten(['padding-0'])}>
+    <PageWithView style={style.flatten(["padding-0", "padding-bottom-0"])}>
       <WebViewStateContext.Provider
         value={{
           webView: webviewRef.current,
           name: props.name,
           url: currentURL,
           canGoBack,
-          canGoForward
+          canGoForward,
         }}
       >
         <OnScreenWebpageScreenHeader />
@@ -220,8 +222,8 @@ export const WebpageScreen: FunctionComponent<
           {...props}
         />
       ) : null}
-    </PageWithViewInBottomTabView>
+    </PageWithView>
   );
 });
 
-export * from './screen-options';
+export * from "./screen-options";

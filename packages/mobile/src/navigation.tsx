@@ -99,6 +99,7 @@ import { TorusSignInScreen } from "./screens/register/torus";
 import {
   HeaderAddIcon,
   HeaderWalletConnectIcon,
+  HeaderBackButtonIcon,
 } from "./components/header/icon";
 import { BlurredBottomTabBar } from "./components/bottom-tabbar";
 import { UnlockScreen } from "./screens/unlock";
@@ -363,9 +364,9 @@ const BrowserScreenHeaderLeft: FunctionComponent = observer(() => {
     >
       <View style={style.flatten(["flex-row", "items-center"])}>
         <Text
-          style={style.flatten(["h4", "color-text-black-low", "margin-left-4"])}
+          style={style.flatten(["h4", "color-text-black-low",])}
         >
-          Browser
+          <HeaderBackButtonIcon />
         </Text>
       </View>
     </HeaderLeftButton>
@@ -435,6 +436,7 @@ export const MainNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: "Web",
+          headerShown: false,
         }}
         name="Web"
         component={WebNavigation}

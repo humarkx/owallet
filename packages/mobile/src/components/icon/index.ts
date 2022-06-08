@@ -22,3 +22,7 @@ export * from "./apple";
 export * from "./wallet";
 export * from "./setting";
 export * from "./contact";
+export * from "./icon-search";
+export * from './home';
+export * from './threedots'
+export * from './tab';

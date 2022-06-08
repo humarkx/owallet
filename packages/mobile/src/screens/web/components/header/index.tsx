@@ -7,6 +7,8 @@ import { useWebViewState } from "../context";
 import Svg, { Path } from "react-native-svg";
 import { RectButton } from "../../../../components/rect-button";
 import { useSmartNavigation } from "../../../../navigation";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { useNavigation } from "@react-navigation/core";
 
 const ArrowLeftIcon: FunctionComponent<{
   size: number;
@@ -82,6 +84,7 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
   const actualHeaderHeight = headerHeight - safeAreaInsets.top;
 
   const smartNavigation = useSmartNavigation();
+  const navigation = useNavigation();
 
   const webViewState = useWebViewState();
 
@@ -205,7 +208,8 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
             activeOpacity={1}
             underlayColor={style.get("color-primary-10").color}
             onPress={() => {
-              smartNavigation.navigateSmart("Web.Intro", {});
+              navigation.navigate("Browser");
+              // smartNavigation.navigateSmart("Web.Intro", {});
             }}
           >
             <HomeIcon size={32} color={style.get("color-primary").color} />
