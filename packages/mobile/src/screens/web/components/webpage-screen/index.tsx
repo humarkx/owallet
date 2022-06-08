@@ -15,7 +15,6 @@ import RNFS from "react-native-fs";
 import EventEmitter from "eventemitter3";
 // import { PageWithViewInBottomTabView } from "../../../../components/page";
 import { PageWithView } from "../../../../components/page";
-
 import { OnScreenWebpageScreenHeader } from "../header";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { WebViewStateContext } from "../context";
@@ -182,7 +181,10 @@ export const WebpageScreen: FunctionComponent<
   const sourceCode = useInjectedSourceCode();
 
   return (
-    <PageWithView style={style.flatten(["padding-0", "padding-bottom-0"])}>
+    <PageWithView
+      style={style.flatten(["padding-0", "padding-bottom-0"])}
+      disableSafeArea
+    >
       <WebViewStateContext.Provider
         value={{
           webView: webviewRef.current,

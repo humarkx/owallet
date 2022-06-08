@@ -146,7 +146,7 @@ export const SendScreen: FunctionComponent = observer(() => {
           }
         }}
       />
-      <View style={style.flatten(["height-page-pad", "margin-bottom-58"])} />
+      <View style={style.flatten(["height-page-pad", "margin-bottom-87"])} />
     </PageWithScrollView>
   );
 });
