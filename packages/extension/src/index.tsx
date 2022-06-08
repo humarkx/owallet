@@ -69,7 +69,6 @@ const owallet = new OWallet(
   'core',
   new InExtensionMessageRequester()
 );
-
 window.keplr = window.keplr || owallet;
 window.owallet = owallet;
 

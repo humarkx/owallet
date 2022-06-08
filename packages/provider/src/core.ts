@@ -6,11 +6,7 @@ import {
   OWalletSignOptions,
   Key
 } from '@owallet/types';
-import {
-  BACKGROUND_PORT,
-  MessageRequester,
-  RequestSignDirectMsg
-} from '@owallet/router';
+import { BACKGROUND_PORT, MessageRequester } from '@owallet/router';
 import {
   BroadcastMode,
   AminoSignResponse,
@@ -43,6 +39,7 @@ import { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } from './cosmjs';
 import deepmerge from 'deepmerge';
 import Long from 'long';
 import { Buffer } from 'buffer/';
+import { RequestSignDirectMsg } from './msgs';
 
 export class OWallet implements IOWallet {
   protected enigmaUtils: Map<string, SecretUtils> = new Map();
