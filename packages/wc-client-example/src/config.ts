@@ -2,8 +2,8 @@ import { Bech32Address } from '@owallet/cosmos';
 
 export const EmbedChainInfos = [
   {
-    rpc: 'https://rpc-cosmoshub.owallet.app',
-    rest: 'https://lcd-cosmoshub.owallet.app',
+    rpc: 'https://rpc-cosmoshub.keplr.app',
+    rest: 'https://lcd-cosmoshub.keplr.app',
     chainId: 'cosmoshub-4',
     chainName: 'Cosmos',
     stakeCurrency: {
@@ -36,8 +36,8 @@ export const EmbedChainInfos = [
     features: ['stargate', 'ibc-transfer']
   },
   {
-    rpc: 'https://rpc-osmosis.owallet.app',
-    rest: 'https://lcd-osmosis.owallet.app',
+    rpc: 'https://rpc-osmosis.keplr.app',
+    rest: 'https://lcd-osmosis.keplr.app',
     chainId: 'osmosis-1',
     chainName: 'Osmosis',
     stakeCurrency: {

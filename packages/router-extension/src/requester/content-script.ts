@@ -19,6 +19,7 @@ export class ContentScriptMessageRequester implements MessageRequester {
       typeof window !== 'undefined'
         ? window.location.origin
         : new URL(browser.runtime.getURL('/')).origin;
+
     const routerId = await ExtensionEnv.assignCmd('get-router-id');
     msg.routerMeta = {
       ...msg.routerMeta,

@@ -61,7 +61,8 @@ export class InjectedOWallet implements IOWallet {
     },
     parseMessage?: (message: any) => any
   ) {
-    eventListener.addMessageListener(async (e: any) => {
+    // listen method when inject send to
+    eventListener.addMessageListener(async (e: MessageEvent) => {
       const message: ProxyRequest = parseMessage
         ? parseMessage(e.data)
         : e.data;
@@ -199,7 +200,7 @@ export class InjectedOWallet implements IOWallet {
     };
 
     return new Promise((resolve, reject) => {
-      const receiveResponse = (e: any) => {
+      const receiveResponse = (e: MessageEvent) => {
         const proxyResponse: ProxyRequestResponse = this.parseMessage
           ? this.parseMessage(e.data)
           : e.data;
