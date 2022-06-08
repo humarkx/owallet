@@ -1,16 +1,11 @@
-import {
-  Env,
-  Handler,
-  InternalHandler,
-  RequestSignDirectMsg,
-  Message
-} from '@owallet/router';
+import { Env, Handler, InternalHandler, Message } from '@owallet/router';
 import {
   CreateMnemonicKeyMsg,
   CreatePrivateKeyMsg,
   GetKeyMsg,
   UnlockKeyRingMsg,
   RequestSignAminoMsg,
+  RequestSignDirectMsg,
   LockKeyRingMsg,
   DeleteKeyRingMsg,
   UpdateNameKeyRingMsg,
