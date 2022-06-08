@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { VectorCharacter } from "../vector-character";
 import FastImage from "react-native-fast-image";
 import { Hash } from "@owallet/crypto";
+import { BrowserIcon } from "../icon/browser";
 
 export type DrawerContentProps =
   DrawerContentComponentProps<DrawerContentOptions>;
@@ -176,10 +177,10 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
                 "justify-center",
                 "overflow-hidden",
                 "margin-right-16",
-                "background-color-black",
+                "background-color-profile-green",
               ])}
             >
-              <VectorCharacter char={"B"} height={15} color="white" />
+              <BrowserIcon />
             </View>
             <Text style={style.flatten(["h5", "color-text-black-medium"])}>
               {"Browser"}
