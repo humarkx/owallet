@@ -1,5 +1,5 @@
 import { Router, MessageSender, Result, EnvProducer } from '@owallet/router';
-import { ExtensionEnv } from '../env';
+import { getOWalletExtensionRouterId } from '../utils';
 
 export class ExtensionRouter extends Router {
   constructor(envProducer: EnvProducer) {
@@ -12,6 +12,7 @@ export class ExtensionRouter extends Router {
     }
 
     this.port = port;
+
     browser.runtime.onMessage.addListener(this.onMessage);
     // Although security considerations cross-extension communication are in place,
     // we have put in additional security measures by disbling extension-to-extension communication until a formal security audit has taken place.
@@ -47,7 +48,7 @@ export class ExtensionRouter extends Router {
 
     // The receiverRouterId will be set when requesting an interaction from the background to the frontend.
     // If this value exists, it compares this value with the current router id and processes them only if they are the same.
-    const routerId = await ExtensionEnv.assignCmd('get-router-id');
+    const routerId = getOWalletExtensionRouterId();
     if (
       message.msg?.routerMeta?.receiverRouterId &&
       message.msg.routerMeta.receiverRouterId !== routerId
@@ -68,17 +69,19 @@ export class ExtensionRouter extends Router {
         return: result
       };
     } catch (e) {
+      console.error(e);
       console.log(
         `Failed to process msg ${message.type}: ${e?.message || e?.toString()}`
       );
+
       if (e) {
-        return Promise.resolve({
+        return {
           error: e.message || e.toString()
-        });
+        };
       } else {
-        return Promise.resolve({
+        return {
           error: 'Unknown error, and error is null'
-        });
+        };
       }
     }
   }

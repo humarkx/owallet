@@ -1,6 +1,6 @@
-import { OWalletSignOptions } from '@owallet/types';
 import { StdSignature } from '@cosmjs/launchpad';
-import { Message } from './message';
+import { Message } from '@owallet/router';
+import { OWalletSignOptions } from '@owallet/types';
 
 export class RequestSignDirectMsg extends Message<{
   readonly signed: {
@@ -37,25 +37,6 @@ export class RequestSignDirectMsg extends Message<{
     if (!this.signer) {
       throw new Error('signer not set');
     }
-
-    // It is not important to check this on the client side as opposed to increasing the bundle size.
-    // Validate bech32 address.
-    // Bech32Address.validate(this.signer);
-
-    // const signDoc = cosmos.tx.v1beta1.SignDoc.create({
-    //   bodyBytes: this.signDoc.bodyBytes,
-    //   authInfoBytes: this.signDoc.authInfoBytes,
-    //   chainId: this.signDoc.chainId,
-    //   accountNumber: this.signDoc.accountNumber
-    //     ? Long.fromString(this.signDoc.accountNumber)
-    //     : undefined,
-    // });
-    //
-    // if (signDoc.chainId !== this.chainId) {
-    //   throw new Error(
-    //     "Chain id in the message is not matched with the requested chain id"
-    //   );
-    // }
 
     if (!this.signOptions) {
       throw new Error('Sign options are null');

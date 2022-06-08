@@ -29,7 +29,7 @@ const TokenView: FunctionComponent<{
     ['#F6F7FB', '#0e0314']
   ]);
 
-  let name = balance.currency.coinDenom.toUpperCase();
+  let name = balance.currency.coinDenom;
   const minimalDenom = balance.currency.coinMinimalDenom;
 
   let amount = balance.balance.trim(true).shrink(true);
