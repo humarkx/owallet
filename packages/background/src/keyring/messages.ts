@@ -15,8 +15,9 @@ import {
 import { BIP44, OWalletSignOptions, Key } from '@owallet/types';
 
 import { StdSignDoc, AminoSignResponse, StdSignature } from '@cosmjs/launchpad';
-import bip39 from 'bip39';
 import Long from 'long';
+
+const bip39 = require('bip39');
 
 export class RestoreKeyRingMsg extends Message<{
   status: KeyRingStatus;
