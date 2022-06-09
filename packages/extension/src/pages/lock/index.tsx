@@ -88,7 +88,7 @@ export const LockPage: FunctionComponent = observer(() => {
         <Banner
           icon={require('../../public/assets/orai_wallet_logo.png')}
           logo={require('../../public/assets/logo-temp.png')}
-          subtitle="Wallet for the Interchain"
+          subtitle="Cosmos x EVM in one Wallet"
         />
         <PasswordInput
           label={intl.formatMessage({
