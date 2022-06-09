@@ -6,7 +6,7 @@ import useForm from 'react-hook-form';
 import {
   AdvancedBIP44Option,
   BIP44Option,
-  useBIP44Option
+  useBIP44Option,
 } from '../advanced-bip44';
 import style from '../style.module.scss';
 import { Alert, Button, ButtonGroup, Form } from 'reactstrap';
@@ -42,7 +42,7 @@ export const NewMnemonicIntro: FunctionComponent<{
 
         registerConfig.setType(TypeNewMnemonic);
         analyticsStore.logEvent('Create account started', {
-          registerType: 'seed'
+          registerType: 'seed',
         });
       }}
     >
@@ -89,8 +89,8 @@ export const GenerateMnemonicModePage: FunctionComponent<{
       name: newMnemonicConfig.name,
       words: newMnemonicConfig.mnemonic,
       password: '',
-      confirmPassword: ''
-    }
+      confirmPassword: '',
+    },
   });
 
   return (
@@ -110,7 +110,7 @@ export const GenerateMnemonicModePage: FunctionComponent<{
       </Alert>
       <div className={style.title}>
         {intl.formatMessage({
-          id: 'register.create.title'
+          id: 'register.create.title',
         })}
         <div style={{ float: 'right' }}>
           <ButtonGroup size="sm" style={{ marginBottom: '4px' }}>
@@ -149,7 +149,7 @@ export const GenerateMnemonicModePage: FunctionComponent<{
           className={style.mnemonic}
           autoCapitalize="none"
           placeholder={intl.formatMessage({
-            id: 'register.create.textarea.mnemonic.place-holder'
+            id: 'register.create.textarea.mnemonic.place-holder',
           })}
           name="words"
           rows={newMnemonicConfig.numWords === NumWords.WORDS24 ? 5 : 3}
@@ -160,29 +160,29 @@ export const GenerateMnemonicModePage: FunctionComponent<{
             validate: (value: string): string | undefined => {
               if (value.split(' ').length < 8) {
                 return intl.formatMessage({
-                  id: 'register.create.textarea.mnemonic.error.too-short'
+                  id: 'register.create.textarea.mnemonic.error.too-short',
                 });
               }
 
               if (!bip39.validateMnemonic(value)) {
                 return intl.formatMessage({
-                  id: 'register.create.textarea.mnemonic.error.invalid'
+                  id: 'register.create.textarea.mnemonic.error.invalid',
                 });
               }
-            }
+            },
           })}
           error={errors.words && errors.words.message}
         />
         <Input
           label={intl.formatMessage({
-            id: 'register.name'
+            id: 'register.name',
           })}
           type="text"
           name="name"
           ref={register({
             required: intl.formatMessage({
-              id: 'register.name.error.required'
-            })
+              id: 'register.name.error.required',
+            }),
           })}
           error={errors.name && errors.name.message}
         />
@@ -190,39 +190,39 @@ export const GenerateMnemonicModePage: FunctionComponent<{
           <React.Fragment>
             <PasswordInput
               label={intl.formatMessage({
-                id: 'register.create.input.password'
+                id: 'register.create.input.password',
               })}
               name="password"
               ref={register({
                 required: intl.formatMessage({
-                  id: 'register.create.input.password.error.required'
+                  id: 'register.create.input.password.error.required',
                 }),
                 validate: (password: string): string | undefined => {
                   if (password.length < 8) {
                     return intl.formatMessage({
-                      id: 'register.create.input.password.error.too-short'
+                      id: 'register.create.input.password.error.too-short',
                     });
                   }
-                }
+                },
               })}
               error={errors.password && errors.password.message}
             />
             <PasswordInput
               label={intl.formatMessage({
-                id: 'register.create.input.confirm-password'
+                id: 'register.create.input.confirm-password',
               })}
               name="confirmPassword"
               ref={register({
                 required: intl.formatMessage({
-                  id: 'register.create.input.confirm-password.error.required'
+                  id: 'register.create.input.confirm-password.error.required',
                 }),
                 validate: (confirmPassword: string): string | undefined => {
                   if (confirmPassword !== getValues()['password']) {
                     return intl.formatMessage({
-                      id: 'register.create.input.confirm-password.error.unmatched'
+                      id: 'register.create.input.confirm-password.error.unmatched',
                     });
                   }
-                }
+                },
               })}
               error={errors.confirmPassword && errors.confirmPassword.message}
             />
@@ -330,7 +330,7 @@ export const VerifyMnemonicModePage: FunctionComponent<{
         disabled={suggestedWords.join(' ') !== wordsSlice.join(' ')}
         block
         style={{
-          marginTop: '30px'
+          marginTop: '30px',
         }}
         onClick={async (e) => {
           e.preventDefault();
@@ -344,7 +344,7 @@ export const VerifyMnemonicModePage: FunctionComponent<{
             );
             analyticsStore.setUserProperties({
               registerType: 'seed',
-              accountType: 'mnemonic'
+              accountType: 'mnemonic',
             });
           } catch (e) {
             alert(e.message ? e.message : e.toString());
