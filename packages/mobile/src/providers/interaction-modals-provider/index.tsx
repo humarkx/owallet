@@ -40,6 +40,8 @@ export const InteractionModalsProivder: FunctionComponent = observer(
       }
     }, [permissionStore, permissionStore.waitingDatas]);
 
+    console.log('experimentalSuggest');
+
     return (
       <React.Fragment>
         {/*

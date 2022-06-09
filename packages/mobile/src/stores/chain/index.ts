@@ -1,18 +1,18 @@
-import { observable, action, computed, makeObservable, flow } from "mobx";
+import { observable, action, computed, makeObservable, flow } from 'mobx';
 
-import { ChainStore as BaseChainStore } from "@owallet/stores";
+import { ChainInfoInner, ChainStore as BaseChainStore } from '@owallet/stores';
 
-import { ChainInfo } from "@owallet/types";
+import { ChainInfo } from '@owallet/types';
 import {
   ChainInfoWithEmbed,
   GetChainInfosMsg,
   RemoveSuggestedChainInfoMsg,
-  TryUpdateChainMsg,
-} from "@owallet/background";
-import { BACKGROUND_PORT } from "@owallet/router";
+  TryUpdateChainMsg
+} from '@owallet/background';
+import { BACKGROUND_PORT } from '@owallet/router';
 
-import { MessageRequester } from "@owallet/router";
-import { KVStore, toGenerator } from "@owallet/common";
+import { MessageRequester } from '@owallet/router';
+import { KVStore, toGenerator } from '@owallet/common';
 
 export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
   @observable
@@ -20,7 +20,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
 
   @observable
   protected _isInitializing: boolean = false;
-  protected deferChainIdSelect: string = "";
+  protected deferChainIdSelect: string = '';
 
   constructor(
     embedChainInfos: ChainInfo[],
@@ -32,8 +32,8 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
         return {
           ...chainInfo,
           ...{
-            embeded: true,
-          },
+            embeded: true
+          }
         };
       })
     );
@@ -55,12 +55,6 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
     });
   }
 
-  get chainInfosStatus() {
-    return this.chainInfos.filter((chainInfo) => {
-      return chainInfo.disabled;
-    });
-  }
-
   @action
   selectChain(chainId: string) {
     if (this._isInitializing) {
@@ -70,7 +64,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
   }
 
   @computed
-  get current(): ChainInfoWithEmbed {
+  get current(): ChainInfoInner<ChainInfoWithEmbed> {
     if (this.hasChain(this.selectedChainId)) {
       return this.getChain(this.selectedChainId);
     }
@@ -80,7 +74,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
 
   async saveLastViewChainId() {
     // Save last view chain id to kv store
-    await this.kvStore.set<string>("last_view_chain_id", this.selectedChainId);
+    await this.kvStore.set<string>('last_view_chain_id', this.selectedChainId);
   }
 
   @flow
@@ -90,7 +84,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
 
     // Get last view chain id from kv store
     const lastViewChainId = yield* toGenerator(
-      this.kvStore.get<string>("last_view_chain_id")
+      this.kvStore.get<string>('last_view_chain_id')
     );
 
     if (!this.deferChainIdSelect) {
@@ -102,7 +96,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
 
     if (this.deferChainIdSelect) {
       this.selectChain(this.deferChainIdSelect);
-      this.deferChainIdSelect = "";
+      this.deferChainIdSelect = '';
     }
   }
 
