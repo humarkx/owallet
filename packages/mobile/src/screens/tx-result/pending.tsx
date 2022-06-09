@@ -166,7 +166,7 @@ export const TxPendingResultScreen: FunctionComponent = observer(() => {
         ])}
       >
         <View style={style.flatten(["flex-row", "width-full"])}>
-          {/* <Button
+          <Button
             containerStyle={style.flatten(["flex-1"])}
             size="default"
             text="Go to homescreen"
@@ -182,7 +182,7 @@ export const TxPendingResultScreen: FunctionComponent = observer(() => {
             onPress={() => {
               smartNavigation.navigateSmart("Home", {});
             }}
-          /> */}
+          />
         </View>
       </View>
       <View style={style.flatten(["flex-2"])} />
