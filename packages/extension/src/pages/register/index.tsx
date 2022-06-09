@@ -78,7 +78,7 @@ export const RegisterPage: FunctionComponent = observer(() => {
   return (
     <EmptyLayout
       className={style.container}
-      style={{ height: '100%', padding: 0 }}
+      style={{ height: '100%', padding: 0}}
     >
       <div className={style.logoContainer}>
         <img
@@ -92,19 +92,19 @@ export const RegisterPage: FunctionComponent = observer(() => {
             src={require('../../public/assets/logo-temp.png')}
             alt="logo"
           />
-          <div className={style.paragraph}>Wallet for the Interchain</div>
+          <div className={style.paragraph}>Cosmos x EVM in one Wallet</div>
         </div>
       </div>
       {registerConfig.render()}
       {registerConfig.isFinalized ? <WelcomePage /> : null}
       {registerConfig.isIntro ? (
         <div className={style.subContent}>
-          <FormattedMessage
+          {/* <FormattedMessage
             id="register.intro.sub-content"
             values={{
               br: <br />
             }}
-          />
+          /> */}
         </div>
       ) : null}
     </EmptyLayout>
