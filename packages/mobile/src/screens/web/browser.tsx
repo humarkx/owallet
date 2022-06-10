@@ -1,25 +1,26 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from 'react';
 // import { PageWithScrollViewInBottomTabView } from "../../components/page";
 
-import { Image, StyleSheet, View } from "react-native";
-import { useStyle } from "../../styles";
-import { TextInput } from "../../components/input";
+import { Image, StyleSheet, View } from 'react-native';
+import { useStyle } from '../../styles';
+import { TextInput } from '../../components/input';
 // import { Button } from "../../components/button";
-import { useSmartNavigation } from "../../navigation";
+import { useSmartNavigation } from '../../navigation';
 // import { PageWithScrollView } from "../../components/page";
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { useNavigation } from "@react-navigation/core";
+import { useNavigation } from '@react-navigation/core';
 import {
   BrowserSectionTitle,
   BrowserSectionModal,
-} from "./components/section-title";
+} from './components/section-title';
 import {
   SearchIcon,
   RightArrowIcon,
   HomeIcon,
   ThreeDotsIcon,
   TabIcon,
-} from "../../components/icon";
+} from '../../components/icon';
+import { ORAIDEX_DEV_URL } from './config';
 
 const isValidDomain = (url) => {
   const reg =
@@ -35,41 +36,41 @@ export const Browser: FunctionComponent = () => {
   const [isOpenSetting, setIsOpenSetting] = useState(false);
   const navigation = useNavigation();
 
-  const arrayIcon = ["back", "next", "tabs", "home", "settings"];
+  const arrayIcon = ['back', 'next', 'tabs', 'home', 'settings'];
 
   const renderIcon = (type, tabNum = 0) => {
     switch (type) {
-      case "back":
+      case 'back':
         return (
           <RightArrowIcon
             onPress={() => onPress(type)}
-            type={"left"}
-            color={"white"}
+            type={'left'}
+            color={'white'}
             height={18}
           />
         );
-      case "next":
+      case 'next':
         return (
           <RightArrowIcon
             onPress={() => onPress(type)}
-            type={"right"}
-            color={"white"}
+            type={'right'}
+            color={'white'}
             height={18}
           />
         );
-      case "tabs":
+      case 'tabs':
         return (
-          <TabIcon onPress={() => onPress(type)} color={"white"} size={24} />
+          <TabIcon onPress={() => onPress(type)} color={'white'} size={24} />
         );
-      case "home":
+      case 'home':
         return (
-          <HomeIcon onPress={() => onPress(type)} color={"white"} size={18} />
+          <HomeIcon onPress={() => onPress(type)} color={'white'} size={18} />
         );
-      case "settings":
+      case 'settings':
         return (
           <ThreeDotsIcon
             onPress={() => onPress(type)}
-            color={"white"}
+            color={'white'}
             size={18}
           />
         );
@@ -78,29 +79,30 @@ export const Browser: FunctionComponent = () => {
   useEffect(() => {
     navigation
       .getParent()
-      ?.setOptions({ tabBarStyle: { display: "none" }, tabBarVisible: false });
+      ?.setOptions({ tabBarStyle: { display: 'none' }, tabBarVisible: false });
     return () =>
       navigation
         .getParent()
         ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
   }, [navigation]);
 
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState('');
 
   const onHandleUrl = () => {
     if (isValidDomain(url?.toLowerCase())) {
-      smartNavigation.pushSmart("Web.dApp", {
-        name: "Browser",
+      smartNavigation.pushSmart('Web.dApp', {
+        name: 'Browser',
         uri:
-          url?.toLowerCase().indexOf("http") >= 0
+          url?.toLowerCase().indexOf('http') >= 0
             ? url?.toLowerCase()
-            : "https://" + url?.toLowerCase(),
+            : 'https://' + url?.toLowerCase(),
       });
       return;
     } else {
-      smartNavigation.pushSmart("Web.dApp", {
-        name: "Google",
-        uri: `https://www.google.com/search?q=${url ?? ""}`,
+      smartNavigation.pushSmart('Web.dApp', {
+        name: 'Google',
+        // uri: `https://www.google.com/search?q=${url ?? ""}`,
+        uri: ORAIDEX_DEV_URL,
       });
     }
   };
@@ -110,16 +112,16 @@ export const Browser: FunctionComponent = () => {
 
     try {
       switch (type) {
-        case "settings":
+        case 'settings':
           return setIsOpenSetting(!isOpenSetting);
-        case "back":
+        case 'back':
           return smartNavigation.goBack();
-        case "next":
+        case 'next':
           return;
-        case "tabs":
+        case 'tabs':
           return;
-        case "home":
-          return smartNavigation.navigateSmart("Home", {});
+        case 'home':
+          return smartNavigation.navigateSmart('Home', {});
       }
     } catch (error) {
       console.log({ error });
@@ -127,40 +129,40 @@ export const Browser: FunctionComponent = () => {
   };
   return (
     <View
-      style={style.flatten(["flex-column", "justify-between", "height-full"])}
+      style={style.flatten(['flex-column', 'justify-between', 'height-full'])}
     >
       <View style={{ opacity: isOpenSetting ? 0.8 : 1 }}>
         <BrowserSectionTitle title="Browser" />
         <View style={{ height: 260 }}>
           <Image
             style={{
-              width: "100%",
-              height: "100%",
+              width: '100%',
+              height: '100%',
             }}
             fadeDuration={0}
             resizeMode="stretch"
-            source={require("../../assets/image/background.png")}
+            source={require('../../assets/image/background.png')}
           />
           <TextInput
             containerStyle={{
-              width: "100%",
+              width: '100%',
               padding: 20,
               marginTop: -50,
             }}
             inputStyle={style.flatten([
-              "flex-row",
-              "items-center",
-              "background-color-white",
-              "padding-20",
-              "border-radius-16",
-              "border-width-4",
-              "border-color-border-pink",
+              'flex-row',
+              'items-center',
+              'background-color-white',
+              'padding-20',
+              'border-radius-16',
+              'border-width-4',
+              'border-color-border-pink',
             ])}
-            returnKeyType={"next"}
+            returnKeyType={'next'}
             onSubmitEditing={onHandleUrl}
             onChangeText={(txt) => setUrl(txt.toLowerCase())}
             inputRight={
-              <SearchIcon onPress={onHandleUrl} color={"gray"} size={20} />
+              <SearchIcon onPress={onHandleUrl} color={'gray'} size={20} />
             }
           />
         </View>
@@ -168,10 +170,10 @@ export const Browser: FunctionComponent = () => {
       {isOpenSetting && (
         <View
           style={{
-            backgroundColor: "#132340",
+            backgroundColor: '#132340',
             height: 200,
             width: 200,
-            position: "absolute",
+            position: 'absolute',
             right: 0,
             bottom: 80,
             borderRadius: 4,
