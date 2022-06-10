@@ -20,13 +20,19 @@ import {
   ThreeDotsIcon,
   TabIcon,
 } from '../../components/icon';
-import { ORAIDEX_DEV_URL } from './config';
 
-const isValidDomain = (url) => {
+const isValidDomain = (url: string) => {
   const reg =
     /^(http(s)?:\/\/.)?(www\.)?[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
   if (reg.test(url)) {
     return true;
+  }
+  // try with URL
+  try {
+    const { origin } = new URL(url);
+    return origin.length > 0;
+  } catch {
+    return false;
   }
 };
 
@@ -97,12 +103,10 @@ export const Browser: FunctionComponent = () => {
             ? url?.toLowerCase()
             : 'https://' + url?.toLowerCase(),
       });
-      return;
     } else {
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
-        // uri: `https://www.google.com/search?q=${url ?? ""}`,
-        uri: ORAIDEX_DEV_URL,
+        uri: `https://www.google.com/search?q=${url ?? ''}`,
       });
     }
   };
