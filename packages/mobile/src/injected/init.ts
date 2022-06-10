@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { OWallet } from '@owallet/types';
 import { OfflineSigner } from '@cosmjs/launchpad';
 import { SecretUtils } from 'secretjs/types/enigmautils';
@@ -11,7 +10,9 @@ export function init(
 ) {
   /* eslint-disable @typescript-eslint/ban-ts-comment */
   // for compartible with keplr dapp
+  // @ts-ignore
   window.keplr = window.keplr || owallet;
+  // @ts-ignore
   window.owallet = owallet;
   // @ts-ignore
   window.getOfflineSigner = getOfflineSigner;
