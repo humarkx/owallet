@@ -38,7 +38,7 @@ import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } from './cosmjs';
 import deepmerge from 'deepmerge';
 import Long from 'long';
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 import { RequestSignDirectMsg } from './msgs';
 
 export class OWallet implements IOWallet {

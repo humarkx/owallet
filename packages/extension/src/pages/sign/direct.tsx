@@ -11,7 +11,7 @@ import {
 } from './messages';
 import { CoinPrimitive } from '@owallet/stores';
 
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 import { fromUtf8 } from '@cosmjs/encoding';
 
 export function renderDirectMessage(
