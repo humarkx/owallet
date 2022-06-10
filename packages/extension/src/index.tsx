@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 import React, { FunctionComponent } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -69,7 +67,10 @@ const owallet = new OWallet(
   'core',
   new InExtensionMessageRequester()
 );
+
+//@ts-ignore
 window.keplr = window.keplr || owallet;
+
 window.owallet = owallet;
 
 // Make sure that icon file will be included in bundle
