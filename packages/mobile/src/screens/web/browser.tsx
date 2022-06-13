@@ -163,7 +163,10 @@ export const Browser: FunctionComponent = () => {
               'border-color-border-pink',
             ])}
             returnKeyType={'next'}
+            placeholder={"Search website"}
+            placeholderTextColor={"#AEAEB2"}
             onSubmitEditing={onHandleUrl}
+            value={url}
             onChangeText={(txt) => setUrl(txt.toLowerCase())}
             inputRight={
               <SearchIcon onPress={onHandleUrl} color={'gray'} size={20} />

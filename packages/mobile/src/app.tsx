@@ -3,7 +3,7 @@ import { StoreProvider, useStore } from './stores';
 import { StyleProvider } from './styles';
 import { AppNavigation } from './navigation';
 import { ModalsProvider } from './modals/base';
-import { Linking, Platform, StatusBar } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import { AdditonalIntlMessages, LanguageToFiatCurrency } from '@owallet/common';
 import { InteractionModalsProivder } from './providers/interaction-modals-provider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,7 +12,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { ConfirmModalProvider } from './providers/confirm-modal';
 import { AppIntlProvider } from '@owallet/common/src/languages';
 import { IntlProvider } from 'react-intl';
-import { handleDeepLink } from './utils/helper';
 
 if (Platform.OS === 'android' || typeof HermesInternal !== 'undefined') {
   // https://github.com/web-ridge/react-native-paper-dates/releases/tag/v0.2.15
@@ -102,14 +101,6 @@ const AppIntlProviderWithStorage = ({ children }) => {
 };
 
 const AppBody: FunctionComponent = () => {
-  useEffect(() => {
-    Linking.addEventListener('url', handleDeepLink);
-    // NotificationUtils.getInstance().initListener();
-    return () => {
-      Linking.removeEventListener('url', handleDeepLink);
-    };
-  }, []);
-
   return (
     <StyleProvider>
       <StoreProvider>
