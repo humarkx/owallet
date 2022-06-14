@@ -88,7 +88,7 @@ export class OWalletConnectV1 implements OWallet {
     } = {}
   ) {
     if (!options.kvStore) {
-      options.kvStore = new IndexedDBKVStore('owallet_wallet_connect');
+      options.kvStore = new IndexedDBKVStore('keplr_wallet_connect');
     }
 
     connector.on('disconnect', () => {
@@ -117,7 +117,7 @@ export class OWalletConnectV1 implements OWallet {
     }
 
     if (
-      payload.method === 'owallet_keystore_may_changed_event_wallet_connect_v1'
+      payload.method === 'keplr_keystore_may_changed_event_wallet_connect_v1'
     ) {
       const param = payload.params[0] as
         | OWalletKeystoreMayChangedEventParam
@@ -172,7 +172,7 @@ export class OWalletConnectV1 implements OWallet {
 
       if (hasChanged) {
         await this.saveAllLastSeenKey(lastSeenKeys);
-        window.dispatchEvent(new Event('owallet_keystorechange'));
+        window.dispatchEvent(new Event('keplr_keystorechange'));
       }
     }
   };
@@ -224,7 +224,7 @@ export class OWalletConnectV1 implements OWallet {
     await this.sendCustomRequest({
       id: payloadId(),
       jsonrpc: '2.0',
-      method: 'owallet_enable_wallet_connect_v1',
+      method: 'keplr_enable_wallet_connect_v1',
       params: chainIds
     });
 
@@ -307,7 +307,7 @@ export class OWalletConnectV1 implements OWallet {
       await this.sendCustomRequest({
         id: payloadId(),
         jsonrpc: '2.0',
-        method: 'owallet_get_key_wallet_connect_v1',
+        method: 'keplr_get_key_wallet_connect_v1',
         params: [chainId]
       })
     )[0] as OWalletGetKeyWalletCoonectV1Response;
@@ -440,7 +440,7 @@ export class OWalletConnectV1 implements OWallet {
       await this.sendCustomRequest({
         id: payloadId(),
         jsonrpc: '2.0',
-        method: 'owallet_sign_amino_wallet_connect_v1',
+        method: 'keplr_sign_amino_wallet_connect_v1',
         params: [
           chainId,
           signer,
