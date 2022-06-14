@@ -6,7 +6,7 @@ export class WCMessageRequester implements MessageRequester {
   constructor(
     protected readonly eventEmitter: EventEmitter,
     protected readonly sessionId: string
-  ) {}
+  ) { }
 
   static getVirtualSessionURL = (sessionId: string): string => {
     return `https://owallet_wc_virtual.${sessionId}`;
