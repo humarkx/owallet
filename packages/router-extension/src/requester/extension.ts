@@ -16,12 +16,6 @@ export class InExtensionMessageRequester implements MessageRequester {
         ? window.location.origin
         : new URL(browser.runtime.getURL('/')).origin;
 
-    const routerId = await ExtensionEnv.assignCmd('get-router-id');
-    msg.routerMeta = {
-      ...msg.routerMeta,
-      routerId
-    };
-
     const result = JSONUint8Array.unwrap(
       await browser.runtime.sendMessage({
         port,
@@ -55,11 +49,6 @@ export class InExtensionMessageRequester implements MessageRequester {
       typeof window !== 'undefined'
         ? window.location.origin
         : new URL(browser.runtime.getURL('/')).origin;
-    const routerId = await ExtensionEnv.assignCmd('get-router-id');
-    msg.routerMeta = {
-      ...msg.routerMeta,
-      routerId
-    };
 
     const result = JSONUint8Array.unwrap(
       await browser.tabs.sendMessage(tabId, {
