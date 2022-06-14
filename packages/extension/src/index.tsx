@@ -60,7 +60,6 @@ import { ExportToMobilePage } from './pages/setting/export-to-mobile';
 import { LogPageViewWrapper } from './components/analytics';
 import { ValidatorListPage } from './pages/stake/validator-list';
 import { IntlProvider } from 'react-intl';
-import { ServiceWorkerHandler } from './service-worker-handler';
 
 const owallet = new OWallet(
   manifest.version,
@@ -69,8 +68,6 @@ const owallet = new OWallet(
 );
 
 //@ts-ignore
-window.keplr = window.keplr || owallet;
-
 window.owallet = owallet;
 
 // Make sure that icon file will be included in bundle
@@ -170,7 +167,6 @@ ReactDOM.render(
         <NotificationStoreProvider>
           <NotificationProvider>
             <ConfirmProvider>
-              <ServiceWorkerHandler />
               <HashRouter>
                 <LogPageViewWrapper>
                   <Route exact path="/" component={StateRenderer} />

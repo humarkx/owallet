@@ -8,9 +8,12 @@ import React, {
 import { BackHandler, Platform } from 'react-native';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import { useStyle } from '../../../../styles';
-import { OWallet } from '@owallet/provider';
+import { OWallet, Ethereum } from '@owallet/provider';
 import { RNMessageRequesterExternal } from '../../../../router';
-import { RNInjectedOWallet } from '../../../../injected/injected-provider';
+import {
+  RNInjectedEthereum,
+  RNInjectedOWallet,
+} from '../../../../injected/injected-provider';
 import RNFS from 'react-native-fs';
 import EventEmitter from 'eventemitter3';
 // import { PageWithViewInBottomTabView } from "../../../../components/page";
@@ -86,6 +89,28 @@ export const WebpageScreen: FunctionComponent<
       )
   );
 
+  const [ethereum] = useState(
+    () =>
+      new Ethereum(
+        DeviceInfo.getVersion(),
+        'core',
+        new RNMessageRequesterExternal(() => {
+          if (!webviewRef.current) {
+            throw new Error('Webview not initialized yet');
+          }
+
+          if (!currentURL) {
+            throw new Error('Current URL is empty');
+          }
+
+          return {
+            url: currentURL,
+            origin: new URL(currentURL).origin,
+          };
+        })
+      )
+  );
+
   const [eventEmitter] = useState(() => new EventEmitter());
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
@@ -100,6 +125,7 @@ export const WebpageScreen: FunctionComponent<
   useEffect(() => {
     RNInjectedOWallet.startProxy(
       owallet,
+
       {
         addMessageListener: (fn) => {
           eventEmitter.addListener('message', fn);
@@ -117,7 +143,27 @@ export const WebpageScreen: FunctionComponent<
       },
       RNInjectedOWallet.parseWebviewMessage
     );
-  }, [eventEmitter, owallet]);
+
+    RNInjectedEthereum.startProxy(
+      ethereum,
+      {
+        addMessageListener: (fn) => {
+          eventEmitter.addListener('message', fn);
+        },
+        postMessage: (message) => {
+          webviewRef.current?.injectJavaScript(
+            `
+                window.postMessage(${JSON.stringify(
+                  message
+                )}, window.location.origin);
+                true; // note: this is required, or you'll sometimes get silent failures
+              `
+          );
+        },
+      },
+      RNInjectedEthereum.parseWebviewMessage
+    );
+  }, [eventEmitter, owallet, ethereum]);
 
   useEffect(() => {
     const keyStoreChangedListener = () => {
