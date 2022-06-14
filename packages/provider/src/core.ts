@@ -6,6 +6,7 @@ import {
   OWalletMode,
   OWalletSignOptions,
   Key,
+  EthereumMode,
 } from '@owallet/types';
 import { BACKGROUND_PORT, MessageRequester } from '@owallet/router';
 import {
@@ -284,7 +285,7 @@ export class OWallet implements IOWallet {
 export class Ethereum implements IEthereum {
   constructor(
     public readonly version: string,
-    public readonly mode: OWalletMode,
+    public readonly mode: EthereumMode,
     protected readonly requester: MessageRequester
   ) {}
 
@@ -296,5 +297,9 @@ export class Ethereum implements IEthereum {
   }
   async asyncRequest(): Promise<void> {
     console.log('');
+  }
+  async getKey(chainId: string): Promise<Key> {
+    const msg = new GetKeyMsg(chainId);
+    return await this.requester.sendMessage(BACKGROUND_PORT, msg);
   }
 }
