@@ -621,4 +621,8 @@ export class InjectedEthereum implements Ethereum {
     console.log('console.log asyncRequest');
     alert('console.log asyncRequest');
   }
+
+  async getKey(chainId: string): Promise<Key> {
+    return await this.requestMethod('getKey', [chainId]);
+  }
 }
