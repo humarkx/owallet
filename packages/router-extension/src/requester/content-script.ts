@@ -20,12 +20,6 @@ export class ContentScriptMessageRequester implements MessageRequester {
         ? window.location.origin
         : new URL(browser.runtime.getURL('/')).origin;
 
-    const routerId = await ExtensionEnv.assignCmd('get-router-id');
-    msg.routerMeta = {
-      ...msg.routerMeta,
-      routerId
-    };
-
     const wrappedMsg = JSONUint8Array.wrap(msg);
 
     const tabs = await browser.tabs.query({
