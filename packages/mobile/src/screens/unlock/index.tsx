@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Dimensions, Image, StatusBar, StyleSheet, View , Linking } from 'react-native';
+import { Dimensions, Image, StatusBar, StyleSheet, View } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 import { observer } from 'mobx-react-lite';
 import { useStyle } from '../../styles';
@@ -20,7 +20,6 @@ import { KeyRingStatus } from '@owallet/background';
 import { KeychainStore } from '../../stores/keychain';
 import { AccountStore } from '@owallet/stores';
 import { autorun } from 'mobx';
-import { handleDeepLink } from '../../utils/helper';
 
 let splashScreenHided = false;
 async function hideSplashScreen() {

@@ -3,7 +3,7 @@ import { StoreProvider, useStore } from './stores';
 import { StyleProvider } from './styles';
 import { AppNavigation } from './navigation';
 import { ModalsProvider } from './modals/base';
-import { Platform, StatusBar } from 'react-native';
+import { Platform, StatusBar, LogBox } from 'react-native';
 import { AdditonalIntlMessages, LanguageToFiatCurrency } from '@owallet/common';
 import { InteractionModalsProivder } from './providers/interaction-modals-provider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -61,6 +61,8 @@ SplashScreen.preventAutoHideAsync()
     console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`)
   )
   .catch(console.warn);
+
+LogBox.ignoreLogs(['EventEmitter.removeListener']);
 
 const AppIntlProviderWithStorage = ({ children }) => {
   const store = useStore();

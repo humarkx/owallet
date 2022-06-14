@@ -1,17 +1,16 @@
 import { navigate } from '../../router/root';
+const SCHEME = 'owallet://open_url?url=';
+const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url=';
 
-const SCHEME = 'owallet://';
-const SCHEME_ANDROID = 'app.owallet.oauth://google/';
-export const handleDeepLink = ({ url }) => {  
-  console.log({ url });
-  
-  if (url && !url.indexOf(SCHEME_ANDROID)) {    
-    const path_android = url.replace(SCHEME_ANDROID, '');
-    navigate('Browser');
-  }
+export const handleDeepLink = async ({ url }) => {
+  if (url) {
+    const path = url.replace(SCHEME_ANDROID, '').replace(SCHEME, '');
+    if (!url.indexOf(SCHEME_ANDROID)) {
+      navigate('Browser', path);
+    }
 
-  if (url && url.indexOf(SCHEME) === 0) {
-    const path = url.replace(SCHEME, '');
-    console.log('path');
+    if (url.indexOf(SCHEME) === 0) {
+      navigate('Browser', path);
+    }
   }
 };
