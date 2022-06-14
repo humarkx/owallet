@@ -56,11 +56,11 @@ export class InjectedOWallet implements IOWallet {
       addMessageListener: (fn: (e: any) => void) => void;
       postMessage: (message: any) => void;
     } = {
-      addMessageListener: (fn: (e: any) => void) =>
-        window.addEventListener('message', fn),
-      postMessage: (message) =>
-        window.postMessage(message, window.location.origin),
-    },
+        addMessageListener: (fn: (e: any) => void) =>
+          window.addEventListener('message', fn),
+        postMessage: (message) =>
+          window.postMessage(message, window.location.origin),
+      },
     parseMessage?: (message: any) => any
   ) {
     // listen method when inject send to
@@ -123,42 +123,45 @@ export class InjectedOWallet implements IOWallet {
         const result =
           message.method === 'signDirect'
             ? await (async () => {
-                const receivedSignDoc: {
-                  bodyBytes?: Uint8Array | null;
-                  authInfoBytes?: Uint8Array | null;
-                  chainId?: string | null;
-                  accountNumber?: string | null;
-                } = message.args[2];
 
-                const result = await owallet.signDirect(
-                  message.args[0],
-                  message.args[1],
-                  {
-                    bodyBytes: receivedSignDoc.bodyBytes,
-                    authInfoBytes: receivedSignDoc.authInfoBytes,
-                    chainId: receivedSignDoc.chainId,
-                    accountNumber: receivedSignDoc.accountNumber
-                      ? Long.fromString(receivedSignDoc.accountNumber)
-                      : null,
-                  },
-                  message.args[3]
-                );
+              console.log("before sign docs ???????????????????????????????????????");
 
-                return {
-                  signed: {
-                    bodyBytes: result.signed.bodyBytes,
-                    authInfoBytes: result.signed.authInfoBytes,
-                    chainId: result.signed.chainId,
-                    accountNumber: result.signed.accountNumber.toString(),
-                  },
-                  signature: result.signature,
-                };
-              })()
-            : await owallet[message.method](
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                ...JSONUint8Array.unwrap(message.args)
+              const receivedSignDoc: {
+                bodyBytes?: Uint8Array | null;
+                authInfoBytes?: Uint8Array | null;
+                chainId?: string | null;
+                accountNumber?: string | null;
+              } = message.args[2];
+
+              const result = await owallet.signDirect(
+                message.args[0],
+                message.args[1],
+                {
+                  bodyBytes: receivedSignDoc.bodyBytes,
+                  authInfoBytes: receivedSignDoc.authInfoBytes,
+                  chainId: receivedSignDoc.chainId,
+                  accountNumber: receivedSignDoc.accountNumber
+                    ? Long.fromString(receivedSignDoc.accountNumber)
+                    : null,
+                },
+                message.args[3]
               );
+
+              return {
+                signed: {
+                  bodyBytes: result.signed.bodyBytes,
+                  authInfoBytes: result.signed.authInfoBytes,
+                  chainId: result.signed.chainId,
+                  accountNumber: result.signed.accountNumber.toString(),
+                },
+                signature: result.signature,
+              };
+            })()
+            : await owallet[message.method](
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              ...JSONUint8Array.unwrap(message.args)
+            );
 
         const proxyResponse: ProxyRequestResponse = {
           type: 'proxy-request-response',
@@ -248,15 +251,15 @@ export class InjectedOWallet implements IOWallet {
       removeMessageListener: (fn: (e: any) => void) => void;
       postMessage: (message: any) => void;
     } = {
-      addMessageListener: (fn: (e: any) => void) =>
-        window.addEventListener('message', fn),
-      removeMessageListener: (fn: (e: any) => void) =>
-        window.removeEventListener('message', fn),
-      postMessage: (message) =>
-        window.postMessage(message, window.location.origin),
-    },
+        addMessageListener: (fn: (e: any) => void) =>
+          window.addEventListener('message', fn),
+        removeMessageListener: (fn: (e: any) => void) =>
+          window.removeEventListener('message', fn),
+        postMessage: (message) =>
+          window.postMessage(message, window.location.origin),
+      },
     protected readonly parseMessage?: (message: any) => any
-  ) {}
+  ) { }
 
   async enable(chainIds: string | string[]): Promise<void> {
     await this.requestMethod('enable', [chainIds]);
@@ -325,6 +328,8 @@ export class InjectedOWallet implements IOWallet {
       chainId: string;
       accountNumber: string;
     } = result.signed;
+
+    console.log("signed message after sign direct: ", signed)
 
     return {
       signed: {
@@ -459,11 +464,11 @@ export class InjectedEthereum implements Ethereum {
       addMessageListener: (fn: (e: any) => void) => void;
       postMessage: (message: any) => void;
     } = {
-      addMessageListener: (fn: (e: any) => void) =>
-        window.addEventListener('message', fn),
-      postMessage: (message) =>
-        window.postMessage(message, window.location.origin),
-    },
+        addMessageListener: (fn: (e: any) => void) =>
+          window.addEventListener('message', fn),
+        postMessage: (message) =>
+          window.postMessage(message, window.location.origin),
+      },
     parseMessage?: (message: any) => any
   ) {
     // listen method when inject send to
@@ -598,15 +603,15 @@ export class InjectedEthereum implements Ethereum {
       removeMessageListener: (fn: (e: any) => void) => void;
       postMessage: (message: any) => void;
     } = {
-      addMessageListener: (fn: (e: any) => void) =>
-        window.addEventListener('message', fn),
-      removeMessageListener: (fn: (e: any) => void) =>
-        window.removeEventListener('message', fn),
-      postMessage: (message) =>
-        window.postMessage(message, window.location.origin),
-    },
+        addMessageListener: (fn: (e: any) => void) =>
+          window.addEventListener('message', fn),
+        removeMessageListener: (fn: (e: any) => void) =>
+          window.removeEventListener('message', fn),
+        postMessage: (message) =>
+          window.postMessage(message, window.location.origin),
+      },
     protected readonly parseMessage?: (message: any) => any
-  ) {}
+  ) { }
 
   async send(): Promise<void> {
     console.log('console.log send');
