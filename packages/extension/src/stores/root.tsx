@@ -83,7 +83,7 @@ export class RootStore {
     );
 
     const router = new ExtensionRouter(ContentScriptEnv.produceEnv);
-    // router.addGuard(ContentScriptGuards.checkMessageIsInternal);
+    router.addGuard(ContentScriptGuards.checkMessageIsInternal);
 
     // Order is important.
     this.interactionStore = new InteractionStore(
