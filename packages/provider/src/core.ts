@@ -1,10 +1,12 @@
 import {
   ChainInfo,
   OWallet as IOWallet,
+  Ethereum as IEthereum,
   OWalletIntereactionOptions,
   OWalletMode,
   OWalletSignOptions,
-  Key
+  Key,
+  EthereumMode,
 } from '@owallet/types';
 import { BACKGROUND_PORT, MessageRequester } from '@owallet/router';
 import {
@@ -13,7 +15,7 @@ import {
   StdSignDoc,
   StdTx,
   OfflineSigner,
-  StdSignature
+  StdSignature,
 } from '@cosmjs/launchpad';
 
 import {
@@ -28,7 +30,7 @@ import {
   ReqeustEncryptMsg,
   RequestDecryptMsg,
   GetTxEncryptionKeyMsg,
-  RequestVerifyADR36AminoSignDoc
+  RequestVerifyADR36AminoSignDoc,
 } from '@owallet/background';
 import { SecretUtils } from 'secretjs/types/enigmautils';
 
@@ -117,7 +119,7 @@ export class OWallet implements IOWallet {
         chainId: signDoc.chainId,
         accountNumber: signDoc.accountNumber
           ? signDoc.accountNumber.toString()
-          : null
+          : null,
       },
       deepmerge(this.defaultOptions.sign ?? {}, signOptions)
     );
@@ -128,9 +130,9 @@ export class OWallet implements IOWallet {
         bodyBytes: response.signed.bodyBytes,
         authInfoBytes: response.signed.authInfoBytes,
         chainId: response.signed.chainId,
-        accountNumber: Long.fromString(response.signed.accountNumber)
+        accountNumber: Long.fromString(response.signed.accountNumber),
       },
-      signature: response.signature
+      signature: response.signature,
     };
   }
 
@@ -153,22 +155,22 @@ export class OWallet implements IOWallet {
       sequence: '0',
       fee: {
         gas: '0',
-        amount: []
+        amount: [],
       },
       msgs: [
         {
           type: 'sign/MsgSignData',
           value: {
             signer,
-            data
-          }
-        }
+            data,
+          },
+        },
       ],
-      memo: ''
+      memo: '',
     };
 
     const msg = new RequestSignAminoMsg(chainId, signer, signDoc, {
-      isADR36WithString
+      isADR36WithString,
     });
     return (await this.requester.sendMessage(BACKGROUND_PORT, msg)).signature;
   }
@@ -277,5 +279,27 @@ export class OWallet implements IOWallet {
     const enigmaUtils = new OWalletEnigmaUtils(chainId, this);
     this.enigmaUtils.set(chainId, enigmaUtils);
     return enigmaUtils;
+  }
+}
+
+export class Ethereum implements IEthereum {
+  constructor(
+    public readonly version: string,
+    public readonly mode: EthereumMode,
+    protected readonly requester: MessageRequester
+  ) {}
+
+  async send(): Promise<void> {
+    console.log('');
+  }
+  async request(): Promise<void> {
+    console.log('');
+  }
+  async asyncRequest(): Promise<void> {
+    console.log('');
+  }
+  async getKey(chainId: string): Promise<Key> {
+    const msg = new GetKeyMsg(chainId);
+    return await this.requester.sendMessage(BACKGROUND_PORT, msg);
   }
 }
