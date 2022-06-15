@@ -326,6 +326,8 @@ export class InjectedOWallet implements IOWallet {
       accountNumber: string;
     } = result.signed;
 
+    console.log('accountNumber', signed);
+
     return {
       signed: {
         bodyBytes: signed.bodyBytes,
