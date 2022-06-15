@@ -114,9 +114,9 @@ export const WebpageScreen: FunctionComponent<
   const [eventEmitter] = useState(() => new EventEmitter());
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
-      if (__DEV__) {
-        console.log('WebViewMessageEvent', event.nativeEvent.data);
-      }
+      // if (__DEV__) {
+      //   console.log('WebViewMessageEvent', event.nativeEvent.data);
+      // }
       eventEmitter.emit('message', event.nativeEvent);
     },
     [eventEmitter]
@@ -169,7 +169,7 @@ export const WebpageScreen: FunctionComponent<
     const keyStoreChangedListener = () => {
       webviewRef.current?.injectJavaScript(
         `
-            window.dispatchEvent(new Event("owallet_keystorechange"));
+            window.dispatchEvent(new Event("keplr_keystorechange"));
             true; // note: this is required, or you'll sometimes get silent failures
           `
       );

@@ -195,7 +195,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     if (!this.hasInited) {
       // If key store in the owallet extension is changed, this event will be dispatched.
       this.eventListener.addEventListener(
-        'owallet_keystorechange',
+        'keplr_keystorechange',
         this.handleInit
       );
     }
@@ -234,7 +234,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     this._walletStatus = WalletStatus.NotInit;
     this.hasInited = false;
     this.eventListener.removeEventListener(
-      'owallet_keystorechange',
+      'keplr_keystorechange',
       this.handleInit
     );
     this._bech32Address = '';

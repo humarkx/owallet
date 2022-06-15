@@ -257,6 +257,7 @@ export const SignModal: FunctionComponent<{
           }
           loading={signInteractionStore.isLoading}
           onPress={async () => {
+            console.log("on press sign")
             try {
               if (signDocHelper.signDocWrapper) {
                 //

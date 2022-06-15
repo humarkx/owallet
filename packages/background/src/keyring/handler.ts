@@ -316,6 +316,9 @@ const handleRequestSignDirectMsg: (
     );
 
     console.log('signDoc msg', msg);
+    console.log(
+      'in handle request sign direct heheeeeeeeeeeeeeeeeeeeeeeeeehehehehehehehehehe'
+    );
 
     const signDoc = cosmos.tx.v1beta1.SignDoc.create({
       bodyBytes: msg.signDoc.bodyBytes,
