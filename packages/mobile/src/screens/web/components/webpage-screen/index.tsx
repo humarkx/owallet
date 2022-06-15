@@ -25,7 +25,7 @@ import { URL } from 'react-native-url-polyfill';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../../stores';
 import DeviceInfo from 'react-native-device-info';
-import { OraiDexUrl } from '../../config';
+import { OraiDexUrl, injectableUrl } from '../../config';
 
 export const useInjectedSourceCode = () => {
   const [code, setCode] = useState<string | undefined>();
@@ -226,6 +226,12 @@ export const WebpageScreen: FunctionComponent<
 
   const sourceCode = useInjectedSourceCode();
 
+  useEffect(() => {
+    if (sourceCode && injectableUrl.includes(currentURL)) {
+      webviewRef.current.reload();
+    }
+  }, [sourceCode, currentURL]);
+
   return (
     <PageWithView
       style={style.flatten(['padding-0', 'padding-bottom-0'])}
@@ -269,7 +275,33 @@ export const WebpageScreen: FunctionComponent<
           allowsBackForwardNavigationGestures={true}
           {...props}
         />
-      ) : null}
+      ) : (
+        <WebView
+          ref={webviewRef}
+          onMessage={onMessage}
+          onNavigationStateChange={(e) => {
+            // Strangely, `onNavigationStateChange` is only invoked whenever page changed only in IOS.
+            // Use two handlers to measure simultaneously in ios and android.
+            setCanGoBack(e.canGoBack);
+            setCanGoForward(e.canGoForward);
+
+            setCurrentURL(e.url);
+          }}
+          onLoadProgress={(e) => {
+            // Strangely, `onLoadProgress` is only invoked whenever page changed only in Android.
+            // Use two handlers to measure simultaneously in ios and android.
+            setCanGoBack(e.nativeEvent.canGoBack);
+            setCanGoForward(e.nativeEvent.canGoForward);
+
+            setCurrentURL(e.nativeEvent.url);
+          }}
+          contentInsetAdjustmentBehavior="never"
+          automaticallyAdjustContentInsets={false}
+          decelerationRate="normal"
+          allowsBackForwardNavigationGestures={true}
+          {...props}
+        />
+      )}
     </PageWithView>
   );
 });
