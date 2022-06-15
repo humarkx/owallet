@@ -3,7 +3,7 @@ import {
   Mnemonic,
   PrivKeySecp256k1,
   PubKeySecp256k1,
-  RNG
+  RNG,
 } from '@owallet/crypto';
 import { KVStore } from '@owallet/common';
 import { LedgerService } from '../ledger';
@@ -23,7 +23,7 @@ export enum KeyRingStatus {
   NOTLOADED,
   EMPTY,
   LOCKED,
-  UNLOCKED
+  UNLOCKED,
 }
 
 export interface Key {
@@ -236,7 +236,7 @@ export class KeyRing {
 
     return {
       status: this.status,
-      multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: await this.getMultiKeyStoreInfo(),
     };
   }
 
@@ -270,7 +270,7 @@ export class KeyRing {
 
     return {
       status: this.status,
-      multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: await this.getMultiKeyStoreInfo(),
     };
   }
 
@@ -313,7 +313,7 @@ export class KeyRing {
 
     return {
       status: this.status,
-      multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: await this.getMultiKeyStoreInfo(),
     };
   }
 
@@ -447,7 +447,7 @@ export class KeyRing {
       })();
       keyStore.coinTypeForChain = {
         ...keyStore.coinTypeForChain,
-        [ChainIdHelper.parse(chainInfo.chainId).identifier]: coinType
+        [ChainIdHelper.parse(chainInfo.chainId).identifier]: coinType,
       };
     }
   }
@@ -481,7 +481,7 @@ export class KeyRing {
 
     this.keyStore.coinTypeForChain = {
       ...this.keyStore.coinTypeForChain,
-      [ChainIdHelper.parse(chainId).identifier]: coinType
+      [ChainIdHelper.parse(chainId).identifier]: coinType,
     };
 
     const keyStoreInMulti = this.multiKeyStore.find((keyStore) => {
@@ -494,7 +494,7 @@ export class KeyRing {
 
     if (keyStoreInMulti) {
       keyStoreInMulti.coinTypeForChain = {
-        ...this.keyStore.coinTypeForChain
+        ...this.keyStore.coinTypeForChain,
       };
     }
 
@@ -558,7 +558,7 @@ export class KeyRing {
     await this.save();
     return {
       multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
-      keyStoreChanged
+      keyStoreChanged,
     };
   }
 
@@ -609,7 +609,7 @@ export class KeyRing {
         algo: 'secp256k1',
         pubKey: pubKey.toBytes(),
         address: pubKey.getAddress(),
-        isNanoLedger: true
+        isNanoLedger: true,
       };
     } else {
       const privKey = this.loadPrivKey(coinType);
@@ -624,7 +624,7 @@ export class KeyRing {
           algo: 'ethsecp256k1',
           pubKey: pubKey.toBytes(),
           address: ethereumAddress,
-          isNanoLedger: false
+          isNanoLedger: false,
         };
       }
 
@@ -633,7 +633,7 @@ export class KeyRing {
         algo: 'secp256k1',
         pubKey: pubKey.toBytes(),
         address: pubKey.getAddress(),
-        isNanoLedger: false
+        isNanoLedger: false,
       };
     }
   }
@@ -687,6 +687,9 @@ export class KeyRing {
     defaultCoinType: number,
     message: Uint8Array
   ): Promise<Uint8Array> {
+    console.log(
+      'ready to sign the transaction FOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO'
+    );
     if (this.status !== KeyRingStatus.UNLOCKED) {
       throw new Error('Key ring is not unlocked');
     }
@@ -694,7 +697,7 @@ export class KeyRing {
     if (!this.keyStore) {
       throw new Error('Key Store is empty');
     }
-
+    // get here
     // Sign with Evmos/Ethereum
     const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
     if (coinType === 60) {
@@ -707,6 +710,8 @@ export class KeyRing {
       if (!pubKey) {
         throw new Error('Ledger public key is not initialized');
       }
+
+      console.log('ledger goes here');
 
       return await this.ledgerKeeper.sign(
         env,
@@ -817,7 +822,7 @@ export class KeyRing {
 
     await this.save();
     return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
     };
   }
 
@@ -844,7 +849,7 @@ export class KeyRing {
 
     await this.save();
     return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
     };
   }
 
@@ -877,7 +882,7 @@ export class KeyRing {
 
     await this.save();
     return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
     };
   }
 
@@ -899,7 +904,7 @@ export class KeyRing {
 
     await this.save();
     return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
     };
   }
 
@@ -916,7 +921,7 @@ export class KeyRing {
         selected: this.keyStore
           ? KeyRing.getKeyStoreId(keyStore) ===
             KeyRing.getKeyStoreId(this.keyStore)
-          : false
+          : false,
       });
     }
 
@@ -955,12 +960,12 @@ export class KeyRing {
             bip44HDPath: keyStore.bip44HDPath ?? {
               account: 0,
               change: 0,
-              addressIndex: 0
+              addressIndex: 0,
             },
             coinTypeForChain: keyStore.coinTypeForChain,
             key: mnemonic,
             meta: keyStore.meta ?? {},
-            type: 'mnemonic'
+            type: 'mnemonic',
           });
 
           break;
@@ -974,12 +979,12 @@ export class KeyRing {
             bip44HDPath: keyStore.bip44HDPath ?? {
               account: 0,
               change: 0,
-              addressIndex: 0
+              addressIndex: 0,
             },
             coinTypeForChain: keyStore.coinTypeForChain,
             key: privateKey,
             meta: keyStore.meta ?? {},
-            type: 'privateKey'
+            type: 'privateKey',
           });
 
           break;
@@ -1056,7 +1061,7 @@ export class KeyRing {
   }> {
     // `__id__` is used to distinguish the key store.
     return Object.assign({}, meta, {
-      __id__: (await this.getIncrementalNumber()).toString()
+      __id__: (await this.getIncrementalNumber()).toString(),
     });
   }
 
@@ -1074,7 +1079,7 @@ export class KeyRing {
       return {
         account: 0,
         change: 0,
-        addressIndex: 0
+        addressIndex: 0,
       };
     }
     KeyRing.validateBIP44Path(keyStore.bip44HDPath);

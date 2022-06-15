@@ -3,14 +3,14 @@ import { ROUTE } from './constants';
 import {
   KeyRing,
   KeyRingStatus,
-  MultiKeyStoreInfoWithSelected
+  MultiKeyStoreInfoWithSelected,
 } from './keyring';
 import { BIP44HDPath, ExportKeyRingData } from './types';
 
 import {
   Bech32Address,
   checkAndValidateADR36AminoSignDoc,
-  cosmos
+  cosmos,
 } from '@owallet/cosmos';
 import { BIP44, OWalletSignOptions, Key } from '@owallet/types';
 
@@ -545,6 +545,7 @@ export class RequestSignAminoMsg extends Message<AminoSignResponse> {
   }
 }
 
+// request goes here
 export class RequestSignDirectMsg extends Message<{
   readonly signed: {
     bodyBytes: Uint8Array;
@@ -590,7 +591,7 @@ export class RequestSignDirectMsg extends Message<{
       chainId: this.signDoc.chainId,
       accountNumber: this.signDoc.accountNumber
         ? Long.fromString(this.signDoc.accountNumber)
-        : undefined
+        : undefined,
     });
 
     if (signDoc.chainId !== this.chainId) {

@@ -123,6 +123,10 @@ export class InjectedOWallet implements IOWallet {
         const result =
           message.method === 'signDirect'
             ? await (async () => {
+                console.log(
+                  'before sign docs ???????????????????????????????????????'
+                );
+
                 const receivedSignDoc: {
                   bodyBytes?: Uint8Array | null;
                   authInfoBytes?: Uint8Array | null;
@@ -325,6 +329,9 @@ export class InjectedOWallet implements IOWallet {
       chainId: string;
       accountNumber: string;
     } = result.signed;
+
+    console.log('accountNumber', signed);
+    console.log('signed message after sign direct: ', signed);
 
     return {
       signed: {
