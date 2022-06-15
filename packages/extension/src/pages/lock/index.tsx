@@ -17,6 +17,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useInteractionInfo } from '@owallet/hooks';
 import { useHistory } from 'react-router';
 import delay from 'delay';
+import { KeyRingStatus } from '@owallet/background';
+import { MainPage } from '../main';
 
 interface FormData {
   password: string;
@@ -35,6 +37,7 @@ export const LockPage: FunctionComponent = observer(() => {
   });
 
   const { keyRingStore } = useStore();
+
   const [loading, setLoading] = useState(false);
 
   const interactionInfo = useInteractionInfo(() => {
@@ -47,6 +50,16 @@ export const LockPage: FunctionComponent = observer(() => {
       passwordRef.current.focus();
     }
   }, []);
+
+  useEffect(() => {
+    // auto unlock works
+    if (keyRingStore.status === KeyRingStatus.UNLOCKED) {
+      // open popup not interaction window
+      if (!interactionInfo.interaction) {
+        history.replace('/');
+      }
+    }
+  }, [keyRingStore.status]);
 
   return (
     <EmptyLayout style={{ height: '100%' }}>
