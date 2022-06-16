@@ -53,9 +53,9 @@ export interface MsgOpt {
 type AminoMsgsOrWithProtoMsgs =
   | Msg[]
   | {
-      aminoMsgs: Msg[];
-      protoMsgs?: google.protobuf.IAny[];
-    };
+    aminoMsgs: Msg[];
+    protoMsgs?: google.protobuf.IAny[];
+  };
 
 export interface AccountSetOpts<MsgOpts> {
   readonly prefetching: boolean;
@@ -110,10 +110,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcastFailed?: (e?: Error) => void;
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) => Promise<boolean>)[] = [];
 
   constructor(
@@ -154,9 +154,9 @@ export class AccountSetBase<MsgOpts, Queries> {
       onTxEvents?:
         | ((tx: any) => void)
         | {
-            onBroadcasted?: (txHash: Uint8Array) => void;
-            onFulfill?: (tx: any) => void;
-          }
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
     ) => Promise<boolean>
   ) {
     this.sendTokenFns.push(fn);
@@ -265,10 +265,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcastFailed?: (e?: Error) => void;
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) {
     runInAction(() => {
       this._isSendingMsg = type;
@@ -380,9 +380,9 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) {
     console.log('get here');
 
@@ -408,6 +408,8 @@ export class AccountSetBase<MsgOpts, Queries> {
 
     throw new Error(`Unsupported type of currency (${denomHelper.type})`);
   }
+
+  // TODO; do we have to add a new broadcast msg for Ethereum?
 
   // Return the tx hash.
   protected async broadcastMsgs(
