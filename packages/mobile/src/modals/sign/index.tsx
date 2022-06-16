@@ -73,7 +73,6 @@ export const SignModal: FunctionComponent<{
       feeConfig.fee?.toCoin().amount,
       amountConfig.amount
     );
-    console.log('feeConfig 2', feeConfig.fee?.toCoin());
     const memoConfig = useMemoConfig(chainStore, chainId);
 
     const signDocWapper = signInteractionStore.waitingData?.data.signDocWrapper;
@@ -83,6 +82,8 @@ export const SignModal: FunctionComponent<{
     const [isInternal, setIsInternal] = useState(false);
 
     useEffect(() => {
+      console.log('signInteractionStore', signInteractionStore.waitingData);
+
       if (signInteractionStore.waitingData) {
         const data = signInteractionStore.waitingData;
         setIsInternal(data.isInternal);
@@ -257,7 +258,7 @@ export const SignModal: FunctionComponent<{
           }
           loading={signInteractionStore.isLoading}
           onPress={async () => {
-            console.log("on press sign")
+            console.log('on press sign');
             try {
               if (signDocHelper.signDocWrapper) {
                 //
