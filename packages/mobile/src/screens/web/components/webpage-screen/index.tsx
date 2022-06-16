@@ -3,7 +3,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react';
 import { BackHandler, Platform } from 'react-native';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
@@ -12,7 +12,7 @@ import { OWallet, Ethereum } from '@owallet/provider';
 import { RNMessageRequesterExternal } from '../../../../router';
 import {
   RNInjectedEthereum,
-  RNInjectedOWallet
+  RNInjectedOWallet,
 } from '../../../../injected/injected-provider';
 import RNFS from 'react-native-fs';
 import EventEmitter from 'eventemitter3';
@@ -25,7 +25,7 @@ import { URL } from 'react-native-url-polyfill';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../../stores';
 import DeviceInfo from 'react-native-device-info';
-import { OraiDexUrl } from '../../config';
+import { OraiDexUrl, injectableUrl } from '../../config';
 
 export const useInjectedSourceCode = () => {
   const [code, setCode] = useState<string | undefined>();
@@ -83,40 +83,40 @@ export const WebpageScreen: FunctionComponent<
 
           return {
             url: currentURL,
-            origin: new URL(currentURL).origin
+            origin: new URL(currentURL).origin,
           };
         })
       )
   );
 
-  const [ethereum] = useState(
-    () =>
-      new Ethereum(
-        DeviceInfo.getVersion(),
-        'core',
-        new RNMessageRequesterExternal(() => {
-          if (!webviewRef.current) {
-            throw new Error('Webview not initialized yet');
-          }
+  // const [ethereum] = useState(
+  //   () =>
+  //     new Ethereum(
+  //       DeviceInfo.getVersion(),
+  //       'core',
+  //       new RNMessageRequesterExternal(() => {
+  //         if (!webviewRef.current) {
+  //           throw new Error('Webview not initialized yet');
+  //         }
 
-          if (!currentURL) {
-            throw new Error('Current URL is empty');
-          }
+  //         if (!currentURL) {
+  //           throw new Error('Current URL is empty');
+  //         }
 
-          return {
-            url: currentURL,
-            origin: new URL(currentURL).origin
-          };
-        })
-      )
-  );
+  //         return {
+  //           url: currentURL,
+  //           origin: new URL(currentURL).origin,
+  //         };
+  //       })
+  //     )
+  // );
 
   const [eventEmitter] = useState(() => new EventEmitter());
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
-      if (__DEV__) {
-        console.log('WebViewMessageEvent', event.nativeEvent.data);
-      }
+      // if (__DEV__) {
+      //   console.log('WebViewMessageEvent', event.nativeEvent.data);
+      // }
       eventEmitter.emit('message', event.nativeEvent);
     },
     [eventEmitter]
@@ -139,31 +139,31 @@ export const WebpageScreen: FunctionComponent<
                 true; // note: this is required, or you'll sometimes get silent failures
               `
           );
-        }
+        },
       },
       RNInjectedOWallet.parseWebviewMessage
     );
 
-    RNInjectedEthereum.startProxy(
-      ethereum,
-      {
-        addMessageListener: (fn) => {
-          eventEmitter.addListener('message', fn);
-        },
-        postMessage: (message) => {
-          webviewRef.current?.injectJavaScript(
-            `
-                window.postMessage(${JSON.stringify(
-                  message
-                )}, window.location.origin);
-                true; // note: this is required, or you'll sometimes get silent failures
-              `
-          );
-        }
-      },
-      RNInjectedEthereum.parseWebviewMessage
-    );
-  }, [eventEmitter, owallet, ethereum]);
+    // RNInjectedEthereum.startProxy(
+    //   ethereum,
+    //   {
+    //     addMessageListener: (fn) => {
+    //       eventEmitter.addListener('message', fn);
+    //     },
+    //     postMessage: (message) => {
+    //       webviewRef.current?.injectJavaScript(
+    //         `
+    //             window.postMessage(${JSON.stringify(
+    //               message
+    //             )}, window.location.origin);
+    //             true; // note: this is required, or you'll sometimes get silent failures
+    //           `
+    //       );
+    //     },
+    //   },
+    //   RNInjectedEthereum.parseWebviewMessage
+    // );
+  }, [eventEmitter, owallet]);
 
   useEffect(() => {
     const keyStoreChangedListener = () => {
@@ -219,12 +219,18 @@ export const WebpageScreen: FunctionComponent<
     // So, checking platform is required.
     if (Platform.OS === 'ios') {
       navigation.setOptions({
-        gestureEnabled: !canGoBack
+        gestureEnabled: !canGoBack,
       });
     }
   }, [canGoBack, navigation]);
 
   const sourceCode = useInjectedSourceCode();
+
+  useEffect(() => {
+    if (sourceCode && injectableUrl.includes(currentURL)) {
+      webviewRef.current.reload();
+    }
+  }, [sourceCode, currentURL]);
 
   return (
     <PageWithView
@@ -237,7 +243,7 @@ export const WebpageScreen: FunctionComponent<
           name: props.name,
           url: currentURL,
           canGoBack,
-          canGoForward
+          canGoForward,
         }}
       >
         <OnScreenWebpageScreenHeader />
@@ -269,7 +275,33 @@ export const WebpageScreen: FunctionComponent<
           allowsBackForwardNavigationGestures={true}
           {...props}
         />
-      ) : null}
+      ) : (
+        <WebView
+          ref={webviewRef}
+          onMessage={onMessage}
+          onNavigationStateChange={(e) => {
+            // Strangely, `onNavigationStateChange` is only invoked whenever page changed only in IOS.
+            // Use two handlers to measure simultaneously in ios and android.
+            setCanGoBack(e.canGoBack);
+            setCanGoForward(e.canGoForward);
+
+            setCurrentURL(e.url);
+          }}
+          onLoadProgress={(e) => {
+            // Strangely, `onLoadProgress` is only invoked whenever page changed only in Android.
+            // Use two handlers to measure simultaneously in ios and android.
+            setCanGoBack(e.nativeEvent.canGoBack);
+            setCanGoForward(e.nativeEvent.canGoForward);
+
+            setCurrentURL(e.nativeEvent.url);
+          }}
+          contentInsetAdjustmentBehavior="never"
+          automaticallyAdjustContentInsets={false}
+          decelerationRate="normal"
+          allowsBackForwardNavigationGestures={true}
+          {...props}
+        />
+      )}
     </PageWithView>
   );
 });

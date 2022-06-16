@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import './styles/global.scss';

@@ -3,14 +3,14 @@ import { ROUTE } from './constants';
 import {
   KeyRing,
   KeyRingStatus,
-  MultiKeyStoreInfoWithSelected
+  MultiKeyStoreInfoWithSelected,
 } from './keyring';
 import { BIP44HDPath, ExportKeyRingData } from './types';
 
 import {
   Bech32Address,
   checkAndValidateADR36AminoSignDoc,
-  cosmos
+  cosmos,
 } from '@owallet/cosmos';
 import { BIP44, OWalletSignOptions, Key } from '@owallet/types';
 
@@ -32,7 +32,7 @@ export class RestoreKeyRingMsg extends Message<{
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  validateBasic(): void {}
+  validateBasic(): void { }
 
   route(): string {
     return ROUTE;
@@ -545,6 +545,7 @@ export class RequestSignAminoMsg extends Message<AminoSignResponse> {
   }
 }
 
+// request goes here
 export class RequestSignDirectMsg extends Message<{
   readonly signed: {
     bodyBytes: Uint8Array;
@@ -590,7 +591,7 @@ export class RequestSignDirectMsg extends Message<{
       chainId: this.signDoc.chainId,
       accountNumber: this.signDoc.accountNumber
         ? Long.fromString(this.signDoc.accountNumber)
-        : undefined
+        : undefined,
     });
 
     if (signDoc.chainId !== this.chainId) {
@@ -616,6 +617,50 @@ export class RequestSignDirectMsg extends Message<{
 
   type(): string {
     return RequestSignDirectMsg.type();
+  }
+}
+
+// request sign ethereum goes here
+export class RequestSignEthereumMsg extends Message<{
+  readonly rawTxHex: string; // raw tx signature to broadcast
+}> {
+  public static type() {
+    return 'request-sign-ethereum';
+  }
+
+  constructor(
+    public readonly chainId: string,
+    public readonly signer: string,
+    public readonly data: string,
+    // public readonly signOptions: OWalletSignOptions = {}
+  ) {
+    super();
+  }
+
+  validateBasic(): void {
+    if (!this.chainId) {
+      throw new Error('chain id not set');
+    }
+
+    if (!this.signer) {
+      throw new Error('signer not set');
+    }
+
+    // if (!this.signOptions) {
+    //   throw new Error('Sign options are null');
+    // }
+  }
+
+  approveExternal(): boolean {
+    return true;
+  }
+
+  route(): string {
+    return ROUTE;
+  }
+
+  type(): string {
+    return RequestSignEthereumMsg.type();
   }
 }
 

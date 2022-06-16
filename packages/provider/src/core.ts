@@ -24,6 +24,7 @@ import {
   SuggestChainInfoMsg,
   SuggestTokenMsg,
   SendTxMsg,
+  SendTxEthereumMsg,
   GetSecret20ViewingKey,
   RequestSignAminoMsg,
   GetPubkeyMsg,
@@ -41,7 +42,7 @@ import { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } from './cosmjs';
 import deepmerge from 'deepmerge';
 import Long from 'long';
 import { Buffer } from 'buffer';
-import { RequestSignDirectMsg } from './msgs';
+import { RequestSignDirectMsg, RequestSignEthereumMsg } from './msgs';
 
 export class OWallet implements IOWallet {
   protected enigmaUtils: Map<string, SecretUtils> = new Map();
@@ -52,7 +53,7 @@ export class OWallet implements IOWallet {
     public readonly version: string,
     public readonly mode: OWalletMode,
     protected readonly requester: MessageRequester
-  ) {}
+  ) { }
 
   async enable(chainIds: string | string[]): Promise<void> {
     if (typeof chainIds === 'string') {
@@ -99,6 +100,7 @@ export class OWallet implements IOWallet {
     return await this.requester.sendMessage(BACKGROUND_PORT, msg);
   }
 
+  // then here to sign
   async signDirect(
     chainId: string,
     signer: string,
@@ -110,6 +112,7 @@ export class OWallet implements IOWallet {
     },
     signOptions: OWalletSignOptions = {}
   ): Promise<DirectSignResponse> {
+    console.log("ready to sign direcT!!!!!!!!!!!!!!!!!!!");
     const msg = new RequestSignDirectMsg(
       chainId,
       signer,
@@ -123,6 +126,7 @@ export class OWallet implements IOWallet {
       },
       deepmerge(this.defaultOptions.sign ?? {}, signOptions)
     );
+
     const response = await this.requester.sendMessage(BACKGROUND_PORT, msg);
 
     return {
@@ -287,19 +291,27 @@ export class Ethereum implements IEthereum {
     public readonly version: string,
     public readonly mode: EthereumMode,
     protected readonly requester: MessageRequester
-  ) {}
+  ) { }
 
-  async send(): Promise<void> {
-    console.log('');
-  }
-  async request(): Promise<void> {
-    console.log('');
-  }
-  async asyncRequest(): Promise<void> {
-    console.log('');
-  }
-  async getKey(chainId: string): Promise<Key> {
-    const msg = new GetKeyMsg(chainId);
+  // async send(): Promise<void> {
+  //   console.log('');
+  // }
+  async request(method: string, params: any[]): Promise<any> {
+    const msg = new SendTxEthereumMsg('kawaii_6886-1', 'https://endpoint1.kawaii.global', method, params); // TODO: hard code chain id & rpc of kawaii to test
     return await this.requester.sendMessage(BACKGROUND_PORT, msg);
   }
+
+  async signRawEthereum(chainId: string, signer: string, data: string): Promise<{ rawTxHex: string; }> {
+    const msg = new RequestSignEthereumMsg(chainId, signer, data);
+    return await this.requester.sendMessage(BACKGROUND_PORT, msg);
+  }
+
+  // async sign()
+  // async asyncRequest(): Promise<void> {
+  //   console.log('');
+  // }
+  // async getKey(chainId: string): Promise<Key> {
+  //   const msg = new GetKeyMsg(chainId);
+  //   return await this.requester.sendMessage(BACKGROUND_PORT, msg);
+  // }
 }
