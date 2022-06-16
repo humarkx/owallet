@@ -20,6 +20,7 @@ import {
   TabIcon,
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useStore } from '../../stores';
 
 const isValidDomain = (url: string) => {
   const reg =
@@ -36,12 +37,12 @@ const isValidDomain = (url: string) => {
   }
 };
 
-export const Browser: FunctionComponent = () => {
+export const Browser: FunctionComponent = (props) => {
   const style = useStyle();
   const smartNavigation = useSmartNavigation();
   const [isOpenSetting, setIsOpenSetting] = useState(false);
   const navigation = useNavigation();
-
+  const { deepLinkUriStore } = useStore();
   const arrayIcon = ['back', 'next', 'tabs', 'home', 'settings'];
 
   const renderIcon = (type, tabNum = 0) => {
@@ -92,6 +93,21 @@ export const Browser: FunctionComponent = () => {
         ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
   }, [navigation]);
 
+  useEffect(() => {
+    updateScreen(props?.route?.params);
+  }, []);
+
+  const updateScreen = async (uri) => {
+    const deepLinkUri = uri || deepLinkUriStore.getDeepLink();
+    if (deepLinkUri) {
+      deepLinkUriStore.updateDeepLink("");
+      smartNavigation.pushSmart('Web.dApp', {
+        name: 'Browser',
+        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io',
+      });
+    }
+  };
+
   const [url, setUrl] = useState('');
 
   const onHandleUrl = () => {
@@ -107,14 +123,11 @@ export const Browser: FunctionComponent = () => {
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
         uri: `https://www.google.com/search?q=${url ?? ''}`,
-        // uri: 'http://192.168.68.95:3000/',
       });
     }
   };
 
   const onPress = (type) => {
-    console.log({ type });
-
     try {
       switch (type) {
         case 'settings':
@@ -164,7 +177,10 @@ export const Browser: FunctionComponent = () => {
               'border-color-border-pink',
             ])}
             returnKeyType={'next'}
+            placeholder={'Search website'}
+            placeholderTextColor={'#AEAEB2'}
             onSubmitEditing={onHandleUrl}
+            value={url}
             onChangeText={(txt) => setUrl(txt.toLowerCase())}
             inputRight={
               <TouchableOpacity onPress={onHandleUrl}>
