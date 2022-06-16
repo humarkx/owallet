@@ -312,7 +312,9 @@ export class KeyRingService {
     signDoc: cosmos.tx.v1beta1.SignDoc,
     signOptions: OWalletSignOptions
   ): Promise<DirectSignResponse> {
-    console.log("in request sign direct heheeeeeeeeeeeeeeeeeeeeeeeeehehehehehehehehehe");
+    console.log(
+      'in request sign direct heheeeeeeeeeeeeeeeeeeeeeeeeehehehehehehehehehe'
+    );
     const coinType = await this.chainsService.getChainCoinType(chainId);
 
     const key = this.keyRing.getKey(chainId, coinType);
@@ -323,6 +325,7 @@ export class KeyRingService {
     if (signer !== bech32Address) {
       throw new Error('Signer mismatched');
     }
+    console.log('it gonna be here');
 
     const newSignDocBytes = (await this.interactionService.waitApprove(
       env,

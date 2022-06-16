@@ -17,6 +17,7 @@ import { APP_PORT } from "@owallet/router";
 import { ChainInfoWithEmbed } from "@owallet/background";
 import { RNEnv, RNRouterUI, RNMessageRequesterInternal } from "../router";
 import { ChainStore } from "./chain";
+import { DeepLinkStore } from "./deeplink";
 import EventEmitter from "eventemitter3";
 import { OWallet } from "@owallet/provider";
 import { KeychainStore } from "./keychain";
@@ -74,6 +75,8 @@ export class RootStore {
       language?: string;
     }
   >;
+
+  public readonly deepLinkUriStore: DeepLinkStore;
 
   constructor() {
     const router = new RNRouterUI(RNEnv.produceEnv);
@@ -259,6 +262,7 @@ export class RootStore {
         },
       }
     );
+    this.deepLinkUriStore = new DeepLinkStore();
   }
 }
 

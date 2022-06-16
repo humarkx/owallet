@@ -21,28 +21,15 @@ import {
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { ORAIDEX_DEV_URL } from 'react-native-dotenv';
+import { isValidDomain } from '../../utils/helper';
+import { useStore } from '../../stores';
 
-const isValidDomain = (url: string) => {
-  const reg =
-    /^(http(s)?:\/\/.)?(www\.)?[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
-  if (reg.test(url)) {
-    return true;
-  }
-  // try with URL
-  try {
-    const { origin } = new URL(url);
-    return origin.length > 0;
-  } catch {
-    return false;
-  }
-};
-
-export const Browser: FunctionComponent = () => {
+export const Browser: FunctionComponent<any> = (props) => {
   const style = useStyle();
   const smartNavigation = useSmartNavigation();
   const [isOpenSetting, setIsOpenSetting] = useState(false);
   const navigation = useNavigation();
-
+  const { deepLinkUriStore } = useStore();
   const arrayIcon = ['back', 'next', 'tabs', 'home', 'settings'];
 
   const renderIcon = (type, tabNum = 0) => {
@@ -93,7 +80,38 @@ export const Browser: FunctionComponent = () => {
         ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
   }, [navigation]);
 
+  useEffect(() => {
+    if (props?.route?.params?.path) {
+      updateScreen(props.route.params.path);
+    }
+  }, []);
+
+  const updateScreen = async (uri) => {
+    const deepLinkUri = uri || deepLinkUriStore.getDeepLink();
+    if (deepLinkUri) {
+      deepLinkUriStore.updateDeepLink('');
+      smartNavigation.pushSmart('Web.dApp', {
+        name: 'Browser',
+        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io',
+      });
+    }
+  };
+
   const [url, setUrl] = useState('');
+
+  useEffect(() => {
+    setTimeout(function () {
+      if (isValidDomain(props?.route?.params?.url?.toLowerCase())) {
+        smartNavigation.pushSmart('Web.dApp', {
+          name: 'Browser',
+          uri:
+            props.route.params.url?.toLowerCase().indexOf('http') >= 0
+              ? props.route.params.url?.toLowerCase()
+              : 'https://' + props.route.params?.url?.toLowerCase(),
+        });
+      }
+    }, 1000);
+  }, [props, smartNavigation, url]);
 
   const onHandleUrl = () => {
     if (isValidDomain(url?.toLowerCase())) {
@@ -116,8 +134,6 @@ export const Browser: FunctionComponent = () => {
   };
 
   const onPress = (type) => {
-    console.log({ type });
-
     try {
       switch (type) {
         case 'settings':
@@ -167,8 +183,10 @@ export const Browser: FunctionComponent = () => {
               'border-color-border-pink',
             ])}
             returnKeyType={'next'}
-            // defaultValue={ORAIDEX_DEV_URL}
+            placeholder={'Search website'}
+            placeholderTextColor={'#AEAEB2'}
             onSubmitEditing={onHandleUrl}
+            value={url}
             onChangeText={(txt) => setUrl(txt.toLowerCase())}
             inputRight={
               <TouchableOpacity onPress={onHandleUrl}>

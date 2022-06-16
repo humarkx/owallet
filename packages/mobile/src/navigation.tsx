@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import React, { FunctionComponent, useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { Alert, Linking, Text, View } from 'react-native';
 import {
   BIP44HDPath,
   ExportKeyRingData,
@@ -114,6 +114,8 @@ import { DAppWebpageScreen } from './screens/web/webpages';
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
 import { Browser } from './screens/web/browser';
 import { navigate, navigationRef } from './router/root';
+import { handleDeepLink } from './utils/helper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { SmartNavigatorProvider, useSmartNavigation } =
   createSmartNavigatorProvider(
@@ -360,7 +362,8 @@ const BrowserScreenHeaderLeft: FunctionComponent = observer(() => {
   return (
     <HeaderLeftButton
       onPress={() => {
-        navigation.goBack();
+        // navigation.goBack();
+        navigate("MainTabDrawer")
       }}
     >
       <View style={style.flatten(['flex-row', 'items-center'])}>
@@ -407,13 +410,16 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
 });
 
 export const MainNavigation: FunctionComponent = () => {
+  const { deepLinkUriStore } = useStore();
+
   return (
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
         headerTitle: '',
       }}
-      initialRouteName="Home"
+      // initialRouteName="Home"
+      initialRouteName={deepLinkUriStore.linkUri ? 'Browser' : 'Home'}
       headerMode="screen"
     >
       <Stack.Screen
@@ -806,6 +812,7 @@ export const MainTabNavigation: FunctionComponent = () => {
   useEffect(() => {
     // When the focused screen is not "Home" screen and the drawer is open,
     // try to close the drawer forcely.
+    // navigate("Browser")
     if (focusedScreen.name !== 'Home' && isDrawerOpen) {
       navigation.dispatch(DrawerActions.toggleDrawer());
     }
@@ -913,7 +920,23 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
 };
 
 export const AppNavigation: FunctionComponent = observer(() => {
-  const { keyRingStore } = useStore();
+  const { keyRingStore, deepLinkUriStore } = useStore();
+
+  useEffect(() => {
+    Linking.getInitialURL()
+      .then((url) => {
+        if (url) {
+          deepLinkUriStore.updateDeepLink('https://oraidex.io');
+        }
+      })
+      .catch((err) => {
+        console.warn('Deeplinking error', err);
+      });
+    Linking.addEventListener('url', handleDeepLink);
+    return () => {
+      Linking.removeEventListener('url', handleDeepLink);
+    };
+  }, []);
 
   return (
     <PageScrollPositionProvider>
