@@ -20,6 +20,7 @@ import {
   TabIcon,
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ORAIDEX_DEV_URL } from 'react-native-dotenv';
 
 const isValidDomain = (url: string) => {
   const reg =
@@ -104,10 +105,12 @@ export const Browser: FunctionComponent = () => {
             : 'https://' + url?.toLowerCase(),
       });
     } else {
+      let uri = `https://www.google.com/search?q=${url ?? ''}`
+      if (ORAIDEX_DEV_URL) uri = ORAIDEX_DEV_URL;
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
-        uri: `https://www.google.com/search?q=${url ?? ''}`,
-        // uri: 'http://192.168.68.95:3000/',
+        // uri: `https://www.google.com/search?q=${url ?? ''}`,
+        uri,
       });
     }
   };
@@ -164,6 +167,7 @@ export const Browser: FunctionComponent = () => {
               'border-color-border-pink',
             ])}
             returnKeyType={'next'}
+            // defaultValue={ORAIDEX_DEV_URL}
             onSubmitEditing={onHandleUrl}
             onChangeText={(txt) => setUrl(txt.toLowerCase())}
             inputRight={
