@@ -20,6 +20,7 @@ import {
   TabIcon,
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ORAIDEX_DEV_URL } from 'react-native-dotenv';
 import { isValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
 
@@ -122,9 +123,12 @@ export const Browser: FunctionComponent<any> = (props) => {
             : 'https://' + url?.toLowerCase(),
       });
     } else {
+      let uri = `https://www.google.com/search?q=${url ?? ''}`
+      if (ORAIDEX_DEV_URL) uri = ORAIDEX_DEV_URL;
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
-        uri: `https://www.google.com/search?q=${url ?? ''}`,
+        // uri: `https://www.google.com/search?q=${url ?? ''}`,
+        uri,
       });
     }
   };

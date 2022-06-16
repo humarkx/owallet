@@ -31,12 +31,13 @@ export const useInjectedSourceCode = () => {
   const [code, setCode] = useState<string | undefined>();
 
   useEffect(() => {
-    // if (__DEV__) {
-    //   fetch(`${OraiDexUrl}/injected-provider.bundle.js`)
-    //     .then((res) => res.text())
-    //     .then(setCode);
-    //   return;
-    // } else {
+    if (__DEV__) {
+      fetch(`${OraiDexUrl}/injected-provider.bundle.js`)
+        .then((res) => res.text())
+        .then(setCode);
+      // return;
+    }
+    // else {
     //   fetch(`${OraiDexProdUrl}/injected-provider.bundle.js`)
     //     .then((res) => res.text())
     //     .then(setCode);
@@ -94,27 +95,27 @@ export const WebpageScreen: FunctionComponent<
       )
   );
 
-  // const [ethereum] = useState(
-  //   () =>
-  //     new Ethereum(
-  //       DeviceInfo.getVersion(),
-  //       'core',
-  //       new RNMessageRequesterExternal(() => {
-  //         if (!webviewRef.current) {
-  //           throw new Error('Webview not initialized yet');
-  //         }
+  const [ethereum] = useState(
+    () =>
+      new Ethereum(
+        DeviceInfo.getVersion(),
+        'core',
+        new RNMessageRequesterExternal(() => {
+          if (!webviewRef.current) {
+            throw new Error('Webview not initialized yet');
+          }
 
-  //         if (!currentURL) {
-  //           throw new Error('Current URL is empty');
-  //         }
+          if (!currentURL) {
+            throw new Error('Current URL is empty');
+          }
 
-  //         return {
-  //           url: currentURL,
-  //           origin: new URL(currentURL).origin,
-  //         };
-  //       })
-  //     )
-  // );
+          return {
+            url: currentURL,
+            origin: new URL(currentURL).origin,
+          };
+        })
+      )
+  );
 
   const [eventEmitter] = useState(() => new EventEmitter());
   const onMessage = useCallback(
@@ -139,8 +140,8 @@ export const WebpageScreen: FunctionComponent<
           webviewRef.current?.injectJavaScript(
             `
                 window.postMessage(${JSON.stringify(
-                  message
-                )}, window.location.origin);
+              message
+            )}, window.location.origin);
                 true; // note: this is required, or you'll sometimes get silent failures
               `
           );
@@ -149,25 +150,25 @@ export const WebpageScreen: FunctionComponent<
       RNInjectedOWallet.parseWebviewMessage
     );
 
-    // RNInjectedEthereum.startProxy(
-    //   ethereum,
-    //   {
-    //     addMessageListener: (fn) => {
-    //       eventEmitter.addListener('message', fn);
-    //     },
-    //     postMessage: (message) => {
-    //       webviewRef.current?.injectJavaScript(
-    //         `
-    //             window.postMessage(${JSON.stringify(
-    //               message
-    //             )}, window.location.origin);
-    //             true; // note: this is required, or you'll sometimes get silent failures
-    //           `
-    //       );
-    //     },
-    //   },
-    //   RNInjectedEthereum.parseWebviewMessage
-    // );
+    RNInjectedEthereum.startProxy(
+      ethereum,
+      {
+        addMessageListener: (fn) => {
+          eventEmitter.addListener('message', fn);
+        },
+        postMessage: (message) => {
+          webviewRef.current?.injectJavaScript(
+            `
+                window.postMessage(${JSON.stringify(
+              message
+            )}, window.location.origin);
+                true; // note: this is required, or you'll sometimes get silent failures
+              `
+          );
+        },
+      },
+      RNInjectedEthereum.parseWebviewMessage
+    );
   }, [eventEmitter, owallet]);
 
   useEffect(() => {
