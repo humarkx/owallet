@@ -4,7 +4,7 @@ import {
   flow,
   makeObservable,
   observable,
-  runInAction
+  runInAction,
 } from 'mobx';
 import { AppCurrency, OWallet, OWalletSignOptions } from '@owallet/types';
 import { DeepReadonly } from 'utility-types';
@@ -17,13 +17,13 @@ import {
   makeStdTx,
   Msg,
   StdFee,
-  StdTx
+  StdTx,
 } from '@cosmjs/launchpad';
 import {
   BaseAccount,
   cosmos,
   google,
-  TendermintTxTracer
+  TendermintTxTracer,
 } from '@owallet/cosmos';
 import Axios, { AxiosInstance } from 'axios';
 import { Buffer } from 'buffer';
@@ -38,7 +38,7 @@ export enum WalletStatus {
   Loading = 'Loading',
   Loaded = 'Loaded',
   NotExist = 'NotExist',
-  Rejected = 'Rejected'
+  Rejected = 'Rejected',
 }
 
 export interface MsgOpt {
@@ -53,9 +53,9 @@ export interface MsgOpt {
 type AminoMsgsOrWithProtoMsgs =
   | Msg[]
   | {
-      aminoMsgs: Msg[];
-      protoMsgs?: google.protobuf.IAny[];
-    };
+    aminoMsgs: Msg[];
+    protoMsgs?: google.protobuf.IAny[];
+  };
 
 export interface AccountSetOpts<MsgOpts> {
   readonly prefetching: boolean;
@@ -110,10 +110,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcastFailed?: (e?: Error) => void;
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) => Promise<boolean>)[] = [];
 
   constructor(
@@ -154,9 +154,9 @@ export class AccountSetBase<MsgOpts, Queries> {
       onTxEvents?:
         | ((tx: any) => void)
         | {
-            onBroadcasted?: (txHash: Uint8Array) => void;
-            onFulfill?: (tx: any) => void;
-          }
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
     ) => Promise<boolean>
   ) {
     this.sendTokenFns.push(fn);
@@ -253,6 +253,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     );
   }
 
+  // get here 11
   async sendMsgs(
     type: string | 'unknown',
     msgs:
@@ -264,10 +265,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcastFailed?: (e?: Error) => void;
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) {
     runInAction(() => {
       this._isSendingMsg = type;
@@ -331,7 +332,7 @@ export class AccountSetBase<MsgOpts, Queries> {
       this.chainGetter.getChain(this.chainId).rpc,
       '/websocket',
       {
-        wsObject: this.opts.wsObject
+        wsObject: this.opts.wsObject,
       }
     );
     txTracer.traceTx(txHash).then((tx) => {
@@ -379,10 +380,12 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) {
+    console.log('get here');
+
     for (let i = 0; i < this.sendTokenFns.length; i++) {
       const fn = this.sendTokenFns[i];
 
@@ -405,6 +408,8 @@ export class AccountSetBase<MsgOpts, Queries> {
 
     throw new Error(`Unsupported type of currency (${denomHelper.type})`);
   }
+
+  // TODO; do we have to add a new broadcast msg for Ethereum?
 
   // Return the tx hash.
   protected async broadcastMsgs(
@@ -461,7 +466,7 @@ export class AccountSetBase<MsgOpts, Queries> {
       const signDoc = {
         bodyBytes: cosmos.tx.v1beta1.TxBody.encode({
           messages: protoMsgs,
-          memo
+          memo,
         }).finish(),
         authInfoBytes: cosmos.tx.v1beta1.AuthInfo.encode({
           signerInfos: [
@@ -472,24 +477,24 @@ export class AccountSetBase<MsgOpts, Queries> {
                     ? '/ethermint.crypto.v1.ethsecp256k1.PubKey'
                     : '/cosmos.crypto.secp256k1.PubKey',
                 value: cosmos.crypto.secp256k1.PubKey.encode({
-                  key: key.pubKey
-                }).finish()
+                  key: key.pubKey,
+                }).finish(),
               },
               modeInfo: {
                 single: {
-                  mode: SignMode.SIGN_MODE_DIRECT
-                }
+                  mode: SignMode.SIGN_MODE_DIRECT,
+                },
               },
-              sequence: Long.fromString(account.getSequence().toString())
-            }
+              sequence: Long.fromString(account.getSequence().toString()),
+            },
           ],
           fee: {
             amount: fee.amount as ICoin[],
-            gasLimit: Long.fromString(fee.gas)
-          }
+            gasLimit: Long.fromString(fee.gas),
+          },
         }).finish(),
         accountNumber: Long.fromString(account.getAccountNumber().toString()),
-        chainId: this.chainId
+        chainId: this.chainId,
       };
 
       const signResponse = await owallet.signDirect(
@@ -502,7 +507,7 @@ export class AccountSetBase<MsgOpts, Queries> {
       signedTx = cosmos.tx.v1beta1.TxRaw.encode({
         bodyBytes: signResponse.signed.bodyBytes, // has to collect body bytes & auth info bytes since OWallet overrides data when signing
         authInfoBytes: signResponse.signed.authInfoBytes,
-        signatures: [Buffer.from(signResponse.signature.signature, 'base64')]
+        signatures: [Buffer.from(signResponse.signature.signature, 'base64')],
       }).finish();
     } else {
       const signDoc = makeSignDoc(
@@ -528,7 +533,7 @@ export class AccountSetBase<MsgOpts, Queries> {
         this.chainId,
         signedTx,
         mode as BroadcastMode
-      )
+      ),
     };
   }
 
@@ -536,10 +541,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     const chainInfo = this.chainGetter.getChain(this.chainId);
     return Axios.create({
       ...{
-        baseURL: chainInfo.rest
+        baseURL: chainInfo.rest,
       },
       ...chainInfo.restConfig,
-      adapter: fetchAdapter
+      adapter: fetchAdapter,
     });
   }
 
