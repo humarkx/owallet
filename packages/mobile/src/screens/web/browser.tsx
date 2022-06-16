@@ -80,7 +80,9 @@ export const Browser: FunctionComponent<any> = (props) => {
   }, [navigation]);
 
   useEffect(() => {
-    updateScreen(props?.route?.params);
+    if (props?.route?.params?.path) {
+      updateScreen(props.route.params.path);
+    }
   }, []);
 
   const updateScreen = async (uri) => {
@@ -97,15 +99,17 @@ export const Browser: FunctionComponent<any> = (props) => {
   const [url, setUrl] = useState('');
 
   useEffect(() => {
-    if (isValidDomain(props?.route?.params?.url?.toLowerCase())) {
-      smartNavigation.pushSmart('Web.dApp', {
-        name: 'Browser',
-        uri:
-          props.route.params.url?.toLowerCase().indexOf('http') >= 0
-            ? props.route.params.url?.toLowerCase()
-            : 'https://' + props.route.params?.url?.toLowerCase(),
-      });
-    }
+    setTimeout(function () {
+      if (isValidDomain(props?.route?.params?.url?.toLowerCase())) {
+        smartNavigation.pushSmart('Web.dApp', {
+          name: 'Browser',
+          uri:
+            props.route.params.url?.toLowerCase().indexOf('http') >= 0
+              ? props.route.params.url?.toLowerCase()
+              : 'https://' + props.route.params?.url?.toLowerCase(),
+        });
+      }
+    }, 1000);
   }, [props, smartNavigation, url]);
 
   const onHandleUrl = () => {
