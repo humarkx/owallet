@@ -307,7 +307,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     evmRpc: 'https://endpoint1.kawaii.global',
     rest: 'https://cosmos1.kawaii.global',
     chainId: 'kawaii_6886-1',
-    chainName: 'Kawaii Islands network',
+    chainName: 'Kawaiiverse',
     stakeCurrency: {
       coinDenom: 'ORAIE',
       coinMinimalDenom: 'oraie',
@@ -318,6 +318,35 @@ export const EmbedChainInfos: AppChainInfo[] = [
       coinType: 60
     },
     bech32Config: Bech32Address.defaultBech32Config('oraie'),
+    get currencies() {
+      return [this.stakeCurrency];
+    },
+    get feeCurrencies() {
+      return [this.stakeCurrency];
+    },
+    gasPriceStep: {
+      low: 0,
+      average: 0.000025,
+      high: 0.00004
+    },
+    features: ['ibc-transfer', 'ibc-go', 'stargate']
+  },
+  {
+    rpc: 'https://tendermint-testnet.bignft.app',
+    evmRpc: 'https://endpoint-testnet.bignft.app',
+    rest: 'https://cosmos-testnet.bignft.app',
+    chainId: 'balcony_888888-1',
+    chainName: 'Balcony Subnet',
+    stakeCurrency: {
+      coinDenom: 'ORAIN',
+      coinMinimalDenom: 'orain',
+      coinDecimals: 18,
+      coinGeckoId: 'orain'
+    },
+    bip44: {
+      coinType: 60
+    },
+    bech32Config: Bech32Address.defaultBech32Config('orain'),
     get currencies() {
       return [this.stakeCurrency];
     },
