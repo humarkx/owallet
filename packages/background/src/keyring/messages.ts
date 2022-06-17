@@ -630,7 +630,6 @@ export class RequestSignEthereumMsg extends Message<{
 
   constructor(
     public readonly chainId: string,
-    public readonly signer: string,
     public readonly data: object,
     // public readonly signOptions: OWalletSignOptions = {}
   ) {
@@ -642,8 +641,8 @@ export class RequestSignEthereumMsg extends Message<{
       throw new Error('chain id not set');
     }
 
-    if (!this.signer) {
-      throw new Error('signer not set');
+    if (!this.data) {
+      throw new Error('data not set');
     }
 
     // if (!this.signOptions) {
