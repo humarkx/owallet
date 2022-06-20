@@ -367,13 +367,11 @@ export class KeyRingService {
   async requestSignEthereum(
     env: Env,
     chainId: string,
-    signer: string,
-    data: string
+    data: object,
   ): Promise<string> {
-    console.log(
-      'in request sign ethereum hahahahahahahhhhhhhhhhhhhhhhhhhhhhhhhhhaahahahaha'
-    );
+    console.log("in request sign ethereum hahahahahahahhhhhhhhhhhhhhhhhhhhhhhhhhhaahahahaha with data: ", data);
     const coinType = await this.chainsService.getChainCoinType(chainId);
+    const rpc = (await this.chainsService.getChainInfo(chainId)).evmRpc;
 
     // TODO: add UI here so users can change gas, memo & fee
     // const newSignDocBytes = (await this.interactionService.waitApprove(
@@ -390,15 +388,21 @@ export class KeyRingService {
     //   }
     // )) as Uint8Array;
 
+    // TEMP HARDCODE, need to have a pop up here to change gas & fee
+    // const { gasPrice, gasLimit } = { gasPrice: 5000000000, gasLimit: 10000000 };
+    const { gasPrice, gasLimit } = { gasPrice: 0, gasLimit: 10000000 };
+
     // const newSignDoc = cosmos.tx.v1beta1.SignDoc.decode(newSignDocBytes);
+    const newData = { ...data, gasPrice, gasLimit };
 
     try {
       // it stuck here in ledger
       // console.log('ledger stuck');
-      const rawTxHex = await this.keyRing.signRawEthereum(
+      const rawTxHex = await this.keyRing.signAndBroadcastEthereum(
         chainId,
         coinType,
-        data
+        rpc,
+        newData,
       );
 
       return rawTxHex;

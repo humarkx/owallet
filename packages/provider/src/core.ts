@@ -7,6 +7,7 @@ import {
   OWalletSignOptions,
   Key,
   EthereumMode,
+  RequestArguments,
 } from '@owallet/types';
 import { BACKGROUND_PORT, MessageRequester } from '@owallet/router';
 import {
@@ -24,7 +25,7 @@ import {
   SuggestChainInfoMsg,
   SuggestTokenMsg,
   SendTxMsg,
-  SendTxEthereumMsg,
+  RequestEthereumMsg,
   GetSecret20ViewingKey,
   RequestSignAminoMsg,
   GetPubkeyMsg,
@@ -290,19 +291,20 @@ export class Ethereum implements IEthereum {
   constructor(
     public readonly version: string,
     public readonly mode: EthereumMode,
+    public chainId: string,
     protected readonly requester: MessageRequester
-  ) { }
+  ) { this.chainId = chainId }
 
   // async send(): Promise<void> {
   //   console.log('');
   // }
-  async request(method: string, params: any[]): Promise<any> {
-    const msg = new SendTxEthereumMsg('kawaii_6886-1', 'https://endpoint1.kawaii.global', method, params); // TODO: hard code chain id & rpc of kawaii to test
+  async request(args: RequestArguments): Promise<any> {
+    const msg = new RequestEthereumMsg(args.chainId, args.method, args.params);
     return await this.requester.sendMessage(BACKGROUND_PORT, msg);
   }
 
-  async signRawEthereum(chainId: string, signer: string, data: string): Promise<{ rawTxHex: string; }> {
-    const msg = new RequestSignEthereumMsg(chainId, signer, data);
+  async signAndBroadcastEthereum(chainId: string, data: object): Promise<{ rawTxHex: string; }> {
+    const msg = new RequestSignEthereumMsg(chainId, data);
     return await this.requester.sendMessage(BACKGROUND_PORT, msg);
   }
 
