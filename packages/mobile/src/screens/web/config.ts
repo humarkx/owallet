@@ -10,6 +10,7 @@ export const injectableUrl = [
   'https://app.osmosis.zone/',
   'https://scan.orai.io/',
   'https://testnet.scan.orai.io/',
+  'https://info.oraidex.io',
 ];
 
 export type DAppInfo = {

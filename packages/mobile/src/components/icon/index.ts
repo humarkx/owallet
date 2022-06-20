@@ -26,3 +26,6 @@ export * from "./icon-search";
 export * from './home';
 export * from './threedots'
 export * from './tab';
+export * from './transaction';
+export * from './contact';
+export * from './country';

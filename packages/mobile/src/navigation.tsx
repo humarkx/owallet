@@ -64,7 +64,9 @@ import {
   DownArrowIcon,
   OpenDrawerIcon,
   ScanIcon,
+  ContactIcon,
   SendIcon,
+  TransactionIcon,
   SettingIcon,
   WalletIcon,
 } from './components/icon';
@@ -113,6 +115,7 @@ import {
 import { DAppWebpageScreen } from './screens/web/webpages';
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
 import { Browser } from './screens/web/browser';
+import { Transactions, TransactionDetail } from './screens/transactions';
 import { navigate, navigationRef } from './router/root';
 import { handleDeepLink } from './utils/helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -354,26 +357,26 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
   );
 });
 
-const BrowserScreenHeaderLeft: FunctionComponent = observer(() => {
-  const style = useStyle();
-
-  const navigation = useNavigation();
-
-  return (
-    <HeaderLeftButton
-      onPress={() => {
-        // navigation.goBack();
-        navigate("MainTabDrawer")
-      }}
-    >
-      <View style={style.flatten(['flex-row', 'items-center'])}>
-        <Text style={style.flatten(['h4', 'color-text-black-low'])}>
-          <HeaderBackButtonIcon />
-        </Text>
-      </View>
-    </HeaderLeftButton>
-  );
-});
+const ScreenHeaderLeft: FunctionComponent = observer(
+  ({ uri = 'MainTabDrawer' }: any) => {
+    const style = useStyle();
+    const navigation = useNavigation();
+    return (
+      <HeaderLeftButton
+        onPress={() => {
+          // navigation.goBack();
+          navigate(uri);
+        }}
+      >
+        <View style={style.flatten(['flex-row', 'items-center'])}>
+          <Text style={style.flatten(['h4', 'color-text-black-low'])}>
+            <HeaderBackButtonIcon />
+          </Text>
+        </View>
+      </HeaderLeftButton>
+    );
+  }
+);
 
 const HomeScreenHeaderRight: FunctionComponent = observer(() => {
   const { walletConnectStore } = useStore();
@@ -433,7 +436,7 @@ export const MainNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: 'Browser',
-          headerLeft: () => <BrowserScreenHeaderLeft />,
+          headerLeft: () => <ScreenHeaderLeft />,
         }}
         name="Browser"
         component={Browser}
@@ -445,6 +448,22 @@ export const MainNavigation: FunctionComponent = () => {
         }}
         name="Web"
         component={WebNavigation}
+      />
+    </Stack.Navigator>
+  );
+};
+
+export const TransactionNavigation: FunctionComponent = () => {
+  return (
+    <Stack.Navigator initialRouteName="Transactions" headerMode="screen">
+      <Stack.Screen name="Transactions" component={Transactions} />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: () => <ScreenHeaderLeft />,
+        }}
+        name="TransactionsDetails"
+        component={TransactionDetail}
       />
     </Stack.Navigator>
   );
@@ -825,9 +844,13 @@ export const MainTabNavigation: FunctionComponent = () => {
           switch (route.name) {
             case 'Main':
               return <WalletIcon color={color} size={24} />;
+            case 'AddressBook':
+              return <ContactIcon color={color} size={24} />;
             // case "Web":
             case 'Send':
               return <SendIcon />;
+            case 'TransactionsTab':
+              return <TransactionIcon color={color} size={24} />;
             case 'Settings':
               return <SettingIcon color={color} />;
           }
@@ -874,7 +897,14 @@ export const MainTabNavigation: FunctionComponent = () => {
       )}
     >
       <Tab.Screen name="Main" component={MainNavigation} />
-      {/* <Tab.Screen name="Web" component={WebNavigation} /> */}
+      <Tab.Screen
+        name="AddressBook"
+        component={AddressBookScreen}
+        initialParams={{
+          currency: chainStore.current.stakeCurrency.coinMinimalDenom,
+          chainId: chainStore.current.chainId,
+        }}
+      />
       <Tab.Screen
         options={{
           title: 'Send',
@@ -886,6 +916,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           chainId: chainStore.current.chainId,
         }}
       />
+      <Tab.Screen name="TransactionsTab" component={TransactionNavigation} />
       <Tab.Screen
         name="Settings"
         component={SettingStackScreen}
@@ -921,7 +952,6 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
 
 export const AppNavigation: FunctionComponent = observer(() => {
   const { keyRingStore, deepLinkUriStore } = useStore();
-
   useEffect(() => {
     Linking.getInitialURL()
       .then((url) => {
