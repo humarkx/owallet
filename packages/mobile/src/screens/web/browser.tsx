@@ -20,7 +20,8 @@ import {
   TabIcon,
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { isValidDomain } from '../../utils/helper';
+import { ORAIDEX_DEV_URL } from 'react-native-dotenv';
+import { checkValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
 
 export const Browser: FunctionComponent<any> = (props) => {
@@ -100,7 +101,7 @@ export const Browser: FunctionComponent<any> = (props) => {
 
   useEffect(() => {
     setTimeout(function () {
-      if (isValidDomain(props?.route?.params?.url?.toLowerCase())) {
+      if (checkValidDomain(props?.route?.params?.url?.toLowerCase())) {
         smartNavigation.pushSmart('Web.dApp', {
           name: 'Browser',
           uri:
@@ -113,7 +114,9 @@ export const Browser: FunctionComponent<any> = (props) => {
   }, [props, smartNavigation, url]);
 
   const onHandleUrl = () => {
-    if (isValidDomain(url?.toLowerCase())) {
+    console.log('valid', checkValidDomain(url?.toLowerCase()));
+
+    if (checkValidDomain(url?.toLowerCase())) {
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Browser',
         uri:
@@ -122,9 +125,12 @@ export const Browser: FunctionComponent<any> = (props) => {
             : 'https://' + url?.toLowerCase(),
       });
     } else {
+      let uri = `https://www.google.com/search?q=${url ?? ''}`;
+      // if (ORAIDEX_DEV_URL) uri = ORAIDEX_DEV_URL;
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
-        uri: `https://www.google.com/search?q=${url ?? ''}`,
+        // uri: `https://staging.oraidex.io/ethereum`,
+        uri,
       });
     }
   };

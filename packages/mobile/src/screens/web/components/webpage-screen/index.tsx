@@ -31,8 +31,14 @@ export const useInjectedSourceCode = () => {
   const [code, setCode] = useState<string | undefined>();
 
   useEffect(() => {
-    // if (__DEV__) {
-    //   fetch(`${OraiDexUrl}/injected-provider.bundle.js`)
+    if (__DEV__) {
+      fetch(`${OraiDexUrl}/injected-provider.bundle.js`)
+        .then((res) => res.text())
+        .then(setCode);
+      // return;
+    }
+    // else {
+    //   fetch(`${OraiDexProdUrl}/injected-provider.bundle.js`)
     //     .then((res) => res.text())
     //     .then(setCode);
     //   return;
@@ -54,7 +60,7 @@ export const WebpageScreen: FunctionComponent<
     name: string;
   }
 > = observer((props) => {
-  const { keyRingStore } = useStore();
+  const { keyRingStore, chainStore } = useStore();
 
   const style = useStyle();
 
@@ -89,27 +95,28 @@ export const WebpageScreen: FunctionComponent<
       )
   );
 
-  // const [ethereum] = useState(
-  //   () =>
-  //     new Ethereum(
-  //       DeviceInfo.getVersion(),
-  //       'core',
-  //       new RNMessageRequesterExternal(() => {
-  //         if (!webviewRef.current) {
-  //           throw new Error('Webview not initialized yet');
-  //         }
+  const [ethereum] = useState(
+    () =>
+      new Ethereum(
+        DeviceInfo.getVersion(),
+        'core',
+        chainStore.current.chainId,
+        new RNMessageRequesterExternal(() => {
+          if (!webviewRef.current) {
+            throw new Error('Webview not initialized yet');
+          }
 
-  //         if (!currentURL) {
-  //           throw new Error('Current URL is empty');
-  //         }
+          if (!currentURL) {
+            throw new Error('Current URL is empty');
+          }
 
-  //         return {
-  //           url: currentURL,
-  //           origin: new URL(currentURL).origin,
-  //         };
-  //       })
-  //     )
-  // );
+          return {
+            url: currentURL,
+            origin: new URL(currentURL).origin,
+          };
+        })
+      )
+  );
 
   const [eventEmitter] = useState(() => new EventEmitter());
   const onMessage = useCallback(
@@ -144,26 +151,26 @@ export const WebpageScreen: FunctionComponent<
       RNInjectedOWallet.parseWebviewMessage
     );
 
-    // RNInjectedEthereum.startProxy(
-    //   ethereum,
-    //   {
-    //     addMessageListener: (fn) => {
-    //       eventEmitter.addListener('message', fn);
-    //     },
-    //     postMessage: (message) => {
-    //       webviewRef.current?.injectJavaScript(
-    //         `
-    //             window.postMessage(${JSON.stringify(
-    //               message
-    //             )}, window.location.origin);
-    //             true; // note: this is required, or you'll sometimes get silent failures
-    //           `
-    //       );
-    //     },
-    //   },
-    //   RNInjectedEthereum.parseWebviewMessage
-    // );
-  }, [eventEmitter, owallet]);
+    RNInjectedEthereum.startProxy(
+      ethereum,
+      {
+        addMessageListener: (fn) => {
+          eventEmitter.addListener('message', fn);
+        },
+        postMessage: (message) => {
+          webviewRef.current?.injectJavaScript(
+            `
+                window.postMessage(${JSON.stringify(
+                  message
+                )}, window.location.origin);
+                true; // note: this is required, or you'll sometimes get silent failures
+              `
+          );
+        },
+      },
+      RNInjectedEthereum.parseWebviewMessage
+    );
+  }, [eventEmitter, owallet, ethereum]);
 
   useEffect(() => {
     const keyStoreChangedListener = () => {
@@ -248,7 +255,36 @@ export const WebpageScreen: FunctionComponent<
       >
         <OnScreenWebpageScreenHeader />
       </WebViewStateContext.Provider>
-      {sourceCode ? (
+      {/* For another url */}
+      {!injectableUrl.includes(currentURL) ? (
+        <WebView
+          ref={webviewRef}
+          onMessage={onMessage}
+          onNavigationStateChange={(e) => {
+            // Strangely, `onNavigationStateChange` is only invoked whenever page changed only in IOS.
+            // Use two handlers to measure simultaneously in ios and android.
+            setCanGoBack(e.canGoBack);
+            setCanGoForward(e.canGoForward);
+
+            setCurrentURL(e.url);
+          }}
+          onLoadProgress={(e) => {
+            // Strangely, `onLoadProgress` is only invoked whenever page changed only in Android.
+            // Use two handlers to measure simultaneously in ios and android.
+            setCanGoBack(e.nativeEvent.canGoBack);
+            setCanGoForward(e.nativeEvent.canGoForward);
+
+            setCurrentURL(e.nativeEvent.url);
+          }}
+          contentInsetAdjustmentBehavior="never"
+          automaticallyAdjustContentInsets={false}
+          decelerationRate="normal"
+          allowsBackForwardNavigationGestures={true}
+          {...props}
+        />
+      ) : null}
+      {/* For injectable url */}
+      {sourceCode && injectableUrl.includes(currentURL) ? (
         <WebView
           ref={webviewRef}
           injectedJavaScriptBeforeContentLoaded={sourceCode}
@@ -275,33 +311,7 @@ export const WebpageScreen: FunctionComponent<
           allowsBackForwardNavigationGestures={true}
           {...props}
         />
-      ) : (
-        <WebView
-          ref={webviewRef}
-          onMessage={onMessage}
-          onNavigationStateChange={(e) => {
-            // Strangely, `onNavigationStateChange` is only invoked whenever page changed only in IOS.
-            // Use two handlers to measure simultaneously in ios and android.
-            setCanGoBack(e.canGoBack);
-            setCanGoForward(e.canGoForward);
-
-            setCurrentURL(e.url);
-          }}
-          onLoadProgress={(e) => {
-            // Strangely, `onLoadProgress` is only invoked whenever page changed only in Android.
-            // Use two handlers to measure simultaneously in ios and android.
-            setCanGoBack(e.nativeEvent.canGoBack);
-            setCanGoForward(e.nativeEvent.canGoForward);
-
-            setCurrentURL(e.nativeEvent.url);
-          }}
-          contentInsetAdjustmentBehavior="never"
-          automaticallyAdjustContentInsets={false}
-          decelerationRate="normal"
-          allowsBackForwardNavigationGestures={true}
-          {...props}
-        />
-      )}
+      ) : null}
     </PageWithView>
   );
 });

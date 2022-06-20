@@ -11,6 +11,8 @@ export const injectableUrl = [
   'https://scan.orai.io/',
   'https://testnet.scan.orai.io/',
   'https://info.oraidex.io',
+  'https://bignft.web.app/',
+  'https://re.bignft.app/'
 ];
 
 export type DAppInfo = {
@@ -21,6 +23,7 @@ export type DAppInfo = {
 };
 
 const oraiLogo = require('../../assets/image/webpage/orai_logo.png');
+const balconyLogo = require('../../assets/image/webpage/balcony.png');
 const oraiThumbnail = require('../../assets/image/webpage/bgoraidex.png');
 export const DAppInfos: DAppInfo[] = [
   {
@@ -46,6 +49,18 @@ export const DAppInfos: DAppInfo[] = [
     thumbnail: oraiThumbnail,
     uri: 'https://testnet.scan.orai.io',
     logo: oraiLogo,
+  },
+  // {
+  //   name: 'Balcony Subnet',
+  //   thumbnail: balconyLogo,
+  //   uri: 'https://bignft.web.app',
+  //   logo: balconyLogo,
+  // },
+  {
+    name: 'Balcony Subnet',
+    thumbnail: balconyLogo,
+    uri: 'https://re.bignft.app',
+    logo: balconyLogo,
   },
 ];
 

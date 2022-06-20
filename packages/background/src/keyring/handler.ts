@@ -369,13 +369,12 @@ const handleRequestSignEthereumMsg: (
     );
 
     console.log(
-      'in handle request sign ethereum msg hohohohohohohohohohohohoho'
+      'in handle request sign ethereum msg hohohohohohohohohohohohoho with msg: ', msg
     );
 
     const response = await service.requestSignEthereum(
       env,
       msg.chainId,
-      msg.signer,
       msg.data,
     );
 

@@ -139,6 +139,12 @@ export type EthereumMode =
   | 'mobile-web'
   | 'walletconnect';
 
+export interface RequestArguments {
+  method: string;
+  params?: any;
+  [key: string]: any;
+}
+
 export interface Ethereum {
   readonly version: string;
   /**
@@ -147,9 +153,10 @@ export interface Ethereum {
    * If the connected Ethereum is on the mobile app with the embeded web browser, the mode should be "mobile-web".
    */
   readonly mode: EthereumMode;
+  chainId: string;
   // send(): Promise<void>;
-  request(method: string, params: any[]): Promise<any>;
-  signRawEthereum(chainId: string, signer: string, data: string): Promise<{ rawTxHex: string }>;
+  request(args: RequestArguments): Promise<any>;
+  signAndBroadcastEthereum(chainId: string, data: object): Promise<{ rawTxHex: string }>;
   // asyncRequest(): Promise<void>;
   // getKey(chainId: string): Promise<Key>;
 }
