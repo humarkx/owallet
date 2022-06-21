@@ -25,7 +25,7 @@ import {
 import { AddressBookConfigMap, useRegisterConfig } from '@owallet/hooks';
 import { AsyncKVStore } from '../../common';
 import { useFocusEffect } from '@react-navigation/native';
-import { isValidDomain } from '../../utils/helper';
+import { checkValidDomain } from '../../utils/helper';
 
 export const CameraScreen: FunctionComponent = observer(() => {
   const { chainStore, walletConnectStore, keyRingStore } = useStore();
@@ -72,7 +72,7 @@ export const CameraScreen: FunctionComponent = observer(() => {
             setIsLoading(true);
 
             try {
-              if (isValidDomain(data.toLowerCase())) {
+              if (checkValidDomain(data.toLowerCase())) {
                 console.log('data', data);
                 navigation.navigate('Browser', { url: data.toLowerCase() });
 
