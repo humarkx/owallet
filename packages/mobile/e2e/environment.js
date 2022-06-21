@@ -3,19 +3,25 @@ require('dotenv').config();
 const NodeEnvironment = require('jest-environment-node');
 const wd = require('wd');
 const path = require('path');
-
-const pagarme = require('../src/clients/pagarme');
-
 const APPIUM_PORT = 4723;
 
 const initializeDriver = (driver) => {
   const options = {
     autoLaunch: false,
+    // platformName: 'iOS',
+    // platformVersion: '15.4.1',
+    // xcodeOrgId: 'ORAICHAIN JOINT STOCK COMPANY',
+    // xcodeSigningId: 'iPhone Developer',
+    // deviceName: process.env.DEVICE_NAME,
+    // bundleId: 'io.orai.owallet',
+    // automationName: 'XCUITest',
+    // app: process.env.IOS_DEBUG_APP
+    noSign: true,
     platformName: 'Android',
-    platformVersion: '9',
-    deviceName: 'Android Emulator',
-    app: path.resolve('./android/app/build/outputs/apk/debug/app-debug.apk'),
-    appPackage: 'com.appiumapptypescript',
+    platformVersion: '11',
+    deviceName: process.env.DEVICE_NAME,
+    app: path.resolve(process.env.ANDROID_DEBUG_APP),
+    appPackage: 'com.chainapsis.owallet',
     appActivity: '.MainActivity',
     automationName: 'UiAutomator2'
   };
@@ -40,12 +46,9 @@ class CustomEnvironment extends NodeEnvironment {
 
     if (!driver) throw new Error('appium driver not initialized');
 
-    const deepLinkIntent = `-a android.intent.action.VIEW -d ${url}`;
-
     return driver.startActivity({
-      appPackage: 'com.appiumapptypescript',
-      appActivity: '.MainActivity',
-      optionalIntentArguments: deepLinkIntent
+      appPackage: 'com.chainapsis.owallet',
+      appActivity: '.MainActivity'
     });
   }
 
@@ -58,14 +61,10 @@ class CustomEnvironment extends NodeEnvironment {
     });
 
     await initializeDriver(driver);
-
-    const pagarmeClient = pagarme();
-    pagarmeClient.authenticate({ api_key: process.env.API_KEY });
-
+    console.log(await driver.hasElementByAccessibilityId('password'));
     this.global.driver = driver;
     this.global.wd = wd;
     this.global.openAppLink = this.openAppLink;
-    this.global.pagarme = pagarmeClient;
     this.global.sleep = sleep;
   }
 
