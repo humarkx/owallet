@@ -59,7 +59,11 @@ export class InteractionService {
       data
     );
 
+    // console.log('interactionWaitingData', interactionWaitingData);
+
     const msg = new PushInteractionDataMsg(interactionWaitingData);
+
+    console.log('msg waitApprove', msg);
 
     return await this.wait(msg.data.id, () => {
       env.requestInteraction(url, msg, options);
@@ -94,6 +98,8 @@ export class InteractionService {
   reject(id: string) {
     if (this.resolverMap.has(id)) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      console.log('reject waiting data', id);
+
       this.resolverMap.get(id)!.onReject(new Error('Request rejected'));
       this.resolverMap.delete(id);
     }
@@ -125,6 +131,8 @@ export class InteractionService {
     }
 
     this.waitingMap.set(id, interactionWaitingData);
+    console.log('this.waitingMap', this.waitingMap);
+
     return interactionWaitingData;
   }
 

@@ -17,8 +17,18 @@ export const InteractionModalsProivder: FunctionComponent = observer(
       ledgerInitStore,
       permissionStore,
       signInteractionStore,
-      walletConnectStore
+      walletConnectStore,
     } = useStore();
+
+    console.log(
+      'signInteractionStore.waitingEthereumData',
+      signInteractionStore.waitingEthereumData
+    );
+
+    console.log(
+      'signInteractionStore.waitingData',
+      signInteractionStore.waitingData
+    );
 
     useEffect(() => {
       if (walletConnectStore.needGoBackToBrowser && Platform.OS === 'android') {
@@ -106,7 +116,17 @@ export const InteractionModalsProivder: FunctionComponent = observer(
         {signInteractionStore.waitingData ? (
           <SignModal
             isOpen={true}
-            close={() => signInteractionStore.rejectAll()}
+            close={() => {
+              signInteractionStore.rejectAll();
+            }}
+          />
+        ) : null}
+        {signInteractionStore.waitingEthereumData ? (
+          <SignModal
+            isOpen={true}
+            close={() => {
+              signInteractionStore.rejectAll();
+            }}
           />
         ) : null}
         {children}

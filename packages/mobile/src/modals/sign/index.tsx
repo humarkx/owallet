@@ -82,7 +82,10 @@ export const SignModal: FunctionComponent<{
     const [isInternal, setIsInternal] = useState(false);
 
     useEffect(() => {
-      console.log('signInteractionStore', signInteractionStore.waitingData);
+      console.log(
+        'signInteractionStore 1',
+        signInteractionStore.waitingEthereumData
+      );
 
       if (signInteractionStore.waitingData) {
         const data = signInteractionStore.waitingData;
@@ -113,12 +116,17 @@ export const SignModal: FunctionComponent<{
           setWCSession(undefined);
         }
       }
+
+      if (signInteractionStore.waitingEthereumData) {
+        const data = signInteractionStore.waitingEthereumData;
+      }
     }, [
       feeConfig,
       gasConfig,
       memoConfig,
       signDocHelper,
       signInteractionStore.waitingData,
+      signInteractionStore.waitingEthereumData,
       walletConnectStore,
     ]);
 

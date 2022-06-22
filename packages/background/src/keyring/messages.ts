@@ -32,7 +32,7 @@ export class RestoreKeyRingMsg extends Message<{
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  validateBasic(): void { }
+  validateBasic(): void {}
 
   route(): string {
     return ROUTE;
@@ -630,9 +630,14 @@ export class RequestSignEthereumMsg extends Message<{
 
   constructor(
     public readonly chainId: string,
-    public readonly data: object,
-    // public readonly signOptions: OWalletSignOptions = {}
-  ) {
+    public readonly data: object // public readonly signOptions: OWalletSignOptions = {} // public readonly signer: string,
+  ) // public readonly signDoc: {
+  //   bodyBytes?: Uint8Array | null;
+  //   authInfoBytes?: Uint8Array | null;
+  //   chainId?: string | null;
+  //   accountNumber?: string | null;
+  // }
+  {
     super();
   }
 
@@ -644,6 +649,23 @@ export class RequestSignEthereumMsg extends Message<{
     if (!this.data) {
       throw new Error('data not set');
     }
+
+    // const signDoc = cosmos.tx.v1beta1.SignDoc.create({
+    //   bodyBytes: this.signDoc.bodyBytes,
+    //   authInfoBytes: this.signDoc.authInfoBytes,
+    //   chainId: this.signDoc.chainId,
+    //   accountNumber: this.signDoc.accountNumber
+    //     ? Long.fromString(this.signDoc.accountNumber)
+    //     : undefined,
+    // });
+
+    // if (signDoc.chainId !== this.chainId) {
+    //   throw new OWalletError(
+    //     'keyring',
+    //     234,
+    //     'Chain id in the message is not matched with the requested chain id'
+    //   );
+    // }
 
     // if (!this.signOptions) {
     //   throw new Error('Sign options are null');
