@@ -112,10 +112,12 @@ export class CosmosAccount {
           onFulfill?: (tx: any) => void;
         }
   ): Promise<boolean> {
+    console.log("PROCESS SEND TOKENNNNNNNNNN")
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
 
     switch (denomHelper.type) {
       case 'native':
+        console.log("GET IN NATIVE!!!!!!!!!!!!!!!!!!!!!!!")
         const actualAmount = (() => {
           let dec = new Dec(amount);
           dec = dec.mul(

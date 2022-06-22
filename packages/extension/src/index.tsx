@@ -17,7 +17,7 @@ import { Banner } from './components/banner';
 
 import {
   NotificationProvider,
-  NotificationStoreProvider
+  NotificationStoreProvider,
 } from './components/notification';
 import { ConfirmProvider } from './components/confirm';
 import { LoadingIndicatorProvider } from './components/loading-indicator';
@@ -35,7 +35,7 @@ import { SettingLanguagePage } from './pages/setting/language';
 import { SettingFiatPage } from './pages/setting/fiat';
 import {
   SettingConnectionsPage,
-  SettingSecret20ViewingKeyConnectionsPage
+  SettingSecret20ViewingKeyConnectionsPage,
 } from './pages/setting/connections';
 import { AddressBookPage } from './pages/setting/address-book';
 import { CreditPage } from './pages/setting/credit';
@@ -50,11 +50,11 @@ import { ManageTokenPage } from './pages/setting/token/manage';
 import {
   AppIntlProvider,
   AdditonalIntlMessages,
-  LanguageToFiatCurrency
+  LanguageToFiatCurrency,
 } from '@owallet/common';
 
 import manifest from './manifest.json';
-import { OWallet } from '@owallet/provider';
+import { Ethereum, OWallet } from '@owallet/provider';
 import { InExtensionMessageRequester } from '@owallet/router-extension';
 import { ExportToMobilePage } from './pages/setting/export-to-mobile';
 import { LogPageViewWrapper } from './components/analytics';
@@ -67,8 +67,17 @@ const owallet = new OWallet(
   new InExtensionMessageRequester()
 );
 
+const ethereum = new Ethereum(
+  manifest.version,
+  'core',
+  '',
+  new InExtensionMessageRequester()
+);
+
 //@ts-ignore
 window.owallet = owallet;
+//@ts-ignore
+window.ethereum = ethereum;
 
 // Make sure that icon file will be included in bundle
 require('./public/assets/orai_wallet_logo.png');
@@ -77,7 +86,7 @@ require('./public/assets/icon/icon-48.png');
 require('./public/assets/icon/icon-128.png');
 
 configure({
-  enforceActions: 'always' // Make mobx to strict mode.
+  enforceActions: 'always', // Make mobx to strict mode.
 });
 
 Modal.setAppElement('#app');
@@ -92,12 +101,12 @@ Modal.defaultStyles = {
     right: 'auto',
     top: '50%',
     bottom: 'auto',
-    transform: 'translate(-50%, -50%)'
+    transform: 'translate(-50%, -50%)',
   },
   overlay: {
     zIndex: 1000,
-    ...Modal.defaultStyles.overlay
-  }
+    ...Modal.defaultStyles.overlay,
+  },
 };
 
 const StateRenderer: FunctionComponent = observer(() => {
@@ -109,7 +118,7 @@ const StateRenderer: FunctionComponent = observer(() => {
     return <LockPage />;
   } else if (keyRingStore.status === KeyRingStatus.EMPTY) {
     browser.tabs.create({
-      url: '/popup.html#/register'
+      url: '/popup.html#/register',
     });
     window.close();
     return (

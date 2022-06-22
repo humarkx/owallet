@@ -36,7 +36,6 @@ export async function request(
     adapter: fetchAdapter
   });
 
-
   try {
     const response = await restInstance.post('/', {
       jsonrpc: '2.0',

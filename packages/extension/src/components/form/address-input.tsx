@@ -8,7 +8,7 @@ import {
   Modal,
   InputGroup,
   Button,
-  FormText
+  FormText,
 } from 'reactstrap';
 import { AddressBookPage } from '../../pages/setting/address-book';
 
@@ -22,7 +22,8 @@ import {
   ENSNotSupportedError,
   ENSFailedToFetchError,
   ENSIsFetchingError,
-  IIBCChannelConfig
+  IIBCChannelConfig,
+  InvalidEvmAddressError,
 } from '@owallet/hooks';
 import { observer } from 'mobx-react-lite';
 import { useIntl } from 'react-intl';
@@ -49,7 +50,7 @@ export const AddressInput: FunctionComponent<AddressInputProps> = observer(
     className,
     label,
     disableAddressBook,
-    disabled = false
+    disabled = false,
   }) => {
     const intl = useIntl();
 
@@ -74,15 +75,19 @@ export const AddressInput: FunctionComponent<AddressInputProps> = observer(
             return;
           case InvalidBech32Error:
             return intl.formatMessage({
-              id: 'input.recipient.error.invalid-bech32'
+              id: 'input.recipient.error.invalid-bech32',
+            });
+          case InvalidEvmAddressError:
+            return intl.formatMessage({
+              id: 'input.recipient.error.invalid-evm-address',
             });
           case ENSNotSupportedError:
             return intl.formatMessage({
-              id: 'input.recipient.error.ens-not-supported'
+              id: 'input.recipient.error.ens-not-supported',
             });
           case ENSFailedToFetchError:
             return intl.formatMessage({
-              id: 'input.recipient.error.ens-failed-to-fetch'
+              id: 'input.recipient.error.ens-failed-to-fetch',
             });
           case ENSIsFetchingError:
             return;
@@ -102,7 +107,7 @@ export const AddressInput: FunctionComponent<AddressInputProps> = observer(
         if (memoConfig) {
           memoConfig.setMemo(memo);
         }
-      }
+      },
     };
 
     return (

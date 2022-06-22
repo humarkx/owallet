@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 
 import classnames from 'classnames';
 import styleCoinInput from './coin-input.module.scss';
@@ -11,7 +11,7 @@ import {
   FormFeedback,
   FormGroup,
   Input,
-  Label
+  Label,
 } from 'reactstrap';
 import { observer } from 'mobx-react-lite';
 import {
@@ -20,7 +20,7 @@ import {
   ZeroAmountError,
   NegativeAmountError,
   InsufficientAmountError,
-  IAmountConfig
+  IAmountConfig,
 } from '@owallet/hooks';
 import { CoinPretty, Dec, DecUtils, Int } from '@owallet/unit';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -42,20 +42,6 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
   ({ amountConfig, className, label, disableAllBalance }) => {
     const intl = useIntl();
 
-    const { queriesStore } = useStore();
-    const queryBalances = queriesStore
-      .get(amountConfig.chainId)
-      .queryBalances.getQueryBech32Address(amountConfig.sender);
-
-    const queryBalance = queryBalances.balances.find(
-      (bal) =>
-        amountConfig.sendCurrency.coinMinimalDenom ===
-        bal.currency.coinMinimalDenom
-    );
-    const balance = queryBalance
-      ? queryBalance.balance
-      : new CoinPretty(amountConfig.sendCurrency, new Int(0));
-
     const [randomId] = useState(() => {
       const bytes = new Uint8Array(4);
       crypto.getRandomValues(bytes);
@@ -71,19 +57,19 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
             return;
           case InvalidNumberAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.invalid-number'
+              id: 'input.amount.error.invalid-number',
             });
           case ZeroAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.is-zero'
+              id: 'input.amount.error.is-zero',
             });
           case NegativeAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.is-negative'
+              id: 'input.amount.error.is-negative',
             });
           case InsufficientAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.insufficient'
+              id: 'input.amount.error.insufficient',
             });
           default:
             return intl.formatMessage({ id: 'input.amount.error.unknown' });
@@ -92,6 +78,39 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
     }, [intl, error]);
 
     const [isOpenTokenSelector, setIsOpenTokenSelector] = useState(false);
+    const { queriesStore, chainStore, accountStore } = useStore();
+    const accountInfo = accountStore.getAccount(chainStore.current.chainId);
+    const queries = queriesStore.get(chainStore.current.chainId);
+    const queryBalances = queriesStore
+      .get(amountConfig.chainId)
+      .queryBalances.getQueryBech32Address(amountConfig.sender);
+    const [balance, setBalance] = useState(
+      new CoinPretty(amountConfig.sendCurrency, new Int(0))
+    );
+
+    // let balance = new CoinPretty(amountConfig.sendCurrency, new Int(0));
+
+    useEffect(() => {
+      if (chainStore.current.networkType === 'evm') {
+        if (!accountInfo.evmosHexAddress) return null;
+
+        const evmBalance = queries.evm.queryEvmBalance.getQueryBalance(
+          accountInfo.evmosHexAddress
+        ).balance;
+        setBalance(evmBalance);
+      } else {
+        const queryBalance = queryBalances.balances.find(
+          (bal) =>
+            amountConfig.sendCurrency.coinMinimalDenom ===
+            bal.currency.coinMinimalDenom
+        );
+        setBalance(
+          queryBalance
+            ? queryBalance.balance
+            : new CoinPretty(amountConfig.sendCurrency, new Int(0))
+        );
+      }
+    }, []);
 
     const selectableCurrencies = amountConfig.sendableCurrencies
       .filter((cur) => {
@@ -119,7 +138,7 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
           <ButtonDropdown
             id={`selector-${randomId}`}
             className={classnames(styleCoinInput.tokenSelector, {
-              disabled: amountConfig.fraction === 1
+              disabled: amountConfig.fraction === 1,
             })}
             isOpen={isOpenTokenSelector}
             toggle={() => setIsOpenTokenSelector((value) => !value)}
@@ -169,7 +188,7 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
                     styleCoinInput.balance,
                     styleCoinInput.clickable,
                     {
-                      [styleCoinInput.clicked]: amountConfig.isMax
+                      [styleCoinInput.clicked]: amountConfig.isMax,
                     }
                   )}
                   onClick={(e) => {

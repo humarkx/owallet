@@ -7,5 +7,5 @@
 
 DIR="$( cd "$( dirname "$0" )" && pwd -P )"
 
-cp ${DIR}/BleTransport.d.ts ${DIR}/../node_modules/@ledgerhq/react-native-hw-transport-ble/lib/BleTransport.d.ts
-cp ${DIR}/BleTransport.js ${DIR}/../node_modules/@ledgerhq/react-native-hw-transport-ble/lib/BleTransport.js
+cp /c/Users/84327/Desktop/owallet/packages/mobile/scripts/BleTransport.d.ts /c/Users/84327/Desktop/owallet/packages/mobile/node_modules/@ledgerhq/react-native-hw-transport-ble/lib/BleTransport.d.ts
+cp /c/Users/84327/Desktop/owallet/packages/mobile/scripts/BleTransport.js /c/Users/84327/Desktop/owallet/packages/mobile/node_modules/@ledgerhq/react-native-hw-transport-ble/lib/BleTransport.js

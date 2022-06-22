@@ -5,7 +5,7 @@ import {
   PubKeySecp256k1,
   RNG
 } from '@owallet/crypto';
-import { fetchAdapter, KVStore } from '@owallet/common';
+import { KVStore } from '@owallet/common';
 import { LedgerService } from '../ledger';
 import { BIP44HDPath, CommonCrypto, ExportKeyRingData } from './types';
 import { ChainInfo } from '@owallet/types';
@@ -198,8 +198,8 @@ export class KeyRing {
 
     return this.keyStore.coinTypeForChain
       ? this.keyStore.coinTypeForChain[
-      ChainIdHelper.parse(chainId).identifier
-      ] ?? defaultCoinType
+          ChainIdHelper.parse(chainId).identifier
+        ] ?? defaultCoinType
       : defaultCoinType;
   }
 
@@ -445,7 +445,7 @@ export class KeyRing {
     return (
       this.keyStore.coinTypeForChain &&
       this.keyStore.coinTypeForChain[
-      ChainIdHelper.parse(chainId).identifier
+        ChainIdHelper.parse(chainId).identifier
       ] !== undefined
     );
   }
@@ -458,7 +458,7 @@ export class KeyRing {
     if (
       this.keyStore.coinTypeForChain &&
       this.keyStore.coinTypeForChain[
-      ChainIdHelper.parse(chainId).identifier
+        ChainIdHelper.parse(chainId).identifier
       ] !== undefined
     ) {
       throw new Error('Coin type already set');
@@ -764,6 +764,7 @@ export class KeyRing {
         signer,
         'latest'
       ]);
+      
       const finalMessage = { ...message, nonce };
 
       const opts: TransactionOptions = { common: customCommon } as any;
@@ -978,7 +979,7 @@ export class KeyRing {
         bip44HDPath: keyStore.bip44HDPath,
         selected: this.keyStore
           ? KeyRing.getKeyStoreId(keyStore) ===
-          KeyRing.getKeyStoreId(this.keyStore)
+            KeyRing.getKeyStoreId(this.keyStore)
           : false
       });
     }

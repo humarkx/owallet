@@ -19,7 +19,7 @@ import { RNEnv, RNRouterUI, RNMessageRequesterInternal } from "../router";
 import { ChainStore } from "./chain";
 import { DeepLinkStore } from "./deeplink";
 import EventEmitter from "eventemitter3";
-import { OWallet } from "@owallet/provider";
+import { Ethereum, OWallet } from "@owallet/provider";
 import { KeychainStore } from "./keychain";
 import { WalletConnectStore } from "./wallet-connect";
 import { FeeType } from "@owallet/hooks";
@@ -152,6 +152,10 @@ export class RootStore {
           getOWallet: async () => {
             // TOOD: Set version for OWallet API
             return new OWallet("", "core", new RNMessageRequesterInternal());
+          },
+          getEthereum: async () => {
+            // TOOD: Set version for OWallet API
+            return new Ethereum("", "core", this.chainStore.current.chainId, new RNMessageRequesterInternal());
           },
         },
         chainOpts: this.chainStore.chainInfos.map((chainInfo) => {

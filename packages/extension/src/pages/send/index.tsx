@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import {
   AddressInput,
   FeeButtons,
@@ -13,6 +13,7 @@ import { observer } from 'mobx-react-lite';
 
 import style from './style.module.scss';
 import { useNotification } from '../../components/notification';
+import { RNMessageRequesterExternal } from '../../../../mobile/src/router';
 
 import { useIntl } from 'react-intl';
 import { Button } from 'reactstrap';
@@ -23,6 +24,8 @@ import queryString from 'querystring';
 import { useSendTxConfig } from '@owallet/hooks';
 import { fitPopupWindow, openPopupWindow, PopupSize } from '@owallet/popup';
 import { EthereumEndpoint } from '@owallet/common';
+import { KeyRing, KeyRingService, RequestSignEthereumMsg } from '@owallet/background';
+import { Ethereum } from '@owallet/provider';
 
 export const SendPage: FunctionComponent = observer(() => {
   const history = useHistory();
@@ -54,14 +57,16 @@ export const SendPage: FunctionComponent = observer(() => {
   const current = chainStore.current;
 
   const accountInfo = accountStore.getAccount(current.chainId);
-
+ 
   const sendConfigs = useSendTxConfig(
     chainStore,
     current.chainId,
     accountInfo.msgOpts.send,
     accountInfo.bech32Address,
     queriesStore.get(current.chainId).queryBalances,
-    EthereumEndpoint
+    EthereumEndpoint,
+    chainStore.current.networkType === "evm" && queriesStore.get(current.chainId).evm.queryEvmBalance,
+    chainStore.current.networkType === "evm" && accountInfo.evmosHexAddress,
   );
 
   useEffect(() => {
@@ -104,6 +109,29 @@ export const SendPage: FunctionComponent = observer(() => {
     sendConfigs.gasConfig.getError() ??
     sendConfigs.feeConfig.getError();
   const txStateIsValid = sendConfigError == null;
+
+  // const [ethereum] = useState(
+  //   () =>
+  //     new Ethereum(
+  //       DeviceInfo.getVersion(),
+  //       'core',
+  //       chainStore.current.chainId,
+  //       new RNMessageRequesterExternal(() => {
+  //         if (!webviewRef.current) {
+  //           throw new Error('Webview not initialized yet');
+  //         }
+
+  //         if (!currentURL) {
+  //           throw new Error('Current URL is empty');
+  //         }
+
+  //         return {
+  //           url: currentURL,
+  //           origin: new URL(currentURL).origin,
+  //         };
+  //       })
+  //     )
+  // );
 
   return (
     <HeaderLayout
@@ -175,6 +203,10 @@ export const SendPage: FunctionComponent = observer(() => {
           e.preventDefault();
 
           if (accountInfo.isReadyToSendMsgs && txStateIsValid) {
+            if (chainStore.current.networkType === "evm") {
+              // const keyRingService = new KeyRing;
+              
+            }
             try {
               const stdFee = sendConfigs.feeConfig.toStdFee();
               (window as any).accountInfo = accountInfo;
@@ -206,6 +238,7 @@ export const SendPage: FunctionComponent = observer(() => {
               if (!isDetachedPage) {
                 history.replace('/');
               }
+              console.log(e.message,'zzzzzzzzzz')
               notification.push({
                 type: 'warning',
                 placement: 'top-center',

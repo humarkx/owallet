@@ -6,7 +6,7 @@ import {
   IGasConfig
 } from './types';
 import { TxChainSetter } from './chain';
-import { ChainGetter, CoinPrimitive } from '@owallet/stores';
+import { ChainGetter, CoinPrimitive, ObservableQueryEvmBalance } from '@owallet/stores';
 import { action, computed, makeObservable, observable } from 'mobx';
 import { Coin, CoinPretty, Dec, DecUtils, Int } from '@owallet/unit';
 import { Currency } from '@owallet/types';
@@ -20,8 +20,14 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
   @observable.ref
   protected queryBalances: ObservableQueryBalances;
 
+  @observable.ref
+  protected queryEvmBalances?: ObservableQueryEvmBalance;
+
   @observable
   protected _sender: string;
+
+  @observable
+  protected _senderEvm?: string;
 
   @observable
   protected _feeType: FeeType | undefined = undefined;
@@ -49,12 +55,16 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
     queryBalances: ObservableQueryBalances,
     protected readonly amountConfig: IAmountConfig,
     protected readonly gasConfig: IGasConfig,
-    additionAmountToNeedFee: boolean = true
+    additionAmountToNeedFee: boolean = true,
+    queryEvmBalances?: ObservableQueryEvmBalance,
+    senderEvm?: string,
   ) {
     super(chainGetter, initialChainId);
 
     this._sender = sender;
+    this._senderEvm = senderEvm;
     this.queryBalances = queryBalances;
+    this.queryEvmBalances = queryEvmBalances;
     this.additionAmountToNeedFee = additionAmountToNeedFee;
 
     makeObservable(this);
@@ -71,8 +81,18 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
   }
 
   @action
+  setQueryEvmBalances(queryEvmBalances: ObservableQueryEvmBalance) {
+    this.queryEvmBalances = queryEvmBalances;
+  }
+
+  @action
   setSender(sender: string) {
     this._sender = sender;
+  }
+
+  @action
+  setSenderEvm(senderEvm: string) {
+    this._senderEvm = senderEvm;
   }
 
   @action
@@ -209,30 +229,45 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
     }
 
     if (need.amount.gt(new Int(0))) {
-      const bal = this.queryBalances
-        .getQueryBech32Address(this._sender)
-        .balances.find((bal) => {
-          return bal.currency.coinMinimalDenom === need.denom;
-        });
+      if (this.chainInfo.networkType === "evm") {
+        const balance = this.queryEvmBalances.getQueryBalance(this._senderEvm).balance;
+        if (!balance) return new InsufficientFeeError('insufficient fee');
+        else if (
+          balance
+            .toDec()
+            .mul(
+              DecUtils.getTenExponentNInPrecisionRange(balance.currency.coinDecimals)
+            )
+            .truncate()
+            .lt(need.amount)
+        ) return new InsufficientFeeError('insufficient fee');
+      }
+      else {
+        const bal = this.queryBalances
+          .getQueryBech32Address(this._sender)
+          .balances.find((bal) => {
+            return bal.currency.coinMinimalDenom === need.denom;
+          });
 
-      if (!bal) {
-        return new InsufficientFeeError('insufficient fee');
-      } else if (!bal.response && !bal.error) {
-        // If fetching balance doesn't have the response nor error,
-        // assume it is not loaded from KVStore(cache).
-        return new NotLoadedFeeError(
-          `${bal.currency.coinDenom} is not loaded yet`
-        );
-      } else if (
-        bal.balance
-          .toDec()
-          .mul(
-            DecUtils.getTenExponentNInPrecisionRange(bal.currency.coinDecimals)
-          )
-          .truncate()
-          .lt(need.amount)
-      ) {
-        return new InsufficientFeeError('insufficient fee');
+        if (!bal) {
+          return new InsufficientFeeError('insufficient fee');
+        } else if (!bal.response && !bal.error) {
+          // If fetching balance doesn't have the response nor error,
+          // assume it is not loaded from KVStore(cache).
+          return new NotLoadedFeeError(
+            `${bal.currency.coinDenom} is not loaded yet`
+          );
+        } else if (
+          bal.balance
+            .toDec()
+            .mul(
+              DecUtils.getTenExponentNInPrecisionRange(bal.currency.coinDecimals)
+            )
+            .truncate()
+            .lt(need.amount)
+        ) {
+          return new InsufficientFeeError('insufficient fee');
+        }
       }
     }
   }
@@ -254,7 +289,9 @@ export const useFeeConfig = (
   queryBalances: ObservableQueryBalances,
   amountConfig: IAmountConfig,
   gasConfig: IGasConfig,
-  additionAmountToNeedFee: boolean = true
+  additionAmountToNeedFee: boolean = true,
+  queryEvmBalances?: ObservableQueryEvmBalance,
+  senderEvm?: string,
 ) => {
   const [config] = useState(
     () =>
@@ -265,13 +302,17 @@ export const useFeeConfig = (
         queryBalances,
         amountConfig,
         gasConfig,
-        additionAmountToNeedFee
+        additionAmountToNeedFee,
+        queryEvmBalances,
+        senderEvm,
       )
   );
   config.setChain(chainId);
   config.setQueryBalances(queryBalances);
   config.setSender(sender);
   config.setAdditionAmountToNeedFee(additionAmountToNeedFee);
+  config.setQueryEvmBalances(queryEvmBalances);
+  config.setSenderEvm(senderEvm);
 
   return config;
 };

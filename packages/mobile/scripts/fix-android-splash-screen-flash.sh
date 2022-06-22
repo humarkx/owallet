@@ -6,7 +6,7 @@
 # To fix this problem, this script just replaces some codes on the expo's splash screen module to handle the background as image.
 
 DIR="$( cd "$( dirname "$0" )" && pwd -P )"
-
-cp ${DIR}/splashscreen_background.png ${DIR}/../node_modules/expo-splash-screen/android/src/main/res/drawable/splashscreen_background.png
-cp ${DIR}/SplashScreenView.kt ${DIR}/../node_modules/expo-splash-screen/android/src/main/java/expo/modules/splashscreen/SplashScreenView.kt
-cp ${DIR}/NativeResourcesBasedSplashScreenViewProvider.kt ${DIR}/../node_modules/expo-splash-screen/android/src/main/java/expo/modules/splashscreen/NativeResourcesBasedSplashScreenViewProvider.kt
+echo $DIR
+cp /c/Users/84327/Desktop/owallet/packages/mobile/scripts/splashscreen_background.png /c/Users/84327/Desktop/owallet/packages/mobile/node_modules/expo-splash-screen/android/src/main/res/drawable/splashscreen_background.png
+cp /c/Users/84327/Desktop/owallet/packages/mobile/scripts/SplashScreenView.kt /c/Users/84327/Desktop/owallet/packages/mobile/node_modules/expo-splash-screen/android/src/main/java/expo/modules/splashscreen/SplashScreenView.kt
+cp /c/Users/84327/Desktop/owallet/packages/mobile/scripts/NativeResourcesBasedSplashScreenViewProvider.kt /c/Users/84327/Desktop/owallet/packages/mobile/node_modules/expo-splash-screen/android/src/main/java/expo/modules/splashscreen/NativeResourcesBasedSplashScreenViewProvider.kt

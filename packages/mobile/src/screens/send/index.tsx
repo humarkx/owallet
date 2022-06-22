@@ -53,7 +53,9 @@ export const SendScreen: FunctionComponent = observer(() => {
     account.msgOpts['send'],
     account.bech32Address,
     queries.queryBalances,
-    EthereumEndpoint
+    EthereumEndpoint,
+    queries.evm.queryEvmBalance,
+    account?.evmosHexAddress || null,
   );
 
   useEffect(() => {
