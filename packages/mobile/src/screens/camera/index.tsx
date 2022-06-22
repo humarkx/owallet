@@ -4,7 +4,7 @@ import { useStyle } from '../../styles';
 import { PageWithView } from '../../components/page';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 import { Button } from '../../components/button';
 import { Share, StyleSheet, View } from 'react-native';
 import { ChainSelectorModal } from '../../components/chain-selector';
@@ -25,7 +25,7 @@ import {
 import { AddressBookConfigMap, useRegisterConfig } from '@owallet/hooks';
 import { AsyncKVStore } from '../../common';
 import { useFocusEffect } from '@react-navigation/native';
-import { isValidDomain } from '../../utils/helper';
+import { checkValidDomain } from '../../utils/helper';
 
 export const CameraScreen: FunctionComponent = observer(() => {
   const { chainStore, walletConnectStore, keyRingStore } = useStore();
@@ -72,7 +72,7 @@ export const CameraScreen: FunctionComponent = observer(() => {
             setIsLoading(true);
 
             try {
-              if (isValidDomain(data.toLowerCase())) {
+              if (checkValidDomain(data.toLowerCase())) {
                 console.log('data', data);
                 navigation.navigate('Browser', { url: data.toLowerCase() });
 

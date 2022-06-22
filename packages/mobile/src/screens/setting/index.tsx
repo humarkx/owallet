@@ -1,23 +1,23 @@
-import React, { FunctionComponent } from "react";
-import { PageWithScrollViewInBottomTabView } from "../../components/page";
-import { RightArrow, SettingItem, SettingSectionTitle } from "./components";
+import React, { FunctionComponent } from 'react';
+import { PageWithScrollViewInBottomTabView } from '../../components/page';
+import { RightArrow, SettingItem, SettingSectionTitle } from './components';
 // import { SettingSelectAccountItem } from "./items/select-account";
-import { useSmartNavigation } from "../../navigation";
+import { useSmartNavigation } from '../../navigation.provider';
 // import { SettingFiatCurrencyItem } from "./items/fiat-currency";
-import { SettingBiometricLockItem } from "./items/biometric-lock";
-import { observer } from "mobx-react-lite";
-import { useStore } from "../../stores";
-import { SettingRemoveAccountItem } from "./items/remove-account";
-import { canShowPrivateData } from "./screens/view-private-data";
-import { SettingViewPrivateDataItem } from "./items/view-private-data";
-import { useStyle } from "../../styles";
+import { SettingBiometricLockItem } from './items/biometric-lock';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../stores';
+import { SettingRemoveAccountItem } from './items/remove-account';
+import { canShowPrivateData } from './screens/view-private-data';
+import { SettingViewPrivateDataItem } from './items/view-private-data';
+import { useStyle } from '../../styles';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Platform,
-} from "react-native";
+  Platform
+} from 'react-native';
 
 export const SettingScreen: FunctionComponent = observer(() => {
   const { keychainStore, keyRingStore, priceStore } = useStore();
@@ -32,94 +32,94 @@ export const SettingScreen: FunctionComponent = observer(() => {
 
   return (
     <PageWithScrollViewInBottomTabView
-      backgroundColor={style.get("color-setting-screen-background").color}
+      backgroundColor={style.get('color-setting-screen-background').color}
     >
       <View
         style={style.flatten(
           [
-            "background-color-primary-400",
-            "padding-24",
-            "padding-top-76",
-            "padding-bottom-101",
-            "margin-bottom-102",
+            'background-color-primary-400',
+            'padding-24',
+            'padding-top-76',
+            'padding-bottom-101',
+            'margin-bottom-102'
           ],
           [
-            Platform.OS === "ios" && "border-radius-top-left-32",
-            Platform.OS === "ios" && "border-radius-top-right-32",
+            Platform.OS === 'ios' && 'border-radius-top-left-32',
+            Platform.OS === 'ios' && 'border-radius-top-right-32'
           ]
         )}
       >
-        <Text style={style.flatten(["h1", "color-white"])}>Setting</Text>
+        <Text style={style.flatten(['h1', 'color-white'])}>Setting</Text>
         <View
           style={[
             style.flatten([
-              "absolute-fill",
-              "background-color-white",
-              "height-160",
-              "margin-24",
-              "margin-top-150",
-              "border-radius-12",
-              "padding-20",
+              'absolute-fill',
+              'background-color-white',
+              'height-160',
+              'margin-24',
+              'margin-top-150',
+              'border-radius-12',
+              'padding-20'
             ]),
-            styles.shadowBox,
+            styles.shadowBox
           ]}
         >
           <TouchableOpacity
             onPress={() =>
-              smartNavigation.navigateSmart("SettingSelectAccount", {})
+              smartNavigation.navigateSmart('SettingSelectAccount', {})
             }
             style={style.flatten([
-              "flex-row",
-              "items-center",
-              "justify-between",
+              'flex-row',
+              'items-center',
+              'justify-between'
             ])}
           >
             <View>
               <Text
                 style={style.flatten([
-                  "text-caption2",
-                  "color-text-black-very-low",
+                  'text-caption2',
+                  'color-text-black-very-low'
                 ])}
               >
                 WALLET
               </Text>
               <Text
                 style={style.flatten([
-                  "text-caption2",
-                  "color-black",
-                  "font-bold",
-                  "subtitle1",
+                  'text-caption2',
+                  'color-black',
+                  'font-bold',
+                  'subtitle1'
                 ])}
               >
                 {selected
-                  ? selected.meta?.name || "Keplr Account"
-                  : "No Account"}
+                  ? selected.meta?.name || 'Keplr Account'
+                  : 'No Account'}
               </Text>
             </View>
             <RightArrow />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
-              smartNavigation.navigateSmart("SettingSelectLang", {})
+              smartNavigation.navigateSmart('SettingSelectLang', {})
             }
             style={style.flatten([
-              "flex-row",
-              "items-center",
-              "justify-between",
-              "padding-top-20",
+              'flex-row',
+              'items-center',
+              'justify-between',
+              'padding-top-20'
             ])}
           >
             <View>
               <Text
                 style={style.flatten([
-                  "text-caption2",
-                  "color-text-black-very-low",
+                  'text-caption2',
+                  'color-text-black-very-low'
                 ])}
               >
                 CURRENCY
               </Text>
               <Text
-                style={style.flatten(["text-caption2", "color-black", "body1"])}
+                style={style.flatten(['text-caption2', 'color-black', 'body1'])}
               >
                 {priceStore.defaultVsCurrency.toUpperCase()}
               </Text>
@@ -131,13 +131,13 @@ export const SettingScreen: FunctionComponent = observer(() => {
       {/* <SettingSelectAccountItem /> */}
       {/* <SettingFiatCurrencyItem topBorder={true} /> */}
       {/* <SettingSectionTitle title="General" /> */}
-      <View style={style.flatten(["background-color-white"])}>
+      <View style={style.flatten(['background-color-white'])}>
         <SettingSectionTitle title="Security" />
         <SettingItem
           label="Address book"
           right={<RightArrow />}
           onPress={() => {
-            smartNavigation.navigateSmart("AddressBook", {});
+            smartNavigation.navigateSmart('AddressBook', {});
           }}
         />
 
@@ -154,12 +154,12 @@ export const SettingScreen: FunctionComponent = observer(() => {
           label="About OWallet"
           // topBorder={true}
           onPress={() => {
-            smartNavigation.navigateSmart("Setting.Version", {});
+            smartNavigation.navigateSmart('Setting.Version', {});
           }}
         />
         <SettingRemoveAccountItem topBorder={true} />
         {/* Mock element for padding bottom */}
-        <View style={style.get("height-16")} />
+        <View style={style.get('height-16')} />
       </View>
     </PageWithScrollViewInBottomTabView>
   );
@@ -167,12 +167,12 @@ export const SettingScreen: FunctionComponent = observer(() => {
 
 const styles = StyleSheet.create({
   shadowBox: {
-    shadowColor: "#ccc",
+    shadowColor: '#ccc',
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 3
     },
     shadowRadius: 5,
-    shadowOpacity: 1.0,
-  },
+    shadowOpacity: 1.0
+  }
 });

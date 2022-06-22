@@ -1,18 +1,7 @@
 import { ImageSourcePropType } from 'react-native';
-import { ORAIDEX_DEV_URL } from 'react-native-dotenv';
+import { INJECTED_PROVIDER_URL } from '@env';
 
-export const OraiDexUrl = ORAIDEX_DEV_URL || 'https://staging.oraidex.io';
-export const OraiDexProdUrl = 'https://oraidex.io';
-
-export const injectableUrl = [
-  'https://oraidex.io/',
-  'https://staging.oraidex.io/',
-  'https://app.osmosis.zone/',
-  'https://scan.orai.io/',
-  'https://testnet.scan.orai.io/',
-  'https://bignft.web.app/',
-  'https://re.bignft.app/'
-];
+export const InjectedProviderUrl = INJECTED_PROVIDER_URL;
 
 export type DAppInfo = {
   name: string;
@@ -29,25 +18,25 @@ export const DAppInfos: DAppInfo[] = [
     name: 'Oraidex',
     thumbnail: oraiThumbnail,
     uri: 'https://oraidex.io',
-    logo: oraiLogo,
+    logo: oraiLogo
   },
   {
     name: 'Oraidex',
     thumbnail: oraiThumbnail,
     uri: 'https://staging.oraidex.io',
-    logo: oraiLogo,
+    logo: oraiLogo
   },
   {
     name: 'Osmosis',
     thumbnail: require('../../assets/image/webpage/bgomosis.png'),
     uri: 'https://app.osmosis.zone',
-    logo: require('../../assets/image/webpage/osmosis_logo.png'),
+    logo: require('../../assets/image/webpage/osmosis_logo.png')
   },
   {
     name: 'Oraiscan testnet',
     thumbnail: oraiThumbnail,
     uri: 'https://testnet.scan.orai.io',
-    logo: oraiLogo,
+    logo: oraiLogo
   },
   // {
   //   name: 'Balcony Subnet',
@@ -59,15 +48,15 @@ export const DAppInfos: DAppInfo[] = [
     name: 'Balcony Subnet',
     thumbnail: balconyLogo,
     uri: 'https://re.bignft.app',
-    logo: balconyLogo,
-  },
+    logo: balconyLogo
+  }
 ];
 
-if (__DEV__ && ORAIDEX_DEV_URL) {
+if (__DEV__) {
   DAppInfos.push({
     name: 'Oraidex',
     thumbnail: oraiThumbnail,
-    uri: ORAIDEX_DEV_URL,
-    logo: oraiLogo,
+    uri: InjectedProviderUrl,
+    logo: oraiLogo
   });
 }

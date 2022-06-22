@@ -4,25 +4,25 @@ import { Image, View } from 'react-native';
 import { useStyle } from '../../styles';
 import { TextInput } from '../../components/input';
 // import { Button } from "../../components/button";
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 // import { PageWithScrollView } from "../../components/page";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { useNavigation } from '@react-navigation/core';
 import {
   BrowserSectionTitle,
-  BrowserSectionModal,
+  BrowserSectionModal
 } from './components/section-title';
 import {
   SearchIcon,
   RightArrowIcon,
   HomeIcon,
   ThreeDotsIcon,
-  TabIcon,
+  TabIcon
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { ORAIDEX_DEV_URL } from 'react-native-dotenv';
-import { isValidDomain } from '../../utils/helper';
+import { checkValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
+import { InjectedProviderUrl } from './config';
 
 export const Browser: FunctionComponent<any> = (props) => {
   const style = useStyle();
@@ -92,7 +92,7 @@ export const Browser: FunctionComponent<any> = (props) => {
       deepLinkUriStore.updateDeepLink('');
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Browser',
-        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io',
+        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io'
       });
     }
   };
@@ -101,39 +101,41 @@ export const Browser: FunctionComponent<any> = (props) => {
 
   useEffect(() => {
     setTimeout(function () {
-      if (isValidDomain(props?.route?.params?.url?.toLowerCase())) {
+      if (checkValidDomain(props?.route?.params?.url?.toLowerCase())) {
         smartNavigation.pushSmart('Web.dApp', {
           name: 'Browser',
           uri:
             props.route.params.url?.toLowerCase().indexOf('http') >= 0
               ? props.route.params.url?.toLowerCase()
-              : 'https://' + props.route.params?.url?.toLowerCase(),
+              : 'https://' + props.route.params?.url?.toLowerCase()
         });
       }
     }, 1000);
   }, [props, smartNavigation, url]);
 
   const onHandleUrl = () => {
-    if (isValidDomain(url?.toLowerCase())) {
+    console.log('valid', checkValidDomain(url?.toLowerCase()));
+
+    if (checkValidDomain(url?.toLowerCase())) {
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Browser',
         uri:
           url?.toLowerCase().indexOf('http') >= 0
             ? url?.toLowerCase()
-            : 'https://' + url?.toLowerCase(),
+            : 'https://' + url?.toLowerCase()
       });
     } else {
-      let uri = `https://www.google.com/search?q=${url ?? ''}`
-      if (ORAIDEX_DEV_URL) uri = ORAIDEX_DEV_URL;
+      let uri = `https://www.google.com/search?q=${url ?? ''}`;
+      if (InjectedProviderUrl) uri = InjectedProviderUrl;
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
-        // uri: `https://www.google.com/search?q=${url ?? ''}`,
-        uri,
+        // uri: `https://staging.oraidex.io/ethereum`,
+        uri
       });
     }
   };
 
-  const onPress = (type) => {
+  const onPress = (type: any) => {
     try {
       switch (type) {
         case 'settings':
@@ -161,7 +163,7 @@ export const Browser: FunctionComponent<any> = (props) => {
           <Image
             style={{
               width: '100%',
-              height: '100%',
+              height: '100%'
             }}
             fadeDuration={0}
             resizeMode="stretch"
@@ -171,7 +173,7 @@ export const Browser: FunctionComponent<any> = (props) => {
             containerStyle={{
               width: '100%',
               padding: 20,
-              marginTop: -50,
+              marginTop: -50
             }}
             inputStyle={style.flatten([
               'flex-row',
@@ -180,7 +182,7 @@ export const Browser: FunctionComponent<any> = (props) => {
               'padding-20',
               'border-radius-16',
               'border-width-4',
-              'border-color-border-pink',
+              'border-color-border-pink'
             ])}
             returnKeyType={'next'}
             placeholder={'Search website'}
@@ -207,7 +209,7 @@ export const Browser: FunctionComponent<any> = (props) => {
             bottom: 80,
             borderRadius: 4,
             zIndex: 1,
-            padding: 10,
+            padding: 10
           }}
         >
           <BrowserSectionModal
