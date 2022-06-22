@@ -1,1177 +1,779 @@
-// import { Crypto, KeyStore } from './crypto';
-// import {
-//   Mnemonic,
-//   PrivKeySecp256k1,
-//   PubKeySecp256k1,
-//   RNG
-// } from '@owallet/crypto';
-// import { fetchAdapter, KVStore } from '@owallet/common';
-// import { LedgerService } from '../ledger';
-// import { BIP44HDPath, CommonCrypto, ExportKeyRingData } from './types';
-// import { ChainInfo } from '@owallet/types';
-// import { Env } from '@owallet/router';
-
-// import { Buffer } from 'buffer';
-// import { ChainIdHelper } from '@owallet/cosmos';
-
-// import { Wallet } from '@ethersproject/wallet';
-// import * as BytesUtils from '@ethersproject/bytes';
-// import { ETH } from '@tharsis/address-converter';
-// import { keccak256 } from '@ethersproject/keccak256';
-// import Common from '@ethereumjs/common';
-// import { TransactionOptions, Transaction } from 'ethereumjs-tx';
-// import { request } from '../tx';
-
-// export enum KeyRingStatus {
-//   NOTLOADED,
-//   EMPTY,
-//   LOCKED,
-//   UNLOCKED
-// }
-
-// export interface Key {
-//   algo: string;
-//   pubKey: Uint8Array;
-//   address: Uint8Array;
-//   isNanoLedger: boolean;
-// }
-
-// export type MultiKeyStoreInfoElem = Pick<
-//   KeyStore,
-//   'version' | 'type' | 'meta' | 'bip44HDPath' | 'coinTypeForChain'
-// >;
-// export type MultiKeyStoreInfo = MultiKeyStoreInfoElem[];
-// export type MultiKeyStoreInfoWithSelectedElem = MultiKeyStoreInfoElem & {
-//   selected: boolean;
-// };
-// export type MultiKeyStoreInfoWithSelected = MultiKeyStoreInfoWithSelectedElem[];
-
-// const KeyStoreKey = 'key-store';
-// const KeyMultiStoreKey = 'key-multi-store';
-
-// /*
-//  Keyring stores keys in persistent backround.
-//  And, this manages the state, crypto, address, signing and so on...
-//  */
-// export class KeyRing {
-//   private cached: Map<string, Uint8Array> = new Map();
-
-//   private loaded: boolean;
-
-//   /**
-//    * Keyring can have either private key or mnemonic.
-//    * If keyring has private key, it can't set the BIP 44 path.
-//    */
-//   private _privateKey?: Uint8Array;
-//   private _mnemonic?: string;
-//   private _ledgerPublicKey?: Uint8Array;
-
-//   private keyStore: KeyStore | null;
-
-//   private multiKeyStore: KeyStore[];
-
-//   private password: string = '';
-
-//   constructor(
-//     private readonly embedChainInfos: ChainInfo[],
-//     private readonly kvStore: KVStore,
-//     private readonly ledgerKeeper: LedgerService,
-//     private readonly rng: RNG,
-//     private readonly crypto: CommonCrypto
-//   ) {
-//     this.loaded = false;
-//     this.keyStore = null;
-//     this.multiKeyStore = [];
-//   }
-
-//   public static getTypeOfKeyStore(
-//     keyStore: Omit<KeyStore, 'crypto'>
-//   ): 'mnemonic' | 'privateKey' | 'ledger' {
-//     const type = keyStore.type;
-//     if (type == null) {
-//       return 'mnemonic';
-//     }
-
-//     if (type !== 'mnemonic' && type !== 'privateKey' && type !== 'ledger') {
-//       throw new Error('Invalid type of key store');
-//     }
-
-//     return type;
-//   }
-
-//   public get type(): 'mnemonic' | 'privateKey' | 'ledger' | 'none' {
-//     if (!this.keyStore) {
-//       return 'none';
-//     } else {
-//       return KeyRing.getTypeOfKeyStore(this.keyStore);
-//     }
-//   }
-
-//   public isLocked(): boolean {
-//     return (
-//       this.privateKey == null &&
-//       this.mnemonic == null &&
-//       this.ledgerPublicKey == null
-//     );
-//   }
-
-//   private get privateKey(): Uint8Array | undefined {
-//     return this._privateKey;
-//   }
-
-//   private set privateKey(privateKey: Uint8Array | undefined) {
-//     this._privateKey = privateKey;
-//     this._mnemonic = undefined;
-//     this._ledgerPublicKey = undefined;
-//     this.cached = new Map();
-//   }
-
-//   private get mnemonic(): string | undefined {
-//     return this._mnemonic;
-//   }
-
-//   private set mnemonic(mnemonic: string | undefined) {
-//     this._mnemonic = mnemonic;
-//     this._privateKey = undefined;
-//     this._ledgerPublicKey = undefined;
-//     this.cached = new Map();
-//   }
-
-//   private get ledgerPublicKey(): Uint8Array | undefined {
-//     return this._ledgerPublicKey;
-//   }
-
-//   private set ledgerPublicKey(publicKey: Uint8Array | undefined) {
-//     this._mnemonic = undefined;
-//     this._privateKey = undefined;
-//     this._ledgerPublicKey = publicKey;
-//     this.cached = new Map();
-//   }
-
-//   public get status(): KeyRingStatus {
-//     if (!this.loaded) {
-//       return KeyRingStatus.NOTLOADED;
-//     }
-
-//     if (!this.keyStore) {
-//       return KeyRingStatus.EMPTY;
-//     } else if (!this.isLocked()) {
-//       return KeyRingStatus.UNLOCKED;
-//     } else {
-//       return KeyRingStatus.LOCKED;
-//     }
-//   }
-
-//   public getKeyStoreCoinType(chainId: string): number | undefined {
-//     if (!this.keyStore) {
-//       return undefined;
-//     }
-
-//     if (!this.keyStore.coinTypeForChain) {
-//       return undefined;
-//     }
-
-//     return this.keyStore.coinTypeForChain[
-//       ChainIdHelper.parse(chainId).identifier
-//     ];
-//   }
-
-//   public getKey(chainId: string, defaultCoinType: number): Key {
-//     return this.loadKey(this.computeKeyStoreCoinType(chainId, defaultCoinType));
-//   }
-
-//   public getKeyStoreMeta(key: string): string {
-//     if (!this.keyStore || this.keyStore.meta == null) {
-//       return '';
-//     }
-
-//     return this.keyStore.meta[key] ?? '';
-//   }
-
-//   public computeKeyStoreCoinType(
-//     chainId: string,
-//     defaultCoinType: number
-//   ): number {
-//     if (!this.keyStore) {
-//       throw new Error('Key Store is empty');
-//     }
-
-//     return this.keyStore.coinTypeForChain
-//       ? this.keyStore.coinTypeForChain[
-//       ChainIdHelper.parse(chainId).identifier
-//       ] ?? defaultCoinType
-//       : defaultCoinType;
-//   }
-
-//   public getKeyFromCoinType(coinType: number): Key {
-//     return this.loadKey(coinType);
-//   }
-
-//   public async createMnemonicKey(
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     mnemonic: string,
-//     password: string,
-//     meta: Record<string, string>,
-//     bip44HDPath: BIP44HDPath
-//   ): Promise<{
-//     status: KeyRingStatus;
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//   }> {
-//     if (this.status !== KeyRingStatus.EMPTY) {
-//       throw new Error('Key ring is not loaded or not empty');
-//     }
-
-//     this.mnemonic = mnemonic;
-//     this.keyStore = await KeyRing.CreateMnemonicKeyStore(
-//       this.rng,
-//       this.crypto,
-//       kdf,
-//       mnemonic,
-//       password,
-//       await this.assignKeyStoreIdMeta(meta),
-//       bip44HDPath
-//     );
-//     this.password = password;
-//     this.multiKeyStore.push(this.keyStore);
-
-//     await this.save();
-
-//     return {
-//       status: this.status,
-//       multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
-//     };
-//   }
-
-//   public async createPrivateKey(
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     privateKey: Uint8Array,
-//     password: string,
-//     meta: Record<string, string>
-//   ): Promise<{
-//     status: KeyRingStatus;
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//   }> {
-//     if (this.status !== KeyRingStatus.EMPTY) {
-//       throw new Error('Key ring is not loaded or not empty');
-//     }
-
-//     this.privateKey = privateKey;
-//     this.keyStore = await KeyRing.CreatePrivateKeyStore(
-//       this.rng,
-//       this.crypto,
-//       kdf,
-//       privateKey,
-//       password,
-//       await this.assignKeyStoreIdMeta(meta)
-//     );
-//     this.password = password;
-//     this.multiKeyStore.push(this.keyStore);
-
-//     await this.save();
-
-//     return {
-//       status: this.status,
-//       multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
-//     };
-//   }
-
-//   public async createLedgerKey(
-//     env: Env,
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     password: string,
-//     meta: Record<string, string>,
-//     bip44HDPath: BIP44HDPath
-//   ): Promise<{
-//     status: KeyRingStatus;
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//   }> {
-//     if (this.status !== KeyRingStatus.EMPTY) {
-//       throw new Error('Key ring is not loaded or not empty');
-//     }
-
-//     // Get public key first
-//     this.ledgerPublicKey = await this.ledgerKeeper.getPublicKey(
-//       env,
-//       bip44HDPath
-//     );
-
-//     const keyStore = await KeyRing.CreateLedgerKeyStore(
-//       this.rng,
-//       this.crypto,
-//       kdf,
-//       this.ledgerPublicKey,
-//       password,
-//       await this.assignKeyStoreIdMeta(meta),
-//       bip44HDPath
-//     );
-
-//     this.password = password;
-//     this.keyStore = keyStore;
-//     this.multiKeyStore.push(this.keyStore);
-
-//     await this.save();
-
-//     return {
-//       status: this.status,
-//       multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
-//     };
-//   }
-
-//   public lock() {
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     this.mnemonic = undefined;
-//     this.privateKey = undefined;
-//     this.ledgerPublicKey = undefined;
-//     this.password = '';
-//   }
-
-//   public async unlock(password: string) {
-//     if (!this.keyStore || this.type === 'none') {
-//       throw new Error('Key ring not initialized');
-//     }
-
-//     if (this.type === 'mnemonic') {
-//       // If password is invalid, error will be thrown.
-//       this.mnemonic = Buffer.from(
-//         await Crypto.decrypt(this.crypto, this.keyStore, password)
-//       ).toString();
-//     } else if (this.type === 'privateKey') {
-//       // If password is invalid, error will be thrown.
-//       this.privateKey = Buffer.from(
-//         Buffer.from(
-//           await Crypto.decrypt(this.crypto, this.keyStore, password)
-//         ).toString(),
-//         'hex'
-//       );
-//     } else if (this.type === 'ledger') {
-//       this.ledgerPublicKey = Buffer.from(
-//         Buffer.from(
-//           await Crypto.decrypt(this.crypto, this.keyStore, password)
-//         ).toString(),
-//         'hex'
-//       );
-//     } else {
-//       throw new Error('Unexpected type of keyring');
-//     }
-
-//     this.password = password;
-//   }
-
-//   public async save() {
-//     await this.kvStore.set<KeyStore>(KeyStoreKey, this.keyStore);
-//     await this.kvStore.set<KeyStore[]>(KeyMultiStoreKey, this.multiKeyStore);
-//   }
-
-//   public async restore() {
-//     const keyStore = await this.kvStore.get<KeyStore>(KeyStoreKey);
-//     if (!keyStore) {
-//       this.keyStore = null;
-//     } else {
-//       this.keyStore = keyStore;
-//     }
-//     const multiKeyStore = await this.kvStore.get<KeyStore[]>(KeyMultiStoreKey);
-//     if (!multiKeyStore) {
-//       // Restore the multi keystore if key store exist but multi key store is empty.
-//       // This case will occur if extension is updated from the prior version that doesn't support the multi key store.
-//       // This line ensures the backward compatibility.
-//       if (keyStore) {
-//         keyStore.meta = await this.assignKeyStoreIdMeta({});
-//         this.multiKeyStore = [keyStore];
-//       } else {
-//         this.multiKeyStore = [];
-//       }
-//       await this.save();
-//     } else {
-//       this.multiKeyStore = multiKeyStore;
-//     }
-
-//     let hasLegacyKeyStore = false;
-//     // In prior of version 1.2, bip44 path didn't tie with the keystore, and bip44 exists on the chain info.
-//     // But, after some chain matures, they decided the bip44 path's coin type.
-//     // So, some chain can have the multiple bip44 coin type (one is the standard coin type and other is the legacy coin type).
-//     // We should support the legacy coin type, so we determined that the coin type ties with the keystore.
-//     // To decrease the barrier of existing users, set the alternative coin type by force if the keystore version is prior than 1.2.
-//     if (this.keyStore) {
-//       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//       // @ts-ignore
-//       if (this.keyStore.version === '1' || this.keyStore.version === '1.1') {
-//         hasLegacyKeyStore = true;
-//         this.updateLegacyKeyStore(this.keyStore);
-//       }
-//     }
-//     for (const keyStore of this.multiKeyStore) {
-//       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//       // @ts-ignore
-//       if (keyStore.version === '1' || keyStore.version === '1.1') {
-//         hasLegacyKeyStore = true;
-//         this.updateLegacyKeyStore(keyStore);
-//       }
-//     }
-//     if (hasLegacyKeyStore) {
-//       await this.save();
-//     }
-
-//     this.loaded = true;
-//   }
-
-//   private updateLegacyKeyStore(keyStore: KeyStore) {
-//     keyStore.version = '1.2';
-//     for (const chainInfo of this.embedChainInfos) {
-//       const coinType = (() => {
-//         if (
-//           chainInfo.alternativeBIP44s &&
-//           chainInfo.alternativeBIP44s.length > 0
-//         ) {
-//           return chainInfo.alternativeBIP44s[0].coinType;
-//         } else {
-//           return chainInfo.bip44.coinType;
-//         }
-//       })();
-//       keyStore.coinTypeForChain = {
-//         ...keyStore.coinTypeForChain,
-//         [ChainIdHelper.parse(chainInfo.chainId).identifier]: coinType
-//       };
-//     }
-//   }
-
-//   public isKeyStoreCoinTypeSet(chainId: string): boolean {
-//     if (!this.keyStore) {
-//       throw new Error('Empty key store');
-//     }
-
-//     return (
-//       this.keyStore.coinTypeForChain &&
-//       this.keyStore.coinTypeForChain[
-//       ChainIdHelper.parse(chainId).identifier
-//       ] !== undefined
-//     );
-//   }
-
-//   public async setKeyStoreCoinType(chainId: string, coinType: number) {
-//     if (!this.keyStore) {
-//       throw new Error('Empty key store');
-//     }
-
-//     if (
-//       this.keyStore.coinTypeForChain &&
-//       this.keyStore.coinTypeForChain[
-//       ChainIdHelper.parse(chainId).identifier
-//       ] !== undefined
-//     ) {
-//       throw new Error('Coin type already set');
-//     }
-
-//     this.keyStore.coinTypeForChain = {
-//       ...this.keyStore.coinTypeForChain,
-//       [ChainIdHelper.parse(chainId).identifier]: coinType
-//     };
-
-//     const keyStoreInMulti = this.multiKeyStore.find((keyStore) => {
-//       return (
-//         KeyRing.getKeyStoreId(keyStore) ===
-//         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//         KeyRing.getKeyStoreId(this.keyStore!)
-//       );
-//     });
-
-//     if (keyStoreInMulti) {
-//       keyStoreInMulti.coinTypeForChain = {
-//         ...this.keyStore.coinTypeForChain
-//       };
-//     }
-
-//     await this.save();
-//   }
-
-//   public async deleteKeyRing(
-//     index: number,
-//     password: string
-//   ): Promise<{
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//     keyStoreChanged: boolean;
-//   }> {
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     if (this.password !== password) {
-//       throw new Error('Invalid password');
-//     }
-
-//     const keyStore = this.multiKeyStore[index];
-
-//     if (!keyStore) {
-//       throw new Error('Empty key store');
-//     }
-
-//     const multiKeyStore = this.multiKeyStore
-//       .slice(0, index)
-//       .concat(this.multiKeyStore.slice(index + 1));
-
-//     // Make sure that password is valid.
-//     await Crypto.decrypt(this.crypto, keyStore, password);
-
-//     let keyStoreChanged = false;
-//     if (this.keyStore) {
-//       // If key store is currently selected key store
-//       if (
-//         KeyRing.getKeyStoreId(keyStore) === KeyRing.getKeyStoreId(this.keyStore)
-//       ) {
-//         // If there is a key store left
-//         if (multiKeyStore.length > 0) {
-//           // Lock key store at first
-//           this.lock();
-//           // Select first key store
-//           this.keyStore = multiKeyStore[0];
-//           // And unlock it
-//           await this.unlock(password);
-//         } else {
-//           // Else clear keyring.
-//           this.keyStore = null;
-//           this.mnemonic = undefined;
-//           this.privateKey = undefined;
-//         }
-
-//         keyStoreChanged = true;
-//       }
-//     }
-
-//     this.multiKeyStore = multiKeyStore;
-//     await this.save();
-//     return {
-//       multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
-//       keyStoreChanged
-//     };
-//   }
-
-//   public async updateNameKeyRing(
-//     index: number,
-//     name: string
-//   ): Promise<MultiKeyStoreInfoWithSelected> {
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     const keyStore = this.multiKeyStore[index];
-
-//     if (!keyStore) {
-//       throw new Error('Empty key store');
-//     }
-
-//     keyStore.meta = { ...keyStore.meta, name: name };
-
-//     // If select key store and changed store are same, sync keystore
-//     if (
-//       this.keyStore &&
-//       KeyRing.getKeyStoreId(this.keyStore) === KeyRing.getKeyStoreId(keyStore)
-//     ) {
-//       this.keyStore = keyStore;
-//     }
-//     await this.save();
-//     return this.getMultiKeyStoreInfo();
-//   }
-
-//   private loadKey(coinType: number): Key {
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     if (!this.keyStore) {
-//       throw new Error('Key Store is empty');
-//     }
-
-//     if (this.keyStore.type === 'ledger') {
-//       if (!this.ledgerPublicKey) {
-//         throw new Error('Ledger public key not set');
-//       }
-
-//       const pubKey = new PubKeySecp256k1(this.ledgerPublicKey);
-
-//       return {
-//         algo: 'secp256k1',
-//         pubKey: pubKey.toBytes(),
-//         address: pubKey.getAddress(),
-//         isNanoLedger: true
-//       };
-//     } else {
-//       const privKey = this.loadPrivKey(coinType);
-//       const pubKey = privKey.getPubKey();
-
-//       if (coinType === 60) {
-//         // For Ethereum Key-Gen Only:
-//         const wallet = new Wallet(privKey.toBytes());
-//         const ethereumAddress = ETH.decoder(wallet.address);
-
-//         return {
-//           algo: 'ethsecp256k1',
-//           pubKey: pubKey.toBytes(),
-//           address: ethereumAddress,
-//           isNanoLedger: false
-//         };
-//       }
-
-//       // Default
-//       return {
-//         algo: 'secp256k1',
-//         pubKey: pubKey.toBytes(),
-//         address: pubKey.getAddress(),
-//         isNanoLedger: false
-//       };
-//     }
-//   }
-
-//   private loadPrivKey(coinType: number): PrivKeySecp256k1 {
-//     if (
-//       this.status !== KeyRingStatus.UNLOCKED ||
-//       this.type === 'none' ||
-//       !this.keyStore
-//     ) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     const bip44HDPath = KeyRing.getKeyStoreBIP44Path(this.keyStore);
-
-//     if (this.type === 'mnemonic') {
-//       const path = `m/44'/${coinType}'/${bip44HDPath.account}'/${bip44HDPath.change}/${bip44HDPath.addressIndex}`;
-//       const cachedKey = this.cached.get(path);
-//       if (cachedKey) {
-//         return new PrivKeySecp256k1(cachedKey);
-//       }
-
-//       if (!this.mnemonic) {
-//         throw new Error(
-//           'Key store type is mnemonic and it is unlocked. But, mnemonic is not loaded unexpectedly'
-//         );
-//       }
-
-//       const privKey = Mnemonic.generateWalletFromMnemonic(this.mnemonic, path);
-
-//       this.cached.set(path, privKey);
-//       return new PrivKeySecp256k1(privKey);
-//     } else if (this.type === 'privateKey') {
-//       // If key store type is private key, path will be ignored.
-
-//       if (!this.privateKey) {
-//         throw new Error(
-//           'Key store type is private key and it is unlocked. But, private key is not loaded unexpectedly'
-//         );
-//       }
-
-//       return new PrivKeySecp256k1(this.privateKey);
-//     } else {
-//       throw new Error('Unexpected type of keyring');
-//     }
-//   }
-
-//   public async sign(
-//     env: Env,
-//     chainId: string,
-//     defaultCoinType: number,
-//     message: Uint8Array
-//   ): Promise<Uint8Array> {
-//     console.log(
-//       'ready to sign the transaction FOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO'
-//     );
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     if (!this.keyStore) {
-//       throw new Error('Key Store is empty');
-//     }
-//     // get here
-//     // Sign with Evmos/Ethereum
-//     const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-//     if (coinType === 60) {
-//       return this.signEthereum(chainId, defaultCoinType, message);
-//     }
-
-//     if (this.keyStore.type === 'ledger') {
-//       const pubKey = this.ledgerPublicKey;
-
-//       if (!pubKey) {
-//         throw new Error('Ledger public key is not initialized');
-//       }
-
-//       console.log('ledger goes here');
-
-//       return await this.ledgerKeeper.sign(
-//         env,
-//         KeyRing.getKeyStoreBIP44Path(this.keyStore),
-//         pubKey,
-//         message
-//       );
-//     } else {
-//       const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-
-//       const privKey = this.loadPrivKey(coinType);
-//       return privKey.sign(message);
-//     }
-//   }
-
-//   validateChainId(chainId: string): number {
-//     // chain id example: kawaii_6886-1. If chain id input is already a number in string => parse it immediately
-//     if (isNaN(parseInt(chainId))) {
-//       const firstSplit = chainId.split('_')[1];
-//       if (firstSplit) {
-//         const chainId = parseInt(firstSplit.split('-')[0]);
-//         return chainId;
-//       }
-//       throw new Error('Invalid chain id. Please try again');
-//     }
-//     return parseInt(chainId);
-//   }
-
-//   public async signAndBroadcastEthereum(
-//     chainId: string,
-//     coinType: number,
-//     rpc: string,
-//     message: object
-//   ): Promise<string> {
-//     console.log('sign raw ethereum');
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     if (!this.keyStore) {
-//       throw new Error('Key Store is empty');
-//     }
-
-//     const cType = this.computeKeyStoreCoinType(chainId, coinType);
-//     if (cType !== 60) {
-//       throw new Error(
-//         'Invalid coin type passed in to Ethereum signing (expected 60)'
-//       );
-//     }
-
-//     if (this.keyStore.type === 'ledger') {
-//       // TODO: Ethereum Ledger Integration
-//       throw new Error('Ethereum signing with Ledger is not yet supported');
-//     } else {
-//       const privKey = this.loadPrivKey(coinType);
-//       const chainIdNumber = this.validateChainId(chainId);
-//       const customCommon = Common.custom({
-//         name: chainId,
-//         networkId: chainIdNumber,
-//         chainId: chainIdNumber
-//       });
-
-//       const signer = new Wallet(privKey.toBytes()).address;
-//       const nonce = await request(rpc, 'eth_getTransactionCount', [
-//         signer,
-//         'latest'
-//       ]);
-//       const finalMessage = { ...message, nonce };
-
-//       const opts: TransactionOptions = { common: customCommon } as any;
-//       const tx = new Transaction(finalMessage, opts);
-//       tx.sign(Buffer.from(privKey.toBytes()));
-
-//       // // validate signer. Has to get substring(2) to remove 0x
-//       // if (
-//       //   !tx.getSenderAddress().equals(Buffer.from(signer.substring(2), 'hex'))
-//       // ) {
-//       //   throw new Error('Signer mismatched');
-//       // }
-
-//       const serializedTx = tx.serialize();
-//       const rawTxHex = '0x' + serializedTx.toString('hex');
-
-//       const response = await request(rpc, 'eth_sendRawTransaction', [rawTxHex]);
-//       return response;
-//     }
-//   }
-
-//   public async signEthereum(
-//     chainId: string,
-//     defaultCoinType: number,
-//     message: Uint8Array
-//   ): Promise<Uint8Array> {
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     if (!this.keyStore) {
-//       throw new Error('Key Store is empty');
-//     }
-
-//     if (this.keyStore.type === 'ledger') {
-//       // TODO: Ethereum Ledger Integration
-//       throw new Error('Ethereum signing with Ledger is not yet supported');
-//     } else {
-//       const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-//       if (coinType !== 60) {
-//         throw new Error(
-//           'Invalid coin type passed in to Ethereum signing (expected 60)'
-//         );
-//       }
-
-//       const privKey = this.loadPrivKey(coinType);
-
-//       // Use ether js to sign Ethereum tx
-//       const ethWallet = new Wallet(privKey.toBytes());
-
-//       const signature = ethWallet._signingKey().signDigest(keccak256(message));
-//       const splitSignature = BytesUtils.splitSignature(signature);
-//       return BytesUtils.arrayify(
-//         BytesUtils.concat([splitSignature.r, splitSignature.s])
-//       );
-//     }
-//   }
-
-//   // Show private key or mnemonic key if password is valid.
-//   public async showKeyRing(index: number, password: string): Promise<string> {
-//     if (this.status !== KeyRingStatus.UNLOCKED) {
-//       throw new Error('Key ring is not unlocked');
-//     }
-
-//     if (this.password !== password) {
-//       throw new Error('Invalid password');
-//     }
-
-//     const keyStore = this.multiKeyStore[index];
-
-//     if (!keyStore) {
-//       throw new Error('Empty key store');
-//     }
-
-//     if (keyStore.type === 'mnemonic') {
-//       // If password is invalid, error will be thrown.
-//       return Buffer.from(
-//         await Crypto.decrypt(this.crypto, keyStore, password)
-//       ).toString();
-//     } else {
-//       // If password is invalid, error will be thrown.
-//       return Buffer.from(
-//         await Crypto.decrypt(this.crypto, keyStore, password)
-//       ).toString();
-//     }
-//   }
-
-//   public get canSetPath(): boolean {
-//     return this.type === 'mnemonic' || this.type === 'ledger';
-//   }
-
-//   public async addMnemonicKey(
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     mnemonic: string,
-//     meta: Record<string, string>,
-//     bip44HDPath: BIP44HDPath
-//   ): Promise<{
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//   }> {
-//     if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-//       throw new Error('Key ring is locked or not initialized');
-//     }
-
-//     const keyStore = await KeyRing.CreateMnemonicKeyStore(
-//       this.rng,
-//       this.crypto,
-//       kdf,
-//       mnemonic,
-//       this.password,
-//       await this.assignKeyStoreIdMeta(meta),
-//       bip44HDPath
-//     );
-//     this.multiKeyStore.push(keyStore);
-
-//     await this.save();
-//     return {
-//       multiKeyStoreInfo: this.getMultiKeyStoreInfo()
-//     };
-//   }
-
-//   public async addPrivateKey(
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     privateKey: Uint8Array,
-//     meta: Record<string, string>
-//   ): Promise<{
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//   }> {
-//     if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-//       throw new Error('Key ring is locked or not initialized');
-//     }
-
-//     const keyStore = await KeyRing.CreatePrivateKeyStore(
-//       this.rng,
-//       this.crypto,
-//       kdf,
-//       privateKey,
-//       this.password,
-//       await this.assignKeyStoreIdMeta(meta)
-//     );
-//     this.multiKeyStore.push(keyStore);
-
-//     await this.save();
-//     return {
-//       multiKeyStoreInfo: this.getMultiKeyStoreInfo()
-//     };
-//   }
-
-//   public async addLedgerKey(
-//     env: Env,
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     meta: Record<string, string>,
-//     bip44HDPath: BIP44HDPath
-//   ): Promise<{
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//   }> {
-//     if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-//       throw new Error('Key ring is locked or not initialized');
-//     }
-
-//     // Get public key first
-//     const publicKey = await this.ledgerKeeper.getPublicKey(env, bip44HDPath);
-
-//     const keyStore = await KeyRing.CreateLedgerKeyStore(
-//       this.rng,
-//       this.crypto,
-//       kdf,
-//       publicKey,
-//       this.password,
-//       await this.assignKeyStoreIdMeta(meta),
-//       bip44HDPath
-//     );
-
-//     this.multiKeyStore.push(keyStore);
-
-//     await this.save();
-//     return {
-//       multiKeyStoreInfo: this.getMultiKeyStoreInfo()
-//     };
-//   }
-
-//   public async changeKeyStoreFromMultiKeyStore(index: number): Promise<{
-//     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-//   }> {
-//     if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-//       throw new Error('Key ring is locked or not initialized');
-//     }
-
-//     const keyStore = this.multiKeyStore[index];
-//     if (!keyStore) {
-//       throw new Error('Invalid keystore');
-//     }
-
-//     this.keyStore = keyStore;
-
-//     await this.unlock(this.password);
-
-//     await this.save();
-//     return {
-//       multiKeyStoreInfo: this.getMultiKeyStoreInfo()
-//     };
-//   }
-
-//   public getMultiKeyStoreInfo(): MultiKeyStoreInfoWithSelected {
-//     const result: MultiKeyStoreInfoWithSelected = [];
-
-//     for (const keyStore of this.multiKeyStore) {
-//       result.push({
-//         version: keyStore.version,
-//         type: keyStore.type,
-//         meta: keyStore.meta,
-//         coinTypeForChain: keyStore.coinTypeForChain,
-//         bip44HDPath: keyStore.bip44HDPath,
-//         selected: this.keyStore
-//           ? KeyRing.getKeyStoreId(keyStore) ===
-//           KeyRing.getKeyStoreId(this.keyStore)
-//           : false
-//       });
-//     }
-
-//     return result;
-//   }
-
-//   checkPassword(password: string): boolean {
-//     if (!this.password) {
-//       throw new Error('Keyring is locked');
-//     }
-
-//     return this.password === password;
-//   }
-
-//   async exportKeyRingDatas(password: string): Promise<ExportKeyRingData[]> {
-//     if (!this.password) {
-//       throw new Error('Keyring is locked');
-//     }
-
-//     if (this.password !== password) {
-//       throw new Error('Invalid password');
-//     }
-
-//     const result: ExportKeyRingData[] = [];
-
-//     for (const keyStore of this.multiKeyStore) {
-//       const type = keyStore.type ?? 'mnemonic';
-
-//       switch (type) {
-//         case 'mnemonic': {
-//           const mnemonic = Buffer.from(
-//             await Crypto.decrypt(this.crypto, keyStore, password)
-//           ).toString();
-
-//           result.push({
-//             bip44HDPath: keyStore.bip44HDPath ?? {
-//               account: 0,
-//               change: 0,
-//               addressIndex: 0
-//             },
-//             coinTypeForChain: keyStore.coinTypeForChain,
-//             key: mnemonic,
-//             meta: keyStore.meta ?? {},
-//             type: 'mnemonic'
-//           });
-
-//           break;
-//         }
-//         case 'privateKey': {
-//           const privateKey = Buffer.from(
-//             await Crypto.decrypt(this.crypto, keyStore, password)
-//           ).toString();
-
-//           result.push({
-//             bip44HDPath: keyStore.bip44HDPath ?? {
-//               account: 0,
-//               change: 0,
-//               addressIndex: 0
-//             },
-//             coinTypeForChain: keyStore.coinTypeForChain,
-//             key: privateKey,
-//             meta: keyStore.meta ?? {},
-//             type: 'privateKey'
-//           });
-
-//           break;
-//         }
-//       }
-//     }
-
-//     return result;
-//   }
-
-//   private static async CreateMnemonicKeyStore(
-//     rng: RNG,
-//     crypto: CommonCrypto,
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     mnemonic: string,
-//     password: string,
-//     meta: Record<string, string>,
-//     bip44HDPath: BIP44HDPath
-//   ): Promise<KeyStore> {
-//     return await Crypto.encrypt(
-//       rng,
-//       crypto,
-//       kdf,
-//       'mnemonic',
-//       mnemonic,
-//       password,
-//       meta,
-//       bip44HDPath
-//     );
-//   }
-
-//   private static async CreatePrivateKeyStore(
-//     rng: RNG,
-//     crypto: CommonCrypto,
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     privateKey: Uint8Array,
-//     password: string,
-//     meta: Record<string, string>
-//   ): Promise<KeyStore> {
-//     return await Crypto.encrypt(
-//       rng,
-//       crypto,
-//       kdf,
-//       'privateKey',
-//       Buffer.from(privateKey).toString('hex'),
-//       password,
-//       meta
-//     );
-//   }
-
-//   private static async CreateLedgerKeyStore(
-//     rng: RNG,
-//     crypto: CommonCrypto,
-//     kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-//     publicKey: Uint8Array,
-//     password: string,
-//     meta: Record<string, string>,
-//     bip44HDPath: BIP44HDPath
-//   ): Promise<KeyStore> {
-//     return await Crypto.encrypt(
-//       rng,
-//       crypto,
-//       kdf,
-//       'ledger',
-//       Buffer.from(publicKey).toString('hex'),
-//       password,
-//       meta,
-//       bip44HDPath
-//     );
-//   }
-
-//   private async assignKeyStoreIdMeta(meta: { [key: string]: string }): Promise<{
-//     [key: string]: string;
-//   }> {
-//     // `__id__` is used to distinguish the key store.
-//     return Object.assign({}, meta, {
-//       __id__: (await this.getIncrementalNumber()).toString()
-//     });
-//   }
-
-//   private static getKeyStoreId(keyStore: KeyStore): string {
-//     const id = keyStore.meta?.__id__;
-//     if (!id) {
-//       throw new Error("Key store's id is empty");
-//     }
-
-//     return id;
-//   }
-
-//   private static getKeyStoreBIP44Path(keyStore: KeyStore): BIP44HDPath {
-//     if (!keyStore.bip44HDPath) {
-//       return {
-//         account: 0,
-//         change: 0,
-//         addressIndex: 0
-//       };
-//     }
-//     KeyRing.validateBIP44Path(keyStore.bip44HDPath);
-//     return keyStore.bip44HDPath;
-//   }
-
-//   public static validateBIP44Path(bip44Path: BIP44HDPath): void {
-//     if (!Number.isInteger(bip44Path.account) || bip44Path.account < 0) {
-//       throw new Error('Invalid account in hd path');
-//     }
-
-//     if (
-//       !Number.isInteger(bip44Path.change) ||
-//       !(bip44Path.change === 0 || bip44Path.change === 1)
-//     ) {
-//       throw new Error('Invalid change in hd path');
-//     }
-
-//     if (
-//       !Number.isInteger(bip44Path.addressIndex) ||
-//       bip44Path.addressIndex < 0
-//     ) {
-//       throw new Error('Invalid address index in hd path');
-//     }
-//   }
-
-//   private async getIncrementalNumber(): Promise<number> {
-//     let num = await this.kvStore.get<number>('incrementalNumber');
-//     if (num === undefined) {
-//       num = 0;
-//     }
-//     num++;
-
-//     await this.kvStore.set('incrementalNumber', num);
-//     return num;
-//   }
-// }
+import { MsgOpt } from './base';
+import { AccountEthSetBase, AccountEthSetOpts } from './base-eth';
+import { AppCurrency, OWalletSignOptions } from '@owallet/types';
+import { StdFee } from '@cosmjs/launchpad';
+import { DenomHelper } from '@owallet/common';
+import { Dec, DecUtils, Int } from '@owallet/unit';
+import { ChainIdHelper, cosmos, ibc } from '@owallet/cosmos';
+import { BondStatus } from '../query/cosmos/staking/types';
+import { HasCosmosQueries, QueriesSetBase, QueriesStore } from '../query';
+import { DeepReadonly } from 'utility-types';
+import { ChainGetter } from '../common';
+import Long from 'long';
+
+export interface HasEthereumAccount {
+  ethereum: DeepReadonly<EthereumAccount>;
+}
+
+export interface CosmosMsgOpts {
+  readonly send: {
+    readonly native: MsgOpt;
+  };
+  readonly ibcTransfer: MsgOpt;
+  readonly delegate: MsgOpt;
+  readonly undelegate: MsgOpt;
+  readonly redelegate: MsgOpt;
+  // The gas multiplication per rewards.
+  readonly withdrawRewards: MsgOpt;
+  readonly govVote: MsgOpt;
+}
+
+export class AccountWithEthereum
+  extends AccountEthSetBase<CosmosMsgOpts, HasCosmosQueries>
+  implements HasEthereumAccount
+{
+  public readonly ethereum: DeepReadonly<EthereumAccount>;
+
+  static readonly defaultMsgOpts: CosmosMsgOpts = {
+    send: {
+      native: {
+        type: 'cosmos-sdk/MsgSend',
+        gas: 80000,
+      },
+    },
+    ibcTransfer: {
+      type: 'cosmos-sdk/MsgTransfer',
+      gas: 450000,
+    },
+    delegate: {
+      type: 'cosmos-sdk/MsgDelegate',
+      gas: 250000,
+    },
+    undelegate: {
+      type: 'cosmos-sdk/MsgUndelegate',
+      gas: 250000,
+    },
+    redelegate: {
+      type: 'cosmos-sdk/MsgBeginRedelegate',
+      gas: 250000,
+    },
+    // The gas multiplication per rewards.
+    withdrawRewards: {
+      type: 'cosmos-sdk/MsgWithdrawDelegationReward',
+      gas: 140000,
+    },
+    govVote: {
+      type: 'cosmos-sdk/MsgVote',
+      gas: 250000,
+    },
+  };
+
+  constructor(
+    protected readonly eventListener: {
+      addEventListener: (type: string, fn: () => unknown) => void;
+      removeEventListener: (type: string, fn: () => unknown) => void;
+    },
+    protected readonly chainGetter: ChainGetter,
+    protected readonly chainId: string,
+    protected readonly queriesStore: QueriesStore<
+      QueriesSetBase & HasCosmosQueries
+    >,
+    protected readonly opts: AccountEthSetOpts<CosmosMsgOpts>
+  ) {
+    super(eventListener, chainGetter, chainId, queriesStore, opts);
+
+    this.ethereum = new EthereumAccount(this, chainGetter, chainId, queriesStore);
+  }
+}
+
+export class EthereumAccount {
+  constructor(
+    protected readonly base: AccountEthSetBase<CosmosMsgOpts, HasCosmosQueries>,
+    protected readonly chainGetter: ChainGetter,
+    protected readonly chainId: string,
+    protected readonly queriesStore: QueriesStore<
+      QueriesSetBase & HasCosmosQueries
+    >
+  ) {
+    this.base.registerSendTokenFn(this.processSendToken.bind(this));
+  }
+
+  //send token
+  protected async processSendToken(
+    amount: string,
+    currency: AppCurrency,
+    recipient: string,
+    memo: string,
+    stdFee: Partial<StdFee>,
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+  ): Promise<boolean> {
+    console.log("PROCESS SEND TOKENNNNNNNNNN")
+    const denomHelper = new DenomHelper(currency.coinMinimalDenom);
+
+    switch (denomHelper.type) {
+      case 'native':
+        console.log("GET IN NATIVE!!!!!!!!!!!!!!!!!!!!!!!")
+        const actualAmount = (() => {
+          let dec = new Dec(amount);
+          dec = dec.mul(
+            DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+          );
+          return dec.truncate().toString();
+        })();
+
+        const msg = {
+          type: this.base.msgOpts.send.native.type,
+          value: {
+            from_address: this.base.bech32Address,
+            to_address: recipient,
+            amount: [
+              {
+                denom: currency.coinMinimalDenom,
+                amount: actualAmount,
+              },
+            ],
+          },
+        };
+
+        console.log('msg 1', msg);
+
+        await this.base.sendMsgs(
+          'send',
+          {
+            aminoMsgs: [msg],
+            protoMsgs: this.hasNoLegacyStdFeature()
+              ? [
+                  {
+                    type_url: '/cosmos.bank.v1beta1.MsgSend',
+                    value: cosmos.bank.v1beta1.MsgSend.encode({
+                      fromAddress: msg.value.from_address,
+                      toAddress: msg.value.to_address,
+                      amount: msg.value.amount,
+                    }).finish(),
+                  },
+                ]
+              : undefined,
+          },
+          memo,
+          {
+            amount: stdFee.amount ?? [],
+            gas: stdFee.gas ?? this.base.msgOpts.send.native.gas.toString(),
+          },
+          signOptions,
+          this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
+            if (tx.code == null || tx.code === 0) {
+              // After succeeding to send token, refresh the balance.
+              const queryBalance = this.queries.queryBalances
+                .getQueryBech32Address(this.base.bech32Address)
+                .balances.find((bal) => {
+                  return (
+                    bal.currency.coinMinimalDenom === currency.coinMinimalDenom
+                  );
+                });
+
+              if (queryBalance) {
+                queryBalance.fetch();
+              }
+            }
+          })
+        );
+        return true;
+    }
+
+    return false;
+  }
+
+  async sendIBCTransferMsg(
+    channel: {
+      portId: string;
+      channelId: string;
+      counterpartyChainId: string;
+    },
+    amount: string,
+    currency: AppCurrency,
+    recipient: string,
+    memo: string = '',
+    stdFee: Partial<StdFee> = {},
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+  ) {
+    if (new DenomHelper(currency.coinMinimalDenom).type !== 'native') {
+      throw new Error('Only native token can be sent via IBC');
+    }
+
+    const actualAmount = (() => {
+      let dec = new Dec(amount);
+      dec = dec.mul(
+        DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+      );
+      return dec.truncate().toString();
+    })();
+
+    const destinationBlockHeight = this.queriesStore
+      .get(channel.counterpartyChainId)
+      .cosmos.queryBlock.getBlock('latest');
+
+    await this.base.sendMsgs(
+      'ibcTransfer',
+      async () => {
+        // Wait until fetching complete.
+        await destinationBlockHeight.waitFreshResponse();
+
+        if (destinationBlockHeight.height.equals(new Int('0'))) {
+          throw new Error(
+            `Failed to fetch the latest block of ${channel.counterpartyChainId}`
+          );
+        }
+
+        const msg = {
+          type: this.base.msgOpts.ibcTransfer.type,
+          value: {
+            source_port: channel.portId,
+            source_channel: channel.channelId,
+            token: {
+              denom: currency.coinMinimalDenom,
+              amount: actualAmount,
+            },
+            sender: this.base.bech32Address,
+            receiver: recipient,
+            timeout_height: {
+              revision_number: ChainIdHelper.parse(
+                channel.counterpartyChainId
+              ).version.toString() as string | undefined,
+              // Set the timeout height as the current height + 150.
+              revision_height: destinationBlockHeight.height
+                .add(new Int('150'))
+                .toString(),
+            },
+          },
+        };
+
+        if (msg.value.timeout_height.revision_number === '0') {
+          delete msg.value.timeout_height.revision_number;
+        }
+
+        return {
+          aminoMsgs: [msg],
+          protoMsgs: [
+            {
+              type_url: '/ibc.applications.transfer.v1.MsgTransfer',
+              value: ibc.applications.transfer.v1.MsgTransfer.encode({
+                sourcePort: msg.value.source_port,
+                sourceChannel: msg.value.source_channel,
+                token: msg.value.token,
+                sender: msg.value.sender,
+                receiver: msg.value.receiver,
+                timeoutHeight: {
+                  revisionNumber: msg.value.timeout_height.revision_number
+                    ? Long.fromString(msg.value.timeout_height.revision_number)
+                    : null,
+                  revisionHeight: Long.fromString(
+                    msg.value.timeout_height.revision_height
+                  ),
+                },
+              }).finish(),
+            },
+          ],
+        };
+      },
+      memo,
+      {
+        amount: stdFee.amount ?? [],
+        gas: stdFee.gas ?? this.base.msgOpts.ibcTransfer.gas.toString(),
+      },
+      signOptions,
+      this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
+        if (tx.code == null || tx.code === 0) {
+          // After succeeding to send token, refresh the balance.
+          const queryBalance = this.queries.queryBalances
+            .getQueryBech32Address(this.base.bech32Address)
+            .balances.find((bal) => {
+              return (
+                bal.currency.coinMinimalDenom === currency.coinMinimalDenom
+              );
+            });
+
+          if (queryBalance) {
+            queryBalance.fetch();
+          }
+        }
+      })
+    );
+  }
+
+  /**
+   * Send `MsgDelegate` msg to the chain.
+   * @param amount Decimal number used by humans.
+   *               If amount is 0.1 and the stake currenct is uatom, actual amount will be changed to the 100000uatom.
+   * @param validatorAddress
+   * @param memo
+   * @param onFulfill
+   */
+  async sendDelegateMsg(
+    amount: string,
+    validatorAddress: string,
+    memo: string = '',
+    stdFee: Partial<StdFee> = {},
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+  ) {
+    const currency = this.chainGetter.getChain(this.chainId).stakeCurrency;
+
+    let dec = new Dec(amount);
+    dec = dec.mulTruncate(
+      DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+    );
+
+    const msg = {
+      type: this.base.msgOpts.delegate.type,
+      value: {
+        delegator_address: this.base.bech32Address,
+        validator_address: validatorAddress,
+        amount: {
+          denom: currency.coinMinimalDenom,
+          amount: dec.truncate().toString(),
+        },
+      },
+    };
+
+    await this.base.sendMsgs(
+      'delegate',
+      {
+        aminoMsgs: [msg],
+        protoMsgs: this.hasNoLegacyStdFeature()
+          ? [
+              {
+                type_url: '/cosmos.staking.v1beta1.MsgDelegate',
+                value: cosmos.staking.v1beta1.MsgDelegate.encode({
+                  delegatorAddress: msg.value.delegator_address,
+                  validatorAddress: msg.value.validator_address,
+                  amount: msg.value.amount,
+                }).finish(),
+              },
+            ]
+          : undefined,
+      },
+      memo,
+      {
+        amount: stdFee.amount ?? [],
+        gas: stdFee.gas ?? this.base.msgOpts.delegate.gas.toString(),
+      },
+      signOptions,
+      this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
+        if (tx.code == null || tx.code === 0) {
+          // After succeeding to delegate, refresh the validators and delegations, rewards.
+          this.queries.cosmos.queryValidators
+            .getQueryStatus(BondStatus.Bonded)
+            .fetch();
+          this.queries.cosmos.queryDelegations
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+          this.queries.cosmos.queryRewards
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+        }
+      })
+    );
+  }
+
+  /**
+   * Send `MsgUndelegate` msg to the chain.
+   * @param amount Decimal number used by humans.
+   *               If amount is 0.1 and the stake currenct is uatom, actual amount will be changed to the 100000uatom.
+   * @param validatorAddress
+   * @param memo
+   * @param onFulfill
+   */
+  async sendUndelegateMsg(
+    amount: string,
+    validatorAddress: string,
+    memo: string = '',
+    stdFee: Partial<StdFee> = {},
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+  ) {
+    const currency = this.chainGetter.getChain(this.chainId).stakeCurrency;
+
+    let dec = new Dec(amount);
+    dec = dec.mulTruncate(
+      DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+    );
+
+    const msg = {
+      type: this.base.msgOpts.undelegate.type,
+      value: {
+        delegator_address: this.base.bech32Address,
+        validator_address: validatorAddress,
+        amount: {
+          denom: currency.coinMinimalDenom,
+          amount: dec.truncate().toString(),
+        },
+      },
+    };
+
+    await this.base.sendMsgs(
+      'undelegate',
+      {
+        aminoMsgs: [msg],
+        protoMsgs: [
+          {
+            type_url: '/cosmos.staking.v1beta1.MsgUndelegate',
+            value: cosmos.staking.v1beta1.MsgUndelegate.encode({
+              delegatorAddress: msg.value.delegator_address,
+              validatorAddress: msg.value.validator_address,
+              amount: msg.value.amount,
+            }).finish(),
+          },
+        ],
+      },
+      memo,
+      {
+        amount: stdFee.amount ?? [],
+        gas: stdFee.gas ?? this.base.msgOpts.undelegate.gas.toString(),
+      },
+      signOptions,
+      this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
+        if (tx.code == null || tx.code === 0) {
+          // After succeeding to unbond, refresh the validators and delegations, unbonding delegations, rewards.
+          this.queries.cosmos.queryValidators
+            .getQueryStatus(BondStatus.Bonded)
+            .fetch();
+          this.queries.cosmos.queryDelegations
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+          this.queries.cosmos.queryUnbondingDelegations
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+          this.queries.cosmos.queryRewards
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+        }
+      })
+    );
+  }
+
+  /**
+   * Send `MsgBeginRedelegate` msg to the chain.
+   * @param amount Decimal number used by humans.
+   *               If amount is 0.1 and the stake currenct is uatom, actual amount will be changed to the 100000uatom.
+   * @param srcValidatorAddress
+   * @param dstValidatorAddress
+   * @param memo
+   * @param onFulfill
+   */
+  async sendBeginRedelegateMsg(
+    amount: string,
+    srcValidatorAddress: string,
+    dstValidatorAddress: string,
+    memo: string = '',
+    stdFee: Partial<StdFee> = {},
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+  ) {
+    const currency = this.chainGetter.getChain(this.chainId).stakeCurrency;
+
+    let dec = new Dec(amount);
+    dec = dec.mulTruncate(
+      DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+    );
+
+    const msg = {
+      type: this.base.msgOpts.redelegate.type,
+      value: {
+        delegator_address: this.base.bech32Address,
+        validator_src_address: srcValidatorAddress,
+        validator_dst_address: dstValidatorAddress,
+        amount: {
+          denom: currency.coinMinimalDenom,
+          amount: dec.truncate().toString(),
+        },
+      },
+    };
+
+    await this.base.sendMsgs(
+      'redelegate',
+      {
+        aminoMsgs: [msg],
+        protoMsgs: this.hasNoLegacyStdFeature()
+          ? [
+              {
+                type_url: '/cosmos.staking.v1beta1.MsgBeginRedelegate',
+                value: cosmos.staking.v1beta1.MsgBeginRedelegate.encode({
+                  delegatorAddress: msg.value.delegator_address,
+                  validatorSrcAddress: msg.value.validator_src_address,
+                  validatorDstAddress: msg.value.validator_dst_address,
+                  amount: msg.value.amount,
+                }).finish(),
+              },
+            ]
+          : undefined,
+      },
+      memo,
+      {
+        amount: stdFee.amount ?? [],
+        gas: stdFee.gas ?? this.base.msgOpts.redelegate.gas.toString(),
+      },
+      signOptions,
+      this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
+        if (tx.code == null || tx.code === 0) {
+          // After succeeding to redelegate, refresh the validators and delegations, rewards.
+          this.queries.cosmos.queryValidators
+            .getQueryStatus(BondStatus.Bonded)
+            .fetch();
+          this.queries.cosmos.queryDelegations
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+          this.queries.cosmos.queryRewards
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+        }
+      })
+    );
+  }
+
+  async sendWithdrawDelegationRewardMsgs(
+    validatorAddresses: string[],
+    memo: string = '',
+    stdFee: Partial<StdFee> = {},
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+  ) {
+    const msgs = validatorAddresses.map((validatorAddress) => {
+      return {
+        type: this.base.msgOpts.withdrawRewards.type,
+        value: {
+          delegator_address: this.base.bech32Address,
+          validator_address: validatorAddress,
+        },
+      };
+    });
+
+    await this.base.sendMsgs(
+      'withdrawRewards',
+      {
+        aminoMsgs: msgs,
+        protoMsgs: this.hasNoLegacyStdFeature()
+          ? msgs.map((msg) => {
+              return {
+                type_url:
+                  '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
+                value:
+                  cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward.encode(
+                    {
+                      delegatorAddress: msg.value.delegator_address,
+                      validatorAddress: msg.value.validator_address,
+                    }
+                  ).finish(),
+              };
+            })
+          : undefined,
+      },
+      memo,
+      {
+        amount: stdFee.amount ?? [],
+        gas:
+          stdFee.gas ??
+          (
+            this.base.msgOpts.withdrawRewards.gas * validatorAddresses.length
+          ).toString(),
+      },
+      signOptions,
+      this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
+        if (tx.code == null || tx.code === 0) {
+          // After succeeding to withdraw rewards, refresh rewards.
+          this.queries.cosmos.queryRewards
+            .getQueryBech32Address(this.base.bech32Address)
+            .fetch();
+        }
+      })
+    );
+  }
+
+  async sendGovVoteMsg(
+    proposalId: string,
+    option: 'Yes' | 'No' | 'Abstain' | 'NoWithVeto',
+    memo: string = '',
+    stdFee: Partial<StdFee> = {},
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+  ) {
+    const voteOption = (() => {
+      if (
+        this.chainGetter.getChain(this.chainId).features?.includes('stargate')
+      ) {
+        switch (option) {
+          case 'Yes':
+            return 1;
+          case 'Abstain':
+            return 2;
+          case 'No':
+            return 3;
+          case 'NoWithVeto':
+            return 4;
+        }
+      } else {
+        return option;
+      }
+    })();
+
+    const msg = {
+      type: this.base.msgOpts.govVote.type,
+      value: {
+        option: voteOption,
+        proposal_id: proposalId,
+        voter: this.base.bech32Address,
+      },
+    };
+
+    await this.base.sendMsgs(
+      'govVote',
+      {
+        aminoMsgs: [msg],
+        protoMsgs: this.hasNoLegacyStdFeature()
+          ? [
+              {
+                type_url: '/cosmos.gov.v1beta1.MsgVote',
+                value: cosmos.gov.v1beta1.MsgVote.encode({
+                  proposalId: Long.fromString(msg.value.proposal_id),
+                  voter: msg.value.voter,
+                  option: (() => {
+                    switch (msg.value.option) {
+                      case 'Yes':
+                      case 1:
+                        return cosmos.gov.v1beta1.VoteOption.VOTE_OPTION_YES;
+                      case 'Abstain':
+                      case 2:
+                        return cosmos.gov.v1beta1.VoteOption
+                          .VOTE_OPTION_ABSTAIN;
+                      case 'No':
+                      case 3:
+                        return cosmos.gov.v1beta1.VoteOption.VOTE_OPTION_NO;
+                      case 'NoWithVeto':
+                      case 4:
+                        return cosmos.gov.v1beta1.VoteOption
+                          .VOTE_OPTION_NO_WITH_VETO;
+                      default:
+                        return cosmos.gov.v1beta1.VoteOption
+                          .VOTE_OPTION_UNSPECIFIED;
+                    }
+                  })(),
+                }).finish(),
+              },
+            ]
+          : undefined,
+      },
+      memo,
+      {
+        amount: stdFee.amount ?? [],
+        gas: stdFee.gas ?? this.base.msgOpts.govVote.gas.toString(),
+      },
+      signOptions,
+      this.txEventsWithPreOnFulfill(onTxEvents, (tx) => {
+        if (tx.code == null || tx.code === 0) {
+          // After succeeding to vote, refresh the proposal.
+          const proposal = this.queries.cosmos.queryGovernance.proposals.find(
+            (proposal) => proposal.id === proposalId
+          );
+          if (proposal) {
+            proposal.fetch();
+          }
+
+          const vote = this.queries.cosmos.queryProposalVote.getVote(
+            proposalId,
+            this.base.bech32Address
+          );
+          vote.fetch();
+        }
+      })
+    );
+  }
+
+  protected txEventsWithPreOnFulfill(
+    onTxEvents:
+      | ((tx: any) => void)
+      | {
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
+      | undefined,
+    preOnFulfill?: (tx: any) => void
+  ):
+    | {
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
+    | undefined {
+    if (!onTxEvents) {
+      return;
+    }
+
+    const onBroadcasted =
+      typeof onTxEvents === 'function' ? undefined : onTxEvents.onBroadcasted;
+    const onFulfill =
+      typeof onTxEvents === 'function' ? onTxEvents : onTxEvents.onFulfill;
+
+    return {
+      onBroadcasted,
+      onFulfill:
+        onFulfill || preOnFulfill
+          ? (tx: any) => {
+              if (preOnFulfill) {
+                preOnFulfill(tx);
+              }
+
+              if (onFulfill) {
+                onFulfill(tx);
+              }
+            }
+          : undefined,
+    };
+  }
+
+  protected get queries(): DeepReadonly<QueriesSetBase & HasCosmosQueries> {
+    return this.queriesStore.get(this.chainId);
+  }
+
+  protected hasNoLegacyStdFeature(): boolean {
+    const chainInfo = this.chainGetter.getChain(this.chainId);
+    return (
+      chainInfo.features != null &&
+      chainInfo.features.includes('no-legacy-stdTx')
+    );
+  }
+}

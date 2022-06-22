@@ -49,11 +49,12 @@ export const SendPage: FunctionComponent = observer(() => {
 
   const notification = useNotification();
 
-  const { chainStore, accountStore, priceStore, queriesStore, analyticsStore } =
+  const { chainStore, accountStore, priceStore, queriesStore, analyticsStore, accountEthStore } =
     useStore();
   const current = chainStore.current;
 
   const accountInfo = accountStore.getAccount(current.chainId);
+  const accountEthInfo = accountStore.getAccount(current.chainId);
  
   const sendConfigs = useSendTxConfig(
     chainStore,
