@@ -169,12 +169,10 @@ export class AccountSetBase<MsgOpts, Queries> {
           }
     ) => Promise<boolean>
   ) {
-    console.log("Register send token FN PASS HEREEE")
     this.sendTokenFns.push(fn);
   }
 
   protected async enable(owallet: OWallet, chainId: string): Promise<void> {
-    console.log("Enable!!!!!!!!!!!!")
     const chainInfo = this.chainGetter.getChain(chainId);
 
     if (this.opts.suggestChain) {
@@ -191,7 +189,6 @@ export class AccountSetBase<MsgOpts, Queries> {
     owallet: OWallet,
     chainInfo: ReturnType<ChainGetter['getChain']>
   ): Promise<void> {
-    console.log("Suggest chainnnnnnnnn!!!!!!!!!!!!")
 
     await owallet.experimentalSuggestChain(chainInfo.raw);
   }
@@ -494,52 +491,6 @@ export class AccountSetBase<MsgOpts, Queries> {
     console.log(this.chainId,"CHAIN ID!!!!!!!!!!!!!!!!!!!!!!")
     const chainInfo = this.chainGetter.getChain(this.chainId);
     if (chainInfo.networkType === "evm") {
-      // console.log("Network EVM true!!!!!!!!!!!")
-      // const key = await owallet.getKey(this.chainId);
-      // const privKey = this.loadPrivKey(coinType);
-      // const chainIdNumber = this.validateChainId(this.chainId);
-      // const customCommon = Common.custom({
-      //   name: this.chainId,
-      //   networkId: chainIdNumber,
-      //   chainId: chainIdNumber
-      // });
-
-      // const signer = new Wallet(privKey.toBytes()).address;
-      // const nonce = await request(chainInfo.evmRpc, 'eth_getTransactionCount', [
-      //   signer,
-      //   'latest'
-      // ]);
-
-      // const message = {
-      //   from: "0xb60e8dd61c5d32be8058bb8eb970870f07233155",
-      //   to: "0xd46e8dd67c5d32be8058bb8eb970870f07244567",
-      //   gas: Buffer.from(fee.gas),
-      //   gasPrice: Buffer.from("100"),
-      //   value: "0x9184e72a",
-      //   // data: "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"
-      // }
-      // const finalMessage = { ...message, nonce };
-
-      // const opts: TransactionOptions = { common: customCommon } as any;
-      // const tx = new Transaction(finalMessage, opts);
-      // tx.sign(Buffer.from(privKey.toBytes()));
-
-      // // // validate signer. Has to get substring(2) to remove 0x
-      // // if (
-      // //   !tx.getSenderAddress().equals(Buffer.from(signer.substring(2), 'hex'))
-      // // ) {
-      // //   throw new Error('Signer mismatched');
-      // // }
-
-      // const serializedTx = tx.serialize();
-      // const rawTxHex = '0x' + serializedTx.toString('hex');
-
-      // const response = await request(chainInfo.evmRpc, 'eth_sendRawTransaction', [rawTxHex]);
-      // return response;
-      // console.log(chainInfo.rest,"EVM RPC@@@@@@@@@@@@@@@")
-      // const gasPrice = await request(chainInfo.rest, "eth_gasPrice", []);
-      // console.log(gasPrice,'GAS PRICE!!!!!!!!!!!!');
-
       const message = {
         "from": "0xC5cb5c75050a9297FfF61d735372C009176C6934",
         "to": "0xC5cb5c75050a9297FfF61d735372C009176C6934",

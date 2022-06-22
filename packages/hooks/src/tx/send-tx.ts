@@ -21,13 +21,14 @@ export const useSendTxConfig = (
   queryEvmBalances?: ObservableQueryEvmBalance,
   senderEvm?: string,
 ) => {
+  const chainInfo = chainGetter.getChain(chainId);
   const amountConfig = useAmountConfig(
     chainGetter,
     chainId,
     sender,
     queryBalances,
-    queryEvmBalances,
-    senderEvm,
+    chainInfo.networkType === "evm" && queryEvmBalances,
+    chainInfo.networkType === "evm" && senderEvm,
   );
 
   const memoConfig = useMemoConfig(chainGetter, chainId);
@@ -45,8 +46,8 @@ export const useSendTxConfig = (
     amountConfig,
     gasConfig,
     true,
-    queryEvmBalances,
-    senderEvm,
+    chainInfo.networkType === "evm" && queryEvmBalances,
+    chainInfo.networkType === "evm" && senderEvm,
   );
   // Due to the circular references between the amount config and gas/fee configs,
   // set the fee config of the amount config after initing the gas/fee configs.

@@ -153,39 +153,47 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
   }
 
   getFeePrimitive(): CoinPrimitive | undefined {
-    // If there is no fee currency, just return with empty fee amount.
-    if (!this.feeCurrency) {
+    try {
+      // If there is no fee currency, just return with empty fee amount.
+      if (!this.feeCurrency) {
+        return undefined;
+      }
+
+      if (this._manualFee) {
+        return this._manualFee;
+      }
+
+      if (this.feeType) {
+        return this.getFeeTypePrimitive(this.feeType);
+      }
+
+      // If fee is not set, just return with empty fee amount.
       return undefined;
+    } catch (error) {
+      console.log("Error in getFeePrimitive:", error);
     }
-
-    if (this._manualFee) {
-      return this._manualFee;
-    }
-
-    if (this.feeType) {
-      return this.getFeeTypePrimitive(this.feeType);
-    }
-
-    // If fee is not set, just return with empty fee amount.
-    return undefined;
   }
 
   protected getFeeTypePrimitive(feeType: FeeType): CoinPrimitive {
-    if (!this.feeCurrency) {
-      throw new Error('Fee currency not set');
+    try {
+      if (!this.feeCurrency) {
+        throw new Error('Fee currency not set');
+      }
+
+      const gasPriceStep = this.chainInfo.gasPriceStep
+        ? this.chainInfo.gasPriceStep
+        : DefaultGasPriceStep;
+
+      const gasPrice = new Dec(gasPriceStep[feeType].toString());
+      const feeAmount = gasPrice.mul(new Dec(this.gasConfig.gas));
+
+      return {
+        denom: this.feeCurrency.coinMinimalDenom,
+        amount: feeAmount.roundUp().toString()
+      };
+    } catch (error) {
+      console.log("Error in getFeeTypePrimitive:", error);
     }
-
-    const gasPriceStep = this.chainInfo.gasPriceStep
-      ? this.chainInfo.gasPriceStep
-      : DefaultGasPriceStep;
-
-    const gasPrice = new Dec(gasPriceStep[feeType].toString());
-    const feeAmount = gasPrice.mul(new Dec(this.gasConfig.gas));
-
-    return {
-      denom: this.feeCurrency.coinMinimalDenom,
-      amount: feeAmount.roundUp().toString()
-    };
   }
 
   readonly getFeeTypePretty = computedFn((feeType: FeeType) => {
@@ -203,72 +211,76 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
   });
 
   getError(): Error | undefined {
-    if (this.gasConfig.getError()) {
-      return this.gasConfig.getError();
-    }
-
-    if (this.disableBalanceCheck) {
-      return undefined;
-    }
-
-    const fee = this.getFeePrimitive();
-    if (!fee) {
-      return undefined;
-    }
-
-    const amount = this.amountConfig.getAmountPrimitive();
-
-    let need: Coin;
-    if (this.additionAmountToNeedFee && fee && fee.denom === amount.denom) {
-      need = new Coin(
-        fee.denom,
-        new Int(fee.amount).add(new Int(amount.amount))
-      );
-    } else {
-      need = new Coin(fee.denom, new Int(fee.amount));
-    }
-
-    if (need.amount.gt(new Int(0))) {
-      if (this.chainInfo.networkType === "evm") {
-        const balance = this.queryEvmBalances.getQueryBalance(this._senderEvm).balance;
-        if (!balance) return new InsufficientFeeError('insufficient fee');
-        else if (
-          balance
-            .toDec()
-            .mul(
-              DecUtils.getTenExponentNInPrecisionRange(balance.currency.coinDecimals)
-            )
-            .truncate()
-            .lt(need.amount)
-        ) return new InsufficientFeeError('insufficient fee');
+    try {
+      if (this.gasConfig.getError()) {
+        return this.gasConfig.getError();
       }
-      else {
-        const bal = this.queryBalances
-          .getQueryBech32Address(this._sender)
-          .balances.find((bal) => {
-            return bal.currency.coinMinimalDenom === need.denom;
-          });
 
-        if (!bal) {
-          return new InsufficientFeeError('insufficient fee');
-        } else if (!bal.response && !bal.error) {
-          // If fetching balance doesn't have the response nor error,
-          // assume it is not loaded from KVStore(cache).
-          return new NotLoadedFeeError(
-            `${bal.currency.coinDenom} is not loaded yet`
-          );
-        } else if (
-          bal.balance
-            .toDec()
-            .mul(
-              DecUtils.getTenExponentNInPrecisionRange(bal.currency.coinDecimals)
-            )
-            .truncate()
-            .lt(need.amount)
-        ) {
-          return new InsufficientFeeError('insufficient fee');
+      if (this.disableBalanceCheck) {
+        return undefined;
+      }
+
+      const fee = this.getFeePrimitive();
+      if (!fee) {
+        return undefined;
+      }
+
+      const amount = this.amountConfig.getAmountPrimitive();
+
+      let need: Coin;
+      if (this.additionAmountToNeedFee && fee && fee.denom === amount.denom) {
+        need = new Coin(
+          fee.denom,
+          new Int(fee.amount).add(new Int(amount.amount))
+        );
+      } else {
+        need = new Coin(fee.denom, new Int(fee.amount));
+      }
+
+      if (need.amount.gt(new Int(0))) {
+        if (this.chainInfo.networkType === "evm") {
+          const balance = this.queryEvmBalances.getQueryBalance(this._senderEvm).balance;
+          if (!balance) return new InsufficientFeeError('insufficient fee');
+          else if (
+            balance
+              .toDec()
+              .mul(
+                DecUtils.getTenExponentNInPrecisionRange(balance.currency.coinDecimals)
+              )
+              .truncate()
+              .lt(need.amount)
+          ) return new InsufficientFeeError('insufficient fee');
+        }
+        else {
+          const bal = this.queryBalances
+            .getQueryBech32Address(this._sender)
+            .balances.find((bal) => {
+              return bal.currency.coinMinimalDenom === need.denom;
+            });
+
+          if (!bal) {
+            return new InsufficientFeeError('insufficient fee');
+          } else if (!bal.response && !bal.error) {
+            // If fetching balance doesn't have the response nor error,
+            // assume it is not loaded from KVStore(cache).
+            return new NotLoadedFeeError(
+              `${bal.currency.coinDenom} is not loaded yet`
+            );
+          } else if (
+            bal.balance
+              .toDec()
+              .mul(
+                DecUtils.getTenExponentNInPrecisionRange(bal.currency.coinDecimals)
+              )
+              .truncate()
+              .lt(need.amount)
+          ) {
+            return new InsufficientFeeError('insufficient fee');
+          }
         }
       }
+    } catch (error) {
+        console.log("Error on get fees: ", error);
     }
   }
 

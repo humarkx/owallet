@@ -63,7 +63,7 @@ export class RNMessageRequesterBase implements MessageRequester {
     }
 
     if (result.error) {
-      throw new Error(result.error);
+      throw new Error(result.error.toString());
     }
 
     return result.return;

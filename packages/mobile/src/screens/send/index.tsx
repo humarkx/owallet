@@ -54,8 +54,8 @@ export const SendScreen: FunctionComponent = observer(() => {
     account.bech32Address,
     queries.queryBalances,
     EthereumEndpoint,
-    queries.evm.queryEvmBalance,
-    account?.evmosHexAddress || null,
+    chainStore.current.networkType === "evm" && queries.evm.queryEvmBalance,
+    chainStore.current.networkType === "evm" && account?.evmosHexAddress || null,
   );
 
   useEffect(() => {
