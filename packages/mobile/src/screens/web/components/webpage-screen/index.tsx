@@ -225,6 +225,7 @@ export const WebpageScreen: FunctionComponent<
       {sourceCode ? (
         <WebView
           ref={webviewRef}
+          incognito={true}
           injectedJavaScriptBeforeContentLoaded={sourceCode}
           onMessage={onMessage}
           onNavigationStateChange={(e) => {
