@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
-import { RightArrow, SettingItem, SettingSectionTitle } from './components';
+import { renderFlag, RightArrow, SettingItem, SettingSectionTitle } from './components';
 // import { SettingSelectAccountItem } from "./items/select-account";
 import { useSmartNavigation } from '../../navigation.provider';
 // import { SettingFiatCurrencyItem } from "./items/fiat-currency";
@@ -59,7 +59,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
               'margin-24',
               'margin-top-150',
               'border-radius-12',
-              'padding-20'
+              'padding-20',
             ]),
             styles.shadowBox
           ]}
@@ -71,14 +71,14 @@ export const SettingScreen: FunctionComponent = observer(() => {
             style={style.flatten([
               'flex-row',
               'items-center',
-              'justify-between'
+              'justify-between',
             ])}
           >
             <View>
               <Text
                 style={style.flatten([
                   'text-caption2',
-                  'color-text-black-very-low'
+                  'color-text-black-very-low',
                 ])}
               >
                 WALLET
@@ -88,7 +88,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
                   'text-caption2',
                   'color-black',
                   'font-bold',
-                  'subtitle1'
+                  'subtitle1',
                 ])}
               >
                 {selected
@@ -106,23 +106,35 @@ export const SettingScreen: FunctionComponent = observer(() => {
               'flex-row',
               'items-center',
               'justify-between',
-              'padding-top-20'
+              'padding-top-20',
             ])}
           >
             <View>
               <Text
                 style={style.flatten([
                   'text-caption2',
-                  'color-text-black-very-low'
+                  'color-text-black-very-low',
                 ])}
               >
                 CURRENCY
               </Text>
-              <Text
-                style={style.flatten(['text-caption2', 'color-black', 'body1'])}
-              >
-                {priceStore.defaultVsCurrency.toUpperCase()}
-              </Text>
+              <View style={style.flatten([
+                'flex-row',
+                'items-center',
+                'justify-center',
+              ])}>
+                {renderFlag(priceStore.defaultVsCurrency)}
+                <Text
+                  style={style.flatten([
+                    'text-caption2',
+                    'color-black',
+                    'body1',
+                    'margin-x-8'
+                  ])}
+                >
+                  {priceStore.defaultVsCurrency.toUpperCase()}
+                </Text>
+              </View>
             </View>
             <RightArrow />
           </TouchableOpacity>

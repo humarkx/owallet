@@ -56,7 +56,7 @@ export const SettingItem: FunctionComponent<{
         {left}
         <View
           style={StyleSheet.flatten([
-            style.flatten(["flex-row", "justify-between", "items-center"]),
+            style.flatten(["flex-row", "justify-between", "items-center","width-full"]),
           ])}
         >
           <Text

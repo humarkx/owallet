@@ -31,9 +31,9 @@ export async function request(
 ): Promise<any> {
   const restInstance = Axios.create({
     ...{
-      baseURL: rpc
+      baseURL: rpc,
     },
-    adapter: fetchAdapter
+    adapter: fetchAdapter,
   });
 
   try {
@@ -43,13 +43,13 @@ export async function request(
         jsonrpc: '2.0',
         id: 1,
         method,
-        params
+        params,
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
+          'Access-Control-Allow-Origin': '*',
+        },
       }
     );
     if (response.data.result) return response.data.result;
@@ -86,16 +86,16 @@ export class BackgroundTxService {
 
     const restInstance = Axios.create({
       ...{
-        baseURL: chainInfo.rest
+        baseURL: chainInfo.rest,
       },
       ...chainInfo.restConfig,
-      adapter: fetchAdapter
+      adapter: fetchAdapter,
     });
 
     this.notification.create({
       iconRelativeUrl: 'assets/orai_wallet_logo.png',
       title: 'Tx is pending...',
-      message: 'Wait a second'
+      message: 'Wait a second',
     });
 
     const isProtoTx = Buffer.isBuffer(tx) || tx instanceof Uint8Array;
@@ -114,11 +114,11 @@ export class BackgroundTxService {
               default:
                 return 'BROADCAST_MODE_UNSPECIFIED';
             }
-          })()
+          })(),
         }
       : {
           tx,
-          mode: mode
+          mode: mode,
         };
 
     try {
@@ -161,10 +161,15 @@ export class BackgroundTxService {
   }
 
   async request(chainId: string, method: string, params: any[]): Promise<any> {
-    var chainInfo: ChainInfoWithEmbed;
+    let chainInfo: ChainInfoWithEmbed;
     switch (method) {
       case 'eth_accounts':
+        chainInfo = await this.chainsService.getChainInfo(chainId);
+        if (chainInfo.coinType !== 60) return undefined;
+        return true;
       case 'eth_requestAccounts':
+        chainInfo = await this.chainsService.getChainInfo(chainId);
+        if (chainInfo.coinType !== 60) return undefined;
         const chainIdOrCoinType = params.length ? parseInt(params[0]) : chainId; // default is cointype 60 for ethereum based
         const key = await this.keyRingService.getKey(chainIdOrCoinType);
         return [`0x${Buffer.from(key.address).toString('hex')}`];
@@ -211,7 +216,7 @@ export class BackgroundTxService {
         iconRelativeUrl: 'assets/orai_wallet_logo.png',
         title: 'Tx succeeds',
         // TODO: Let users know the tx id?
-        message: 'Congratulations!'
+        message: 'Congratulations!',
       });
     } catch (e: any) {
       BackgroundTxService.processTxErrorNotification(notification, e);
@@ -265,7 +270,7 @@ export class BackgroundTxService {
     notification.create({
       iconRelativeUrl: 'assets/orai_wallet_logo.png',
       title: 'Tx failed',
-      message
+      message,
     });
   }
 }
