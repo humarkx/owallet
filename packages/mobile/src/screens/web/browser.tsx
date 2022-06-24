@@ -16,20 +16,19 @@ import { useSmartNavigation } from '../../navigation.provider';
 import { useNavigation } from '@react-navigation/core';
 import {
   BrowserSectionTitle,
-  BrowserSectionModal,
+  BrowserSectionModal
 } from './components/section-title';
 import {
   SearchIcon,
   RightArrowIcon,
   HomeIcon,
   ThreeDotsIcon,
-  TabIcon,
-  RemoveIcon,
+  TabIcon
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { checkValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
-import { InjectedProviderUrl } from './config';
+import { DAppInfos, InjectedProviderUrl } from './config';
 
 export const BrowserSection: FunctionComponent<{}> = ({}) => {
   const style = useStyle();
@@ -43,14 +42,14 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
           'flex-row',
           'justify-between',
           'items-center',
-          'padding-20',
+          'padding-20'
         ])}
       >
         <Text
           style={{
             fontSize: 18,
             fontWeight: '500',
-            color: '#1C1C1E',
+            color: '#1C1C1E'
           }}
         >
           Bookmarks
@@ -59,7 +58,7 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
           style={{
             fontSize: 14,
             fontWeight: '400',
-            color: '#4334F1',
+            color: '#4334F1'
           }}
           onPress={() => navigation.navigate('BookMarks')}
         >
@@ -70,7 +69,7 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
         style={style.flatten([
           'height-1',
           'margin-x-20',
-          'background-color-border-white',
+          'background-color-border-white'
         ])}
       />
     </React.Fragment>
@@ -144,7 +143,7 @@ export const Browser: FunctionComponent<any> = (props) => {
       deepLinkUriStore.updateDeepLink('');
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Browser',
-        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io',
+        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io'
       });
     }
   };
@@ -160,7 +159,7 @@ export const Browser: FunctionComponent<any> = (props) => {
           uri:
             props.route.params.url?.toLowerCase().indexOf('http') >= 0
               ? props.route.params.url?.toLowerCase()
-              : 'https://' + props.route.params?.url?.toLowerCase(),
+              : 'https://' + props.route.params?.url?.toLowerCase()
         });
       }
     }, 1000);
@@ -173,7 +172,7 @@ export const Browser: FunctionComponent<any> = (props) => {
         uri:
           url?.toLowerCase().indexOf('http') >= 0
             ? url?.toLowerCase()
-            : 'https://' + url?.toLowerCase(),
+            : 'https://' + url?.toLowerCase()
       });
     } else {
       let uri = `https://www.google.com/search?q=${url ?? ''}`;
@@ -181,7 +180,7 @@ export const Browser: FunctionComponent<any> = (props) => {
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
         // uri: `https://staging.oraidex.io/ethereum`,
-        uri,
+        uri
       });
     }
   };
@@ -189,7 +188,7 @@ export const Browser: FunctionComponent<any> = (props) => {
   const handleClickUri = (uri: string, name: string) => {
     smartNavigation.pushSmart('Web.dApp', {
       name,
-      uri,
+      uri
     });
   };
 
