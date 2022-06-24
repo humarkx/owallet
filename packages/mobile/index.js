@@ -1,7 +1,3 @@
-/**
- * @format
- */
-
 import './shim';
 
 import 'text-encoding';
@@ -16,13 +12,8 @@ import './init';
 
 import CodePush from 'react-native-code-push';
 
-// The use of "require" is intentional.
-// In case of "import" statement, it is located before execution of the next line,
-// To prevent this, "require" is used.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const App = require('./src/app').App;
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const appName = require('./app.json').name;
+import { App } from './src/app';
+import { name as appName } from './app.json';
 
 // not using CodePush for development
 const CodePushApp = __DEV__
