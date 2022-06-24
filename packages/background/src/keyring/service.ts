@@ -206,10 +206,14 @@ export class KeyRingService {
     return this.keyRing.status;
   }
 
-  async getKey(chainId: string): Promise<Key> {
+  async getKey(chainIdOrCoinType: string | number): Promise<Key> {
+    // if getKey directly from cointype as number
+    if (typeof chainIdOrCoinType === 'number') {
+      return this.keyRing.getKeyFromCoinType(chainIdOrCoinType);
+    }
     return this.keyRing.getKey(
-      chainId,
-      await this.chainsService.getChainCoinType(chainId)
+      chainIdOrCoinType,
+      await this.chainsService.getChainCoinType(chainIdOrCoinType)
     );
   }
 
