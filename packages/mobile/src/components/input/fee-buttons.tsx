@@ -7,14 +7,14 @@ import {
   IFeeConfig,
   IGasConfig,
   InsufficientFeeError,
-  NotLoadedFeeError
+  NotLoadedFeeError,
 } from '@owallet/hooks';
 import { GasInput } from './gas';
 import { useStore } from '../../stores';
 import { CoinPretty, PricePretty } from '@owallet/unit';
 import { LoadingSpinner } from '../spinner';
 import { RectButton } from '../rect-button';
-
+import { FastIcon, LowIcon, AverageIcon } from '../icon';
 export interface FeeButtonsProps {
   labelStyle?: TextStyle;
   containerStyle?: ViewProps;
@@ -81,7 +81,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
     buttonsContainerStyle,
     errorLabelStyle,
     label,
-    feeConfig
+    feeConfig,
   }) => {
     const { priceStore } = useStore();
 
@@ -127,6 +127,19 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
       }
     })();
 
+    const renderIconTypeFee = (label: string, size?: number) => {
+      switch (label) {
+        case 'Low':
+          return <LowIcon color={'#1E1E1E'} size={24} />;
+        case 'Average':
+          return <AverageIcon color={'#1E1E1E'} size={24} />;
+        case 'Fast':
+          return <FastIcon color={'#1E1E1E'} size={24} />;
+        default:
+          return <LowIcon color={'#1E1E1E'} size={24} />;
+      }
+    };
+
     const renderButton: (
       label: string,
       price: PricePretty | undefined,
@@ -139,38 +152,40 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
           style={style.flatten(
             [
               'flex-1',
-              'items-center',
-              'padding-y-14',
-              'background-color-white'
+              'justify-between',
+              'padding-12',
+              'background-color-white',
+              'border-color-border-white',
+              'border-radius-12',
             ],
-            [selected && 'background-color-primary-50']
+            [selected && 'border-color-button-primary', 'border-width-1']
           )}
           rippleColor={style.get('color-primary-100').color}
           onPress={onPress}
         >
-          <Text
-            style={style.flatten(
-              ['h5', 'color-text-black-medium'],
-              [selected && 'color-primary']
-            )}
-          >
-            {label}
-          </Text>
+          <View style={style.flatten(['flex-row', 'justify-between'])}>
+            <Text style={style.flatten(['body3'])}>
+              {label}
+            </Text>
+            {renderIconTypeFee(label)}
+          </View>
           {price ? (
             <Text
-              style={style.flatten(
-                ['padding-top-2', 'h7', 'color-text-black-medium'],
-                [selected && 'color-primary']
-              )}
+              style={style.flatten([
+                'padding-top-8',
+                'padding-bottom-8',
+                'text-caption2',
+              ])}
             >
               {price.toString()}
             </Text>
           ) : null}
           <Text
-            style={style.flatten(
-              ['padding-top-2', 'text-caption1', 'color-text-black-low'],
-              [selected && 'color-primary']
-            )}
+            style={{
+              fontSize: 10.5,
+              color: '#636366',
+              lineHeight: 16,
+            }}
           >
             {amount.maxDecimals(6).trim(true).separator('').toString()}
           </Text>
@@ -182,7 +197,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
       <View
         style={StyleSheet.flatten([
           style.flatten(['padding-bottom-28']),
-          containerStyle
+          containerStyle,
         ])}
       >
         <Text
@@ -190,9 +205,9 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
             style.flatten([
               'subtitle3',
               'color-text-black-medium',
-              'margin-bottom-3'
+              'margin-bottom-3',
             ]),
-            labelStyle
+            labelStyle,
           ])}
         >
           {label}
@@ -201,13 +216,12 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
           style={StyleSheet.flatten([
             style.flatten([
               'flex-row',
-              'background-color-white',
               'border-radius-4',
               'border-width-1',
               'border-color-border-white',
-              'overflow-hidden'
+              'overflow-hidden',
             ]),
-            buttonsContainerStyle
+            buttonsContainerStyle,
           ])}
         >
           {renderButton(
@@ -220,7 +234,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
             }
           )}
           <View
-            style={style.flatten(['width-1', 'background-color-border-white'])}
+            style={style.flatten(['width-4', 'background-color-border-white'])}
           />
           {renderButton(
             'Average',
@@ -232,10 +246,10 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
             }
           )}
           <View
-            style={style.flatten(['width-1', 'background-color-border-white'])}
+            style={style.flatten(['width-4', 'background-color-border-white'])}
           />
           {renderButton(
-            'High',
+            'Fast',
             highFeePrice,
             highFee,
             feeConfig.feeType === 'high',
@@ -252,7 +266,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
                 'height-16',
                 'justify-center',
                 'margin-top-2',
-                'margin-left-4'
+                'margin-left-4',
               ])}
             >
               <LoadingSpinner
@@ -271,9 +285,9 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
                   'text-caption1',
                   'color-error',
                   'margin-top-2',
-                  'margin-left-4'
+                  'margin-left-4',
                 ]),
-                errorLabelStyle
+                errorLabelStyle,
               ])}
             >
               {errorText}
