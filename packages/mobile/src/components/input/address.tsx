@@ -7,16 +7,16 @@ import {
   ENSNotSupportedError,
   IMemoConfig,
   InvalidBech32Error,
-  IRecipientConfig
+  IRecipientConfig,
 } from '@owallet/hooks';
 import { TextStyle, View, ViewStyle } from 'react-native';
 import { TextInput } from './input';
 import { ObservableEnsFetcher } from '@owallet/ens';
 import { LoadingSpinner } from '../spinner';
 import { useStyle } from '../../styles';
-import { AddressBookIcon } from '../icon';
+import { AddressBookIcon, NoteIcon } from '../icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 
 export const AddressInput: FunctionComponent<{
   labelStyle?: TextStyle;
@@ -30,6 +30,9 @@ export const AddressInput: FunctionComponent<{
   memoConfig: IMemoConfig;
 
   disableAddressBook?: boolean;
+
+  placeholder?: string;
+  placeholderTextColor?: string;
 }> = observer(
   ({
     labelStyle,
@@ -39,7 +42,9 @@ export const AddressInput: FunctionComponent<{
     label,
     recipientConfig,
     memoConfig,
-    disableAddressBook
+    disableAddressBook,
+    placeholder,
+    placeholderTextColor,
   }) => {
     const smartNavigation = useSmartNavigation();
 
@@ -84,6 +89,8 @@ export const AddressInput: FunctionComponent<{
         onChangeText={(text) => {
           recipientConfig.setRawRecipient(text);
         }}
+        placeholder={placeholder}
+        placeholderTextColor={placeholderTextColor}
         paragraph={
           isENSAddress ? (
             isENSLoading ? (
@@ -94,7 +101,7 @@ export const AddressInput: FunctionComponent<{
                     'height-16',
                     'justify-center',
                     'margin-top-2',
-                    'margin-left-4'
+                    'margin-left-4',
                   ])}
                 >
                   <LoadingSpinner
@@ -126,7 +133,7 @@ export const AddressInput: FunctionComponent<{
                   });
                 }}
               >
-                <AddressBookIcon
+                <NoteIcon
                   color={style.get('color-primary').color}
                   height={18}
                 />

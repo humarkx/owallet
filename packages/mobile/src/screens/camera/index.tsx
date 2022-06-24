@@ -4,7 +4,7 @@ import { useStyle } from '../../styles';
 import { PageWithView } from '../../components/page';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 import { Button } from '../../components/button';
 import { Share, StyleSheet, View } from 'react-native';
 import { ChainSelectorModal } from '../../components/chain-selector';

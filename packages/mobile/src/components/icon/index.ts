@@ -29,3 +29,4 @@ export * from './tab';
 export * from './transaction';
 export * from './contact';
 export * from './country';
+export * from './remove';

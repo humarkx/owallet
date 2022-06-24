@@ -158,7 +158,6 @@ export const DetailsItems: FunctionComponent<{
 
 export const TransactionDetail: FunctionComponent<any> = () => {
   const style = useStyle();
-
   const handleCopyText = (text: string) => {
     Clipboard.setString(text);
   };
@@ -176,59 +175,70 @@ export const TransactionDetail: FunctionComponent<any> = () => {
       </View>
       <TransactionSectionTitle title={'Received token'} right={<></>} />
       <View>
-        <DetailsItems
-          label="From"
-          topBorder={true}
-          paragraph={'orai1nc752...74u9uylc'}
-          right={
-            <CopyIc onPress={() => handleCopyText('orai1nc752...74u9uylc')} />
-          }
-          styleParagraph={style.flatten(['body1'])}
-          styleLabel={{
-            color: '#636366',
-            fontSize: 16,
-          }}
-        />
-        <DetailsItems
-          label="To"
-          topBorder={true}
-          paragraph={'orai1nc752...74u9322'}
-          right={<CopyIc />}
-          styleParagraph={style.flatten(['body1'])}
-          styleLabel={{
-            color: '#636366',
-            fontSize: 16,
-          }}
-        />
-        <DetailsItems
-          label="Transaction hash"
-          topBorder={true}
-          paragraph={'051E23F9...87C52492'}
-          right={<CopyIc />}
-          styleParagraph={{
-            color: '#4334F1',
-            fontSize: 18,
-            fontWeight: '400',
-          }}
-          styleLabel={{
-            color: '#636366',
-            fontSize: 16,
-          }}
-        />
-        <DetailsItems
-          label="Amount"
-          topBorder={true}
-          paragraph={'+125,000 ORAI'}
-          styleParagraph={{
-            color: '#4BB10C',
-            fontSize: 18,
-            fontWeight: '700',
-          }}
-          styleLabel={{
-            color: '#636366',
-            fontSize: 16,
-          }}
-        />
+        {[
+          {
+            label: 'From',
+            paragraph: 'orai1nc752...74u9uylc',
+            icon: (
+              <CopyIc onPress={() => handleCopyText('orai1nc752...74u9uylc')} />
+            ),
+            styleLabel: {
+              color: '#636366',
+              fontSize: 16,
+            },
+            styleParagraph: style.flatten(['body1'])
+          },
+          {
+            label: 'To',
+            paragraph: 'orai1nc752...74u9uylc',
+            icon: (
+              <CopyIc onPress={() => handleCopyText('orai1nc752...74u9uylc')} />
+            ),
+            styleLabel: {
+              color: '#636366',
+              fontSize: 16,
+            },
+            styleParagraph: style.flatten(['body1'])
+          },
+          {
+            label: 'Transaction hash',
+            paragraph: 'orai1nc752...74u9uylc',
+            icon: (
+              <CopyIc onPress={() => handleCopyText('orai1nc752...74u9uylc')} />
+            ),
+            styleLabel: {
+              color: '#636366',
+              fontSize: 16,
+            },
+            styleParagraph: {
+              color: '#4334F1',
+              fontSize: 18,
+              fontWeight: '400',
+            }
+          },
+          {
+            label: 'Amount',
+            paragraph: '+125,000 ORAI',
+            styleLabel: {
+              color: '#636366',
+              fontSize: 16,
+            },
+            styleParagraph: {
+              color: '#4BB10C',
+              fontSize: 18,
+              fontWeight: '700',
+            }
+          },
+        ].map((e) => (
+          <DetailsItems
+            label={e.label}
+            topBorder={true}
+            paragraph={e.paragraph}
+            right={e.icon}
+            styleParagraph={e.styleParagraph}
+            styleLabel={e.styleLabel}
+          />
+        ))}
       </View>
       <TransactionSectionTitle title={'Detail'} right={<></>} />
       {[

@@ -1,10 +1,16 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 // import { PageWithScrollViewInBottomTabView } from "../../components/page";
-import { Image, View } from 'react-native';
+import {
+  Image,
+  Text,
+  View,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import { useStyle } from '../../styles';
 import { TextInput } from '../../components/input';
 // import { Button } from "../../components/button";
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 // import { PageWithScrollView } from "../../components/page";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { useNavigation } from '@react-navigation/core';
@@ -18,11 +24,58 @@ import {
   HomeIcon,
   ThreeDotsIcon,
   TabIcon,
+  RemoveIcon,
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { ORAIDEX_DEV_URL } from 'react-native-dotenv';
 import { checkValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
+import { InjectedProviderUrl } from './config';
+
+export const BrowserSection: FunctionComponent<{}> = ({}) => {
+  const style = useStyle();
+  const navigation = useNavigation();
+  return (
+    <React.Fragment>
+      <View
+        style={style.flatten([
+          'width-full',
+          'height-66',
+          'flex-row',
+          'justify-between',
+          'items-center',
+          'padding-20',
+        ])}
+      >
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '500',
+            color: '#1C1C1E',
+          }}
+        >
+          Bookmarks
+        </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: '400',
+            color: '#4334F1',
+          }}
+          onPress={() => navigation.navigate('BookMarks')}
+        >
+          View all
+        </Text>
+      </View>
+      <View
+        style={style.flatten([
+          'height-1',
+          'margin-x-20',
+          'background-color-border-white',
+        ])}
+      />
+    </React.Fragment>
+  );
+};
 
 export const Browser: FunctionComponent<any> = (props) => {
   const style = useStyle();
@@ -31,7 +84,6 @@ export const Browser: FunctionComponent<any> = (props) => {
   const navigation = useNavigation();
   const { deepLinkUriStore } = useStore();
   const arrayIcon = ['back', 'next', 'tabs', 'home', 'settings'];
-
   const renderIcon = (type, tabNum = 0) => {
     switch (type) {
       case 'back':
@@ -98,6 +150,7 @@ export const Browser: FunctionComponent<any> = (props) => {
   };
 
   const [url, setUrl] = useState('');
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
     setTimeout(function () {
@@ -114,8 +167,6 @@ export const Browser: FunctionComponent<any> = (props) => {
   }, [props, smartNavigation, url]);
 
   const onHandleUrl = () => {
-    console.log('valid', checkValidDomain(url?.toLowerCase()));
-
     if (checkValidDomain(url?.toLowerCase())) {
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Browser',
@@ -126,7 +177,7 @@ export const Browser: FunctionComponent<any> = (props) => {
       });
     } else {
       let uri = `https://www.google.com/search?q=${url ?? ''}`;
-      // if (ORAIDEX_DEV_URL) uri = ORAIDEX_DEV_URL;
+      if (InjectedProviderUrl) uri = InjectedProviderUrl;
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
         // uri: `https://staging.oraidex.io/ethereum`,
@@ -135,7 +186,14 @@ export const Browser: FunctionComponent<any> = (props) => {
     }
   };
 
-  const onPress = (type) => {
+  const handleClickUri = (uri: string, name: string) => {
+    smartNavigation.pushSmart('Web.dApp', {
+      name,
+      uri,
+    });
+  };
+
+  const onPress = (type: any) => {
     try {
       switch (type) {
         case 'settings':
@@ -153,72 +211,155 @@ export const Browser: FunctionComponent<any> = (props) => {
       console.log({ error });
     }
   };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
-    <View
+    <TouchableWithoutFeedback
       style={style.flatten(['flex-column', 'justify-between', 'height-full'])}
+      onPress={() => {
+        if (isKeyboardVisible) Keyboard.dismiss();
+      }}
     >
-      <View style={{ opacity: isOpenSetting ? 0.8 : 1 }}>
-        <BrowserSectionTitle title="Browser" />
-        <View style={{ height: 260 }}>
-          <Image
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-            fadeDuration={0}
-            resizeMode="stretch"
-            source={require('../../assets/image/background.png')}
-          />
-          <TextInput
-            containerStyle={{
-              width: '100%',
-              padding: 20,
-              marginTop: -50,
-            }}
-            inputStyle={style.flatten([
-              'flex-row',
-              'items-center',
+      <View>
+        <View style={{ opacity: isOpenSetting ? 0.8 : 1 }}>
+          <BrowserSectionTitle title="Browser" />
+          <View style={{ height: 260 }}>
+            <Image
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              fadeDuration={0}
+              resizeMode="stretch"
+              source={require('../../assets/image/background.png')}
+            />
+            <TextInput
+              containerStyle={{
+                width: '100%',
+                padding: 20,
+                marginTop: -50,
+              }}
+              inputStyle={style.flatten([
+                'flex-row',
+                'items-center',
+                'background-color-white',
+                'padding-20',
+                'border-radius-16',
+                'border-width-4',
+                'border-color-border-pink',
+              ])}
+              returnKeyType={'next'}
+              placeholder={'Search website'}
+              placeholderTextColor={'#AEAEB2'}
+              onSubmitEditing={onHandleUrl}
+              value={url}
+              onChangeText={(txt) => setUrl(txt.toLowerCase())}
+              inputRight={
+                <TouchableOpacity onPress={onHandleUrl}>
+                  <SearchIcon color={'gray'} size={20} />
+                </TouchableOpacity>
+              }
+            />
+          </View>
+          <View
+            style={style.flatten([
+              'height-full',
               'background-color-white',
-              'padding-20',
-              'border-radius-16',
-              'border-width-4',
-              'border-color-border-pink',
+              'margin-y-64',
             ])}
-            returnKeyType={'next'}
-            placeholder={'Search website'}
-            placeholderTextColor={'#AEAEB2'}
-            onSubmitEditing={onHandleUrl}
-            value={url}
-            onChangeText={(txt) => setUrl(txt.toLowerCase())}
-            inputRight={
-              <TouchableOpacity onPress={onHandleUrl}>
-                <SearchIcon color={'gray'} size={20} />
-              </TouchableOpacity>
-            }
-          />
+          >
+            <BrowserSection />
+            <View style={style.flatten(['height-full', 'padding-20'])}>
+              {[
+                {
+                  label: 'Oraidex',
+                  uri: 'https://oraidex.io',
+                  logo: (
+                    <Image
+                      style={{
+                        width: 20,
+                        height: 20,
+                      }}
+                      source={require('../../assets/image/webpage/oraidex_icon.png')}
+                      fadeDuration={0}
+                    />
+                  ),
+                },
+                {
+                  label: 'Osmosis Trade',
+                  uri: 'https://app.osmosis.zone',
+                  logo: (
+                    <Image
+                      style={{
+                        width: 20,
+                        height: 22,
+                      }}
+                      source={require('../../assets/image/webpage/osmosis_icon.png')}
+                      fadeDuration={0}
+                    />
+                  ),
+                },
+              ].map((e) => (
+                <TouchableOpacity
+                  style={style.flatten([
+                    'height-44',
+                    'margin-bottom-15',
+                    'flex-row',
+                  ])}
+                  onPress={() => handleClickUri(e.uri, e.label)}
+                >
+                  <View style={style.flatten(['padding-top-5'])}>{e.logo}</View>
+                  <View style={style.flatten(['padding-x-15'])}>
+                    <Text style={style.flatten(['subtitle2'])}>{e.label}</Text>
+                    <Text style={{ color: '#636366', fontSize: 14 }}>
+                      {e.uri}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
-      </View>
-      {isOpenSetting && (
-        <View
-          style={{
-            backgroundColor: '#132340',
-            height: 200,
-            width: 200,
-            position: 'absolute',
-            right: 0,
-            bottom: 80,
-            borderRadius: 4,
-            zIndex: 1,
-            padding: 10,
-          }}
-        >
-          <BrowserSectionModal
-            onClose={() => setIsOpenSetting(false)}
-            title="Setting"
-          />
-        </View>
-      )}
-      {/* <View
+        {isOpenSetting && (
+          <View
+            style={{
+              backgroundColor: '#132340',
+              height: 200,
+              width: 200,
+              position: 'absolute',
+              right: 0,
+              bottom: 80,
+              borderRadius: 4,
+              zIndex: 1,
+              padding: 10,
+            }}
+          >
+            <BrowserSectionModal
+              onClose={() => setIsOpenSetting(false)}
+              title="Setting"
+            />
+          </View>
+        )}
+
+        {/* <View
         style={style.flatten([
           "width-full",
           "height-80",
@@ -236,6 +377,7 @@ export const Browser: FunctionComponent<any> = (props) => {
           );
         })}
       </View> */}
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };

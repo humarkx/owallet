@@ -15,7 +15,7 @@ import {
 import { useStyle } from '../../styles';
 import { Button } from '../../components/button';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 import { Buffer } from 'buffer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -93,6 +93,7 @@ export const SendScreen: FunctionComponent = observer(() => {
       />
       {/* <View style={style.flatten(['height-page-pad'])} /> */}
       <AddressInput
+        placeholder="Type the receiver"
         label="Recipient"
         recipientConfig={sendConfigs.recipientConfig}
         memoConfig={sendConfigs.memoConfig}
@@ -102,8 +103,16 @@ export const SendScreen: FunctionComponent = observer(() => {
         placeHolder="Select Token"
         amountConfig={sendConfigs.amountConfig}
       />
-      <AmountInput label="Amount" amountConfig={sendConfigs.amountConfig} />
-      <MemoInput label="Memo (Optional)" memoConfig={sendConfigs.memoConfig} />
+      <AmountInput
+        placeholder="Type the receiver"
+        label="Amount"
+        amountConfig={sendConfigs.amountConfig}
+      />
+      <MemoInput
+        label="Memo (Optional)"
+        placeholder="Type your memo here"
+        memoConfig={sendConfigs.memoConfig}
+      />
       <FeeButtons
         label="Fee"
         gasLabel="gas"

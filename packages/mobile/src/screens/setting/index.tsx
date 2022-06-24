@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
-import { RightArrow, SettingItem, SettingSectionTitle } from './components';
+import { renderFlag, RightArrow, SettingItem, SettingSectionTitle } from './components';
 // import { SettingSelectAccountItem } from "./items/select-account";
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 // import { SettingFiatCurrencyItem } from "./items/fiat-currency";
 import { SettingBiometricLockItem } from './items/biometric-lock';
 import { observer } from 'mobx-react-lite';
@@ -16,9 +16,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Platform,
+  Platform
 } from 'react-native';
-import { renderFlag } from './components';
 
 export const SettingScreen: FunctionComponent = observer(() => {
   const { keychainStore, keyRingStore, priceStore } = useStore();
@@ -42,11 +41,11 @@ export const SettingScreen: FunctionComponent = observer(() => {
             'padding-24',
             'padding-top-76',
             'padding-bottom-101',
-            'margin-bottom-102',
+            'margin-bottom-102'
           ],
           [
             Platform.OS === 'ios' && 'border-radius-top-left-32',
-            Platform.OS === 'ios' && 'border-radius-top-right-32',
+            Platform.OS === 'ios' && 'border-radius-top-right-32'
           ]
         )}
       >
@@ -62,7 +61,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
               'border-radius-12',
               'padding-20',
             ]),
-            styles.shadowBox,
+            styles.shadowBox
           ]}
         >
           <TouchableOpacity
@@ -183,9 +182,9 @@ const styles = StyleSheet.create({
     shadowColor: '#ccc',
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 3
     },
     shadowRadius: 5,
-    shadowOpacity: 1.0,
-  },
+    shadowOpacity: 1.0
+  }
 });

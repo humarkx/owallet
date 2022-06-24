@@ -29,7 +29,7 @@
     "clean": "lerna run clean && rm -rf node_modules && yarn clean:watchman",
     "clean:watchman": "watchman watch-del-all",
     "build": "lerna run build",
-    "build:libs": "lerna run build --ignore @owallet/extension",
+    "build:libs": "lerna run build --ignore @owallet/extension --ignore @owallet/mobile",
     "test": "lerna run test --parallel",
     "build:clean": "yarn clean && yarn install --frozen-lockfile && lerna run build",
     "lint-test": "lerna run lint-test",
@@ -64,6 +64,7 @@
     "ts-jest": "^26.5.5",
     "ts-loader": "^8.0.14",
     "ts-node": "^9.1.1",
+    "firebase-tools": "^10.2.2",
     "typescript": "^4.1.3",
     "zx": "^4.2.0"
   },
