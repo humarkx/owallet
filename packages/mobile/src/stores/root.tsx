@@ -21,7 +21,6 @@ import { DeepLinkStore, BrowserStore } from './browser';
 import EventEmitter from 'eventemitter3';
 import { OWallet } from '@owallet/provider';
 import { KeychainStore } from './keychain';
-import { WalletConnectStore } from './wallet-connect';
 import { FeeType } from '@owallet/hooks';
 import {
   AmplitudeApiKey,
@@ -52,7 +51,6 @@ export class RootStore {
   protected readonly ibcCurrencyRegistrar: IBCCurrencyRegsitrar<ChainInfoWithEmbed>;
 
   public readonly keychainStore: KeychainStore;
-  public readonly walletConnectStore: WalletConnectStore;
 
   public readonly analyticsStore: AnalyticsStore<
     {
@@ -208,21 +206,6 @@ export class RootStore {
     this.keychainStore = new KeychainStore(
       new AsyncKVStore('store_keychain'),
       this.keyRingStore
-    );
-
-    this.walletConnectStore = new WalletConnectStore(
-      new AsyncKVStore('store_wallet_connect'),
-      {
-        addEventListener: (type: string, fn: () => void) => {
-          eventEmitter.addListener(type, fn);
-        },
-        removeEventListener: (type: string, fn: () => void) => {
-          eventEmitter.removeListener(type, fn);
-        },
-      },
-      this.chainStore,
-      this.keyRingStore,
-      this.permissionStore
     );
 
     this.analyticsStore = new AnalyticsStore(
