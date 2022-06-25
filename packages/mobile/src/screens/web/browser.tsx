@@ -5,7 +5,7 @@ import {
   Text,
   View,
   Keyboard,
-  TouchableWithoutFeedback,
+  TouchableWithoutFeedback
 } from 'react-native';
 import { useStyle } from '../../styles';
 import { TextInput } from '../../components/input';
@@ -244,7 +244,7 @@ export const Browser: FunctionComponent<any> = (props) => {
             <Image
               style={{
                 width: '100%',
-                height: '100%',
+                height: '100%'
               }}
               fadeDuration={0}
               resizeMode="stretch"
@@ -254,7 +254,7 @@ export const Browser: FunctionComponent<any> = (props) => {
               containerStyle={{
                 width: '100%',
                 padding: 20,
-                marginTop: -50,
+                marginTop: -50
               }}
               inputStyle={style.flatten([
                 'flex-row',
@@ -263,7 +263,7 @@ export const Browser: FunctionComponent<any> = (props) => {
                 'padding-20',
                 'border-radius-16',
                 'border-width-4',
-                'border-color-border-pink',
+                'border-color-border-pink'
               ])}
               returnKeyType={'next'}
               placeholder={'Search website'}
@@ -282,54 +282,34 @@ export const Browser: FunctionComponent<any> = (props) => {
             style={style.flatten([
               'height-full',
               'background-color-white',
-              'margin-y-64',
+              'margin-y-64'
             ])}
           >
             <BrowserSection />
             <View style={style.flatten(['height-full', 'padding-20'])}>
-              {[
-                {
-                  label: 'Oraidex',
-                  uri: 'https://oraidex.io',
-                  logo: (
-                    <Image
-                      style={{
-                        width: 20,
-                        height: 20,
-                      }}
-                      source={require('../../assets/image/webpage/oraidex_icon.png')}
-                      fadeDuration={0}
-                    />
-                  ),
-                },
-                {
-                  label: 'Osmosis Trade',
-                  uri: 'https://app.osmosis.zone',
-                  logo: (
-                    <Image
-                      style={{
-                        width: 20,
-                        height: 22,
-                      }}
-                      source={require('../../assets/image/webpage/osmosis_icon.png')}
-                      fadeDuration={0}
-                    />
-                  ),
-                },
-              ].map((e) => (
+              {DAppInfos.map(({ logo, uri, name }) => (
                 <TouchableOpacity
                   style={style.flatten([
                     'height-44',
                     'margin-bottom-15',
-                    'flex-row',
+                    'flex-row'
                   ])}
-                  onPress={() => handleClickUri(e.uri, e.label)}
+                  onPress={() => handleClickUri(uri, name)}
                 >
-                  <View style={style.flatten(['padding-top-5'])}>{e.logo}</View>
+                  <View style={style.flatten(['padding-top-5'])}>
+                    <Image
+                      style={{
+                        width: 20,
+                        height: 20
+                      }}
+                      source={logo}
+                      fadeDuration={0}
+                    />
+                  </View>
                   <View style={style.flatten(['padding-x-15'])}>
-                    <Text style={style.flatten(['subtitle2'])}>{e.label}</Text>
+                    <Text style={style.flatten(['subtitle2'])}>{name}</Text>
                     <Text style={{ color: '#636366', fontSize: 14 }}>
-                      {e.uri}
+                      {uri}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -348,7 +328,7 @@ export const Browser: FunctionComponent<any> = (props) => {
               bottom: 80,
               borderRadius: 4,
               zIndex: 1,
-              padding: 10,
+              padding: 10
             }}
           >
             <BrowserSectionModal

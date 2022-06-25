@@ -16,14 +16,14 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
           'flex-row',
           'justify-between',
           'items-center',
-          'padding-20',
+          'padding-20'
         ])}
       >
         <Text
           style={{
             fontSize: 18,
             fontWeight: '500',
-            color: '#1C1C1E',
+            color: '#1C1C1E'
           }}
         >
           Bookmarks
@@ -33,7 +33,7 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
         style={style.flatten([
           'height-1',
           'margin-x-20',
-          'background-color-border-white',
+          'background-color-border-white'
         ])}
       />
     </React.Fragment>
@@ -54,7 +54,7 @@ export const BookMarks: FunctionComponent<any> = () => {
           style={style.flatten([
             'height-full',
             'background-color-white',
-            'margin-y-24',
+            'margin-y-24'
           ])}
         >
           <BrowserSection />
@@ -67,12 +67,12 @@ export const BookMarks: FunctionComponent<any> = () => {
                   <Image
                     style={{
                       width: 20,
-                      height: 20,
+                      height: 20
                     }}
                     source={require('../../assets/image/webpage/oraidex_icon.png')}
                     fadeDuration={0}
                   />
-                ),
+                )
               },
               {
                 label: 'Osmosis Trade',
@@ -81,13 +81,13 @@ export const BookMarks: FunctionComponent<any> = () => {
                   <Image
                     style={{
                       width: 20,
-                      height: 22,
+                      height: 22
                     }}
                     source={require('../../assets/image/webpage/osmosis_icon.png')}
                     fadeDuration={0}
                   />
-                ),
-              },
+                )
+              }
             ].map((e) => (
               <TouchableOpacity
                 style={style.flatten([
@@ -95,7 +95,7 @@ export const BookMarks: FunctionComponent<any> = () => {
                   'margin-bottom-20',
                   'flex-row',
                   'items-center',
-                  'justify-between',
+                  'justify-between'
                 ])}
               >
                 <View style={style.flatten(['flex-row'])}>
