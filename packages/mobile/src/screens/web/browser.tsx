@@ -5,7 +5,7 @@ import {
   Text,
   View,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useStyle } from '../../styles';
 import { TextInput } from '../../components/input';
@@ -16,14 +16,14 @@ import { useSmartNavigation } from '../../navigation.provider';
 import { useNavigation } from '@react-navigation/core';
 import {
   BrowserSectionTitle,
-  BrowserSectionModal
+  BrowserSectionModal,
 } from './components/section-title';
 import {
   SearchIcon,
   RightArrowIcon,
   HomeIcon,
   ThreeDotsIcon,
-  TabIcon
+  TabIcon,
 } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { checkValidDomain } from '../../utils/helper';
@@ -42,14 +42,14 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
           'flex-row',
           'justify-between',
           'items-center',
-          'padding-20'
+          'padding-20',
         ])}
       >
         <Text
           style={{
             fontSize: 18,
             fontWeight: '500',
-            color: '#1C1C1E'
+            color: '#1C1C1E',
           }}
         >
           Bookmarks
@@ -58,7 +58,7 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
           style={{
             fontSize: 14,
             fontWeight: '400',
-            color: '#4334F1'
+            color: '#4334F1',
           }}
           onPress={() => navigation.navigate('BookMarks')}
         >
@@ -69,7 +69,7 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
         style={style.flatten([
           'height-1',
           'margin-x-20',
-          'background-color-border-white'
+          'background-color-border-white',
         ])}
       />
     </React.Fragment>
@@ -132,18 +132,19 @@ export const Browser: FunctionComponent<any> = (props) => {
   }, [navigation]);
 
   useEffect(() => {
-    if (props?.route?.params?.path) {
-      updateScreen(props.route.params.path);
+    const deepLinkUri =
+      props?.route?.params?.path || deepLinkUriStore.getDeepLink();
+    if (deepLinkUri) {
+      updateScreen(deepLinkUri);
     }
   }, []);
 
   const updateScreen = async (uri) => {
-    const deepLinkUri = uri || deepLinkUriStore.getDeepLink();
-    if (deepLinkUri) {
+    if (uri) {
       deepLinkUriStore.updateDeepLink('');
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Browser',
-        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io'
+        uri: decodeURIComponent(uri) || 'https://oraidex.io',
       });
     }
   };
@@ -159,7 +160,7 @@ export const Browser: FunctionComponent<any> = (props) => {
           uri:
             props.route.params.url?.toLowerCase().indexOf('http') >= 0
               ? props.route.params.url?.toLowerCase()
-              : 'https://' + props.route.params?.url?.toLowerCase()
+              : 'https://' + props.route.params?.url?.toLowerCase(),
         });
       }
     }, 1000);
@@ -172,7 +173,7 @@ export const Browser: FunctionComponent<any> = (props) => {
         uri:
           url?.toLowerCase().indexOf('http') >= 0
             ? url?.toLowerCase()
-            : 'https://' + url?.toLowerCase()
+            : 'https://' + url?.toLowerCase(),
       });
     } else {
       let uri = `https://www.google.com/search?q=${url ?? ''}`;
@@ -180,7 +181,7 @@ export const Browser: FunctionComponent<any> = (props) => {
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Google',
         // uri: `https://staging.oraidex.io/ethereum`,
-        uri
+        uri,
       });
     }
   };
@@ -188,7 +189,7 @@ export const Browser: FunctionComponent<any> = (props) => {
   const handleClickUri = (uri: string, name: string) => {
     smartNavigation.pushSmart('Web.dApp', {
       name,
-      uri
+      uri,
     });
   };
 
@@ -244,7 +245,7 @@ export const Browser: FunctionComponent<any> = (props) => {
             <Image
               style={{
                 width: '100%',
-                height: '100%'
+                height: '100%',
               }}
               fadeDuration={0}
               resizeMode="stretch"
@@ -254,7 +255,7 @@ export const Browser: FunctionComponent<any> = (props) => {
               containerStyle={{
                 width: '100%',
                 padding: 20,
-                marginTop: -50
+                marginTop: -50,
               }}
               inputStyle={style.flatten([
                 'flex-row',
@@ -263,7 +264,7 @@ export const Browser: FunctionComponent<any> = (props) => {
                 'padding-20',
                 'border-radius-16',
                 'border-width-4',
-                'border-color-border-pink'
+                'border-color-border-pink',
               ])}
               returnKeyType={'next'}
               placeholder={'Search website'}
@@ -282,7 +283,7 @@ export const Browser: FunctionComponent<any> = (props) => {
             style={style.flatten([
               'height-full',
               'background-color-white',
-              'margin-y-64'
+              'margin-y-64',
             ])}
           >
             <BrowserSection />
@@ -292,7 +293,7 @@ export const Browser: FunctionComponent<any> = (props) => {
                   style={style.flatten([
                     'height-44',
                     'margin-bottom-15',
-                    'flex-row'
+                    'flex-row',
                   ])}
                   onPress={() => handleClickUri(uri, name)}
                 >
@@ -300,7 +301,7 @@ export const Browser: FunctionComponent<any> = (props) => {
                     <Image
                       style={{
                         width: 20,
-                        height: 20
+                        height: 20,
                       }}
                       source={logo}
                       fadeDuration={0}
@@ -328,7 +329,7 @@ export const Browser: FunctionComponent<any> = (props) => {
               bottom: 80,
               borderRadius: 4,
               zIndex: 1,
-              padding: 10
+              padding: 10,
             }}
           >
             <BrowserSectionModal
