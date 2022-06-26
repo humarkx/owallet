@@ -1,11 +1,11 @@
 /* eslint-disable react/display-name */
 import React, { FunctionComponent, useEffect } from 'react';
-import { Alert, Linking, Text, View } from 'react-native';
+import { Alert, Image, Linking, Text, View } from 'react-native';
 import { KeyRingStatus } from '@owallet/background';
 import {
   DrawerActions,
   NavigationContainer,
-  useNavigation
+  useNavigation,
 } from '@react-navigation/native';
 import { useStore } from './stores';
 import { observer } from 'mobx-react-lite';
@@ -47,23 +47,20 @@ import {
   DelegateScreen,
   StakingDashboardScreen,
   ValidatorDetailsScreen,
-  ValidatorListScreen
+  ValidatorListScreen,
 } from './screens/stake';
 import {
   DownArrowIcon,
-  OpenDrawerIcon,
-  ScanIcon,
-  ContactIcon,
-  SendIcon,
-  TransactionIcon,
-  SettingIcon,
-  WalletIcon,
-  WalletOutLineIcon,
-  ContactFillIcon,
-  ContactOutLineIcon,
-  TransactionOutlineIcon,
   SettingFillIcon,
-  SettingOutLineIcon
+  SettingOutLineIcon,
+  DotsIcon,
+  HomeFillIcon,
+  HomeOutlineIcon,
+  BrowserIcon,
+  BrowserOutLineIcon,
+  BrowserFillIcon,
+  InvestOutlineIcon,
+  InvestFillIcon,
 } from './components/icon';
 import {
   AddAddressBookScreen,
@@ -90,7 +87,7 @@ import {
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
-  TxSuccessResultScreen
+  TxSuccessResultScreen,
 } from './screens/tx-result';
 import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon';
 import { BlurredBottomTabBar } from './components/bottom-tabbar';
@@ -236,7 +233,7 @@ export const TransactionNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: '',
-          headerLeft: () => <ScreenHeaderLeft uri="Transactions" />
+          headerLeft: () => <ScreenHeaderLeft uri="Transactions" />,
         }}
         name="TransactionsDetails"
         component={TransactionDetail}
@@ -252,7 +249,7 @@ export const RegisterNavigation: FunctionComponent = () => {
     <Stack.Navigator
       screenOptions={{
         ...PlainHeaderScreenOptionsPreset,
-        headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
+        headerTitleStyle: style.flatten(['h5', 'color-text-black-high']),
       }}
       initialRouteName="Register.Intro"
       headerMode="screen"
@@ -324,7 +321,7 @@ export const OtherNavigation: FunctionComponent = () => {
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
-        headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
+        headerTitleStyle: style.flatten(['h5', 'color-text-black-high']),
       }}
       headerMode="screen"
     >
@@ -458,7 +455,7 @@ export const SettingStackScreen: FunctionComponent = () => {
     <Stack.Navigator
       screenOptions={{
         ...PlainHeaderScreenOptionsPreset,
-        headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
+        headerTitleStyle: style.flatten(['h5', 'color-text-black-high']),
       }}
       headerMode="screen"
     >
@@ -469,7 +466,7 @@ export const SettingStackScreen: FunctionComponent = () => {
           ...getPlainHeaderScreenOptionsPresetWithBackgroundColor(
             style.get('color-setting-screen-background').color
           ),
-          headerTitleStyle: style.flatten(['h3', 'color-text-black-high'])
+          headerTitleStyle: style.flatten(['h3', 'color-text-black-high']),
         }}
         name="Setting"
         component={SettingScreen}
@@ -524,7 +521,7 @@ export const AddressBookStackScreen: FunctionComponent = () => {
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
-        headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
+        headerTitleStyle: style.flatten(['h5', 'color-text-black-high']),
       }}
       headerMode="screen"
     >
@@ -587,37 +584,95 @@ export const MainTabNavigation: FunctionComponent = () => {
     return color == '#C6C6CD';
   };
 
+  const RenderTabsBarIcon = ({ color, name }) => {
+    let checkColor = checkActiveTabBottom(color);
+    let icon;
+    let nameRoute = name;
+    switch (name) {
+      case 'Main':
+        icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />;
+        break;
+      case 'Browse':
+        icon = checkColor ? <BrowserOutLineIcon /> : <BrowserFillIcon />;
+        break;
+      case 'Invest':
+        icon = checkColor ? <InvestOutlineIcon /> : <InvestFillIcon />;
+        break;
+      case 'Settings':
+        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />;
+        break;
+      default:
+        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />;
+        break;
+    }
+    return (
+      <View
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingTop: !checkColor ? 30 : 12,
+        }}
+      >
+        {icon}
+        {!!nameRoute && (
+          <Text
+            style={{
+              fontSize: 12,
+              lineHeight: 16,
+              color: '#5F5E77',
+            }}
+          >
+            {nameRoute}
+          </Text>
+        )}
+
+        {!checkColor && (
+          <View style={{ paddingTop: 10 }}>
+            <DotsIcon />
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => {
           switch (route.name) {
             case 'Main':
-              return checkActiveTabBottom(color) ? (
-                <WalletOutLineIcon size={24} />
-              ) : (
-                <WalletIcon size={24} />
-              );
+              return <RenderTabsBarIcon color={color} name={'Main'} />;
             case 'AddressBook':
-              return checkActiveTabBottom(color) ? (
-                <ContactOutLineIcon size={24} />
-              ) : (
-                <ContactFillIcon size={24} />
-              );
+              return <RenderTabsBarIcon color={color} name={'Browse'} />;
             case 'Send':
-              return <SendIcon />;
+              return (
+                <View
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    paddingTop: !checkActiveTabBottom(color) ? 30 : 8,
+                  }}
+                >
+                  <Image
+                    style={{
+                      width: 50,
+                      height: 50,
+                    }}
+                    source={require('./assets/image/push.png')}
+                    resizeMode="contain"
+                    fadeDuration={0}
+                  />
+                  {!checkActiveTabBottom(color) && (
+                    <View style={{ paddingTop: 14 }}>
+                      <DotsIcon />
+                    </View>
+                  )}
+                </View>
+              );
             case 'TransactionsTab':
-              return checkActiveTabBottom(color) ? (
-                <TransactionOutlineIcon size={24} />
-              ) : (
-                <TransactionIcon size={24} />
-              );
+              return <RenderTabsBarIcon color={color} name={'Invest'} />;
             case 'Settings':
-              return checkActiveTabBottom(color) ? (
-                <SettingOutLineIcon size={24} />
-              ) : (
-                <SettingFillIcon size={24} />
-              );
+              return <RenderTabsBarIcon color={color} name={'Settings'} />;
           }
         },
         tabBarButton: (props) => (
