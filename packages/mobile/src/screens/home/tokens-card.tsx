@@ -55,10 +55,6 @@ const nftsData = [
   }
 ]
 
-const _renderSectionItem = ({ item, section }) => {
-  return <View />
-}
-
 const _renderFlatlistItem = ({ item }) => (
   <View style={styles.flatListItem}>
     <Image
@@ -194,7 +190,7 @@ export const TokensCard: FunctionComponent<{
                     }}
                   >
                     <Text style={styles.sectionHeader}>{section.title}</Text>
-                    <DownArrowIcon color={colors['black']} height={44} />
+                    <DownArrowIcon color={colors['black']} height={12} />
                   </View>
 
                   <FlatList
