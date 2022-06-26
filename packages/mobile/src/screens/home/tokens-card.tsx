@@ -18,7 +18,7 @@ import { DownArrowIcon } from '../../components/icon'
 
 const nftsData = [
   {
-    title: 'NFT721',
+    title: 'ERC-721',
     data: [
       {
         uri: 'https://picsum.photos/id/1002/200',
@@ -38,7 +38,7 @@ const nftsData = [
     ]
   },
   {
-    title: 'NFT1155',
+    title: 'ERC-1155',
     data: [
       {
         uri: 'https://picsum.photos/id/1002/200',
@@ -129,7 +129,7 @@ export const TokensCard: FunctionComponent<{
     <View style={containerStyle}>
       <Card
         style={{
-          marginTop: spacing['32'],
+          paddingTop: spacing['8'],
           paddingBottom: spacing['14'],
           borderRadius: spacing['24']
         }}
@@ -156,6 +156,7 @@ export const TokensCard: FunctionComponent<{
               title={title}
               titleStyle={active => ({
                 fontSize: 14,
+                fontWeight: "700",
                 color: active ? colors['gray-900'] : colors['gray-600']
               })}
               containerStyle={{
