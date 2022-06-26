@@ -50,20 +50,11 @@ import {
   ValidatorListScreen,
 } from './screens/stake';
 import {
-  DownArrowIcon,
-  SendIcon,
-  TransactionIcon,
-  WalletIcon,
-  WalletOutLineIcon,
-  ContactFillIcon,
-  ContactOutLineIcon,
-  TransactionOutlineIcon,
   SettingFillIcon,
   SettingOutLineIcon,
   DotsIcon,
   HomeFillIcon,
   HomeOutlineIcon,
-  BrowserIcon,
   BrowserOutLineIcon,
   BrowserFillIcon,
   InvestOutlineIcon,
@@ -108,7 +99,10 @@ import { BookMarks } from './screens/web/bookmarks';
 import { Transactions, TransactionDetail } from './screens/transactions';
 import { navigate, navigationRef } from './router/root';
 import { handleDeepLink } from './utils/helper';
-import { SmartNavigatorProvider } from './navigation.provider';
+import {
+  SmartNavigatorProvider,
+  useSmartNavigation,
+} from './navigation.provider';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -146,10 +140,12 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
 const ScreenHeaderLeft: FunctionComponent<{ uri: string }> = observer(
   ({ uri = 'MainTabDrawer' }) => {
     const style = useStyle();
+    const smartNavigation = useSmartNavigation();
     return (
       <HeaderLeftButton
         onPress={() => {
-          navigate(uri);
+          // navigate(uri);
+          smartNavigation.goBack();
         }}
       >
         <View style={style.flatten(['flex-row', 'items-center'])}>
@@ -185,24 +181,23 @@ export const MainNavigation: FunctionComponent = () => {
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
-        headerTitle: () => (
-          <View style={{ alignItems: 'center', height: 40 }}>
-            <HomeScreenHeaderLeft />
-          </View>
-        ),
-        // headerTitle: ''
+        // headerTitle: () => (
+        //   <View style={{ alignItems: 'center', height: 40 }}>
+        //     <HomeScreenHeaderLeft />
+        //   </View>
+        // ),
+        headerTitle: '',
       }}
       // initialRouteName="Home"
       initialRouteName={deepLinkUriStore.getDeepLink() ? 'Browser' : 'Home'}
       headerMode="screen"
     >
       <Stack.Screen
-        options={
-          {
-            // headerLeft: () => <HomeScreenHeaderLeft />,
-            // headerRight: () => <HomeScreenHeaderRight />,
-          }
-        }
+        options={{
+          headerShown: false,
+          // headerLeft: () => <HomeScreenHeaderLeft />,
+          // headerRight: () => <HomeScreenHeaderRight />,
+        }}
         name="Home"
         component={HomeScreen}
       />
@@ -242,7 +237,7 @@ export const TransactionNavigation: FunctionComponent = () => {
         component={Transactions}
         options={{
           title: 'Transactions',
-          headerLeft: null,
+          headerLeft: () => <ScreenHeaderLeft />,
         }}
       />
       <Stack.Screen
@@ -607,7 +602,7 @@ export const MainTabNavigation: FunctionComponent = () => {
       case 'Main':
         icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />;
         break;
-      case 'Browse':
+      case 'Browser':
         icon = checkColor ? <BrowserOutLineIcon /> : <BrowserFillIcon />;
         break;
       case 'Invest':
@@ -657,8 +652,8 @@ export const MainTabNavigation: FunctionComponent = () => {
           switch (route.name) {
             case 'Main':
               return <RenderTabsBarIcon color={color} name={'Main'} />;
-            case 'AddressBook':
-              return <RenderTabsBarIcon color={color} name={'Browse'} />;
+            case 'Browser':
+              return <RenderTabsBarIcon color={color} name={'Browser'} />;
             case 'Send':
               return (
                 <View
@@ -684,7 +679,7 @@ export const MainTabNavigation: FunctionComponent = () => {
                   )}
                 </View>
               );
-            case 'TransactionsTab':
+            case 'Invest':
               return <RenderTabsBarIcon color={color} name={'Invest'} />;
             case 'Settings':
               return <RenderTabsBarIcon color={color} name={'Settings'} />;
@@ -732,14 +727,7 @@ export const MainTabNavigation: FunctionComponent = () => {
       )}
     >
       <Tab.Screen name="Main" component={MainNavigation} />
-      <Tab.Screen
-        name="AddressBook"
-        component={AddressBookScreen}
-        initialParams={{
-          currency: chainStore.current.stakeCurrency.coinMinimalDenom,
-          chainId: chainStore.current.chainId,
-        }}
-      />
+      <Tab.Screen name="Browser" component={Browser} />
       <Tab.Screen
         options={{
           title: 'Send',
@@ -751,7 +739,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           chainId: chainStore.current.chainId,
         }}
       />
-      <Tab.Screen name="TransactionsTab" component={TransactionNavigation} />
+      <Tab.Screen name="Invest" component={StakingDashboardScreen} />
       <Tab.Screen
         name="Settings"
         component={SettingStackScreen}
@@ -831,6 +819,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
               />
               <Stack.Screen name="Register" component={RegisterNavigation} />
               <Stack.Screen name="Others" component={OtherNavigation} />
+              <Stack.Screen name="Trans" component={TransactionNavigation} />
               <Stack.Screen
                 name="AddressBooks"
                 component={AddressBookStackScreen}
