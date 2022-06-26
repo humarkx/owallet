@@ -51,6 +51,13 @@ import {
 } from './screens/stake';
 import {
   DownArrowIcon,
+  SendIcon,
+  TransactionIcon,
+  WalletIcon,
+  WalletOutLineIcon,
+  ContactFillIcon,
+  ContactOutLineIcon,
+  TransactionOutlineIcon,
   SettingFillIcon,
   SettingOutLineIcon,
   DotsIcon,
@@ -136,8 +143,8 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
   );
 });
 
-const ScreenHeaderLeft: FunctionComponent = observer(
-  ({ uri = 'MainTabDrawer' }: any) => {
+const ScreenHeaderLeft: FunctionComponent<{ uri: string }> = observer(
+  ({ uri = 'MainTabDrawer' }) => {
     const style = useStyle();
     return (
       <HeaderLeftButton

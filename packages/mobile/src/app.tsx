@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent } from 'react';
 import { StoreProvider, useStore } from './stores';
 import { StyleProvider } from './styles';
 import { AppNavigation } from './navigation';
@@ -62,7 +62,8 @@ SplashScreen.preventAutoHideAsync()
   )
   .catch(console.warn);
 
-LogBox.ignoreLogs(['EventEmitter.removeListener']);
+// we already log in debugging tools
+LogBox.ignoreAllLogs();
 
 const AppIntlProviderWithStorage = ({ children }) => {
   const store = useStore();
@@ -90,9 +91,9 @@ const AppIntlProviderWithStorage = ({ children }) => {
                 hour: '2-digit',
                 hour12: false,
                 minute: '2-digit',
-                timeZoneName: 'short',
-              },
-            },
+                timeZoneName: 'short'
+              }
+            }
           }}
         >
           {children}
@@ -102,7 +103,7 @@ const AppIntlProviderWithStorage = ({ children }) => {
   );
 };
 
-const AppBody: FunctionComponent = () => {
+export const App: FunctionComponent = () => {
   return (
     <StyleProvider>
       <StoreProvider>
@@ -128,10 +129,3 @@ const AppBody: FunctionComponent = () => {
     </StyleProvider>
   );
 };
-
-export const App: FunctionComponent = AppBody;
-// ? AppBody
-// : codePush({
-//     installMode: codePush.InstallMode.IMMEDIATE,
-//     checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
-//   })(AppBody);
