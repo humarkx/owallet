@@ -10,7 +10,7 @@ import {
   AccountWithAll,
   LedgerInitStore,
   IBCCurrencyRegsitrar,
-  PermissionStore
+  PermissionStore,
 } from '@owallet/stores';
 import { AsyncKVStore } from '../common';
 import { APP_PORT } from '@owallet/router';
@@ -26,12 +26,13 @@ import {
   AmplitudeApiKey,
   EmbedChainInfos,
   UIConfigStore,
-  FiatCurrencies
+  FiatCurrencies,
 } from '@owallet/common';
 import { AnalyticsStore, NoopAnalyticsClient } from '@owallet/analytics';
 import { Amplitude } from '@amplitude/react-native';
 import { ChainIdHelper } from '@owallet/cosmos';
 import { FiatCurrency } from '@owallet/types';
+import { ModalStore } from './modal';
 
 export class RootStore {
   public readonly uiConfigStore: UIConfigStore;
@@ -75,6 +76,7 @@ export class RootStore {
   >;
 
   public readonly deepLinkUriStore: DeepLinkStore;
+  public readonly modalStore: ModalStore;
 
   constructor() {
     const router = new RNRouterUI(RNEnv.produceEnv);
@@ -108,7 +110,7 @@ export class RootStore {
       {
         dispatchEvent: (type: string) => {
           eventEmitter.emit(type);
-        }
+        },
       },
       'pbkdf2',
       this.chainStore,
@@ -137,7 +139,7 @@ export class RootStore {
         },
         removeEventListener: (type: string, fn: () => void) => {
           eventEmitter.removeListener(type, fn);
-        }
+        },
       },
       AccountWithAll,
       this.chainStore,
@@ -150,7 +152,7 @@ export class RootStore {
           getOWallet: async () => {
             // TOOD: Set version for OWallet API
             return new OWallet('', 'core', new RNMessageRequesterInternal());
-          }
+          },
         },
         chainOpts: this.chainStore.chainInfos.map((chainInfo) => {
           if (chainInfo.chainId.startsWith('osmosis')) {
@@ -158,14 +160,14 @@ export class RootStore {
               chainId: chainInfo.chainId,
               msgOpts: {
                 withdrawRewards: {
-                  gas: 200000
-                }
-              }
+                  gas: 200000,
+                },
+              },
             };
           }
 
           return { chainId: chainInfo.chainId };
-        })
+        }),
       }
     );
 
@@ -184,7 +186,7 @@ export class RootStore {
       {
         addEventListener: (type: string, fn: () => void) => {
           eventEmitter.addListener(type, fn);
-        }
+        },
       },
       this.chainStore,
       new RNMessageRequesterInternal(),
@@ -222,7 +224,7 @@ export class RootStore {
         logEvent: (eventName, eventProperties) => {
           if (eventProperties?.chainId || eventProperties?.toChainId) {
             eventProperties = {
-              ...eventProperties
+              ...eventProperties,
             };
 
             if (eventProperties.chainId) {
@@ -240,12 +242,13 @@ export class RootStore {
 
           return {
             eventName,
-            eventProperties
+            eventProperties,
           };
-        }
+        },
       }
     );
     this.deepLinkUriStore = new DeepLinkStore();
+    this.modalStore = new ModalStore();
   }
 }
 
