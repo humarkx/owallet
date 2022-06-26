@@ -9,7 +9,11 @@ import { useSmartNavigation } from '../../navigation.provider'
 import { RectButton } from '../../components/rect-button'
 import { colors, metrics, spacing, typography } from '../../themes'
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler'
-import { formatContractAddress, _keyExtract } from '../../utils/helper'
+import {
+  capitalizedText,
+  formatContractAddress,
+  _keyExtract
+} from '../../utils/helper'
 import { DownArrowIcon } from '../../components/icon'
 
 const nftsData = [
@@ -178,7 +182,6 @@ export const TokensCard: FunctionComponent<{
         ) : (
           <CardBody>
             <SectionList
-              contentContainerStyle={{ paddingHorizontal: 10 }}
               stickySectionHeadersEnabled={false}
               sections={nftsData}
               renderSectionHeader={({ section }) => (
@@ -199,8 +202,6 @@ export const TokensCard: FunctionComponent<{
                     renderItem={_renderFlatlistItem}
                     keyExtractor={_keyExtract}
                     showsHorizontalScrollIndicator={false}
-                    ListHeaderComponent={<View style={{ width: 12 }} />}
-                    ListFooterComponent={<View style={{ width: 12 }} />}
                   />
                 </>
               )}
@@ -222,7 +223,9 @@ export const TokensCard: FunctionComponent<{
               smartNavigation.navigateSmart('Tokens', {})
             }}
           >
-            <Text style={styles.textLoadMore}>View all</Text>
+            <Text style={styles.textLoadMore}>
+              {capitalizedText('view all')}
+            </Text>
           </RectButton>
         </View>
       </Card>
@@ -232,9 +235,8 @@ export const TokensCard: FunctionComponent<{
 
 const styles = StyleSheet.create({
   textLoadMore: {
-    ...typography['text-button3'],
-    textTransform: 'capitalize',
-    color: colors['gray-800']
+    ...typography['h7'],
+    color: colors['purple-700']
   },
   containerBtn: {
     alignItems: 'center',
