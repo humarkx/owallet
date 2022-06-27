@@ -225,19 +225,12 @@ export const MainNavigation: FunctionComponent = () => {
         name="Web"
         component={WebNavigation}
       />
-    </Stack.Navigator>
-  );
-};
-
-export const TransactionNavigation: FunctionComponent = () => {
-  return (
-    <Stack.Navigator initialRouteName="Transactions" headerMode="screen">
       <Stack.Screen
         name="Transactions"
         component={Transactions}
         options={{
           title: 'Transactions',
-          headerLeft: () => <ScreenHeaderLeft />,
+          headerLeft:() =>  <ScreenHeaderLeft  />,
         }}
       />
       <Stack.Screen
@@ -245,12 +238,13 @@ export const TransactionNavigation: FunctionComponent = () => {
           title: '',
           headerLeft: () => <ScreenHeaderLeft uri="Transactions" />,
         }}
-        name="TransactionsDetails"
+        name="Transactions.Detail"
         component={TransactionDetail}
       />
     </Stack.Navigator>
   );
 };
+
 
 export const RegisterNavigation: FunctionComponent = () => {
   const style = useStyle();
@@ -819,7 +813,6 @@ export const AppNavigation: FunctionComponent = observer(() => {
               />
               <Stack.Screen name="Register" component={RegisterNavigation} />
               <Stack.Screen name="Others" component={OtherNavigation} />
-              <Stack.Screen name="Trans" component={TransactionNavigation} />
               <Stack.Screen
                 name="AddressBooks"
                 component={AddressBookStackScreen}
