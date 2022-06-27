@@ -32,6 +32,7 @@ import { AnalyticsStore, NoopAnalyticsClient } from '@owallet/analytics';
 import { Amplitude } from '@amplitude/react-native';
 import { ChainIdHelper } from '@owallet/cosmos';
 import { FiatCurrency } from '@owallet/types';
+import { ModalStore } from './modal';
 
 export class RootStore {
   public readonly uiConfigStore: UIConfigStore;
@@ -76,6 +77,7 @@ export class RootStore {
 
   public readonly deepLinkUriStore: DeepLinkStore;
   public readonly browserStore: BrowserStore;
+  public readonly modalStore: ModalStore;
 
   constructor() {
     const router = new RNRouterUI(RNEnv.produceEnv);
@@ -248,6 +250,7 @@ export class RootStore {
     );
     this.deepLinkUriStore = new DeepLinkStore();
     this.browserStore = new BrowserStore();
+    this.modalStore = new ModalStore();
   }
 }
 
