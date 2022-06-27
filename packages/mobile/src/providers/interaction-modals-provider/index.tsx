@@ -4,7 +4,7 @@ import { useStore } from '../../stores';
 import { SignModal } from '../../modals/sign';
 import { LedgerGranterModal } from '../../modals/ledger';
 import { HomeBaseModal } from '../../modals/home-base';
-import { Text } from 'react-native-svg';
+import { Text } from 'react-native';
 
 export const InteractionModalsProivder: FunctionComponent = observer(
   ({ children }) => {
@@ -15,6 +15,10 @@ export const InteractionModalsProivder: FunctionComponent = observer(
       signInteractionStore,
       modalStore,
     } = useStore();
+
+    // Example usage
+    // modalStore.setOpen();
+    // modalStore.setChildren(<Text>33333</Text>);
 
     useEffect(() => {
       for (const data of permissionStore.waitingDatas) {
@@ -43,7 +47,7 @@ export const InteractionModalsProivder: FunctionComponent = observer(
         ) : null}
         {modalStore.getState() ? (
           <HomeBaseModal isOpen={true} close={() => modalStore.close()}>
-            {<Text>123123</Text>}
+            <Text>123123</Text>
           </HomeBaseModal>
         ) : null}
 
