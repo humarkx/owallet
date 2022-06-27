@@ -18,13 +18,7 @@ import {
   BrowserSectionTitle,
   BrowserSectionModal,
 } from './components/section-title';
-import {
-  SearchIcon,
-  RightArrowIcon,
-  HomeIcon,
-  ThreeDotsIcon,
-  TabIcon,
-} from '../../components/icon';
+import { SearchIcon } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { checkValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
@@ -97,18 +91,19 @@ export const Browser: FunctionComponent<any> = (props) => {
   }, [navigation]);
 
   useEffect(() => {
-    if (props?.route?.params?.path) {
-      updateScreen(props.route.params.path);
+    const deepLinkUri =
+      props?.route?.params?.path || deepLinkUriStore.getDeepLink();
+    if (deepLinkUri) {
+      updateScreen(deepLinkUri);
     }
   }, []);
 
   const updateScreen = async (uri) => {
-    const deepLinkUri = uri || deepLinkUriStore.getDeepLink();
-    if (deepLinkUri) {
+    if (uri) {
       deepLinkUriStore.updateDeepLink('');
       smartNavigation.pushSmart('Web.dApp', {
         name: 'Browser',
-        uri: decodeURIComponent(deepLinkUri) || 'https://oraidex.io',
+        uri: decodeURIComponent(uri) || 'https://oraidex.io',
       });
     }
   };
