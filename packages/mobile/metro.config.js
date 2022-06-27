@@ -28,49 +28,17 @@ const watchFolders = [
 module.exports = (async () => {
   const {
     resolver: { sourceExts, assetExts }
-  } = await getDefaultConfig();
-
-  // patch code
-  const gasFile = path.resolve(
-    __dirname,
-    '../../node_modules/@cosmjs/launchpad/build/gas.js'
-  );
-
-  fs.writeFileSync(
-    gasFile,
-    fs
-      .readFileSync(gasFile)
-      .toString()
-      .replace(
-        `const matchResult = gasPrice.match(/^(?<amount>.+?)(?<denom>[a-z]+)$/);
-        if (!matchResult) {
-            throw new Error("Invalid gas price string");
-        }
-        const { amount, denom } = matchResult.groups;`,
-        `const matchResult = gasPrice.match(/^(.+?)([a-z]+)$/);
-        if (!matchResult) {
-            throw new Error("Invalid gas price string");
-        }
-        const [ amount, denom ] = matchResult.slice(1);`
-      )
-  );
+  } = await getDefaultConfig(__dirname);
 
   return {
     projectRoot: path.resolve(__dirname, '.'),
     watchFolders,
     resolver: {
-      // For react-native-svg-transformer
       assetExts: assetExts.filter((ext) => ext !== 'svg'),
       sourceExts: [...sourceExts, 'svg'],
-      // To prevent that multiple react instances exist,
-      // add the react in this package to the blacklist,
-      // and use the only react in the root project.
       blacklistRE: blacklist([/packages\/mobile\/node_modules\/react\/.*/]),
       extraNodeModules: {
-        crypto: path.resolve(
-          __dirname,
-          './node_modules/react-native-crypto-polyfill'
-        ),
+        crypto: path.resolve(__dirname, './polyfill/crypto'),
         buffer: path.resolve(__dirname, '../../node_modules/buffer'),
         stream: path.resolve(__dirname, '../../node_modules/stream-browserify'),
         string_decoder: path.resolve(
@@ -85,7 +53,7 @@ module.exports = (async () => {
     },
     transformer: {
       babelTransformerPath: require.resolve('react-native-svg-transformer'),
-      getTransformOptions: async () => ({
+      getTransformOptions: () => ({
         transform: {
           experimentalImportSupport: false,
           inlineRequires: false

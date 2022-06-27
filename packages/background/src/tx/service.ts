@@ -27,33 +27,39 @@ interface ABCIMessageLog {
 export async function request(
   rpc: string,
   method: string,
-  params: any[],
+  params: any[]
 ): Promise<any> {
   const restInstance = Axios.create({
     ...{
-      baseURL: rpc
+      baseURL: rpc,
     },
-    adapter: fetchAdapter
+    adapter: fetchAdapter,
   });
 
-
   try {
-    const response = await restInstance.post('/', {
-      jsonrpc: '2.0',
-      id: 1,
-      method,
-      params,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+    const response = await restInstance.post(
+      '/',
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method,
+        params,
       },
-    })
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      }
+    );
     if (response.data.result) return response.data.result;
-    if (response.data.error) throw new Error(JSON.stringify(response.data.error));
-    throw new Error(`Unexpected error from the network: ${JSON.stringify(response.data)}`);
+    if (response.data.error)
+      throw new Error(JSON.stringify(response.data.error));
+    throw new Error(
+      `Unexpected error from the network: ${JSON.stringify(response.data)}`
+    );
   } catch (error) {
-    console.error("error calling request from ethereum provider: ", error)
+    console.error('error calling request from ethereum provider: ', error);
   }
 }
 
@@ -68,52 +74,52 @@ export class BackgroundTxService {
     public readonly permissionService: PermissionService,
     @inject(TYPES.Notification)
     protected readonly notification: Notification
-  ) { }
+  ) {}
 
   async sendTx(
     chainId: string,
     tx: unknown,
     mode: 'async' | 'sync' | 'block'
   ): Promise<Uint8Array> {
-    console.log("finally, in send tx to broadcast Keplr message");
+    console.log('finally, in send tx to broadcast Keplr message');
     const chainInfo = await this.chainsService.getChainInfo(chainId);
 
     const restInstance = Axios.create({
       ...{
-        baseURL: chainInfo.rest
+        baseURL: chainInfo.rest,
       },
       ...chainInfo.restConfig,
-      adapter: fetchAdapter
+      adapter: fetchAdapter,
     });
 
     this.notification.create({
       iconRelativeUrl: 'assets/orai_wallet_logo.png',
       title: 'Tx is pending...',
-      message: 'Wait a second'
+      message: 'Wait a second',
     });
 
     const isProtoTx = Buffer.isBuffer(tx) || tx instanceof Uint8Array;
 
     const params = isProtoTx
       ? {
-        tx_bytes: Buffer.from(tx as any).toString('base64'),
-        mode: (() => {
-          switch (mode) {
-            case 'async':
-              return 'BROADCAST_MODE_ASYNC';
-            case 'block':
-              return 'BROADCAST_MODE_BLOCK';
-            case 'sync':
-              return 'BROADCAST_MODE_SYNC';
-            default:
-              return 'BROADCAST_MODE_UNSPECIFIED';
-          }
-        })()
-      }
+          tx_bytes: Buffer.from(tx as any).toString('base64'),
+          mode: (() => {
+            switch (mode) {
+              case 'async':
+                return 'BROADCAST_MODE_ASYNC';
+              case 'block':
+                return 'BROADCAST_MODE_BLOCK';
+              case 'sync':
+                return 'BROADCAST_MODE_SYNC';
+              default:
+                return 'BROADCAST_MODE_UNSPECIFIED';
+            }
+          })(),
+        }
       : {
-        tx,
-        mode: mode
-      };
+          tx,
+          mode: mode,
+        };
 
     try {
       const result = await restInstance.post(
@@ -143,30 +149,39 @@ export class BackgroundTxService {
     }
   }
 
-  private parseChainId({ chainId }: { chainId: string }): { chainId: string, isEvm: boolean } {
-    if (!chainId) throw new Error("Invalid empty chain id when switching Ethereum chain");
-    if (chainId.substring(0, 2) === '0x') return { chainId: parseInt(chainId, 16).toString(), isEvm: true };
+  private parseChainId({ chainId }: { chainId: string }): {
+    chainId: string;
+    isEvm: boolean;
+  } {
+    if (!chainId)
+      throw new Error('Invalid empty chain id when switching Ethereum chain');
+    if (chainId.substring(0, 2) === '0x')
+      return { chainId: parseInt(chainId, 16).toString(), isEvm: true };
     return { chainId, isEvm: false };
   }
 
-  async request(
-    chainId: string,
-    method: string,
-    params: any[],
-  ): Promise<any> {
-    var chainInfo: ChainInfoWithEmbed;
+  async request(chainId: string, method: string, params: any[]): Promise<any> {
+    let chainInfo: ChainInfoWithEmbed;
     switch (method) {
       case 'eth_accounts':
       case 'eth_requestAccounts':
-        const key = await this.keyRingService.getKey(chainId);
+        chainInfo = await this.chainsService.getChainInfo(chainId);
+        if (chainInfo.coinType !== 60) return undefined;
+        const chainIdOrCoinType = params.length ? parseInt(params[0]) : chainId; // default is cointype 60 for ethereum based
+        const key = await this.keyRingService.getKey(chainIdOrCoinType);
         return [`0x${Buffer.from(key.address).toString('hex')}`];
       case 'wallet_switchEthereumChain' as any:
         const { chainId: inputChainId, isEvm } = this.parseChainId(params[0]);
-        chainInfo = isEvm ? await this.chainsService.getChainInfo(inputChainId, 'evm') : await this.chainsService.getChainInfo(inputChainId);
+        chainInfo = isEvm
+          ? await this.chainsService.getChainInfo(inputChainId, 'evm')
+          : await this.chainsService.getChainInfo(inputChainId);
         return chainInfo.chainId;
       default:
         chainInfo = await this.chainsService.getChainInfo(chainId);
-        if (!chainInfo.evmRpc) throw new Error(`The given chain ID: ${chainId} does not have a RPC endpoint to connect to`);
+        if (!chainInfo.evmRpc)
+          throw new Error(
+            `The given chain ID: ${chainId} does not have a RPC endpoint to connect to`
+          );
         return await request(chainInfo.evmRpc, method, params);
     }
   }
@@ -198,7 +213,7 @@ export class BackgroundTxService {
         iconRelativeUrl: 'assets/orai_wallet_logo.png',
         title: 'Tx succeeds',
         // TODO: Let users know the tx id?
-        message: 'Congratulations!'
+        message: 'Congratulations!',
       });
     } catch (e: any) {
       BackgroundTxService.processTxErrorNotification(notification, e);
@@ -252,7 +267,7 @@ export class BackgroundTxService {
     notification.create({
       iconRelativeUrl: 'assets/orai_wallet_logo.png',
       title: 'Tx failed',
-      message
+      message,
     });
   }
 }

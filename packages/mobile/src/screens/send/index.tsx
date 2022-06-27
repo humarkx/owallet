@@ -10,7 +10,7 @@ import {
   AmountInput,
   MemoInput,
   CurrencySelector,
-  FeeButtons
+  FeeButtons,
 } from '../../components/input';
 import { useStyle } from '../../styles';
 import { Button } from '../../components/button';
@@ -88,11 +88,12 @@ export const SendScreen: FunctionComponent = observer(() => {
     >
       <View
         style={{
-          marginTop: safeAreaInsets.top
+          marginTop: safeAreaInsets.top,
         }}
       />
       {/* <View style={style.flatten(['height-page-pad'])} /> */}
       <AddressInput
+        placeholder="Type the receiver"
         label="Recipient"
         recipientConfig={sendConfigs.recipientConfig}
         memoConfig={sendConfigs.memoConfig}
@@ -102,8 +103,16 @@ export const SendScreen: FunctionComponent = observer(() => {
         placeHolder="Select Token"
         amountConfig={sendConfigs.amountConfig}
       />
-      <AmountInput label="Amount" amountConfig={sendConfigs.amountConfig} />
-      <MemoInput label="Memo (Optional)" memoConfig={sendConfigs.memoConfig} />
+      <AmountInput
+        placeholder="Type the receiver"
+        label="Amount"
+        amountConfig={sendConfigs.amountConfig}
+      />
+      <MemoInput
+        label="Memo (Optional)"
+        placeholder="Type your memo here"
+        memoConfig={sendConfigs.memoConfig}
+      />
       <FeeButtons
         label="Fee"
         gasLabel="gas"
@@ -127,19 +136,19 @@ export const SendScreen: FunctionComponent = observer(() => {
                 sendConfigs.feeConfig.toStdFee(),
                 {
                   preferNoSetFee: true,
-                  preferNoSetMemo: true
+                  preferNoSetMemo: true,
                 },
                 {
                   onBroadcasted: (txHash) => {
                     analyticsStore.logEvent('Send token tx broadcasted', {
                       chainId: chainStore.current.chainId,
                       chainName: chainStore.current.chainName,
-                      feeType: sendConfigs.feeConfig.feeType
+                      feeType: sendConfigs.feeConfig.feeType,
                     });
                     smartNavigation.pushSmart('TxPendingResult', {
-                      txHash: Buffer.from(txHash).toString('hex')
+                      txHash: Buffer.from(txHash).toString('hex'),
                     });
-                  }
+                  },
                 }
               );
             } catch (e) {

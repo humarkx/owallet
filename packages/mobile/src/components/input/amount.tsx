@@ -18,7 +18,8 @@ export const AmountInput: FunctionComponent<{
   containerStyle?: ViewStyle;
   inputContainerStyle?: ViewStyle;
   errorLabelStyle?: TextStyle;
-
+  placeholder?: string;
+  placeholderTextColor?: string;
   label: string;
 
   amountConfig: IAmountConfig;
@@ -30,6 +31,8 @@ export const AmountInput: FunctionComponent<{
     errorLabelStyle,
     label,
     amountConfig,
+    placeholder,
+    placeholderTextColor,
   }) => {
     const style = useStyle();
 
@@ -65,6 +68,8 @@ export const AmountInput: FunctionComponent<{
         onChangeText={(text) => {
           amountConfig.setAmount(text.replace(/,/g, '.'));
         }}
+        placeholder={placeholder}
+        placeholderTextColor={placeholderTextColor}
         inputRight={
           <View
             style={style.flatten([
@@ -75,7 +80,7 @@ export const AmountInput: FunctionComponent<{
           >
             <Button
               text="MAX"
-              mode={amountConfig.isMax ? 'light' : 'fill'}
+              mode={amountConfig.isMax ? 'fill' : 'light'}
               size="small"
               style={style.flatten(['padding-x-5', 'padding-y-3'])}
               containerStyle={style.flatten(['height-24', 'border-radius-4'])}

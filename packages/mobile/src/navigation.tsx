@@ -51,11 +51,15 @@ import {
 } from './screens/stake';
 import {
   DownArrowIcon,
-  OpenDrawerIcon,
-  ScanIcon,
   SendIcon,
-  SettingIcon,
-  WalletIcon
+  TransactionIcon,
+  WalletIcon,
+  WalletOutLineIcon,
+  ContactFillIcon,
+  ContactOutLineIcon,
+  TransactionOutlineIcon,
+  SettingFillIcon,
+  SettingOutLineIcon
 } from './components/icon';
 import {
   AddAddressBookScreen,
@@ -84,23 +88,16 @@ import {
   TxPendingResultScreen,
   TxSuccessResultScreen
 } from './screens/tx-result';
-import {
-  HeaderAddIcon,
-  HeaderWalletConnectIcon,
-  HeaderBackButtonIcon
-} from './components/header/icon';
+import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon';
 import { BlurredBottomTabBar } from './components/bottom-tabbar';
 import { UnlockScreen } from './screens/unlock';
 import { OWalletVersionScreen } from './screens/setting/screens/version';
-import { ManageWalletConnectScreen } from './screens/manage-wallet-connect';
-import {
-  ImportFromExtensionIntroScreen,
-  ImportFromExtensionScreen,
-  ImportFromExtensionSetPasswordScreen
-} from './screens/register/import-from-extension';
+
 import { DAppWebpageScreen } from './screens/web/webpages';
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
 import { Browser } from './screens/web/browser';
+import { BookMarks } from './screens/web/bookmarks';
+import { Transactions, TransactionDetail } from './screens/transactions';
 import { navigate, navigationRef } from './router/root';
 import { handleDeepLink } from './utils/helper';
 import { SmartNavigatorProvider } from './navigation.provider';
@@ -137,30 +134,26 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
   );
 });
 
-const BrowserScreenHeaderLeft: FunctionComponent = observer(() => {
-  const style = useStyle();
-
-  const navigation = useNavigation();
-
-  return (
-    <HeaderLeftButton
-      onPress={() => {
-        // navigation.goBack();
-        navigate('MainTabDrawer');
-      }}
-    >
-      <View style={style.flatten(['flex-row', 'items-center'])}>
-        <Text style={style.flatten(['h4', 'color-text-black-low'])}>
-          <HeaderBackButtonIcon />
-        </Text>
-      </View>
-    </HeaderLeftButton>
-  );
-});
+const ScreenHeaderLeft: FunctionComponent<{ uri: string }> = observer(
+  ({ uri = 'MainTabDrawer' }) => {
+    const style = useStyle();
+    return (
+      <HeaderLeftButton
+        onPress={() => {
+          navigate(uri);
+        }}
+      >
+        <View style={style.flatten(['flex-row', 'items-center'])}>
+          <Text style={style.flatten(['h4', 'color-text-black-low'])}>
+            <HeaderBackButtonIcon />
+          </Text>
+        </View>
+      </HeaderLeftButton>
+    );
+  }
+);
 
 const HomeScreenHeaderRight: FunctionComponent = observer(() => {
-  const { walletConnectStore } = useStore();
-
   const navigation = useNavigation();
 
   return (
@@ -171,23 +164,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
             screen: 'Camera'
           });
         }}
-      >
-        {/* <ScanIcon size={28} color={style.get("color-primary").color} /> */}
-      </HeaderRightButton>
-      {walletConnectStore.sessions.length > 0 ? (
-        <HeaderRightButton
-          style={{
-            right: 42
-          }}
-          onPress={() => {
-            navigation.navigate('Others', {
-              screen: 'ManageWalletConnect'
-            });
-          }}
-        >
-          <HeaderWalletConnectIcon />
-        </HeaderRightButton>
-      ) : null}
+      ></HeaderRightButton>
     </React.Fragment>
   );
 });
@@ -215,11 +192,19 @@ export const MainNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'Browser',
-          headerLeft: () => <BrowserScreenHeaderLeft />
+          title: 'Browser'
+          // headerLeft: () => <ScreenHeaderLeft />,
         }}
         name="Browser"
         component={Browser}
+      />
+      <Stack.Screen
+        options={{
+          title: 'BookMarks'
+          // headerLeft: () => <ScreenHeaderLeft uri="Browser"/>,
+        }}
+        name="BookMarks"
+        component={BookMarks}
       />
       <Stack.Screen
         options={{
@@ -228,6 +213,29 @@ export const MainNavigation: FunctionComponent = () => {
         }}
         name="Web"
         component={WebNavigation}
+      />
+    </Stack.Navigator>
+  );
+};
+
+export const TransactionNavigation: FunctionComponent = () => {
+  return (
+    <Stack.Navigator initialRouteName="Transactions" headerMode="screen">
+      <Stack.Screen
+        name="Transactions"
+        component={Transactions}
+        options={{
+          title: 'Transactions',
+          headerLeft: null
+        }}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: () => <ScreenHeaderLeft uri="Transactions" />
+        }}
+        name="TransactionsDetails"
+        component={TransactionDetail}
       />
     </Stack.Navigator>
   );
@@ -296,28 +304,6 @@ export const RegisterNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          // Only show the back button.
-          title: ''
-        }}
-        name="Register.ImportFromExtension.Intro"
-        component={ImportFromExtensionIntroScreen}
-      />
-      <Stack.Screen
-        options={{
-          headerShown: false
-        }}
-        name="Register.ImportFromExtension"
-        component={ImportFromExtensionScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Import Extension'
-        }}
-        name="Register.ImportFromExtension.SetPassword"
-        component={ImportFromExtensionSetPasswordScreen}
-      />
-      <Stack.Screen
-        options={{
           headerShown: false
         }}
         name="Register.End"
@@ -358,13 +344,6 @@ export const OtherNavigation: FunctionComponent = () => {
         }}
         name="Camera"
         component={CameraScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'WalletConnect'
-        }}
-        name="ManageWalletConnect"
-        component={ManageWalletConnectScreen}
       />
       <Stack.Screen
         options={{
@@ -600,18 +579,41 @@ export const MainTabNavigation: FunctionComponent = () => {
     }
   }, [focusedScreen.name, isDrawerOpen, navigation]);
 
+  const checkActiveTabBottom = (color: string) => {
+    return color == '#C6C6CD';
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => {
           switch (route.name) {
             case 'Main':
-              return <WalletIcon color={color} size={24} />;
-            // case "Web":
+              return checkActiveTabBottom(color) ? (
+                <WalletOutLineIcon size={24} />
+              ) : (
+                <WalletIcon size={24} />
+              );
+            case 'AddressBook':
+              return checkActiveTabBottom(color) ? (
+                <ContactOutLineIcon size={24} />
+              ) : (
+                <ContactFillIcon size={24} />
+              );
             case 'Send':
               return <SendIcon />;
+            case 'TransactionsTab':
+              return checkActiveTabBottom(color) ? (
+                <TransactionOutlineIcon size={24} />
+              ) : (
+                <TransactionIcon size={24} />
+              );
             case 'Settings':
-              return <SettingIcon color={color} />;
+              return checkActiveTabBottom(color) ? (
+                <SettingOutLineIcon size={24} />
+              ) : (
+                <SettingFillIcon size={24} />
+              );
           }
         },
         tabBarButton: (props) => (
@@ -656,7 +658,14 @@ export const MainTabNavigation: FunctionComponent = () => {
       )}
     >
       <Tab.Screen name="Main" component={MainNavigation} />
-      {/* <Tab.Screen name="Web" component={WebNavigation} /> */}
+      <Tab.Screen
+        name="AddressBook"
+        component={AddressBookScreen}
+        initialParams={{
+          currency: chainStore.current.stakeCurrency.coinMinimalDenom,
+          chainId: chainStore.current.chainId
+        }}
+      />
       <Tab.Screen
         options={{
           title: 'Send'
@@ -668,6 +677,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           chainId: chainStore.current.chainId
         }}
       />
+      <Tab.Screen name="TransactionsTab" component={TransactionNavigation} />
       <Tab.Screen
         name="Settings"
         component={SettingStackScreen}
@@ -703,11 +713,15 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
 
 export const AppNavigation: FunctionComponent = observer(() => {
   const { keyRingStore, deepLinkUriStore } = useStore();
-
   useEffect(() => {
     Linking.getInitialURL()
       .then((url) => {
         if (url) {
+          // const SCHEME_IOS = 'owallet://open_url?url=';
+          // const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url=';
+          // deepLinkUriStore.updateDeepLink(
+          //   url.replace(SCHEME_ANDROID, '').replace(SCHEME_IOS, '')
+          // );
           deepLinkUriStore.updateDeepLink('https://oraidex.io');
         }
       })

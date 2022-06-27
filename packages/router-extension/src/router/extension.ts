@@ -1,4 +1,10 @@
-import { Router, MessageSender, Result, EnvProducer } from '@owallet/router';
+import {
+  Router,
+  MessageSender,
+  Result,
+  EnvProducer,
+  OWalletError
+} from '@owallet/router';
 
 export class ExtensionRouter extends Router {
   constructor(envProducer: EnvProducer) {
@@ -58,19 +64,26 @@ export class ExtensionRouter extends Router {
         return: result
       };
     } catch (e) {
-      console.error(e);
       console.log(
         `Failed to process msg ${message.type}: ${e?.message || e?.toString()}`
       );
 
-      if (e) {
-        return {
+      if (e instanceof OWalletError) {
+        return Promise.resolve({
+          error: {
+            code: e.code,
+            module: e.module,
+            message: e.message || e.toString()
+          }
+        });
+      } else if (e) {
+        return Promise.resolve({
           error: e.message || e.toString()
-        };
+        });
       } else {
-        return {
+        return Promise.resolve({
           error: 'Unknown error, and error is null'
-        };
+        });
       }
     }
   }
