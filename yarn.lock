@@ -20031,6 +20031,11 @@ react-native-keychain@^7.0.0:
   resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-7.0.0.tgz#11fd559fe86ae89f934b8c75ae228247deed5494"
   integrity sha512-tH26sgW4OxB/llXmhO+DajFISEUoF1Ip2+WSDMIgCt8SP1xRE81m2qFzgIOc/7StYsUERxHhDPkxvq2H0/Goig==
 
+react-native-linear-gradient@^2.5.6:
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
+  integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
+
 react-native-localize@^2.1.1:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/react-native-localize/-/react-native-localize-2.2.2.tgz#a1c6369000c9dae6800eded8ddb1673bf090f84e"
@@ -24266,10 +24271,8 @@ watchpack@^1.7.4:
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.7.5.tgz#1267e6c55e0b9b5be44c2023aed5437a2c26c453"
   integrity sha512-9P3MWk6SrKjHsGkLT2KHXdQ/9SNkyoJbabxnKOoJepsvJjJG8uYTR3yTPxPQvNDI3w4Nz1xnE0TLHK4RIVe/MQ==
   dependencies:
-    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
-    watchpack-chokidar2 "^2.0.1"
   optionalDependencies:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
