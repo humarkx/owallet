@@ -1,4 +1,4 @@
-import { ChainInfo } from '../chain-info';
+import { ChainInfo, NetworkType } from '../chain-info';
 import {
   BroadcastMode,
   AminoSignResponse,
@@ -35,6 +35,7 @@ export interface OWalletSignOptions {
   readonly preferNoSetMemo?: boolean;
 
   readonly disableBalanceCheck?: boolean;
+  readonly networkType?: NetworkType;
 }
 
 export interface OWallet {

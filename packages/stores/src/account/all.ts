@@ -1,4 +1,4 @@
-// import { AccountSetEvmBase, AccountSetEvmOpts } from './base-evm';
+import { EthereumAccount, EthereumMsgOpts } from './ethereum';
 import { AccountSetBase, AccountSetOpts } from "./base";
 import {
   AccountWithCosmos,
@@ -15,6 +15,7 @@ import {
 import {
   HasCosmosQueries,
   HasCosmwasmQueries,
+  HasEvmQueries,
   HasSecretQueries,
   QueriesSetBase,
   QueriesStore,
@@ -31,8 +32,8 @@ import {
 
 export class AccountWithAll
   extends AccountSetBase<
-    CosmosMsgOpts & SecretMsgOpts & CosmwasmMsgOpts,
-    HasCosmosQueries & HasSecretQueries & HasCosmwasmQueries
+    CosmosMsgOpts & SecretMsgOpts & CosmwasmMsgOpts & EthereumMsgOpts,
+    HasCosmosQueries & HasSecretQueries & HasCosmwasmQueries & HasEvmQueries
   >
   implements HasCosmosAccount, HasSecretAccount, HasCosmwasmAccount {
   static readonly defaultMsgOpts: CosmosMsgOpts &
@@ -46,6 +47,7 @@ export class AccountWithAll
   );
 
   public readonly cosmos: DeepReadonly<CosmosAccount>;
+  public readonly ethereum: DeepReadonly<EthereumAccount>;
   public readonly secret: DeepReadonly<SecretAccount>;
   public readonly cosmwasm: DeepReadonly<CosmwasmAccount>;
 
@@ -57,7 +59,7 @@ export class AccountWithAll
     protected readonly chainGetter: ChainGetter,
     protected readonly chainId: string,
     protected readonly queriesStore: QueriesStore<
-      QueriesSetBase & HasCosmosQueries & HasSecretQueries & HasCosmwasmQueries
+      QueriesSetBase & HasCosmosQueries & HasSecretQueries & HasCosmwasmQueries & HasEvmQueries
     >,
     protected readonly opts: AccountSetOpts<
       CosmosMsgOpts & SecretMsgOpts & CosmwasmMsgOpts
@@ -79,6 +81,12 @@ export class AccountWithAll
     );
     this.cosmwasm = new CosmwasmAccount(
       this as AccountSetBase<CosmwasmMsgOpts, HasCosmwasmQueries>,
+      chainGetter,
+      chainId,
+      queriesStore
+    );
+    this.ethereum = new EthereumAccount(
+      this as AccountSetBase<EthereumMsgOpts, HasEvmQueries>,
       chainGetter,
       chainId,
       queriesStore

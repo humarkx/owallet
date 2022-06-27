@@ -1,6 +1,7 @@
 import { Transaction, TransactionOptions } from 'ethereumjs-tx';
 import { Wallet } from '@ethersproject/wallet';
 import Common from '@ethereumjs/common';
+import Web3 from 'web3';
 import "reflect-metadata";
 import {
   action,
@@ -20,6 +21,7 @@ import {
   makeSignDoc,
   makeStdTx,
   Msg,
+  MsgSend,
   StdFee,
   StdTx
 } from '@cosmjs/launchpad';
@@ -58,9 +60,9 @@ export interface MsgOpt {
 type AminoMsgsOrWithProtoMsgs =
   | Msg[]
   | {
-      aminoMsgs: Msg[];
-      protoMsgs?: google.protobuf.IAny[];
-    };
+    aminoMsgs: Msg[];
+    protoMsgs?: google.protobuf.IAny[];
+  };
 
 export interface AccountSetOpts<MsgOpts> {
   readonly prefetching: boolean;
@@ -116,10 +118,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcastFailed?: (e?: Error) => void;
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) => Promise<boolean>)[] = [];
 
   constructor(
@@ -164,9 +166,9 @@ export class AccountSetBase<MsgOpts, Queries> {
       onTxEvents?:
         | ((tx: any) => void)
         | {
-            onBroadcasted?: (txHash: Uint8Array) => void;
-            onFulfill?: (tx: any) => void;
-          }
+          onBroadcasted?: (txHash: Uint8Array) => void;
+          onFulfill?: (tx: any) => void;
+        }
     ) => Promise<boolean>
   ) {
     this.sendTokenFns.push(fn);
@@ -277,10 +279,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcastFailed?: (e?: Error) => void;
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) {
     runInAction(() => {
       this._isSendingMsg = type;
@@ -384,6 +386,154 @@ export class AccountSetBase<MsgOpts, Queries> {
     });
   }
 
+  async sendEvmMsgs(
+    type: string | 'unknown',
+    msgs: Msg,
+    memo: string = '',
+    fee: StdFee,
+    signOptions?: OWalletSignOptions,
+    onTxEvents?:
+      | ((tx: any) => void)
+      | {
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
+  ) {
+    runInAction(() => {
+      this._isSendingMsg = type;
+    });
+
+    let txHash: string;
+
+    console.log("REACH sendMgs in base!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+    try {
+      const result = await this.broadcastEvmMsgs(
+        msgs,
+      );
+      txHash = result.txHash;
+      console.log(txHash, "TXHASH!!!!!!!!!!!!!!!!!!")
+    } catch (e: any) {
+      runInAction(() => {
+        this._isSendingMsg = false;
+      });
+
+      if (this.opts.preTxEvents?.onBroadcastFailed) {
+        this.opts.preTxEvents.onBroadcastFailed(e);
+      }
+
+      if (
+        onTxEvents &&
+        'onBroadcastFailed' in onTxEvents &&
+        onTxEvents.onBroadcastFailed
+      ) {
+        onTxEvents.onBroadcastFailed(e);
+      }
+
+      console.log("REACH ERROR ON CATCH HERE", e);
+
+      throw e;
+    }
+
+    let onBroadcasted: ((txHash: Uint8Array) => void) | undefined;
+    let onFulfill: ((tx: any) => void) | undefined;
+
+    if (onTxEvents) {
+      if (typeof onTxEvents === 'function') {
+        onFulfill = onTxEvents;
+      } else {
+        onBroadcasted = onTxEvents.onBroadcasted;
+        onFulfill = onTxEvents.onFulfill;
+      }
+    }
+
+    console.log("REACH HERE 6 !!!!!!!!!!!!!!!");
+
+    const rpc = this.chainGetter.getChain(this.chainId).rest;
+    console.log(rpc, "REACH HERE 7 !!!!!!!!!!!!!!!");
+
+
+    runInAction(() => {
+      this._isSendingMsg = false;
+    });
+
+    const waitForPendingTransaction = async (rpc, txHash, onFulfill) => {
+      let expectedBlockTime = 3000;
+      const sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+      }
+
+      let transactionReceipt = null;
+      let retryCount = 0;
+      while (transactionReceipt == null) { // Waiting expectedBlockTime until the transaction is mined
+        transactionReceipt = await request(rpc, "eth_getTransactionReceipt", [txHash]);
+        retryCount += 1;
+        if (retryCount === 10) break;
+        await sleep(expectedBlockTime);
+      }
+
+      if (this.opts.preTxEvents?.onFulfill) {
+        this.opts.preTxEvents.onFulfill(transactionReceipt);
+      }
+
+      if (onFulfill) {
+        onFulfill(transactionReceipt);
+      }
+    }
+
+    waitForPendingTransaction(rpc, txHash, onFulfill);
+
+    console.log("REACH HERE 8 !!!!!!!!!!!!!!!");
+
+
+    // if (this.opts.preTxEvents?.onFulfill) {
+    //   this.opts.preTxEvents.onFulfill(txInfo);
+    // }
+
+    // if (onFulfill) {
+    //   onFulfill(txInfo);
+    // }
+
+    // const txTracer = new TendermintTxTracer(
+    //   this.chainGetter.getChain(this.chainId).rpc,
+    //   '/websocket',
+    //   {
+    //     wsObject: this.opts.wsObject
+    //   }
+    // );
+
+    // txTracer.traceTx(txHash).then((tx) => {
+    //   txTracer.close();
+
+    //   runInAction(() => {
+    //     this._isSendingMsg = false;
+    //   });
+
+    //   // After sending tx, the balances is probably changed due to the fee.
+    //   // for (const feeAmount of fee.amount) {
+    //   //   const queryEvmBalance = this.queries.queryEvmBalances.getQueryBalance(this.evmosHexAddress)
+
+    //   //   if (queryEvmBalance) {
+    //   //     queryEvmBalance.fetch();
+    //   //   }
+    //   // }
+
+    //   // Always add the tx hash data.
+    //   if (tx && !tx.hash) {
+    //     tx.hash = Buffer.from(txHash).toString('hex');
+    //   }
+
+    //   if (this.opts.preTxEvents?.onFulfill) {
+    //     this.opts.preTxEvents.onFulfill(tx);
+    //   }
+
+    //   if (onFulfill) {
+    //     onFulfill(tx);
+    //   }
+    // });
+  }
+
   async sendToken(
     amount: string,
     currency: AppCurrency,
@@ -394,11 +544,10 @@ export class AccountSetBase<MsgOpts, Queries> {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) {
-    console.log('get here');
 
     for (let i = 0; i < this.sendTokenFns.length; i++) {
       const fn = this.sendTokenFns[i];
@@ -436,8 +585,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     return parseInt(chainId);
   }
 
-  // TODO; do we have to add a new broadcast msg for Ethereum?
-
+  // TODO; do we have to add a new broadcast msg for Ethereum? -- Update: Added done
   // Return the tx hash.
   protected async broadcastMsgs(
     msgs: AminoMsgsOrWithProtoMsgs,
@@ -448,65 +596,40 @@ export class AccountSetBase<MsgOpts, Queries> {
   ): Promise<{
     txHash: Uint8Array;
   }> {
-    console.log("REACH broadcast MSG!!!!!!!!!!!!!!!!!!!!!!!")
-
-    if (this.walletStatus !== WalletStatus.Loaded) {
-      throw new Error(`Wallet is not loaded: ${this.walletStatus}`);
-    }
-
-    let aminoMsgs: Msg[];
-    let protoMsgs: google.protobuf.IAny[] | undefined;
-    if ('aminoMsgs' in msgs) {
-      aminoMsgs = msgs.aminoMsgs;
-      protoMsgs = msgs.protoMsgs;
-    } else {
-      aminoMsgs = msgs;
-    }
-
-    if (aminoMsgs.length === 0) {
-      throw new Error('There is no msg to send');
-    }
-
-    if (
-      this.hasNoLegacyStdFeature() &&
-      (!protoMsgs || protoMsgs.length === 0)
-    ) {
-      throw new Error(
-        "Chain can't send legecy stdTx. But, proto any type msgs are not provided"
-      );
-    }
-
-    console.log("REACH BROADCAST MSG PHASE 2!!!!!!!!!!!!!!")
-
-    const coinType = this.chainGetter.getChain(this.chainId).bip44.coinType;
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const owallet = (await this.getOWallet())!;
-    const ethereum = (await this.getEthereum())!;
-
-    console.log(ethereum, 'ETHEREUM WALLET!!!!!!!!!!!!!!!!')
-
-    let signedTx: Uint8Array | StdTx;
-
-    console.log(this.chainId,"CHAIN ID!!!!!!!!!!!!!!!!!!!!!!")
-    const chainInfo = this.chainGetter.getChain(this.chainId);
-    if (chainInfo.networkType === "evm") {
-      const message = {
-        "from": "0xC5cb5c75050a9297FfF61d735372C009176C6934",
-        "to": "0xC5cb5c75050a9297FfF61d735372C009176C6934",
-        // "gas": "0x76c0",
-        // "gasPrice": gasPrice,
-        "value": "0x76c0",
-        "data": "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"
+    try {
+      if (this.walletStatus !== WalletStatus.Loaded) {
+        throw new Error(`Wallet is not loaded: ${this.walletStatus}`);
       }
-      const signResponse = await ethereum.signAndBroadcastEthereum(
-        this.chainId,
-        message
-      );
 
-      console.log(signResponse,'RESPONSE SIGN!@!!!!!!!!!!!!!!')
-    }
-    else {
+      let aminoMsgs: Msg[];
+      let protoMsgs: google.protobuf.IAny[] | undefined;
+      if ('aminoMsgs' in msgs) {
+        aminoMsgs = msgs.aminoMsgs;
+        protoMsgs = msgs.protoMsgs;
+      } else {
+        aminoMsgs = msgs;
+      }
+
+      if (aminoMsgs.length === 0) {
+        throw new Error('There is no msg to send');
+      }
+
+      if (
+        this.hasNoLegacyStdFeature() &&
+        (!protoMsgs || protoMsgs.length === 0)
+      ) {
+        throw new Error(
+          "Chain can't send legecy stdTx. But, proto any type msgs are not provided"
+        );
+      }
+
+      const coinType = this.chainGetter.getChain(this.chainId).bip44.coinType;
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const owallet = (await this.getOWallet())!;
+
+      let signedTx: Uint8Array | StdTx;
+
       const account = await BaseAccount.fetchFromRest(
         this.instance,
         this.bech32Address,
@@ -514,7 +637,6 @@ export class AccountSetBase<MsgOpts, Queries> {
       );
 
       if (this.hasNoLegacyStdFeature()) {
-        console.log("Has no legacy std feature!!!!!!!!!!!!!!!")
         const key = await owallet.getKey(this.chainId);
 
         const signDoc = {
@@ -564,7 +686,6 @@ export class AccountSetBase<MsgOpts, Queries> {
           signatures: [Buffer.from(signResponse.signature.signature, 'base64')],
         }).finish();
       } else {
-        console.log("Has legacy feature!!!!!!!!!!!!!")
         const signDoc = makeSignDoc(
           aminoMsgs,
           fee,
@@ -582,17 +703,63 @@ export class AccountSetBase<MsgOpts, Queries> {
 
         signedTx = makeStdTx(signResponse.signed, signResponse.signature);
       }
+
+      return {
+        txHash: await owallet.sendTx(
+          this.chainId,
+          signedTx,
+          mode as BroadcastMode
+        )
+      };
+    } catch (error) {
+      console.log("Error on broadcastMsgs: ", error);
     }
+  }
 
+  // Return the tx hash.
+  protected async broadcastEvmMsgs(
+    msgs: Msg,
+  ): Promise<{
+    txHash: string;
+  }> {
+    try {
 
+      console.log("REACH broadcast MSG IN ETHEREUMMM!!!!!!!!!!!!!!!!!!!!!!!")
 
-    return {
-      txHash: await owallet.sendTx(
+      if (this.walletStatus !== WalletStatus.Loaded) {
+        throw new Error(`Wallet is not loaded: ${this.walletStatus}`);
+      }
+
+      if (Object.values(msgs).length === 0) {
+        throw new Error('There is no msg to send');
+      }
+
+      console.log("REACH BROADCAST MSG PHASE 2!!!!!!!!!!!!!!")
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const ethereum = (await this.getEthereum())!;
+      console.log("Amino Msgs: ", msgs);
+
+      const message = {
+        to: msgs.value.to_address,
+        value: "0x" + parseInt(msgs.value.amount[0].amount).toString(16),
+      }
+
+      console.log(message, 'MESSAGEEEEEEEEEEEEEEEEEEEEEEEE')
+
+      const signResponse = await ethereum.signAndBroadcastEthereum(
         this.chainId,
-        signedTx,
-        mode as BroadcastMode
-      )
-    };
+        message
+      );
+
+      console.log(signResponse, 'RESPONSE SIGN!@!!!!!!!!!!!!!!')
+
+      return {
+        txHash: signResponse.rawTxHex
+      };
+    } catch (error) {
+      console.log("Error on broadcastMsgs: ", error);
+    }
   }
 
   get instance(): AxiosInstance {

@@ -49,7 +49,7 @@ export const SendPage: FunctionComponent = observer(() => {
 
   const notification = useNotification();
 
-  const { chainStore, accountStore, priceStore, queriesStore, analyticsStore, accountEthStore } =
+  const { chainStore, accountStore, priceStore, queriesStore, analyticsStore } =
     useStore();
   const current = chainStore.current;
 
@@ -178,10 +178,6 @@ export const SendPage: FunctionComponent = observer(() => {
           e.preventDefault();
 
           if (accountInfo.isReadyToSendMsgs && txStateIsValid) {
-            if (chainStore.current.networkType === "evm") {
-              // const keyRingService = new KeyRing;
-              
-            }
             try {
               const stdFee = sendConfigs.feeConfig.toStdFee();
               (window as any).accountInfo = accountInfo;
@@ -194,7 +190,8 @@ export const SendPage: FunctionComponent = observer(() => {
                 stdFee,
                 {
                   preferNoSetFee: true,
-                  preferNoSetMemo: true
+                  preferNoSetMemo: true,
+                  networkType: chainStore.current.networkType,
                 },
                 {
                   onBroadcasted: () => {
@@ -203,17 +200,40 @@ export const SendPage: FunctionComponent = observer(() => {
                       chainName: chainStore.current.chainName,
                       feeType: sendConfigs.feeConfig.feeType
                     });
+                  },
+                  onFulfill: (tx) => {
+                    console.log(tx,"TX INFO ON SEND PAGE!!!!!!!!!!!!!!!!!!!!!")
+                    notification.push({
+                      placement: 'top-center',
+                      type: tx?.status === "0x1" ? 'success' : 'danger',
+                      duration: 5,
+                      content: tx?.status === "0x1" ? `Transaction successful with tx: ${tx?.transactionHash}`: `Transaction failed with tx: ${tx?.transactionHash}`,
+                      canDelete: true,
+                      transition: {
+                        duration: 0.25
+                      }
+                    });
                   }
                 }
               );
               if (!isDetachedPage) {
                 history.replace('/');
               }
+              notification.push({
+                placement: 'top-center',
+                type: 'success',
+                duration: 5,
+                content: 'Transaction submitted!',
+                canDelete: true,
+                transition: {
+                  duration: 0.25
+                }
+              });
             } catch (e: any) {
               if (!isDetachedPage) {
                 history.replace('/');
               }
-              console.log(e.message,'zzzzzzzzzz')
+              console.log(e.message,'Catch Error on send!!!')
               notification.push({
                 type: 'warning',
                 placement: 'top-center',
