@@ -5,10 +5,10 @@ export const HomeIcon: FunctionComponent<{
   color: string;
   size: number;
   onPress?: () => void;
-}> = ({ color, size , onPress }) => {
+}> = ({ color, size, onPress }) => {
   return (
     <Svg
-    onPress={onPress}
+      onPress={onPress}
       width={size}
       height={size}
       viewBox="0 0 24 24"

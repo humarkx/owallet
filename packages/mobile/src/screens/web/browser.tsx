@@ -245,7 +245,7 @@ export const Browser: FunctionComponent<any> = (props) => {
             >
               <BrowserBookmark />
               <View style={style.flatten(['padding-20'])}>
-                {browserStore.getBookmarks()?.map((e) => (
+                {browserStore.getBookmarks?.map((e) => (
                   <TouchableOpacity
                     key={e.uri}
                     style={style.flatten([
