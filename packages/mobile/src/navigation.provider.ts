@@ -61,7 +61,7 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       Tokens: {
         upperScreenName: 'Main'
       },
-      Ntfs: {
+      Nfts: {
         upperScreenName: 'Main'
       },
       Camera: {
