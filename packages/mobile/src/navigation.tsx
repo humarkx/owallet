@@ -96,8 +96,9 @@ import { navigate, navigationRef } from './router/root'
 import { handleDeepLink } from './utils/helper'
 import {
   SmartNavigatorProvider,
-  useSmartNavigation
-} from './navigation.provider'
+  useSmartNavigation,
+} from './navigation.provider';
+import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
 import { NtfsScreen } from './screens/nfts'
 
 const Stack = createStackNavigator()
@@ -783,7 +784,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           title: 'Send'
         }}
         name="Send"
-        component={SendScreen}
+        component={TransferTokensScreen}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
           chainId: chainStore.current.chainId
