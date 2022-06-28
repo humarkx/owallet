@@ -78,7 +78,6 @@ import {
   FocusedScreenProvider,
   useFocusedScreen
 } from './providers/focused-screen'
-// import Svg, { Path, Rect } from "react-native-svg";
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
@@ -88,7 +87,6 @@ import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon'
 import { BlurredBottomTabBar } from './components/bottom-tabbar'
 import { UnlockScreen } from './screens/unlock'
 import { OWalletVersionScreen } from './screens/setting/screens/version'
-
 import { DAppWebpageScreen } from './screens/web/webpages'
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen'
 import { Browser } from './screens/web/browser'
@@ -275,7 +273,7 @@ export const MainNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: ''
+          title: 'Ntf detail'
         }}
         name="Nfts"
         component={NtfsScreen}
