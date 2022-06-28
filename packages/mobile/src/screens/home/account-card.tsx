@@ -1,26 +1,28 @@
-import React, { FunctionComponent } from "react"
-import { observer } from "mobx-react-lite"
-import { Card, CardBody } from "../../components/card"
+import React, {
+  FunctionComponent,
+  ReactElement,
+  useCallback,
+  useEffect
+} from 'react'
+import { observer } from 'mobx-react-lite'
+import { Card, CardBody } from '../../components/card'
 import {
-  StyleSheet,
   Text,
   View,
   ViewStyle,
-  ImageBackground,
   Image,
   Touchable,
-  TouchableWithoutFeedback
-} from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
-import { useStore } from "../../stores"
-import { AddressCopyable } from "../../components/address-copyable"
-// import { DoubleDoughnutChart } from "../../components/svg";
-import { Button } from "../../components/button"
-import { LoadingSpinner } from "../../components/spinner"
-// import { StakedTokenSymbol, TokenSymbol } from "../../components/token-symbol";
-import { useSmartNavigation } from "../../navigation.provider"
-import { NetworkErrorView } from "./network-error-view"
-import { ProgressBar } from "../../components/progress-bar"
+  TouchableWithoutFeedback,
+  LogBox
+} from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useStore } from '../../stores'
+import { AddressCopyable } from '../../components/address-copyable'
+import { Button } from '../../components/button'
+import { LoadingSpinner } from '../../components/spinner'
+import { useSmartNavigation } from '../../navigation.provider'
+import { NetworkErrorView } from './network-error-view'
+import { ProgressBar } from '../../components/progress-bar'
 import {
   DotsIcon,
   DownArrowIcon,
@@ -30,25 +32,59 @@ import {
   Scanner,
   SendIcon,
   SettingDashboardIcon
-} from "../../components/icon"
-import { useNavigation, DrawerActions } from "@react-navigation/native"
-import { FormattedMessage, useIntl } from "react-intl"
+} from '../../components/icon'
+import { useNavigation, DrawerActions } from '@react-navigation/native'
+import { FormattedMessage, useIntl } from 'react-intl'
 import {
   BuyIcon,
   DepositIcon,
   SendDashboardIcon
-} from "../../components/icon/button"
-import { colors, metrics, spacing, typography } from "../../themes"
-import { navigate } from "../../router/root"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { NamespaceModal, NetworkModal } from "./components"
-import { RectButton } from "../../components/rect-button"
+} from '../../components/icon/button'
+import { colors, metrics, spacing, typography } from '../../themes'
+import { navigate } from '../../router/root'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { NamespaceModal, NetworkModal } from './components'
+import { Hash } from '@owallet/crypto'
+import LinearGradient from 'react-native-linear-gradient'
+import MyWalletModal from './components/my-wallet-modal/my-wallet-modal'
 
 export const AccountCard: FunctionComponent<{
   containerStyle?: ViewStyle
 }> = observer(({ containerStyle }) => {
   const { chainStore, accountStore, queriesStore, priceStore, modalStore } =
     useStore()
+
+  const deterministicNumber = useCallback(chainInfo => {
+    const bytes = Hash.sha256(
+      Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
+    )
+    return (
+      (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0
+    )
+  }, [])
+
+  const profileColor = useCallback(
+    chainInfo => {
+      const colors = [
+        'sky-blue',
+        'mint',
+        'red',
+        'orange',
+        'blue-violet',
+        'green',
+        'sky-blue',
+        'mint',
+        'red',
+        'purple',
+        'red',
+        'orange',
+        'black'
+      ]
+
+      return colors[deterministicNumber(chainInfo) % colors.length]
+    },
+    [deterministicNumber]
+  )
 
   const smartNavigation = useSmartNavigation()
   const navigation = useNavigation()
@@ -84,13 +120,13 @@ export const AccountCard: FunctionComponent<{
   ]
   const safeAreaInsets = useSafeAreaInsets()
   const onPressBtnMain = name => {
-    if (name === "Buy") {
-      navigate("Browser", { path: "https://oraidex.io" })
+    if (name === 'Buy') {
+      navigate('Browser', { path: 'https://oraidex.io' })
     }
-    if (name === "Deposit") {
+    if (name === 'Deposit') {
     }
-    if (name === "Send") {
-      smartNavigation.navigateSmart("Send", {
+    if (name === 'Send') {
+      smartNavigation.navigateSmart('Send', {
         currency: chainStore.current.stakeCurrency.coinMinimalDenom
       })
     }
@@ -98,7 +134,13 @@ export const AccountCard: FunctionComponent<{
 
   const _onPressNetworkModal = () => {
     modalStore.setOpen()
-    modalStore.setChildren(NetworkModal(account))
+    modalStore.setChildren(
+      NetworkModal({
+        profileColor,
+        chainStore,
+        modalStore
+      })
+    )
   }
 
   const _onPressNamespace = () => {
@@ -106,45 +148,54 @@ export const AccountCard: FunctionComponent<{
     modalStore.setChildren(NamespaceModal(account))
   }
 
+  const _onPressMyWallet = () => {
+    modalStore.setOpen()
+    modalStore.setChildren(MyWalletModal())
+  }
+
   const RenderBtnMain = ({ name }) => {
-    let icon
+    let icon: ReactElement
     switch (name) {
-      case "Buy":
+      case 'Buy':
         icon = <BuyIcon />
         break
-      case "Deposit":
+      case 'Deposit':
         icon = <DepositIcon />
         break
-      case "Send":
+      case 'Send':
         icon = <SendDashboardIcon />
         break
     }
     return (
       <TouchableOpacity
         style={{
-          backgroundColor: colors["violet"],
+          backgroundColor: colors['purple-900'],
           borderWidth: 0.5,
-          borderRadius: spacing["8"],
-          borderColor: colors["violet"]
+          borderRadius: spacing['8'],
+          borderColor: colors['transparent'],
+          marginLeft: 10,
+          marginRight: 10
         }}
         onPress={() => onPressBtnMain(name)}
       >
         <View
           style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            padding: spacing["8"]
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingTop: spacing['6'],
+            paddingBottom: spacing['6'],
+            paddingLeft: spacing['12'],
+            paddingRight: spacing['12']
           }}
         >
           {icon}
           <Text
             style={{
-              ...typography["h7"],
-              lineHeight: spacing["20"],
-              color: colors["white"],
-              paddingLeft: spacing["6"],
-              fontWeight: "700"
+              ...typography['h7'],
+              lineHeight: spacing['20'],
+              color: colors['white'],
+              paddingLeft: spacing['6'],
+              fontWeight: '700'
             }}
           >
             {name}
@@ -158,16 +209,16 @@ export const AccountCard: FunctionComponent<{
     <Card style={containerStyle}>
       <CardBody
         style={{
-          paddingBottom: spacing["0"],
+          paddingBottom: spacing['0'],
           paddingTop: safeAreaInsets.top + 10
         }}
       >
         <View
           style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingBottom: spacing["26"]
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingBottom: spacing['26']
           }}
         >
           <Text />
@@ -175,29 +226,29 @@ export const AccountCard: FunctionComponent<{
           <TouchableWithoutFeedback onPress={_onPressNetworkModal}>
             <View
               style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
                 paddingLeft: 50
               }}
             >
               <DotsIcon />
               <Text
                 style={{
-                  ...typography["h5"],
-                  ...colors["color-text-black-low"],
-                  marginLeft: spacing["8"]
+                  ...typography['h5'],
+                  ...colors['color-text-black-low'],
+                  marginLeft: spacing['8']
                 }}
               >
-                {chainStore.current.chainName + " " + "Network"}
+                {chainStore.current.chainName + ' Network'}
               </Text>
             </View>
           </TouchableWithoutFeedback>
 
-          <View style={{ display: "flex", flexDirection: "row" }}>
+          <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
               onPress={() => {
-                smartNavigation.navigateSmart("Transactions", {})
+                smartNavigation.navigateSmart('Transactions', {})
               }}
               style={{ paddingRight: 15 }}
             >
@@ -205,12 +256,12 @@ export const AccountCard: FunctionComponent<{
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("Others", {
-                  screen: "Camera"
+                navigation.navigate('Others', {
+                  screen: 'Camera'
                 })
               }}
             >
-              <Scanner size={28} color={"#5064fb"} />
+              <Scanner size={28} color={'#5064fb'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -218,17 +269,19 @@ export const AccountCard: FunctionComponent<{
         <View
           style={{
             height: 256,
-            borderWidth: spacing["0.5"],
-            borderColor: colors["gray-100"],
-            borderRadius: spacing["12"]
+            borderWidth: spacing['0.5'],
+            borderColor: colors['gray-100'],
+            borderRadius: spacing['12']
           }}
         >
-          <View
+          <LinearGradient
+            colors={['#161532', '#5E499A']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
             style={{
-              borderTopLeftRadius: spacing["11"],
-              borderTopRightRadius: spacing["11"],
-              height: 179,
-              backgroundColor: "#5E499A" //linear-gradient(112.91deg, #161532 0%, #5E499A 89.85%)
+              borderTopLeftRadius: spacing['11'],
+              borderTopRightRadius: spacing['11'],
+              height: 179
             }}
           >
             <View
@@ -239,8 +292,8 @@ export const AccountCard: FunctionComponent<{
             >
               <Text
                 style={{
-                  textAlign: "center",
-                  color: "#AEAEB2",
+                  textAlign: 'center',
+                  color: '#AEAEB2',
                   fontSize: 14,
                   lineHeight: 20
                 }}
@@ -249,9 +302,9 @@ export const AccountCard: FunctionComponent<{
               </Text>
               <Text
                 style={{
-                  textAlign: "center",
-                  color: "white",
-                  fontWeight: "900",
+                  textAlign: 'center',
+                  color: 'white',
+                  fontWeight: '900',
                   fontSize: 34,
                   lineHeight: 50
                 }}
@@ -263,32 +316,32 @@ export const AccountCard: FunctionComponent<{
             </View>
             <View
               style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingTop: 6,
-                paddingLeft: 20,
-                paddingRight: 20
+                display: 'flex',
+                flexDirection: 'row',
+                paddingTop: spacing['6'],
+                paddingLeft: spacing[22],
+                paddingRight: spacing['22'],
+                justifyContent: 'center'
               }}
             >
-              {["Buy", "Deposit", "Send"].map((e, i) => (
+              {['Buy', 'Deposit', 'Send'].map((e, i) => (
                 <RenderBtnMain key={i} name={e} />
               ))}
             </View>
-          </View>
+          </LinearGradient>
           <View
             style={{
-              backgroundColor: colors["white"],
-              display: "flex",
+              backgroundColor: colors['white'],
+              display: 'flex',
               height: 75,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingLeft: spacing["12"],
-              paddingRight: spacing["18"],
-              borderBottomLeftRadius: spacing["11"],
-              borderBottomRightRadius: spacing["11"],
-              shadowColor: "rgba(24, 39, 75, 0.12)",
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingLeft: spacing['12'],
+              paddingRight: spacing['18'],
+              borderBottomLeftRadius: spacing['11'],
+              borderBottomRightRadius: spacing['11'],
+              shadowColor: 'rgba(24, 39, 75, 0.12)',
               shadowOffset: {
                 width: 0,
                 height: 12
@@ -299,28 +352,28 @@ export const AccountCard: FunctionComponent<{
           >
             <View
               style={{
-                display: "flex",
-                justifyContent: "space-between"
+                display: 'flex',
+                justifyContent: 'space-between'
               }}
             >
               <View
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingBottom: spacing["2"]
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingBottom: spacing['2']
                 }}
               >
                 <Image
                   style={{
-                    width: spacing["26"],
-                    height: spacing["26"]
+                    width: spacing['26'],
+                    height: spacing['26']
                   }}
-                  source={require("../../assets/image/address_default.png")}
+                  source={require('../../assets/image/address_default.png')}
                   fadeDuration={0}
                 />
-                <Text style={{ paddingLeft: spacing["6"] }}>
-                  {account.name || "..."}
+                <Text style={{ paddingLeft: spacing['6'] }}>
+                  {account.name || '...'}
                 </Text>
               </View>
 
@@ -329,19 +382,20 @@ export const AccountCard: FunctionComponent<{
                 maxCharacters={22}
               />
             </View>
-            <View>
-              <DownArrowIcon height={30} color={colors["gray-150"]} />
-            </View>
+            <TouchableOpacity onPress={_onPressMyWallet}>
+              <DownArrowIcon height={30} color={colors['gray-150']} />
+            </TouchableOpacity>
           </View>
+
           {queryStakable.isFetching ? (
             <View
               style={{
-                position: "absolute",
+                position: 'absolute',
                 bottom: 50,
-                left: "50%"
+                left: '50%'
               }}
             >
-              <LoadingSpinner color={colors["gray-150"]} size={22} />
+              <LoadingSpinner color={colors['gray-150']} size={22} />
             </View>
           ) : null}
         </View>
@@ -353,11 +407,11 @@ export const AccountCard: FunctionComponent<{
         <View
           style={{
             height: 75,
-            borderWidth: spacing["0.5"],
-            borderColor: colors["gray-100"],
-            borderRadius: spacing["12"],
-            backgroundColor: colors["white"],
-            shadowColor: "rgba(24, 39, 75, 0.12)",
+            borderWidth: spacing['0.5'],
+            borderColor: colors['gray-100'],
+            borderRadius: spacing['12'],
+            backgroundColor: colors['white'],
+            shadowColor: 'rgba(24, 39, 75, 0.12)',
             shadowOffset: {
               width: 0,
               height: 12
@@ -368,27 +422,27 @@ export const AccountCard: FunctionComponent<{
         >
           <View
             style={{
-              display: "flex",
+              display: 'flex',
               height: 75,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingLeft: spacing["12"],
-              paddingRight: spacing["8"]
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingLeft: spacing['12'],
+              paddingRight: spacing['8']
             }}
           >
             <View
               style={{
-                display: "flex",
-                justifyContent: "space-between"
+                display: 'flex',
+                justifyContent: 'space-between'
               }}
             >
-              <Text style={{ paddingBottom: spacing["6"] }}>Namespace</Text>
+              <Text style={{ paddingBottom: spacing['6'] }}>Namespace</Text>
               <View
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center"
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center'
                 }}
               >
                 <Image
@@ -396,28 +450,28 @@ export const AccountCard: FunctionComponent<{
                     width: 26,
                     height: 26
                   }}
-                  source={require("../../assets/image/namespace_default.png")}
+                  source={require('../../assets/image/namespace_default.png')}
                   fadeDuration={0}
                 />
                 <Text
                   style={{
-                    paddingLeft: spacing["6"],
-                    fontWeight: "700",
-                    fontSize: spacing["18"],
+                    paddingLeft: spacing['6'],
+                    fontWeight: '700',
+                    fontSize: spacing['18'],
                     lineHeight: 26,
-                    textAlign: "center",
-                    color: colors["gray-900"]
+                    textAlign: 'center',
+                    color: colors['gray-900']
                   }}
                 >
-                  {account.name || "Harris.orai"}
+                  {account.name || 'Harris.orai'}
                 </Text>
               </View>
             </View>
             <TouchableOpacity
-              style={{ paddingTop: spacing["10"] }}
+              style={{ paddingTop: spacing['10'] }}
               onPress={_onPressNamespace}
             >
-              <SettingDashboardIcon size={30} color={colors["gray-150"]} />
+              <SettingDashboardIcon size={30} color={colors['gray-150']} />
             </TouchableOpacity>
           </View>
         </View>

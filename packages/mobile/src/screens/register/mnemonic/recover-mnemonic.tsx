@@ -13,6 +13,11 @@ import Clipboard from 'expo-clipboard';
 import { useStore } from '../../../stores';
 import { BIP44AdvancedButton, useBIP44Option } from '../bip44';
 import { Buffer } from 'buffer';
+import {
+  checkRouter,
+  checkRouterPaddingBottomBar,
+  navigate,
+} from '../../../router/root';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bip39 = require('bip39');
@@ -49,7 +54,7 @@ interface FormData {
   confirmPassword: string;
 }
 
-export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
+export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
   const route = useRoute<
     RouteProp<
       Record<
@@ -78,7 +83,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
     setFocus,
     setValue,
     getValues,
-    formState: { errors }
+    formState: { errors },
   } = useForm<FormData>();
 
   const [isCreating, setIsCreating] = useState(false);
@@ -97,7 +102,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
       );
       analyticsStore.setUserProperties({
         registerType: 'seed',
-        accountType: 'mnemonic'
+        accountType: 'mnemonic',
       });
     } else {
       const privateKey = Buffer.from(mnemonic.trim().replace('0x', ''), 'hex');
@@ -108,21 +113,26 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
       );
       analyticsStore.setUserProperties({
         registerType: 'seed',
-        accountType: 'privateKey'
+        accountType: 'privateKey',
       });
     }
-
-    smartNavigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'Register.End',
-          params: {
-            password: getValues('password')
-          }
-        }
-      ]
-    });
+    if (checkRouter(props?.route?.name, 'RegisterRecoverMnemonicMain')) {
+      navigate('RegisterEnd', {
+        password: getValues('password'),
+      });
+    } else {
+      smartNavigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Register.End',
+            params: {
+              password: getValues('password'),
+            },
+          },
+        ],
+      });
+    }
   });
 
   return (
@@ -161,7 +171,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
                 return 'Invalid private key';
               }
             }
-          }
+          },
         }}
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
@@ -172,7 +182,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
               numberOfLines={4}
               inputContainerStyle={style.flatten([
                 'padding-x-20',
-                'padding-y-16'
+                'padding-y-16',
               ])}
               bottomInInputContainer={
                 <View style={style.flatten(['flex-row'])}>
@@ -186,7 +196,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
                       const text = await Clipboard.getStringAsync();
                       if (text) {
                         setValue('mnemonic', text, {
-                          shouldValidate: true
+                          shouldValidate: true,
                         });
 
                         setFocus('name');
@@ -199,8 +209,8 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
                 style.flatten(['h6', 'color-text-black-medium']),
                 {
                   minHeight: 20 * 4,
-                  textAlignVertical: 'top'
-                }
+                  textAlignVertical: 'top',
+                },
               ])}
               onSubmitEditing={() => {
                 setFocus('name');
@@ -219,7 +229,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
       <Controller
         control={control}
         rules={{
-          required: 'Name is required'
+          required: 'Name is required',
         }}
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
@@ -257,7 +267,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
                 if (value.length < 8) {
                   return 'Password must be longer than 8 characters';
                 }
-              }
+              },
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -291,7 +301,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
                 if (getValues('password') !== value) {
                   return "Password doesn't match";
                 }
-              }
+              },
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -316,7 +326,21 @@ export const RecoverMnemonicScreen: FunctionComponent = observer(() => {
         </React.Fragment>
       ) : null}
       <View style={style.flatten(['flex-1'])} />
-      <Button text="Next" size="large" loading={isCreating} onPress={submit} />
+      <View
+        style={{
+          paddingBottom: checkRouterPaddingBottomBar(
+            props?.route?.name,
+            'RegisterRecoverMnemonicMain'
+          ),
+        }}
+      >
+        <Button
+          text="Next"
+          size="large"
+          loading={isCreating}
+          onPress={submit}
+        />
+      </View>
       {/* Mock element for bottom padding */}
       <View style={style.flatten(['height-page-pad'])} />
     </PageWithScrollView>

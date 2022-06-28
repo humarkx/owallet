@@ -16,6 +16,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       'Register.Intro': {
         upperScreenName: 'Register'
       },
+      'NewUser': {
+        upperScreenName: 'Register.NewUser'
+      },
       'Register.NewUser': {
         upperScreenName: 'Register'
       },

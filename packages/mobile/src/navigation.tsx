@@ -188,8 +188,8 @@ export const MainNavigation: FunctionComponent = () => {
         // ),
         headerTitle: '',
       }}
-      // initialRouteName="Home"
-      initialRouteName={deepLinkUriStore.getDeepLink() ? 'Browser' : 'Home'}
+      initialRouteName="Home"
+      // initialRouteName={deepLinkUriStore.getDeepLink() ? 'Browser' : 'Home'}
       headerMode="screen"
     >
       <Stack.Screen
@@ -232,6 +232,41 @@ export const MainNavigation: FunctionComponent = () => {
         }}
         name="Transactions.Detail"
         component={TransactionDetail}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Create a New Wallet',
+        }}
+        name="RegisterMain"
+        component={NewMnemonicScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Verify Mnemonic',
+        }}
+        name="RegisterVerifyMnemonicMain"
+        component={VerifyMnemonicScreen}
+      />
+        <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="RegisterEnd"
+        component={RegisterEndScreen}
+      />
+        <Stack.Screen
+        options={{
+          title: 'Import Existing Wallet',
+        }}
+        name="RegisterRecoverMnemonicMain"
+        component={RecoverMnemonicScreen}
+      />
+       <Stack.Screen
+        options={{
+          title: 'Import Hardware Wallet',
+        }}
+        name="RegisterNewLedgerMain"
+        component={NewLedgerScreen}
       />
     </Stack.Navigator>
   );
@@ -597,7 +632,6 @@ export const MainTabNavigation: FunctionComponent = () => {
   useEffect(() => {
     // When the focused screen is not "Home" screen and the drawer is open,
     // try to close the drawer forcely.
-    // navigate("Browser")
     if (focusedScreen.name !== 'Home' && isDrawerOpen) {
       navigation.dispatch(DrawerActions.toggleDrawer());
     }
