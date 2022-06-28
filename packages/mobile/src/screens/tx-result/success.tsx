@@ -16,7 +16,7 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
   // const [pangpareAnimProgress] = React.useState(new Animated.Value(0));
 
   const route = useRoute<
-    RouteProp< 
+    RouteProp<
       Record<
         string,
         {
@@ -45,7 +45,7 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
       style={style.flatten([
         'flex-grow-1',
         'items-center',
-        'background-color-white'
+        'background-color-white',
       ])}
     >
       <View style={style.flatten(['flex-3'])} />
@@ -54,14 +54,14 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
           'width-122',
           'height-122',
           'justify-center',
-          'items-center'
+          'items-center',
         ])}
       >
         <View
           style={style.flatten([
             'width-full',
             'height-400',
-            'margin-bottom-24'
+            'margin-bottom-24',
           ])}
         >
           {/* <Text>pangpare here pangpareAnimProgress {pangpareAnimProgress}</Text> */}
@@ -76,8 +76,8 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
               'absolute',
               'justify-center',
               'items-center',
-              'background-color-white'
-            ])
+              'background-color-white',
+            ]),
           }}
         >
           <View style={style.flatten(['width-160'])}>
@@ -91,7 +91,7 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
           'h2',
           'color-text-black-medium',
           'margin-top-82',
-          'margin-bottom-32'
+          'margin-bottom-32',
         ])}
       >
         Transaction successful
@@ -104,15 +104,15 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
           style.flatten(['padding-x-36']),
           {
             height: style.get('body2').lineHeight * 3,
-            overflow: 'visible'
-          }
+            overflow: 'visible',
+          },
         ])}
       >
         <Text
           style={style.flatten([
             'body2',
             'text-center',
-            'color-text-black-low'
+            'color-text-black-low',
           ])}
         >
           Congratulations!
@@ -121,7 +121,7 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
           style={style.flatten([
             'body2',
             'text-center',
-            'color-text-black-low'
+            'color-text-black-low',
           ])}
         >
           Your transaction has been completed and confirmed by the blockchain.

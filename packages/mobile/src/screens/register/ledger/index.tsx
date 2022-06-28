@@ -11,6 +11,11 @@ import { View } from 'react-native';
 import { useStore } from '../../../stores';
 import { Button } from '../../../components/button';
 import { BIP44AdvancedButton, useBIP44Option } from '../bip44';
+import {
+  checkRouter,
+  checkRouterPaddingBottomBar,
+  navigate,
+} from '../../../router/root';
 
 interface FormData {
   name: string;
@@ -18,7 +23,7 @@ interface FormData {
   confirmPassword: string;
 }
 
-export const NewLedgerScreen: FunctionComponent = observer(() => {
+export const NewLedgerScreen: FunctionComponent = observer((props) => {
   const route = useRoute<
     RouteProp<
       Record<
@@ -46,7 +51,7 @@ export const NewLedgerScreen: FunctionComponent = observer(() => {
     handleSubmit,
     setFocus,
     getValues,
-    formState: { errors }
+    formState: { errors },
   } = useForm<FormData>();
 
   const [isCreating, setIsCreating] = useState(false);
@@ -62,20 +67,26 @@ export const NewLedgerScreen: FunctionComponent = observer(() => {
       );
       analyticsStore.setUserProperties({
         registerType: 'ledger',
-        accountType: 'ledger'
+        accountType: 'ledger',
       });
 
-      smartNavigation.reset({
-        index: 0,
-        routes: [
-          {
-            name: 'Register.End',
-            params: {
-              password: getValues('password')
-            }
-          }
-        ]
-      });
+      if (checkRouter(props?.route?.name, 'RegisterNewLedgerMain')) {
+        navigate('RegisterEnd', {
+          password: getValues('password'),
+        });
+      } else {
+        smartNavigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'Register.End',
+              params: {
+                password: getValues('password'),
+              },
+            },
+          ],
+        });
+      }
     } catch (e) {
       // Definitely, the error can be thrown when the ledger connection failed
       console.log(e);
@@ -91,7 +102,7 @@ export const NewLedgerScreen: FunctionComponent = observer(() => {
       <Controller
         control={control}
         rules={{
-          required: 'Name is required'
+          required: 'Name is required',
         }}
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
@@ -129,7 +140,7 @@ export const NewLedgerScreen: FunctionComponent = observer(() => {
                 if (value.length < 8) {
                   return 'Password must be longer than 8 characters';
                 }
-              }
+              },
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -163,7 +174,7 @@ export const NewLedgerScreen: FunctionComponent = observer(() => {
                 if (getValues('password') !== value) {
                   return "Password doesn't match";
                 }
-              }
+              },
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -188,7 +199,21 @@ export const NewLedgerScreen: FunctionComponent = observer(() => {
         </React.Fragment>
       ) : null}
       <View style={style.flatten(['flex-1'])} />
-      <Button text="Next" size="large" loading={isCreating} onPress={submit} />
+      <View
+        style={{
+          paddingBottom: checkRouterPaddingBottomBar(
+            props?.route?.name,
+            'RegisterNewLedgerMain'
+          ),
+        }}
+      >
+        <Button
+          text="Next"
+          size="large"
+          loading={isCreating}
+          onPress={submit}
+        />
+      </View>
       {/* Mock element for bottom padding */}
       <View style={style.flatten(['height-page-pad'])} />
     </PageWithScrollView>

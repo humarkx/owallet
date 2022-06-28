@@ -49,7 +49,7 @@ const MyWalletModal = () => {
           width: '100%'
         }}
       >
-        <BookMnemonicSeedIcon color="none" size={16} />
+        {/* <BookMnemonicSeedIcon color="none" size={16} /> */}
         <Text style={{ marginLeft: spacing['8'] }}>Mnemonic seed</Text>
       </View>
       <MnemonicSeed styles={styles} />

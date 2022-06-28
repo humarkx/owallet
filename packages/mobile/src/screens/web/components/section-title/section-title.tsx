@@ -23,8 +23,8 @@ export const BrowserSectionTitle: FunctionComponent<{
 
 export const BrowserSectionModal: FunctionComponent<{
   title: string;
-  onClose?: () => void
-}> = ({ title , onClose }) => {
+  onClose?: () => void;
+}> = ({ title, onClose }) => {
   const style = useStyle();
   return (
     <View
@@ -37,8 +37,7 @@ export const BrowserSectionModal: FunctionComponent<{
         'justify-between',
       ])}
     >
-      <Text style={style.flatten(['h4'])}></Text>
-      <Text onPress={onClose} style={style.flatten(['h4','color-white'])}>X</Text>
+      <Text style={style.flatten(['h4'])}>Bookmark</Text>
     </View>
   );
 };

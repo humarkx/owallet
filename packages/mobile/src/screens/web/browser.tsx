@@ -11,26 +11,23 @@ import { useStyle } from '../../styles';
 import { TextInput } from '../../components/input';
 // import { Button } from "../../components/button";
 import { useSmartNavigation } from '../../navigation.provider';
-// import { PageWithScrollView } from "../../components/page";
+import { PageWithScrollView } from '../../components/page';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { useNavigation } from '@react-navigation/core';
 import {
   BrowserSectionTitle,
   BrowserSectionModal,
 } from './components/section-title';
-import {
-  SearchIcon,
-  RightArrowIcon,
-  HomeIcon,
-  ThreeDotsIcon,
-  TabIcon,
-} from '../../components/icon';
+import { SearchIcon } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { checkValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
 import { DAppInfos, InjectedProviderUrl } from './config';
+import { SwtichTab } from './components/switch-tabs';
+import { BrowserFooterSection } from './components/footer-section';
+import { WebViewStateContext } from './components/context';
 
-export const BrowserSection: FunctionComponent<{}> = ({}) => {
+export const BrowserBookmark: FunctionComponent<{}> = ({}) => {
   const style = useStyle();
   const navigation = useNavigation();
   return (
@@ -79,48 +76,10 @@ export const BrowserSection: FunctionComponent<{}> = ({}) => {
 export const Browser: FunctionComponent<any> = (props) => {
   const style = useStyle();
   const smartNavigation = useSmartNavigation();
-  const [isOpenSetting, setIsOpenSetting] = useState(false);
+  const [isSwitchTab, setIsSwitchTab] = useState(false);
   const navigation = useNavigation();
-  const { deepLinkUriStore } = useStore();
-  const arrayIcon = ['back', 'next', 'tabs', 'home', 'settings'];
-  const renderIcon = (type, tabNum = 0) => {
-    switch (type) {
-      case 'back':
-        return (
-          <RightArrowIcon
-            onPress={() => onPress(type)}
-            type={'left'}
-            color={'white'}
-            height={18}
-          />
-        );
-      case 'next':
-        return (
-          <RightArrowIcon
-            onPress={() => onPress(type)}
-            type={'right'}
-            color={'white'}
-            height={18}
-          />
-        );
-      case 'tabs':
-        return (
-          <TabIcon onPress={() => onPress(type)} color={'white'} size={24} />
-        );
-      case 'home':
-        return (
-          <HomeIcon onPress={() => onPress(type)} color={'white'} size={18} />
-        );
-      case 'settings':
-        return (
-          <ThreeDotsIcon
-            onPress={() => onPress(type)}
-            color={'white'}
-            size={18}
-          />
-        );
-    }
-  };
+  const { deepLinkUriStore, browserStore } = useStore();
+
   useEffect(() => {
     navigation
       .getParent()
@@ -168,13 +127,19 @@ export const Browser: FunctionComponent<any> = (props) => {
 
   const onHandleUrl = () => {
     if (checkValidDomain(url?.toLowerCase())) {
-      smartNavigation.pushSmart('Web.dApp', {
+      const tab = {
+        id: Date.now(),
         name: 'Browser',
         uri:
           url?.toLowerCase().indexOf('http') >= 0
             ? url?.toLowerCase()
             : 'https://' + url?.toLowerCase(),
-      });
+      };
+      browserStore.addTab(tab);
+      console.log('tabs1 add');
+
+      browserStore.updateSelectedTab(tab);
+      smartNavigation.pushSmart('Web.dApp', tab);
     } else {
       let uri = `https://www.google.com/search?q=${url ?? ''}`;
       if (InjectedProviderUrl) uri = InjectedProviderUrl;
@@ -193,23 +158,10 @@ export const Browser: FunctionComponent<any> = (props) => {
     });
   };
 
-  const onPress = (type: any) => {
-    try {
-      switch (type) {
-        case 'settings':
-          return setIsOpenSetting(!isOpenSetting);
-        case 'back':
-          return smartNavigation.goBack();
-        case 'next':
-          return;
-        case 'tabs':
-          return;
-        case 'home':
-          return smartNavigation.navigateSmart('Home', {});
-      }
-    } catch (error) {
-      console.log({ error });
-    }
+  const handlePressItem = ({ name, uri }) => {
+    handleClickUri(uri, name);
+    setIsSwitchTab(false);
+    setUrl(uri);
   };
 
   useEffect(() => {
@@ -231,133 +183,127 @@ export const Browser: FunctionComponent<any> = (props) => {
     };
   }, []);
 
-  return (
-    <TouchableWithoutFeedback
-      style={style.flatten(['flex-column', 'justify-between', 'height-full'])}
-      onPress={() => {
-        if (isKeyboardVisible) Keyboard.dismiss();
-      }}
-    >
-      <View>
-        <View style={{ opacity: isOpenSetting ? 0.8 : 1 }}>
-          <BrowserSectionTitle title="Browser" />
-          <View style={{ height: 260 }}>
-            <Image
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-              fadeDuration={0}
-              resizeMode="stretch"
-              source={require('../../assets/image/background.png')}
-            />
-            <TextInput
-              containerStyle={{
-                width: '100%',
-                padding: 20,
-                marginTop: -50,
-              }}
-              inputStyle={style.flatten([
-                'flex-row',
-                'items-center',
+  const renderBrowser = () => {
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (isKeyboardVisible) Keyboard.dismiss();
+        }}
+      >
+        <View style={[style.flatten(['height-full', 'justify-between'])]}>
+          <View>
+            <BrowserSectionTitle title="Browser" />
+            <View style={{ height: 260 }}>
+              <Image
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                fadeDuration={0}
+                resizeMode="stretch"
+                source={require('../../assets/image/background.png')}
+              />
+              <TextInput
+                containerStyle={{
+                  width: '100%',
+                  padding: 20,
+                  marginTop: -50,
+                }}
+                inputStyle={style.flatten([
+                  'flex-row',
+                  'items-center',
+                  'background-color-white',
+                  'padding-20',
+                  'border-radius-16',
+                  'border-width-4',
+                  'border-color-border-pink',
+                ])}
+                returnKeyType={'next'}
+                placeholder={'Search website'}
+                placeholderTextColor={'#AEAEB2'}
+                onSubmitEditing={onHandleUrl}
+                value={url}
+                onChangeText={(txt) => setUrl(txt.toLowerCase())}
+                inputRight={
+                  <TouchableOpacity onPress={onHandleUrl}>
+                    <SearchIcon color={'gray'} size={20} />
+                  </TouchableOpacity>
+                }
+              />
+            </View>
+            <View
+              style={style.flatten([
                 'background-color-white',
-                'padding-20',
-                'border-radius-16',
-                'border-width-4',
-                'border-color-border-pink',
+                'height-full',
+                'margin-top-64',
+                'padding-bottom-64',
               ])}
-              returnKeyType={'next'}
-              placeholder={'Search website'}
-              placeholderTextColor={'#AEAEB2'}
-              onSubmitEditing={onHandleUrl}
-              value={url}
-              onChangeText={(txt) => setUrl(txt.toLowerCase())}
-              inputRight={
-                <TouchableOpacity onPress={onHandleUrl}>
-                  <SearchIcon color={'gray'} size={20} />
-                </TouchableOpacity>
-              }
-            />
-          </View>
-          <View
-            style={style.flatten([
-              'height-full',
-              'background-color-white',
-              'margin-y-64',
-            ])}
-          >
-            <BrowserSection />
-            <View style={style.flatten(['height-full', 'padding-20'])}>
-              {DAppInfos.map(({ logo, uri, name }) => (
-                <TouchableOpacity
-                  style={style.flatten([
-                    'height-44',
-                    'margin-bottom-15',
-                    'flex-row',
-                  ])}
-                  onPress={() => handleClickUri(uri, name)}
-                >
-                  <View style={style.flatten(['padding-top-5'])}>
-                    <Image
-                      style={{
-                        width: 20,
-                        height: 20,
-                      }}
-                      source={logo}
-                      fadeDuration={0}
-                    />
-                  </View>
-                  <View style={style.flatten(['padding-x-15'])}>
-                    <Text style={style.flatten(['subtitle2'])}>{name}</Text>
-                    <Text style={{ color: '#636366', fontSize: 14 }}>
-                      {uri}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+            >
+              <BrowserBookmark />
+              <View style={style.flatten(['padding-20'])}>
+                {browserStore.getBookmarks?.map((e) => (
+                  <TouchableOpacity
+                    key={e.uri}
+                    style={style.flatten([
+                      'height-44',
+                      'margin-bottom-15',
+                      'flex-row',
+                    ])}
+                    onPress={() => {
+                      handleClickUri(e.uri, e.name);
+                      setUrl(e.uri);
+                    }}
+                  >
+                    <View style={style.flatten(['padding-top-5'])}>
+                      <Image
+                        style={{
+                          width: 20,
+                          height: 22,
+                        }}
+                        source={e.logo}
+                        fadeDuration={0}
+                      />
+                    </View>
+                    <View style={style.flatten(['padding-x-15'])}>
+                      <Text style={style.flatten(['subtitle2'])}>{e.name}</Text>
+                      <Text style={{ color: '#636366', fontSize: 14 }}>
+                        {e.uri}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           </View>
         </View>
-        {isOpenSetting && (
-          <View
-            style={{
-              backgroundColor: '#132340',
-              height: 200,
-              width: 200,
-              position: 'absolute',
-              right: 0,
-              bottom: 80,
-              borderRadius: 4,
-              zIndex: 1,
-              padding: 10,
-            }}
-          >
-            <BrowserSectionModal
-              onClose={() => setIsOpenSetting(false)}
-              title="Setting"
-            />
-          </View>
-        )}
+      </TouchableWithoutFeedback>
+    );
+  };
 
-        {/* <View
-        style={style.flatten([
-          "width-full",
-          "height-80",
-          "background-color-text-black-high",
-          "flex-row",
-          "items-center",
-          "padding-40",
-        ])}
+  return (
+    <>
+      <PageWithScrollView>
+        {isSwitchTab ? (
+          <SwtichTab onPressItem={handlePressItem} />
+        ) : (
+          renderBrowser()
+        )}
+      </PageWithScrollView>
+      <WebViewStateContext.Provider
+        value={{
+          webView: null,
+          name: 'Browser',
+          url: url,
+          canGoBack: false,
+          canGoForward: false,
+        }}
       >
-        {arrayIcon.map((e, i) => {
-          return (
-            <View key={i} style={{ width: "24%" }}>
-              {renderIcon(e)}
-            </View>
-          );
-        })}
-      </View> */}
-      </View>
-    </TouchableWithoutFeedback>
+        <BrowserFooterSection
+          isSwitchTab={isSwitchTab}
+          setIsSwitchTab={setIsSwitchTab}
+          onHandleUrl={onHandleUrl}
+        />
+      </WebViewStateContext.Provider>
+    </>
   );
 };
