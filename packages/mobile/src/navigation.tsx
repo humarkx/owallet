@@ -101,6 +101,7 @@ import {
   useSmartNavigation
 } from './navigation.provider'
 import { NtfsScreen } from './screens/nfts'
+import { OnboardingIntroScreen } from './screens/onboarding'
 
 const Stack = createStackNavigator()
 const Drawer = createDrawerNavigator()
@@ -576,7 +577,8 @@ export const WebNavigation: FunctionComponent = () => {
           title: 'Browser'
         }}
         name="Browser"
-        component={Browser}
+        component={OnboardingIntroScreen}
+        // component={Browser}
       />
       <Stack.Screen
         options={{
