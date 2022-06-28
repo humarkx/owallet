@@ -103,6 +103,7 @@ import {
   SmartNavigatorProvider,
   useSmartNavigation,
 } from './navigation.provider';
+import { NtfsScreen } from './screens/nfts';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -233,6 +234,20 @@ export const MainNavigation: FunctionComponent = () => {
         name="Transactions.Detail"
         component={TransactionDetail}
       />
+      <Stack.Screen
+        options={{
+          title: 'Tokens',
+        }}
+        name="Tokens"
+        component={TokensScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Ntfs',
+        }}
+        name="Ntfs"
+        component={NtfsScreen}
+      />
     </Stack.Navigator>
   );
 };
@@ -347,13 +362,6 @@ export const OtherNavigation: FunctionComponent = () => {
         }}
         name="Send"
         component={SendScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Tokens',
-        }}
-        name="Tokens"
-        component={TokensScreen}
       />
       <Stack.Screen
         options={{
