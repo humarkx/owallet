@@ -135,7 +135,7 @@ const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
   )
 })
 
-const ScreenHeaderLeft: FunctionComponent<{ uri: string }> = observer(
+const ScreenHeaderLeft: FunctionComponent<{ uri?: string }> = observer(
   ({ uri = 'MainTabDrawer' }) => {
     const style = useStyle()
     const smartNavigation = useSmartNavigation()
@@ -198,22 +198,6 @@ export const MainNavigation: FunctionComponent = () => {
         }}
         name="Home"
         component={HomeScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'BookMarks'
-          // headerLeft: () => <ScreenHeaderLeft uri="Browser"/>,
-        }}
-        name="BookMarks"
-        component={BookMarks}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Web',
-          headerShown: false
-        }}
-        name="Web"
-        component={WebNavigation}
       />
       <Stack.Screen
         name="Transactions"
@@ -279,27 +263,6 @@ export const MainNavigation: FunctionComponent = () => {
         }}
         name="Nfts"
         component={NtfsScreen}
-      />
-    </Stack.Navigator>
-  )
-}
-
-export const BrowserNavigation: FunctionComponent = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        ...BlurredHeaderScreenOptionsPreset,
-        headerTitle: ''
-      }}
-      headerMode="screen"
-    >
-      <Stack.Screen
-        options={{
-          title: 'Web',
-          headerShown: false
-        }}
-        name="Web"
-        component={WebNavigation}
       />
     </Stack.Navigator>
   )
@@ -602,7 +565,7 @@ export const AddressBookStackScreen: FunctionComponent = () => {
 export const WebNavigation: FunctionComponent = () => {
   return (
     <Stack.Navigator
-      // initialRouteName="Web.Intro"
+      initialRouteName="Browser"
       screenOptions={{
         ...WebpageScreenScreenOptionsPreset
       }}
@@ -614,6 +577,14 @@ export const WebNavigation: FunctionComponent = () => {
         }}
         name="Browser"
         component={Browser}
+      />
+      <Stack.Screen
+        options={{
+          title: 'BookMarks',
+          headerLeft: () => <ScreenHeaderLeft />,
+        }}
+        name="BookMarks"
+        component={BookMarks}
       />
       <Stack.Screen
         options={{ headerShown: false }}
@@ -779,7 +750,7 @@ export const MainTabNavigation: FunctionComponent = () => {
       )}
     >
       <Tab.Screen name="Main" component={MainNavigation} />
-      <Tab.Screen name="Browser" component={BrowserNavigation} />
+      <Tab.Screen name="Browser" component={WebNavigation} />
       <Tab.Screen
         options={{
           title: 'Send'
@@ -869,7 +840,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
                 name="MainTabDrawer"
                 component={MainTabNavigationWithDrawer}
               />
-              <Stack.Screen name="Browser" component={BrowserNavigation} />
+              <Stack.Screen name="Browser" component={WebNavigation} />
               <Stack.Screen name="Register" component={RegisterNavigation} />
               <Stack.Screen name="Others" component={OtherNavigation} />
               <Stack.Screen
