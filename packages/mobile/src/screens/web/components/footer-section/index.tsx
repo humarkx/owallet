@@ -2,7 +2,6 @@ import React, { FunctionComponent, useMemo, useState } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useStyle } from '../../../../styles';
 import { useWebViewState } from '../context';
-import { useSmartNavigation } from '../../../../navigation.provider';
 import { useNavigation } from '@react-navigation/core';
 
 import {
@@ -23,13 +22,15 @@ export const BrowserFooterSection: FunctionComponent<{
   const style = useStyle();
   const { browserStore } = useStore();
   const [isOpenSetting, setIsOpenSetting] = useState(false);
-  const smartNavigation = useSmartNavigation();
+  const navigation = useNavigation();
   const webViewState = useWebViewState();
 
   const oraiLogo = require('../../../../assets/image/webpage/orai_logo.png');
 
   const onPressBookmark = () => {
-    if (webViewState.url) {
+    console.log('webViewState', webViewState);
+    setIsOpenSetting(false);
+    if (webViewState.webView) {
       browserStore.addBoorkmark({
         id: Date.now(),
         name: webViewState.name,
@@ -46,7 +47,8 @@ export const BrowserFooterSection: FunctionComponent<{
           return setIsOpenSetting(!isOpenSetting);
         case 'back':
           if (!webViewState.canGoBack) {
-            smartNavigation.goBack();
+            webViewState.clearWebViewContext();
+            navigation.goBack();
           } else if (webViewState.webView) {
             webViewState.webView.goBack();
           }
@@ -65,7 +67,7 @@ export const BrowserFooterSection: FunctionComponent<{
           if (webViewState.webView === null) {
             return setIsSwitchTab(false);
           }
-          return smartNavigation.navigateSmart('Browser', {});
+          return navigation.navigate('Browser', {});
       }
     } catch (error) {
       console.log({ error });
