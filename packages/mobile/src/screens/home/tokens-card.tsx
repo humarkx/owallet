@@ -4,7 +4,7 @@ import { SectionList, StyleSheet, View, ViewStyle } from 'react-native'
 import { Image, Text, Tab } from '@rneui/base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../stores'
-import { TokenItem } from '../tokens'
+import { TokenItem } from '../tokens/components/token-item'
 import { useSmartNavigation } from '../../navigation.provider'
 import { RectButton } from '../../components/rect-button'
 import { colors, metrics, spacing, typography } from '../../themes'
@@ -16,6 +16,7 @@ import {
 } from '../../utils/helper'
 import { DownArrowIcon } from '../../components/icon'
 
+// hard code data to test UI
 const nftsData = [
   {
     title: 'ERC-721',
@@ -59,53 +60,7 @@ const nftsData = [
   }
 ]
 
-const _renderFlatlistItem = ({ item }) => (
-  <View style={styles.flatListItem}>
-    <Image
-      source={{
-        uri: item.uri
-      }}
-      style={styles.itemPhoto}
-      resizeMode="cover"
-    />
-    <View
-      style={{
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        marginTop: spacing['12'],
-        alignItems: 'flex-start'
-      }}
-    >
-      <Text
-        style={{
-          ...typography.h7,
-          color: colors['gray-900'],
-          fontWeight: '900'
-        }}
-      >
-        {formatContractAddress(item.title)}
-      </Text>
 
-      <Text
-        style={{
-          ...typography.h5,
-          color: colors['gray-900'],
-          fontWeight: '900'
-        }}
-      >
-        {item.oraiPrice}
-      </Text>
-
-      <Text
-        style={{
-          ...typography.h5,
-          color: colors['gray-900'],
-          fontWeight: '900'
-        }}
-      >{`$ ${58.23}`}</Text>
-    </View>
-  </View>
-)
 
 export const TokensCard: FunctionComponent<{
   containerStyle?: ViewStyle
@@ -124,6 +79,56 @@ export const TokensCard: FunctionComponent<{
   const tokens = queryBalances.positiveNativeUnstakables
     .concat(queryBalances.nonNativeBalances)
     .slice(0, 2)
+
+    const _renderFlatlistItem = ({ item }) => (
+      <TouchableOpacity style={styles.flatListItem} onPress={() => {
+        smartNavigation.navigateSmart('Nfts',{})
+      }}>
+        <Image
+          source={{
+            uri: item.uri
+          }}
+          style={styles.itemPhoto}
+          resizeMode="cover"
+        />
+        <View
+          style={{
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            marginTop: spacing['12'],
+            alignItems: 'flex-start'
+          }}
+        >
+          <Text
+            style={{
+              ...typography.h7,
+              color: colors['gray-900'],
+              fontWeight: '900'
+            }}
+          >
+            {formatContractAddress(item.title)}
+          </Text>
+    
+          <Text
+            style={{
+              ...typography.h5,
+              color: colors['gray-900'],
+              fontWeight: '900'
+            }}
+          >
+            {item.oraiPrice}
+          </Text>
+    
+          <Text
+            style={{
+              ...typography.h5,
+              color: colors['gray-900'],
+              fontWeight: '900'
+            }}
+          >{`$ ${58.23}`}</Text>
+        </View>
+      </TouchableOpacity>
+    )
 
   return (
     <View style={containerStyle}>
@@ -156,8 +161,8 @@ export const TokensCard: FunctionComponent<{
               title={title}
               titleStyle={active => ({
                 fontSize: 14,
-                fontWeight: "700",
-                color: active ? colors['gray-900'] : colors['gray-600']
+                fontWeight: '700',
+                color: active ? colors['gray-900'] : colors['gray-300']
               })}
               containerStyle={{
                 backgroundColor: colors['transparent']
@@ -189,7 +194,7 @@ export const TokensCard: FunctionComponent<{
                 <>
                   <View
                     style={{
-                      marginTop: spacing['24'],
+                      marginTop: spacing['12'],
                       flexDirection: 'row'
                     }}
                   >
@@ -221,7 +226,11 @@ export const TokensCard: FunctionComponent<{
           <RectButton
             style={styles.containerBtn}
             onPress={() => {
-              smartNavigation.navigateSmart('Tokens', {})
+              if (index === 0) {
+                smartNavigation.navigateSmart('Tokens', {})
+              } else {
+                smartNavigation.navigateSmart('Nfts', {})
+              }
             }}
           >
             <Text style={styles.textLoadMore}>

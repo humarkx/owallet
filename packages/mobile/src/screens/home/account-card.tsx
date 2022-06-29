@@ -1,23 +1,25 @@
-import React, { FunctionComponent } from 'react';
+import React, {
+  FunctionComponent,
+  ReactElement,
+  useCallback,
+  useEffect,
+} from 'react';
 import { observer } from 'mobx-react-lite';
 import { Card, CardBody } from '../../components/card';
 import {
-  StyleSheet,
   View,
   ViewStyle,
-  ImageBackground,
   Image,
   Touchable,
   TouchableWithoutFeedback,
+  LogBox,
 } from 'react-native';
-
+import { CText as Text } from '../../components/text';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useStore } from '../../stores';
 import { AddressCopyable } from '../../components/address-copyable';
-// import { DoubleDoughnutChart } from "../../components/svg";
 import { Button } from '../../components/button';
 import { LoadingSpinner } from '../../components/spinner';
-// import { StakedTokenSymbol, TokenSymbol } from "../../components/token-symbol";
 import { useSmartNavigation } from '../../navigation.provider';
 import { NetworkErrorView } from './network-error-view';
 import { ProgressBar } from '../../components/progress-bar';
@@ -25,31 +27,60 @@ import {
   DotsIcon,
   DownArrowIcon,
   HistoryIcon,
-  RightArrowIcon,
-  ScanIcon,
   Scanner,
-  SendIcon,
   SettingDashboardIcon,
 } from '../../components/icon';
 import { useNavigation } from '@react-navigation/native';
-import { CText as Text } from '../../components/text';
-// import { FormattedMessage, useIntl } from "react-intl"
 import {
   BuyIcon,
   DepositIcon,
   SendDashboardIcon,
 } from '../../components/icon/button';
-import { colors, metrics, spacing, typography } from '../../themes';
+import { colors, spacing, typography } from '../../themes';
 import { navigate } from '../../router/root';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NamespaceModal, NetworkModal } from './components';
-// import { RectButton } from '../../components/rect-button';
+import { Hash } from '@owallet/crypto';
+import LinearGradient from 'react-native-linear-gradient';
+import MyWalletModal from './components/my-wallet-modal/my-wallet-modal';
 
 export const AccountCard: FunctionComponent<{
   containerStyle?: ViewStyle;
 }> = observer(({ containerStyle }) => {
   const { chainStore, accountStore, queriesStore, priceStore, modalStore } =
     useStore();
+
+  const deterministicNumber = useCallback((chainInfo) => {
+    const bytes = Hash.sha256(
+      Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
+    );
+    return (
+      (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0
+    );
+  }, []);
+
+  const profileColor = useCallback(
+    (chainInfo) => {
+      const colors = [
+        'sky-blue',
+        'mint',
+        'red',
+        'orange',
+        'blue-violet',
+        'green',
+        'sky-blue',
+        'mint',
+        'red',
+        'purple',
+        'red',
+        'orange',
+        'black',
+      ];
+
+      return colors[deterministicNumber(chainInfo) % colors.length];
+    },
+    [deterministicNumber]
+  );
 
   const smartNavigation = useSmartNavigation();
   const navigation = useNavigation();
@@ -97,18 +128,28 @@ export const AccountCard: FunctionComponent<{
     }
   };
 
+  // open model
   const _onPressNetworkModal = () => {
     modalStore.setOpen();
-    modalStore.setChildren(NetworkModal(account));
+    modalStore.setChildren(
+      NetworkModal({
+        profileColor,
+        chainStore,
+        modalStore,
+      })
+    );
   };
-
   const _onPressNamespace = () => {
     modalStore.setOpen();
     modalStore.setChildren(NamespaceModal(account));
   };
+  const _onPressMyWallet = () => {
+    modalStore.setOpen();
+    modalStore.setChildren(MyWalletModal());
+  };
 
   const RenderBtnMain = ({ name }) => {
-    let icon;
+    let icon: ReactElement;
     switch (name) {
       case 'Buy':
         icon = <BuyIcon />;
@@ -123,19 +164,23 @@ export const AccountCard: FunctionComponent<{
     return (
       <TouchableOpacity
         style={{
-          backgroundColor: colors['violet'],
+          backgroundColor: colors['purple-900'],
           borderWidth: 0.5,
           borderRadius: spacing['8'],
-          borderColor: colors['violet'],
+          borderColor: colors['transparent'],
+          marginLeft: 10,
+          marginRight: 10,
         }}
         onPress={() => onPressBtnMain(name)}
       >
         <View
           style={{
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            padding: spacing['8'],
+            paddingTop: spacing['6'],
+            paddingBottom: spacing['6'],
+            paddingLeft: spacing['12'],
+            paddingRight: spacing['12'],
           }}
         >
           {icon}
@@ -190,7 +235,7 @@ export const AccountCard: FunctionComponent<{
                   marginLeft: spacing['8'],
                 }}
               >
-                {chainStore.current.chainName + ' ' + 'Network'}
+                {chainStore.current.chainName + ' Network'}
               </Text>
             </View>
           </TouchableWithoutFeedback>
@@ -224,12 +269,14 @@ export const AccountCard: FunctionComponent<{
             borderRadius: spacing['12'],
           }}
         >
-          <View
+          <LinearGradient
+            colors={['#161532', '#5E499A']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
             style={{
               borderTopLeftRadius: spacing['11'],
               borderTopRightRadius: spacing['11'],
               height: 179,
-              backgroundColor: '#5E499A', //linear-gradient(112.91deg, #161532 0%, #5E499A 89.85%)
             }}
           >
             <View
@@ -266,17 +313,17 @@ export const AccountCard: FunctionComponent<{
               style={{
                 display: 'flex',
                 flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingTop: 6,
-                paddingLeft: 20,
-                paddingRight: 20,
+                paddingTop: spacing['6'],
+                paddingLeft: spacing[22],
+                paddingRight: spacing['22'],
+                justifyContent: 'center',
               }}
             >
               {['Buy', 'Deposit', 'Send'].map((e, i) => (
                 <RenderBtnMain key={i} name={e} />
               ))}
             </View>
-          </View>
+          </LinearGradient>
           <View
             style={{
               backgroundColor: colors['white'],
@@ -330,10 +377,11 @@ export const AccountCard: FunctionComponent<{
                 maxCharacters={22}
               />
             </View>
-            <View>
+            <TouchableOpacity onPress={_onPressMyWallet}>
               <DownArrowIcon height={30} color={colors['gray-150']} />
-            </View>
+            </TouchableOpacity>
           </View>
+
           {queryStakable.isFetching ? (
             <View
               style={{

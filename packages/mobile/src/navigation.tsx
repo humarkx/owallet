@@ -73,7 +73,7 @@ import {
   HeaderRightButton,
   PlainHeaderScreenOptionsPreset,
 } from './components/header';
-import { TokensScreen } from './screens/tokens';
+import { TokensScreen, TokenDetailScreen } from './screens/tokens';
 import { UndelegateScreen } from './screens/stake/undelegate';
 import { RedelegateScreen } from './screens/stake/redelegate';
 import { CameraScreen } from './screens/camera';
@@ -81,7 +81,6 @@ import {
   FocusedScreenProvider,
   useFocusedScreen,
 } from './providers/focused-screen';
-// import Svg, { Path, Rect } from "react-native-svg";
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
@@ -91,7 +90,6 @@ import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon';
 import { BlurredBottomTabBar } from './components/bottom-tabbar';
 import { UnlockScreen } from './screens/unlock';
 import { OWalletVersionScreen } from './screens/setting/screens/version';
-
 import { DAppWebpageScreen } from './screens/web/webpages';
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
 import { Browser } from './screens/web/browser';
@@ -103,6 +101,8 @@ import {
   SmartNavigatorProvider,
   useSmartNavigation,
 } from './navigation.provider';
+import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
+import { NtfsScreen } from './screens/nfts';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -186,8 +186,8 @@ export const MainNavigation: FunctionComponent = () => {
         // ),
         headerTitle: '',
       }}
-      // initialRouteName="Home"
-      initialRouteName={deepLinkUriStore.getDeepLink() ? 'Browser' : 'Home'}
+      initialRouteName="Home"
+      // initialRouteName={deepLinkUriStore.getDeepLink() ? 'Browser' : 'Home'}
       headerMode="screen"
     >
       <Stack.Screen
@@ -199,7 +199,6 @@ export const MainNavigation: FunctionComponent = () => {
         name="Home"
         component={HomeScreen}
       />
-
       <Stack.Screen
         name="Transactions"
         component={Transactions}
@@ -216,6 +215,69 @@ export const MainNavigation: FunctionComponent = () => {
         name="Transactions.Detail"
         component={TransactionDetail}
       />
+      <Stack.Screen
+        options={{
+          title: 'Create a New Wallet',
+        }}
+        name="RegisterMain"
+        component={NewMnemonicScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Verify Mnemonic',
+        }}
+        name="RegisterVerifyMnemonicMain"
+        component={VerifyMnemonicScreen}
+      />
+      <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="RegisterEnd"
+        component={RegisterEndScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Import Existing Wallet',
+        }}
+        name="RegisterRecoverMnemonicMain"
+        component={RecoverMnemonicScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Import Hardware Wallet',
+        }}
+        name="RegisterNewLedgerMain"
+        component={NewLedgerScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+        }}
+        name="Tokens"
+        component={TokensScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'My NFTs',
+        }}
+        name="Nfts"
+        component={NtfsScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Token detail',
+        }}
+        name="Token.Detail"
+        component={TokenDetailScreen}
+      />
+      {/* <Stack.Screen
+        options={{
+          title: 'Ntf detail'
+        }}
+        name="Nfts.Detail"
+        component={NtfsScreen}
+      /> */}
     </Stack.Navigator>
   );
 };
@@ -309,13 +371,6 @@ export const OtherNavigation: FunctionComponent = () => {
         }}
         name="Send"
         component={SendScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Tokens',
-        }}
-        name="Tokens"
-        component={TokensScreen}
       />
       <Stack.Screen
         options={{
@@ -715,7 +770,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           title: 'Send',
         }}
         name="Send"
-        component={SendScreen}
+        component={TransferTokensScreen}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
           chainId: chainStore.current.chainId,

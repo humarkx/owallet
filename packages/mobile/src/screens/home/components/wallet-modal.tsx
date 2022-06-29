@@ -3,13 +3,9 @@ import { StyleSheet, View, Image } from 'react-native'
 import { Text } from '@rneui/base'
 import { RectButton } from '../../../components/rect-button'
 import { colors, metrics, spacing, typography } from '../../../themes'
-import {
-  NamespaceBuyIcon,
-  NamespaceRelinkIcon,
-  NamespaceUnlinkIcon
-} from '../../../components/icon'
+import { ScanIcon } from '../../../components/icon'
 
-export const NamespaceModal = (account): ReactElement => {
+export const WalletModal = (account): ReactElement => {
   return (
     // container
     <View
@@ -60,7 +56,7 @@ export const NamespaceModal = (account): ReactElement => {
             backgroundColor: colors['purple-900']
           }}
         >
-          <NamespaceBuyIcon color={colors['white']} size={24} />
+          <ScanIcon color={colors['white']} size={24} />
           <Text
             style={{
               ...typography.h6,
@@ -71,14 +67,8 @@ export const NamespaceModal = (account): ReactElement => {
           >{`Buy a new Namespace`}</Text>
         </RectButton>
 
-        <RectButton
-          style={{
-            ...styles.containerBtn,
-            marginTop: spacing['16'],
-            marginBottom: spacing['16']
-          }}
-        >
-          <NamespaceRelinkIcon color={colors['purple-900']} size={24} />
+        <RectButton style={styles.containerBtn}>
+          <ScanIcon color={colors['purple-900']} size={24} />
           <Text
             style={{
               ...typography.h6,
@@ -90,12 +80,12 @@ export const NamespaceModal = (account): ReactElement => {
         </RectButton>
 
         <RectButton style={styles.containerBtn}>
-          <NamespaceUnlinkIcon color={colors['red-900']} size={24} />
+          <ScanIcon color={colors['red-900']} size={24} />
           <Text
             style={{
               ...typography.h6,
               color: colors['red-900'],
-              fontWeight: '700',
+              fontWeight: '900',
               marginLeft: spacing['12']
             }}
           >{`Remove current Namespace`}</Text>
@@ -134,8 +124,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing['16'],
     borderRadius: spacing['8'],
     paddingHorizontal: spacing['16'],
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    flexDirection: 'row'
   }
 })

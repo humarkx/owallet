@@ -15,6 +15,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useSmartNavigation } from '../../../navigation.provider';
 import { useSimpleTimer } from '../../../hooks';
 import { BIP44AdvancedButton, useBIP44Option } from '../bip44';
+import { navigate, checkRouter, checkRouterPaddingBottomBar } from '../../../router/root';
 
 interface FormData {
   name: string;
@@ -22,7 +23,7 @@ interface FormData {
   confirmPassword: string;
 }
 
-export const NewMnemonicScreen: FunctionComponent = observer(() => {
+export const NewMnemonicScreen: FunctionComponent = observer((props) => {
   const route = useRoute<
     RouteProp<
       Record<
@@ -36,7 +37,6 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
   >();
 
   const style = useStyle();
-
   const smartNavigation = useSmartNavigation();
 
   const registerConfig: RegisterConfig = route.params.registerConfig;
@@ -52,17 +52,32 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
     handleSubmit,
     setFocus,
     getValues,
-    formState: { errors }
+    formState: { errors },
   } = useForm<FormData>();
 
   const submit = handleSubmit(() => {
     newMnemonicConfig.setName(getValues('name'));
     newMnemonicConfig.setPassword(getValues('password'));
-    smartNavigation.navigateSmart('Register.VerifyMnemonic', {
-      registerConfig,
-      newMnemonicConfig,
-      bip44HDPath: bip44Option.bip44HDPath
-    });
+
+    // smartNavigation.navigateSmart('Register.VerifyMnemonic', {
+    //   registerConfig,
+    //   newMnemonicConfig,
+    //   bip44HDPath: bip44Option.bip44HDPath,
+    // });
+
+    if (checkRouter(props?.route?.name, 'RegisterMain')) {
+      navigate('RegisterVerifyMnemonicMain', {
+        registerConfig,
+        newMnemonicConfig,
+        bip44HDPath: bip44Option.bip44HDPath,
+      });
+    } else {
+      smartNavigation.navigateSmart('Register.VerifyMnemonic', {
+        registerConfig,
+        newMnemonicConfig,
+        bip44HDPath: bip44Option.bip44HDPath,
+      });
+    }
   });
 
   return (
@@ -77,7 +92,7 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
           'h5',
           'color-text-black-medium',
           'margin-bottom-4',
-          'text-center'
+          'text-center',
         ])}
       >
         Backup your mnemonic securely
@@ -86,7 +101,7 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
       <Controller
         control={control}
         rules={{
-          required: 'Name is required'
+          required: 'Name is required',
         }}
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
@@ -124,7 +139,7 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
                 if (value.length < 8) {
                   return 'Password must be longer than 8 characters';
                 }
-              }
+              },
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -158,7 +173,7 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
                 if (getValues('password') !== value) {
                   return "Password doesn't match";
                 }
-              }
+              },
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -183,7 +198,13 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
         </React.Fragment>
       ) : null}
       <View style={style.flatten(['flex-1'])} />
-      <Button text="Next" size="large" onPress={submit} />
+      <View
+        style={{
+          paddingBottom: checkRouterPaddingBottomBar(props?.route?.name, 'RegisterMain'),
+        }}
+      >
+        <Button text="Next" size="large" onPress={submit} />
+      </View>
       {/* Mock element for bottom padding */}
       <View style={style.flatten(['height-page-pad'])} />
     </PageWithScrollView>
@@ -226,7 +247,7 @@ const WordsCard: FunctionComponent<{
         'background-color-white',
         'border-radius-8',
         'flex-row',
-        'flex-wrap'
+        'flex-wrap',
       ])}
     >
       {words.map((word, i) => {
@@ -239,19 +260,29 @@ const WordsCard: FunctionComponent<{
           />
         );
       })}
-      <View style={style.flatten(['width-full'])}>
+      <View
+        style={{
+          width: '100%',
+        }}
+      >
         <Button
-          textStyle={style.flatten([
-            'text-button1',
-            isTimedOut ? 'color-success' : 'color-primary'
-          ])}
+          textStyle={{
+            fontSize: 18,
+            lineHeight: 20,
+            letterSpacing: 0.2,
+            color: isTimedOut ? '#2DCE89' : '#4762E7',
+          }}
+          // textStyle={style.flatten([
+          //   'text-button1',
+          //   isTimedOut ? 'color-success' : 'color-primary',
+          // ])}
           mode="text"
           {...(isTimedOut && {
             rightIcon: (
               <View style={style.flatten(['margin-left-8'])}>
                 <CheckIcon />
               </View>
-            )
+            ),
           })}
           text="Copy to clipboard"
           onPress={() => {

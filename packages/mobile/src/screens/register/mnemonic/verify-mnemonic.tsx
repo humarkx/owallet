@@ -12,8 +12,13 @@ import { observer } from 'mobx-react-lite';
 import { RectButton } from '../../../components/rect-button';
 import { BIP44HDPath } from '@owallet/background';
 import { useStore } from '../../../stores';
+import {
+  navigate,
+  checkRouter,
+  checkRouterPaddingBottomBar,
+} from '../../../router/root';
 
-export const VerifyMnemonicScreen: FunctionComponent = observer(() => {
+export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
   const route = useRoute<
     RouteProp<
       Record<
@@ -31,7 +36,6 @@ export const VerifyMnemonicScreen: FunctionComponent = observer(() => {
   const style = useStyle();
 
   const { analyticsStore } = useStore();
-
   const smartNavigation = useSmartNavigation();
 
   const registerConfig = route.params.registerConfig;
@@ -56,7 +60,7 @@ export const VerifyMnemonicScreen: FunctionComponent = observer(() => {
       candidateWords.map((word) => {
         return {
           word,
-          usedIndex: -1
+          usedIndex: -1,
         };
       })
     );
@@ -85,7 +89,7 @@ export const VerifyMnemonicScreen: FunctionComponent = observer(() => {
           'color-text-black-medium',
           'margin-top-32',
           'margin-bottom-4',
-          'text-center'
+          'text-center',
         ])}
       >
         Backup your mnemonic seed securely.
@@ -95,7 +99,7 @@ export const VerifyMnemonicScreen: FunctionComponent = observer(() => {
           return {
             word: word ?? '',
             empty: word === undefined,
-            dashed: i === firstEmptyWordSetIndex
+            dashed: i === firstEmptyWordSetIndex,
           };
         })}
       />
@@ -132,37 +136,51 @@ export const VerifyMnemonicScreen: FunctionComponent = observer(() => {
         })}
       </View>
       <View style={style.flatten(['flex-1'])} />
-      <Button
-        text="Next"
-        size="large"
-        loading={isCreating}
-        disabled={wordSet.join(' ') !== newMnemonicConfig.mnemonic}
-        onPress={async () => {
-          setIsCreating(true);
-          await registerConfig.createMnemonic(
-            newMnemonicConfig.name,
-            newMnemonicConfig.mnemonic,
-            newMnemonicConfig.password,
-            route.params.bip44HDPath
-          );
-          analyticsStore.setUserProperties({
-            registerType: 'seed',
-            accountType: 'mnemonic'
-          });
-
-          smartNavigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'Register.End',
-                params: {
-                  password: newMnemonicConfig.password
-                }
-              }
-            ]
-          });
+      <View
+        style={{
+          paddingBottom: checkRouterPaddingBottomBar(
+            props?.route?.name,
+            'RegisterVerifyMnemonicMain'
+          ),
         }}
-      />
+      >
+        <Button
+          text="Next"
+          size="large"
+          loading={isCreating}
+          disabled={wordSet.join(' ') !== newMnemonicConfig.mnemonic}
+          onPress={async () => {
+            setIsCreating(true);
+            await registerConfig.createMnemonic(
+              newMnemonicConfig.name,
+              newMnemonicConfig.mnemonic,
+              newMnemonicConfig.password,
+              route.params.bip44HDPath
+            );
+            analyticsStore.setUserProperties({
+              registerType: 'seed',
+              accountType: 'mnemonic',
+            });
+            if (checkRouter(props?.route?.name, 'RegisterVerifyMnemonicMain')) {
+              navigate('RegisterEnd', {
+                password: newMnemonicConfig.password,
+              });
+            } else {
+              smartNavigation.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'Register.End',
+                    params: {
+                      password: newMnemonicConfig.password,
+                    },
+                  },
+                ],
+              });
+            }
+          }}
+        />
+      </View>
       {/* Mock element for bottom padding */}
       <View style={style.flatten(['height-page-pad'])} />
     </PageWithScrollView>
@@ -185,7 +203,7 @@ const WordButton: FunctionComponent<{
           'padding-y-4',
           'margin-right-12',
           'margin-bottom-12',
-          'border-radius-8'
+          'border-radius-8',
         ],
         [used && 'background-color-primary-100']
       )}
@@ -215,7 +233,7 @@ const WordsCard: FunctionComponent<{
         'background-color-white',
         'border-radius-8',
         'flex-row',
-        'flex-wrap'
+        'flex-wrap',
       ])}
     >
       {wordSet.map((word, i) => {

@@ -16,6 +16,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       'Register.Intro': {
         upperScreenName: 'Register',
       },
+      NewUser: {
+        upperScreenName: 'Register.NewUser',
+      },
       'Register.NewUser': {
         upperScreenName: 'Register',
       },
@@ -51,6 +54,12 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       },
       Send: {
         upperScreenName: 'Others',
+      },
+      // Tokens: {
+      //   upperScreenName: 'Others'
+      // },
+      'Tokens.Detail': {
+        upperScreenName: 'Main',
       },
       Tokens: {
         upperScreenName: 'Others',
