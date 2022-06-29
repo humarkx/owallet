@@ -5,10 +5,11 @@ import { DelegationsCard } from './delegations-card';
 import { UndelegationsCard } from './undelegations-card';
 import { useStyle } from '../../../styles';
 import { useStore } from '../../../stores';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const StakingDashboardScreen: FunctionComponent = () => {
   const { chainStore, accountStore, queriesStore } = useStore();
-
+  const { top } = useSafeAreaInsets();
   const style = useStyle();
 
   const account = accountStore.getAccount(chainStore.current.chainId);
@@ -20,7 +21,9 @@ export const StakingDashboardScreen: FunctionComponent = () => {
     ).unbondingBalances;
 
   return (
-    <PageWithScrollViewInBottomTabView>
+    <PageWithScrollViewInBottomTabView style={{
+      paddingTop: top
+    }}>
       <MyRewardCard containerStyle={style.flatten(['margin-y-card-gap'])} />
       <DelegationsCard
         containerStyle={style.flatten(['margin-bottom-card-gap'])}
