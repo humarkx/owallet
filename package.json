@@ -25,7 +25,7 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "dev": "lerna run dev --parallel",
+    "dev": "lerna run dev --parallel --ignore @owallet/extension --ignore @owallet/mobile --ignore @owallet/wc-client --ignore @owallet/wc-qrcode-modal",
     "clean": "lerna run clean && rm -rf node_modules && yarn clean:watchman",
     "clean:watchman": "watchman watch-del-all",
     "build": "lerna run build",
