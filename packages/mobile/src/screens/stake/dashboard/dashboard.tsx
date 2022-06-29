@@ -1,5 +1,8 @@
 import React, { FunctionComponent } from 'react';
-import { PageWithScrollViewInBottomTabView } from '../../../components/page';
+import {
+  PageWithScrollView,
+  PageWithScrollViewInBottomTabView
+} from '../../../components/page';
 import { MyRewardCard } from './reward-card';
 import { DelegationsCard } from './delegations-card';
 import { UndelegationsCard } from './undelegations-card';
@@ -21,9 +24,11 @@ export const StakingDashboardScreen: FunctionComponent = () => {
     ).unbondingBalances;
 
   return (
-    <PageWithScrollViewInBottomTabView style={{
-      paddingTop: top
-    }}>
+    <PageWithScrollView
+      style={{
+        paddingTop: top
+      }}
+    >
       <MyRewardCard containerStyle={style.flatten(['margin-y-card-gap'])} />
       <DelegationsCard
         containerStyle={style.flatten(['margin-bottom-card-gap'])}
@@ -33,6 +38,6 @@ export const StakingDashboardScreen: FunctionComponent = () => {
           containerStyle={style.flatten(['margin-bottom-card-gap'])}
         />
       ) : null}
-    </PageWithScrollViewInBottomTabView>
+    </PageWithScrollView>
   );
 };
