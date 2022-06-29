@@ -101,8 +101,7 @@ import {
 } from './navigation.provider'
 import TransferTokensScreen from './screens/transfer-tokens/transfer-screen'
 import { OnboardingIntroScreen } from './screens/onboarding'
-import { NtfsScreen } from './screens/nfts'
-import { NtfDetailScreen } from './screens/nfts/nft-detail'
+import { NftsScreen, NftDetailScreen } from './screens/nfts'
 
 const Stack = createStackNavigator()
 const Drawer = createDrawerNavigator()
@@ -261,7 +260,7 @@ export const MainNavigation: FunctionComponent = () => {
           headerLeft: null
         }}
         name="Nfts"
-        component={NtfsScreen}
+        component={NftsScreen}
       />
       <Stack.Screen
         options={{
@@ -275,7 +274,7 @@ export const MainNavigation: FunctionComponent = () => {
           title: 'Ntf detail'
         }}
         name="Nfts.Detail"
-        component={NtfDetailScreen}
+        component={NftDetailScreen}
       />
     </Stack.Navigator>
   )
