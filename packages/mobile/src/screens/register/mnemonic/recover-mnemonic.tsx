@@ -7,7 +7,7 @@ import { useStyle } from '../../../styles';
 import { useSmartNavigation } from '../../../navigation.provider';
 import { Controller, useForm } from 'react-hook-form';
 import { TextInput } from '../../../components/input';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button } from '../../../components/button';
 import Clipboard from 'expo-clipboard';
 import { useStore } from '../../../stores';
@@ -18,7 +18,7 @@ import {
   checkRouterPaddingBottomBar,
   navigate,
 } from '../../../router/root';
-
+import { OWalletLogo } from '../owallet-logo';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bip39 = require('bip39');
 
@@ -140,6 +140,29 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
       contentContainerStyle={style.get('flex-grow-1')}
       style={style.flatten(['padding-x-page'])}
     >
+      <View
+        style={{
+          height: 72,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 24,
+            lineHeight: 34,
+            fontWeight: '700',
+            color: '#1C1C1E',
+          }}
+        >
+          Import wallet
+        </Text>
+        <View>
+          <OWalletLogo size={72} />
+        </View>
+      </View>
       <Controller
         control={control}
         rules={{
@@ -176,7 +199,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
-              label="Mnemonic seed"
+              label="Mnemonic"
               returnKeyType="next"
               multiline={true}
               numberOfLines={4}
@@ -234,7 +257,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
-              label="Wallet nickname"
+              label="Username"
               containerStyle={style.flatten(['padding-bottom-6'])}
               returnKeyType={mode === 'add' ? 'done' : 'next'}
               onSubmitEditing={() => {
@@ -272,7 +295,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
                 <TextInput
-                  label="Password"
+                  label="New password"
                   returnKeyType="next"
                   secureTextEntry={true}
                   onSubmitEditing={() => {
@@ -325,7 +348,33 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
           />
         </React.Fragment>
       ) : null}
-      <View style={style.flatten(['flex-1'])} />
+      <TouchableOpacity
+        disabled={isCreating}
+        onPress={submit}
+        style={{
+          marginBottom: 24,
+          marginTop: 32,
+          backgroundColor: '#8B1BFB',
+          borderRadius: 8,
+        }}
+      >
+        <View
+          style={{
+            padding: 18,
+          }}
+        >
+          <Text
+            style={{
+              color: 'white',
+              textAlign: 'center',
+              fontWeight: '900',
+              fontSize: 16,
+            }}
+          >
+            Create a new wallet
+          </Text>
+        </View>
+      </TouchableOpacity>
       <View
         style={{
           paddingBottom: checkRouterPaddingBottomBar(
@@ -334,15 +383,26 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
           ),
         }}
       >
-        <Button
-          text="Next"
-          size="large"
-          loading={isCreating}
-          onPress={submit}
-        />
+        <Text
+          style={{
+            color: '#8B1BFB',
+            textAlign: 'center',
+            fontWeight: '900',
+            fontSize: 16,
+          }}
+          onPress={() => {
+            smartNavigation.navigateSmart('Register.Intro', {});
+          }}
+        >
+          Go back
+        </Text>
       </View>
       {/* Mock element for bottom padding */}
-      <View style={style.flatten(['height-page-pad'])} />
+      <View
+        style={{
+          height: 20,
+        }}
+      />
     </PageWithScrollView>
   );
 });
