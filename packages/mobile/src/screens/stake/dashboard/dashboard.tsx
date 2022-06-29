@@ -1,10 +1,10 @@
-import React, { FunctionComponent } from "react";
-import { PageWithScrollView } from "../../../components/page";
-import { MyRewardCard } from "./reward-card";
-import { DelegationsCard } from "./delegations-card";
-import { UndelegationsCard } from "./undelegations-card";
-import { useStyle } from "../../../styles";
-import { useStore } from "../../../stores";
+import React, { FunctionComponent } from 'react';
+import { PageWithScrollViewInBottomTabView } from '../../../components/page';
+import { MyRewardCard } from './reward-card';
+import { DelegationsCard } from './delegations-card';
+import { UndelegationsCard } from './undelegations-card';
+import { useStyle } from '../../../styles';
+import { useStore } from '../../../stores';
 
 export const StakingDashboardScreen: FunctionComponent = () => {
   const { chainStore, accountStore, queriesStore } = useStore();
@@ -14,21 +14,22 @@ export const StakingDashboardScreen: FunctionComponent = () => {
   const account = accountStore.getAccount(chainStore.current.chainId);
   const queries = queriesStore.get(chainStore.current.chainId);
 
-  const unbondings = queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
-    account.bech32Address
-  ).unbondingBalances;
+  const unbondings =
+    queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
+      account.bech32Address
+    ).unbondingBalances;
 
   return (
-    <PageWithScrollView>
-      <MyRewardCard containerStyle={style.flatten(["margin-y-card-gap"])} />
+    <PageWithScrollViewInBottomTabView>
+      <MyRewardCard containerStyle={style.flatten(['margin-y-card-gap'])} />
       <DelegationsCard
-        containerStyle={style.flatten(["margin-bottom-card-gap"])}
+        containerStyle={style.flatten(['margin-bottom-card-gap'])}
       />
       {unbondings.length > 0 ? (
         <UndelegationsCard
-          containerStyle={style.flatten(["margin-bottom-card-gap"])}
+          containerStyle={style.flatten(['margin-bottom-card-gap'])}
         />
       ) : null}
-    </PageWithScrollView>
+    </PageWithScrollViewInBottomTabView>
   );
 };
