@@ -18,6 +18,7 @@ import {
   checkRouter,
   checkRouterPaddingBottomBar,
 } from '../../../router/root';
+import { colors } from '../../../themes';
 
 export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
   const route = useRoute<
@@ -197,17 +198,16 @@ const WordButton: FunctionComponent<{
 
   return (
     <RectButton
-      style={style.flatten(
-        [
-          'background-color-primary',
-          'padding-x-12',
-          'padding-y-4',
-          'margin-right-12',
-          'margin-bottom-12',
-          'border-radius-8',
-        ],
-        [used && 'background-color-primary-100']
-      )}
+      style={{
+        backgroundColor: used ? colors['primary-100'] : colors['purple-700'],
+        paddingTop: 4,
+        paddingBottom: 4,
+        paddingLeft: 12,
+        paddingRight: 12,
+        marginRight: 12,
+        marginBottom: 12,
+        borderRadius: 8
+      }}
       onPress={onPress}
     >
       <Text style={style.flatten(['subtitle2', 'color-white'])}>{word}</Text>
