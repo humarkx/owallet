@@ -10,30 +10,36 @@ import { colors, typography, spacing, metrics } from '../../../themes'
 import { CText as Text } from '../../../components/text'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { DownArrowIcon } from '../../../components/icon'
+import { ArrowOpsiteUpDownIcon, DownArrowIcon } from '../../../components/icon'
 import { _keyExtract } from '../../../utils/helper'
-import {ValidatorItem} from '../components/validator-item'
+import { ValidatorItem } from '../components/validator-item'
+import { GiftStakingLogo } from '../../../components/svg'
+import { useSmartNavigation } from '../../../navigation.provider'
 
 const validators = [
   {
-    imageUri: "",
-    amount: "200,000.8",
-    denom: "ORAI"
+    imageUri: 'https://picsum.photos/id/1002/200',
+    name: 'megaorai2',
+    amount: '200,000.8',
+    denom: 'ORAI'
   },
   {
-    imageUri: "",
-    amount: "36.03",
-    denom: "ORAI"
+    imageUri: 'https://picsum.photos/id/1002/200',
+    name: 'g1_moniker',
+    amount: '36.03',
+    denom: 'ORAI'
   },
   {
-    imageUri: "",
-    amount: "12.01",
-    denom: "ORAI"
+    imageUri: 'https://picsum.photos/id/1002/200',
+    name: 'im6h',
+    amount: '12.01',
+    denom: 'ORAI'
   }
 ]
 
 export const StakingDashboardScreen: FunctionComponent = () => {
   const { chainStore, accountStore, queriesStore } = useStore()
+  const smartNavigation = useSmartNavigation()
 
   const style = useStyle()
   const safeAreaInsets = useSafeAreaInsets()
@@ -78,7 +84,7 @@ export const StakingDashboardScreen: FunctionComponent = () => {
         >
           <View
             style={{
-              flex: 1,
+              flex: 1
             }}
           >
             <Text
@@ -120,37 +126,92 @@ export const StakingDashboardScreen: FunctionComponent = () => {
               </View>
             </View>
           </View>
-          <View style={{
-            flex: 1,
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            marginTop: spacing['32']
-          }}>
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              marginTop: spacing['32']
+            }}
+          >
             <TouchableOpacity
               style={{
                 ...styles.containerBtnClaim,
-                height: 40,
+                height: 40
+              }}
+              onPress={() => {
+                smartNavigation.navigate('Validator List', {})
               }}
             >
               <Text
                 style={{
                   ...typography.h7,
                   fontWeight: '700',
-                  color: colors['white'],
+                  color: colors['white']
                 }}
               >{`Stake now`}</Text>
             </TouchableOpacity>
           </View>
+          <View
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 5
+            }}
+          >
+            <GiftStakingLogo />
+          </View>
         </View>
 
-        <View>
-          <View></View>
+        <View style={{ flex: 1 }}>
+          <View
+            style={{
+              marginHorizontal: spacing['24'],
+              marginTop: spacing['32'],
+              marginBottom: spacing['16'],
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <Text
+              style={{
+                ...typography.h6,
+                fontWeight: '400'
+              }}
+            >
+              {`Total: 1000 ORAI`}
+            </Text>
 
-          <FlatList 
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'row'
+              }}
+            >
+              <Text
+                style={{
+                  ...typography.h6,
+                  fontWeight: '400',
+                  marginRight: spacing['10']
+                }}
+              >
+                Amount
+              </Text>
+              <View
+                style={{
+                  marginTop: spacing['5']
+                }}
+              >
+                <ArrowOpsiteUpDownIcon size={24} color={colors['gray-900']} />
+              </View>
+            </View>
+          </View>
+
+          <FlatList
             data={validators}
-            renderItem={({item, index}) => (
-              <ValidatorItem validator={item}/>
-            )}
+            renderItem={({ item, index }) => <ValidatorItem validator={item} />}
             keyExtractor={_keyExtract}
           />
         </View>
