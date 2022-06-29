@@ -86,23 +86,23 @@ export const Browser: FunctionComponent<any> = observer((props) => {
         ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
   }, [navigation]);
 
-  useEffect(() => {
-    const deepLinkUri =
-      props?.route?.params?.path || deepLinkUriStore.getDeepLink();
-    if (deepLinkUri) {
-      updateScreen(deepLinkUri);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const deepLinkUri =
+  //     props?.route?.params?.path || deepLinkUriStore.getDeepLink();
+  //   if (deepLinkUri) {
+  //     // updateScreen(deepLinkUri);
+  //   }
+  // }, []);
 
-  const updateScreen = async (uri) => {
-    if (uri) {
-      deepLinkUriStore.updateDeepLink('');
-      navigation.navigate('Web.dApp', {
-        name: 'Browser',
-        uri: decodeURIComponent(uri) || 'https://oraidex.io',
-      });
-    }
-  };
+  // const updateScreen = async (uri) => {
+  //   if (uri) {
+  //     deepLinkUriStore.updateDeepLink('');
+  //     navigation.navigate('Web.dApp', {
+  //       name: 'Browser',
+  //       uri: decodeURIComponent(uri) || 'https://oraidex.io',
+  //     });
+  //   }
+  // };
 
   const [url, setUrl] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -140,7 +140,6 @@ export const Browser: FunctionComponent<any> = observer((props) => {
       if (InjectedProviderUrl) uri = InjectedProviderUrl;
       navigation.navigate('Web.dApp', {
         name: 'Google',
-        // uri: `https://staging.oraidex.io/ethereum`,
         uri,
       });
     }
