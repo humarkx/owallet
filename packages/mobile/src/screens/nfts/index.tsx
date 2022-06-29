@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactElement } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../stores'
 import { StyleSheet, View, ViewStyle, Image } from 'react-native'
-import { Text } from '@rneui/base'
+import { CText as Text} from "../../components/text";
 import { CoinPretty } from '@owallet/unit'
 import { useSmartNavigation } from '../../navigation.provider'
 import { Currency } from '@owallet/types'
