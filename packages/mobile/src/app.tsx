@@ -1,9 +1,9 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { StoreProvider, useStore } from './stores';
 import { StyleProvider } from './styles';
 import { AppNavigation } from './navigation';
 import { ModalsProvider } from './modals/base';
-import { Platform, StatusBar, LogBox } from 'react-native';
+import { Platform, StatusBar, LogBox, Text } from 'react-native';
 import { AdditonalIntlMessages, LanguageToFiatCurrency } from '@owallet/common';
 import { InteractionModalsProivder } from './providers/interaction-modals-provider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -91,9 +91,9 @@ const AppIntlProviderWithStorage = ({ children }) => {
                 hour: '2-digit',
                 hour12: false,
                 minute: '2-digit',
-                timeZoneName: 'short'
-              }
-            }
+                timeZoneName: 'short',
+              },
+            },
           }}
         >
           {children}
@@ -103,7 +103,7 @@ const AppIntlProviderWithStorage = ({ children }) => {
   );
 };
 
-export const App: FunctionComponent = () => {
+export const App = () => {
   return (
     <StyleProvider>
       <StoreProvider>

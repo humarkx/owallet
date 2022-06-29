@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-// import { PageWithScrollViewInBottomTabView } from "../../components/page";
 import {
   Image,
   Text,
@@ -9,23 +8,21 @@ import {
 } from 'react-native';
 import { useStyle } from '../../styles';
 import { TextInput } from '../../components/input';
-// import { Button } from "../../components/button";
-import { useSmartNavigation } from '../../navigation.provider';
 import { PageWithScrollView } from '../../components/page';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { useNavigation } from '@react-navigation/core';
 import {
   BrowserSectionTitle,
-  BrowserSectionModal,
+  // BrowserSectionModal,
 } from './components/section-title';
 import { SearchIcon } from '../../components/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { checkValidDomain } from '../../utils/helper';
 import { useStore } from '../../stores';
-import { DAppInfos, InjectedProviderUrl } from './config';
+import { InjectedProviderUrl } from './config';
 import { SwtichTab } from './components/switch-tabs';
 import { BrowserFooterSection } from './components/footer-section';
 import { WebViewStateContext } from './components/context';
+import { observer } from 'mobx-react-lite';
 
 export const BrowserBookmark: FunctionComponent<{}> = ({}) => {
   const style = useStyle();
@@ -73,9 +70,8 @@ export const BrowserBookmark: FunctionComponent<{}> = ({}) => {
   );
 };
 
-export const Browser: FunctionComponent<any> = (props) => {
+export const Browser: FunctionComponent<any> = observer((props) => {
   const style = useStyle();
-  const smartNavigation = useSmartNavigation();
   const [isSwitchTab, setIsSwitchTab] = useState(false);
   const navigation = useNavigation();
   const { deepLinkUriStore, browserStore } = useStore();
@@ -90,69 +86,65 @@ export const Browser: FunctionComponent<any> = (props) => {
         ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
   }, [navigation]);
 
-  useEffect(() => {
-    const deepLinkUri =
-      props?.route?.params?.path || deepLinkUriStore.getDeepLink();
-    if (deepLinkUri) {
-      updateScreen(deepLinkUri);
-    }
-  }, []);
-
-  const updateScreen = async (uri) => {
-    if (uri) {
-      deepLinkUriStore.updateDeepLink('');
-      smartNavigation.pushSmart('Web.dApp', {
-        name: 'Browser',
-        uri: decodeURIComponent(uri) || 'https://oraidex.io',
-      });
-    }
-  };
-
   const [url, setUrl] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
     setTimeout(function () {
       if (checkValidDomain(props?.route?.params?.url?.toLowerCase())) {
-        smartNavigation.pushSmart('Web.dApp', {
-          name: 'Browser',
-          uri:
-            props.route.params.url?.toLowerCase().indexOf('http') >= 0
-              ? props.route.params.url?.toLowerCase()
-              : 'https://' + props.route.params?.url?.toLowerCase(),
+        const tabUri =
+          props.route.params.url?.toLowerCase().indexOf('http') >= 0
+            ? props.route.params.url?.toLowerCase()
+            : 'https://' + props.route.params?.url?.toLowerCase();
+        navigation.navigate('Web.dApp', {
+          name: tabUri,
+          uri: tabUri,
         });
       }
     }, 1000);
-  }, [props, smartNavigation, url]);
+  }, [props?.route?.params?.url]);
+
+  useEffect(() => {
+    setTimeout(function () {
+      deepLinkUriStore.updateDeepLink('');
+      if (checkValidDomain(deepLinkUriStore.link.toLowerCase())) {
+        const tabUri =
+          deepLinkUriStore.link?.toLowerCase().indexOf('http') >= 0
+            ? deepLinkUriStore.link?.toLowerCase()
+            : 'https://' + deepLinkUriStore.link?.toLowerCase();
+        navigation.navigate('Web.dApp', {
+          name: tabUri,
+          uri: tabUri,
+        });
+      }
+    }, 1000);
+  }, []);
 
   const onHandleUrl = () => {
     if (checkValidDomain(url?.toLowerCase())) {
       const tab = {
         id: Date.now(),
-        name: 'Browser',
+        name: url,
         uri:
           url?.toLowerCase().indexOf('http') >= 0
             ? url?.toLowerCase()
             : 'https://' + url?.toLowerCase(),
       };
       browserStore.addTab(tab);
-      console.log('tabs1 add');
-
       browserStore.updateSelectedTab(tab);
-      smartNavigation.pushSmart('Web.dApp', tab);
+      navigation.navigate('Web.dApp', tab);
     } else {
       let uri = `https://www.google.com/search?q=${url ?? ''}`;
       if (InjectedProviderUrl) uri = InjectedProviderUrl;
-      smartNavigation.pushSmart('Web.dApp', {
+      navigation.navigate('Web.dApp', {
         name: 'Google',
-        // uri: `https://staging.oraidex.io/ethereum`,
         uri,
       });
     }
   };
 
   const handleClickUri = (uri: string, name: string) => {
-    smartNavigation.pushSmart('Web.dApp', {
+    navigation.navigate('Web.dApp', {
       name,
       uri,
     });
@@ -243,7 +235,7 @@ export const Browser: FunctionComponent<any> = (props) => {
               <View style={style.flatten(['padding-20'])}>
                 {browserStore.getBookmarks?.map((e) => (
                   <TouchableOpacity
-                    key={e.uri}
+                    key={e.id ?? e.uri}
                     style={style.flatten([
                       'height-44',
                       'margin-bottom-15',
@@ -251,6 +243,13 @@ export const Browser: FunctionComponent<any> = (props) => {
                     ])}
                     onPress={() => {
                       handleClickUri(e.uri, e.name);
+                      const tab = {
+                        id: Date.now(),
+                        name: e.name,
+                        uri: e.uri?.toLowerCase(),
+                      };
+                      browserStore.addTab(tab);
+                      browserStore.updateSelectedTab(tab);
                       setUrl(e.uri);
                     }}
                   >
@@ -306,4 +305,4 @@ export const Browser: FunctionComponent<any> = (props) => {
       </WebViewStateContext.Provider>
     </>
   );
-};
+});

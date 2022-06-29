@@ -27,7 +27,6 @@ import DeviceInfo from 'react-native-device-info';
 import { InjectedProviderUrl } from '../../config';
 import { BrowserFooterSection } from '../footer-section';
 import { SwtichTab } from '../switch-tabs';
-import { useSmartNavigation } from '../../../../navigation.provider';
 
 export const useInjectedSourceCode = () => {
   const [code, setCode] = useState<string | undefined>();
@@ -47,7 +46,6 @@ export const WebpageScreen: FunctionComponent<
   }
 > = observer((props) => {
   const { keyRingStore, chainStore, browserStore } = useStore();
-  const smartNavigation = useSmartNavigation();
   const [isSwitchTab, setIsSwitchTab] = useState(false);
   const style = useStyle();
 
@@ -107,9 +105,9 @@ export const WebpageScreen: FunctionComponent<
 
   const onPressItem = ({ name, uri }) => {
     setIsSwitchTab(false);
-    if (browserStore.getSelectedTab()?.uri !== uri) {
+    if (browserStore.getSelectedTab?.uri !== uri) {
       browserStore.updateSelectedTab({ name, uri });
-      smartNavigation.pushSmart('Web.dApp', {
+      navigation.navigate('Web.dApp', {
         name,
         uri,
       });
@@ -279,6 +277,9 @@ export const WebpageScreen: FunctionComponent<
           url: currentURL,
           canGoBack,
           canGoForward,
+          clearWebViewContext: () => {
+            webviewRef.current = null;
+          },
         }}
       >
         <BrowserFooterSection

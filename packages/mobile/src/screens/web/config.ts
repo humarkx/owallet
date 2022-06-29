@@ -38,13 +38,19 @@ export const DAppInfos: DAppInfo[] = [
     uri: 'https://testnet.scan.orai.io',
     logo: oraiLogo,
   },
+  {
+    id: 5,
+    name: 'Oraiscan',
+    uri: 'https://scan.orai.io',
+    logo: oraiLogo,
+  },
   // {
   //   name: 'Balcony Subnet',
   //   uri: 'https://bignft.web.app',
   //   logo: balconyLogo,
   // },
   {
-    id: 5,
+    id: 6,
     name: 'Balcony Subnet',
     uri: 'https://re.bignft.app',
     logo: balconyLogo,
