@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 import React, { FunctionComponent, useEffect } from 'react';
-import { Alert, Image, Linking, Text, View } from 'react-native';
+import { Alert, Image, Linking, View } from 'react-native';
+import { CText as Text} from "./components/text";
 import { KeyRingStatus } from '@owallet/background';
 import {
   DrawerActions,
@@ -102,6 +103,7 @@ import {
   useSmartNavigation,
 } from './navigation.provider';
 import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
+import { OnboardingIntroScreen } from './screens/onboarding';
 import { NtfsScreen } from './screens/nfts'
 import { NtfDetailScreen } from './screens/nfts/nft-detail'
 
@@ -175,7 +177,6 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
 
 export const MainNavigation: FunctionComponent = () => {
   const { deepLinkUriStore } = useStore();
-
   return (
     <Stack.Navigator
       screenOptions={{
@@ -218,35 +219,40 @@ export const MainNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'Create a New Wallet',
+          title: '',
+          headerLeft: null,
         }}
         name="RegisterMain"
         component={NewMnemonicScreen}
       />
       <Stack.Screen
         options={{
-          title: 'Verify Mnemonic',
+          title: '',
+          headerLeft: null,
         }}
         name="RegisterVerifyMnemonicMain"
         component={VerifyMnemonicScreen}
       />
       <Stack.Screen
         options={{
-          headerShown: false,
+          title: '',
+          headerLeft: null,
         }}
         name="RegisterEnd"
         component={RegisterEndScreen}
       />
       <Stack.Screen
         options={{
-          title: 'Import Existing Wallet',
+          title: '',
+          headerLeft: null,
         }}
         name="RegisterRecoverMnemonicMain"
         component={RecoverMnemonicScreen}
       />
       <Stack.Screen
         options={{
-          title: 'Import Hardware Wallet',
+          title: '',
+          headerLeft: null,
         }}
         name="RegisterNewLedgerMain"
         component={NewLedgerScreen}
@@ -254,13 +260,15 @@ export const MainNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: '',
+          headerLeft: null,
         }}
         name="Tokens"
         component={TokensScreen}
       />
       <Stack.Screen
         options={{
-          title: 'My NFTs',
+          title: '',
+          headerLeft: null,
         }}
         name="Nfts"
         component={NtfsScreen}
@@ -289,7 +297,8 @@ export const RegisterNavigation: FunctionComponent = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        ...PlainHeaderScreenOptionsPreset,
+        ...BlurredHeaderScreenOptionsPreset,
+        headerTitle: '',
         headerTitleStyle: style.flatten(['h5', 'color-text-black-high']),
       }}
       initialRouteName="Register.Intro"
@@ -318,7 +327,8 @@ export const RegisterNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'Create New Mnemonic',
+          title: '',
+          headerLeft: null,
         }}
         name="Register.NewMnemonic"
         component={NewMnemonicScreen}

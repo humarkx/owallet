@@ -1,13 +1,13 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { RouteProp, useIsFocused, useRoute } from '@react-navigation/native';
 import { RegisterConfig } from '@owallet/hooks';
 import { useNewMnemonicConfig } from './hook';
 import { PageWithScrollView } from '../../../components/page';
-import { CheckIcon } from '../../../components/icon';
-import { useStyle } from '../../../styles';
+import { CheckIcon, CopyFillIcon } from '../../../components/icon';
 import { WordChip } from '../../../components/mnemonic';
+import { CText as Text } from '../../../components/text';
 import { Button } from '../../../components/button';
 import Clipboard from 'expo-clipboard';
 import { TextInput } from '../../../components/input';
@@ -15,7 +15,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { useSmartNavigation } from '../../../navigation.provider';
 import { useSimpleTimer } from '../../../hooks';
 import { BIP44AdvancedButton, useBIP44Option } from '../bip44';
-import { navigate, checkRouter, checkRouterPaddingBottomBar } from '../../../router/root';
+import {
+  navigate,
+  checkRouter,
+  checkRouterPaddingBottomBar,
+} from '../../../router/root';
+import { OWalletLogo } from '../owallet-logo';
+import { colors, typography } from '../../../themes';
 
 interface FormData {
   name: string;
@@ -36,7 +42,6 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
     >
   >();
 
-  const style = useStyle();
   const smartNavigation = useSmartNavigation();
 
   const registerConfig: RegisterConfig = route.params.registerConfig;
@@ -82,21 +87,36 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
 
   return (
     <PageWithScrollView
-      contentContainerStyle={style.get('flex-grow-1')}
-      style={style.flatten(['padding-x-page'])}
+      contentContainerStyle={{
+        paddingLeft: 20,
+        paddingRight: 20,
+      }}
+      backgroundColor={colors['white']}
     >
       {/* Mock for flexible margin top */}
-      <View style={style.flatten(['max-height-32', 'flex-1'])} />
-      <Text
-        style={style.flatten([
-          'h5',
-          'color-text-black-medium',
-          'margin-bottom-4',
-          'text-center',
-        ])}
+      <View
+        style={{
+          height: 72,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
       >
-        Backup your mnemonic securely
-      </Text>
+        <Text
+          style={{
+            fontSize: 24,
+            lineHeight: 34,
+            fontWeight: '700',
+            color: colors['gray-900'],
+          }}
+        >
+          Create new wallet
+        </Text>
+        <View>
+          <OWalletLogo size={72} />
+        </View>
+      </View>
       <WordsCard words={words} />
       <Controller
         control={control}
@@ -106,8 +126,13 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
-              label="Wallet nickname"
-              containerStyle={style.flatten(['padding-bottom-6'])}
+              label="Username"
+              containerStyle={{
+                paddingBottom: 6,
+              }}
+              inputStyle={{
+                ...styles.borderInput,
+              }}
               returnKeyType={mode === 'add' ? 'done' : 'next'}
               onSubmitEditing={() => {
                 if (mode === 'add') {
@@ -146,6 +171,9 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
                 <TextInput
                   label="Password"
                   returnKeyType="next"
+                  inputStyle={{
+                    ...styles.borderInput,
+                  }}
                   secureTextEntry={true}
                   onSubmitEditing={() => {
                     setFocus('confirmPassword');
@@ -184,6 +212,9 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
                   onSubmitEditing={() => {
                     submit();
                   }}
+                  inputStyle={{
+                    ...styles.borderInput,
+                  }}
                   error={errors.confirmPassword?.message}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -197,16 +228,69 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
           />
         </React.Fragment>
       ) : null}
-      <View style={style.flatten(['flex-1'])} />
       <View
         style={{
-          paddingBottom: checkRouterPaddingBottomBar(props?.route?.name, 'RegisterMain'),
+          flex: 1,
+        }}
+      />
+      <TouchableOpacity
+        onPress={submit}
+        style={{
+          marginBottom: 24,
+          marginTop: 32,
+          backgroundColor: '#8B1BFB',
+          borderRadius: 8,
         }}
       >
-        <Button text="Next" size="large" onPress={submit} />
+        <View
+          style={{
+            padding: 18,
+          }}
+        >
+          <Text
+            style={{
+              color: 'white',
+              textAlign: 'center',
+              fontWeight: '700',
+              fontSize: 16,
+            }}
+          >
+            Next
+          </Text>
+        </View>
+      </TouchableOpacity>
+      <View
+        style={{
+          paddingBottom: checkRouterPaddingBottomBar(
+            props?.route?.name,
+            'RegisterMain'
+          ),
+        }}
+      >
+        <Text
+          style={{
+            color: '#8B1BFB',
+            textAlign: 'center',
+            fontWeight: '700',
+            fontSize: 16,
+          }}
+          onPress={() => {
+            if (checkRouter(props?.route?.name, 'RegisterMain')) {
+              smartNavigation.goBack();
+            } else {
+              smartNavigation.navigateSmart('Register.Intro', {});
+            }
+          }}
+        >
+          Go back
+        </Text>
       </View>
       {/* Mock element for bottom padding */}
-      <View style={style.flatten(['height-page-pad'])} />
+      <View
+        style={{
+          height: 20,
+        }}
+      />
     </PageWithScrollView>
   );
 });
@@ -214,7 +298,6 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
 const WordsCard: FunctionComponent<{
   words: string[];
 }> = ({ words }) => {
-  const style = useStyle();
   const { isTimedOut, setTimer } = useSimpleTimer();
 
   /*
@@ -238,17 +321,19 @@ const WordsCard: FunctionComponent<{
 
   return (
     <View
-      style={style.flatten([
-        'margin-top-14',
-        'margin-bottom-16',
-        'padding-24',
-        'padding-x-28',
-        'padding-bottom-12',
-        'background-color-white',
-        'border-radius-8',
-        'flex-row',
-        'flex-wrap',
-      ])}
+      style={{
+        marginTop: 14,
+        marginBottom: 16,
+        paddingTop: 24,
+        paddingLeft: 28,
+        paddingRight: 28,
+        borderColor: colors['purple-100'],
+        borderWidth: 1,
+        borderRadius: 8,
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 1,
+      }}
     >
       {words.map((word, i) => {
         return (
@@ -263,23 +348,33 @@ const WordsCard: FunctionComponent<{
       <View
         style={{
           width: '100%',
+          borderBottomWidth: 1,
+          padding: 10,
+          borderColor: colors['purple-50'],
+        }}
+      ></View>
+      <View
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
         }}
       >
+        {!isTimedOut && <CopyFillIcon />}
         <Button
           textStyle={{
-            fontSize: 18,
-            lineHeight: 20,
-            letterSpacing: 0.2,
-            color: isTimedOut ? '#2DCE89' : '#4762E7',
+            ...typography['text-button2'],
+            color: isTimedOut ? colors['success'] : colors['purple-900'],
           }}
-          // textStyle={style.flatten([
-          //   'text-button1',
-          //   isTimedOut ? 'color-success' : 'color-primary',
-          // ])}
+          style={{
+            backgroundColor: colors['white'],
+          }}
           mode="text"
           {...(isTimedOut && {
             rightIcon: (
-              <View style={style.flatten(['margin-left-8'])}>
+              <View style={{ paddingLeft: 10 }}>
                 <CheckIcon />
               </View>
             ),
@@ -294,3 +389,16 @@ const WordsCard: FunctionComponent<{
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  borderInput: {
+    borderColor: colors['purple-100'],
+    borderWidth: 1,
+    backgroundColor: colors['white'],
+    paddingLeft: 11,
+    paddingRight: 11,
+    paddingTop: 12,
+    paddingBottom: 12,
+    borderRadius: 4,
+  },
+});

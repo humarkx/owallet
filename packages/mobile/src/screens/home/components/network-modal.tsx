@@ -1,11 +1,11 @@
-import React, { FunctionComponent, ReactElement, useState } from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
-import { Text } from '@rneui/base';
-import { RectButton } from '../../../components/rect-button';
-import { colors, metrics, spacing, typography } from '../../../themes';
-import { _keyExtract } from '../../../utils/helper';
-import FastImage from 'react-native-fast-image';
-import { VectorCharacter } from '../../../components/vector-character';
+import React, { FunctionComponent, ReactElement, useState } from 'react'
+import { StyleSheet, View, FlatList } from 'react-native'
+import { RectButton } from '../../../components/rect-button'
+import { colors, metrics, spacing, typography } from '../../../themes'
+import { _keyExtract } from '../../../utils/helper'
+import FastImage from 'react-native-fast-image'
+import { VectorCharacter } from '../../../components/vector-character'
+import { CText as Text} from "../../../components/text";
 
 export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
   const _renderItem = ({ item }) => {
@@ -15,9 +15,9 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
           ...styles.containerBtn,
         }}
         onPress={() => {
-          chainStore.selectChain(item.chainId);
-          chainStore.saveLastViewChainId();
-          modalStore.close();
+          chainStore.selectChain(item.chainId)
+          chainStore.saveLastViewChainId()
+          modalStore.close()
         }}
       >
         <View
@@ -35,7 +35,7 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
               borderRadius: spacing['12'],
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: profileColor(item),
+              backgroundColor: profileColor(item)
             }}
           >
             {item.raw.chainSymbolImageUrl ? (
@@ -61,7 +61,7 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
           <View
             style={{
               justifyContent: 'space-between',
-              marginLeft: spacing['12'],
+              marginLeft: spacing['12']
             }}
           >
             <Text
@@ -96,7 +96,7 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
                   ? colors['purple-900']
                   : colors['gray-400'],
               justifyContent: 'center',
-              alignItems: 'center',
+              alignItems: 'center'
             }}
           >
             <View
@@ -110,8 +110,8 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
           </View>
         </View>
       </RectButton>
-    );
-  };
+    )
+  }
 
   return (
     // container
