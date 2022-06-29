@@ -103,8 +103,9 @@ import {
   useSmartNavigation,
 } from './navigation.provider';
 import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
-import { NtfsScreen } from './screens/nfts';
 import { OnboardingIntroScreen } from './screens/onboarding';
+import { NtfsScreen } from './screens/nfts'
+import { NtfDetailScreen } from './screens/nfts/nft-detail'
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -276,16 +277,16 @@ export const MainNavigation: FunctionComponent = () => {
         options={{
           title: 'Token detail',
         }}
-        name="Token.Detail"
+        name="Tokens.Detail"
         component={TokenDetailScreen}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         options={{
           title: 'Ntf detail'
         }}
         name="Nfts.Detail"
-        component={NtfsScreen}
-      /> */}
+        component={NtfDetailScreen}
+      />
     </Stack.Navigator>
   );
 };
@@ -600,8 +601,7 @@ export const WebNavigation: FunctionComponent = () => {
           title: 'Browser',
         }}
         name="Browser"
-        component={OnboardingIntroScreen}
-        // component={Browser}
+        component={Browser}
       />
       <Stack.Screen
         options={{
