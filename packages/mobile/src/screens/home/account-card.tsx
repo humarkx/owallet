@@ -7,7 +7,6 @@ import React, {
 import { observer } from 'mobx-react-lite'
 import { Card, CardBody } from '../../components/card'
 import {
-  Text,
   View,
   ViewStyle,
   Image,
@@ -15,6 +14,7 @@ import {
   TouchableWithoutFeedback,
   LogBox
 } from 'react-native'
+import { CText as Text} from '../../components/text'; 
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useStore } from '../../stores'
 import { AddressCopyable } from '../../components/address-copyable'
@@ -49,10 +49,10 @@ import LinearGradient from 'react-native-linear-gradient'
 import MyWalletModal from './components/my-wallet-modal/my-wallet-modal'
 
 export const AccountCard: FunctionComponent<{
-  containerStyle?: ViewStyle
+  containerStyle?: ViewStyle;
 }> = observer(({ containerStyle }) => {
   const { chainStore, accountStore, queriesStore, priceStore, modalStore } =
-    useStore()
+    useStore();
 
   const deterministicNumber = useCallback(chainInfo => {
     const bytes = Hash.sha256(
@@ -89,30 +89,30 @@ export const AccountCard: FunctionComponent<{
   const smartNavigation = useSmartNavigation()
   const navigation = useNavigation()
 
-  const account = accountStore.getAccount(chainStore.current.chainId)
-  const queries = queriesStore.get(chainStore.current.chainId)
+  const account = accountStore.getAccount(chainStore.current.chainId);
+  const queries = queriesStore.get(chainStore.current.chainId);
 
   const queryStakable = queries.queryBalances.getQueryBech32Address(
     account.bech32Address
-  ).stakable
-  const stakable = queryStakable.balance
+  ).stakable;
+  const stakable = queryStakable.balance;
 
   const queryDelegated = queries.cosmos.queryDelegations.getQueryBech32Address(
     account.bech32Address
-  )
-  const delegated = queryDelegated.total
+  );
+  const delegated = queryDelegated.total;
 
   const queryUnbonding =
     queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
       account.bech32Address
-    )
-  const unbonding = queryUnbonding.total
+    );
+  const unbonding = queryUnbonding.total;
 
-  const stakedSum = delegated.add(unbonding)
+  const stakedSum = delegated.add(unbonding);
 
-  const total = stakable.add(stakedSum)
+  const total = stakable.add(stakedSum);
 
-  const totalPrice = priceStore.calculatePrice(total)
+  const totalPrice = priceStore.calculatePrice(total);
 
   const data: [number, number] = [
     parseFloat(stakable.toDec().toString()),
@@ -130,7 +130,7 @@ export const AccountCard: FunctionComponent<{
         currency: chainStore.current.stakeCurrency.coinMinimalDenom
       })
     }
-  }
+  };
 
   const _onPressNetworkModal = () => {
     modalStore.setOpen()
@@ -144,9 +144,9 @@ export const AccountCard: FunctionComponent<{
   }
 
   const _onPressNamespace = () => {
-    modalStore.setOpen()
-    modalStore.setChildren(NamespaceModal(account))
-  }
+    modalStore.setOpen();
+    modalStore.setChildren(NamespaceModal(account));
+  };
 
   const _onPressMyWallet = () => {
     modalStore.setOpen()
@@ -202,8 +202,8 @@ export const AccountCard: FunctionComponent<{
           </Text>
         </View>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   return (
     <Card style={containerStyle}>
@@ -287,7 +287,7 @@ export const AccountCard: FunctionComponent<{
             <View
               style={{
                 marginTop: 28,
-                marginBottom: 16
+                marginBottom: 16,
               }}
             >
               <Text
@@ -295,7 +295,7 @@ export const AccountCard: FunctionComponent<{
                   textAlign: 'center',
                   color: '#AEAEB2',
                   fontSize: 14,
-                  lineHeight: 20
+                  lineHeight: 20,
                 }}
               >
                 Total Balance
@@ -306,7 +306,7 @@ export const AccountCard: FunctionComponent<{
                   color: 'white',
                   fontWeight: '900',
                   fontSize: 34,
-                  lineHeight: 50
+                  lineHeight: 50,
                 }}
               >
                 {totalPrice
@@ -344,10 +344,10 @@ export const AccountCard: FunctionComponent<{
               shadowColor: 'rgba(24, 39, 75, 0.12)',
               shadowOffset: {
                 width: 0,
-                height: 12
+                height: 12,
               },
               shadowOpacity: 1,
-              shadowRadius: 16.0
+              shadowRadius: 16.0,
             }}
           >
             <View
@@ -414,10 +414,10 @@ export const AccountCard: FunctionComponent<{
             shadowColor: 'rgba(24, 39, 75, 0.12)',
             shadowOffset: {
               width: 0,
-              height: 12
+              height: 12,
             },
             shadowOpacity: 1,
-            shadowRadius: 16.0
+            shadowRadius: 16.0,
           }}
         >
           <View
@@ -448,7 +448,7 @@ export const AccountCard: FunctionComponent<{
                 <Image
                   style={{
                     width: 26,
-                    height: 26
+                    height: 26,
                   }}
                   source={require('../../assets/image/namespace_default.png')}
                   fadeDuration={0}
@@ -477,5 +477,5 @@ export const AccountCard: FunctionComponent<{
         </View>
       </CardBody>
     </Card>
-  )
-})
+  );
+});
