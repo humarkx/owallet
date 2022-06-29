@@ -7,7 +7,6 @@ import { CText as Text } from '../../../components/text'
 import { BondStatus, Validator } from '@owallet/stores'
 import { useStyle } from '../../../styles'
 import { SelectorModal, TextInput } from '../../../components/input'
-import { GradientBackground } from '../../../components/svg'
 import { CardDivider } from '../../../components/card'
 import { useSmartNavigation } from '../../../navigation.provider'
 import { CoinPretty, Dec } from '@owallet/unit'
@@ -156,7 +155,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
               </Text>
               <View
                 style={{
-                  paddingHorizontal: spacing['20'],
+                  paddingHorizontal: spacing['24'],
                   paddingTop: spacing['12'],
                   paddingBottom: spacing['4']
                 }}
@@ -179,7 +178,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                       style={{
                         flexDirection: 'row',
                         marginTop: spacing['32'],
-                        marginBottom: spacing['16']
+                        marginHorizontal: spacing['16']
                       }}
                     >
                       <View
@@ -350,7 +349,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors['white'],
     flexDirection: 'row',
-    padding: spacing['8'],
+    paddingTop: spacing['8'],
+    paddingBottom: spacing['8'],
     flex: 1,
     paddingLeft: spacing['8'],
     paddingRight: spacing['16']

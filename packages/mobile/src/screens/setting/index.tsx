@@ -1,6 +1,11 @@
 import React, { FunctionComponent } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
-import { renderFlag, RightArrow, SettingItem, SettingSectionTitle } from './components';
+import {
+  renderFlag,
+  RightArrow,
+  SettingItem,
+  SettingSectionTitle
+} from './components';
 // import { SettingSelectAccountItem } from "./items/select-account";
 import { useSmartNavigation } from '../../navigation.provider';
 // import { SettingFiatCurrencyItem } from "./items/fiat-currency";
@@ -11,13 +16,9 @@ import { SettingRemoveAccountItem } from './items/remove-account';
 import { canShowPrivateData } from './screens/view-private-data';
 import { SettingViewPrivateDataItem } from './items/view-private-data';
 import { useStyle } from '../../styles';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Platform
-} from 'react-native';
-import { CText as Text} from "../../components/text";
+import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { CText as Text } from '../../components/text';
+import { colors } from '../../themes';
 
 export const SettingScreen: FunctionComponent = observer(() => {
   const { keychainStore, keyRingStore, priceStore } = useStore();
@@ -35,19 +36,15 @@ export const SettingScreen: FunctionComponent = observer(() => {
       backgroundColor={style.get('color-setting-screen-background').color}
     >
       <View
-        style={style.flatten(
-          [
-            'background-color-primary-400',
-            'padding-24',
-            'padding-top-76',
-            'padding-bottom-101',
-            'margin-bottom-102'
-          ],
-          [
-            Platform.OS === 'ios' && 'border-radius-top-left-32',
-            Platform.OS === 'ios' && 'border-radius-top-right-32'
-          ]
-        )}
+        style={{
+          backgroundColor: colors['purple-700'],
+          padding: 24,
+          paddingTop: 76,
+          paddingBottom: 101,
+          marginBottom: 102,
+          borderTopLeftRadius: Platform.OS === 'ios' ? 32 : 0,
+          borderTopRightRadius: Platform.OS === 'ios' ? 32 : 0
+        }}
       >
         <Text style={style.flatten(['h1', 'color-white'])}>Setting</Text>
         <View
@@ -59,7 +56,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
               'margin-24',
               'margin-top-150',
               'border-radius-12',
-              'padding-20',
+              'padding-20'
             ]),
             styles.shadowBox
           ]}
@@ -71,14 +68,14 @@ export const SettingScreen: FunctionComponent = observer(() => {
             style={style.flatten([
               'flex-row',
               'items-center',
-              'justify-between',
+              'justify-between'
             ])}
           >
             <View>
               <Text
                 style={style.flatten([
                   'text-caption2',
-                  'color-text-black-very-low',
+                  'color-text-black-very-low'
                 ])}
               >
                 WALLET
@@ -88,7 +85,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
                   'text-caption2',
                   'color-black',
                   'font-bold',
-                  'subtitle1',
+                  'subtitle1'
                 ])}
               >
                 {selected
@@ -106,23 +103,25 @@ export const SettingScreen: FunctionComponent = observer(() => {
               'flex-row',
               'items-center',
               'justify-between',
-              'padding-top-20',
+              'padding-top-20'
             ])}
           >
             <View>
               <Text
                 style={style.flatten([
                   'text-caption2',
-                  'color-text-black-very-low',
+                  'color-text-black-very-low'
                 ])}
               >
                 CURRENCY
               </Text>
-              <View style={style.flatten([
-                'flex-row',
-                'items-center',
-                'justify-center',
-              ])}>
+              <View
+                style={style.flatten([
+                  'flex-row',
+                  'items-center',
+                  'justify-center'
+                ])}
+              >
                 {renderFlag(priceStore.defaultVsCurrency)}
                 <Text
                   style={style.flatten([
