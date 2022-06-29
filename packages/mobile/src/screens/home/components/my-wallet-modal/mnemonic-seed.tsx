@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { FlatList, Image, Text, View } from 'react-native';
+import { FlatList, Image, View } from 'react-native';
+import { CText as Text} from "../../../../components/text";
 import { RectButton } from '../../../../components/rect-button';
 import { useStore } from '../../../../stores';
 import { colors, metrics, spacing, typography } from '../../../../themes';
@@ -38,7 +39,7 @@ const MnemonicSeed = ({ styles }) => {
 
   const renderItem = ({ item }) => {
     console.log({ item });
-    
+
     return (
       <RectButton
         style={{

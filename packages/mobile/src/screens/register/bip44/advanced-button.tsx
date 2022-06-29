@@ -8,11 +8,11 @@ import { observer } from 'mobx-react-lite';
 import { BIP44Option } from './bip44-option';
 import { registerModal } from '../../../modals/base';
 import { CardModal } from '../../../modals/card';
-import { Text, View } from 'react-native';
+import {  View } from 'react-native';
 import { TextInput } from '../../../components/input';
 import { colors, typography } from '../../../themes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import { CText as Text} from "../../../components/text";
 export const BIP44AdvancedButton: FunctionComponent<{
   bip44Option: BIP44Option;
 }> = observer(({ bip44Option }) => {

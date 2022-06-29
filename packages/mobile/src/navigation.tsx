@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 import React, { FunctionComponent, useEffect } from 'react';
-import { Alert, Image, Linking, Text, View } from 'react-native';
+import { Alert, Image, Linking, View } from 'react-native';
+import { CText as Text} from "./components/text";
 import { KeyRingStatus } from '@owallet/background';
 import {
   DrawerActions,
@@ -73,7 +74,7 @@ import {
   HeaderRightButton,
   PlainHeaderScreenOptionsPreset,
 } from './components/header';
-import { TokensScreen } from './screens/tokens';
+import { TokensScreen, TokenDetailScreen } from './screens/tokens';
 import { UndelegateScreen } from './screens/stake/undelegate';
 import { RedelegateScreen } from './screens/stake/redelegate';
 import { CameraScreen } from './screens/camera';
@@ -271,6 +272,20 @@ export const MainNavigation: FunctionComponent = () => {
         name="Nfts"
         component={NtfsScreen}
       />
+      <Stack.Screen
+        options={{
+          title: 'Token detail',
+        }}
+        name="Token.Detail"
+        component={TokenDetailScreen}
+      />
+      {/* <Stack.Screen
+        options={{
+          title: 'Ntf detail'
+        }}
+        name="Nfts.Detail"
+        component={NtfsScreen}
+      /> */}
     </Stack.Navigator>
   );
 };

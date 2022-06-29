@@ -1,10 +1,11 @@
 import React, { FunctionComponent, useState } from 'react'
 import { Card, CardBody } from '../../components/card'
 import { SectionList, StyleSheet, View, ViewStyle } from 'react-native'
-import { Image, Text, Tab } from '@rneui/base'
+import { Image, Tab } from '@rneui/base'
+import { CText as Text} from "../../components/text";
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../stores'
-import { TokenItem } from '../tokens'
+import { TokenItem } from '../tokens/components/token-item'
 import { useSmartNavigation } from '../../navigation.provider'
 import { RectButton } from '../../components/rect-button'
 import { colors, metrics, spacing, typography } from '../../themes'
@@ -108,7 +109,7 @@ export const TokensCard: FunctionComponent<{
           >
             {formatContractAddress(item.title)}
           </Text>
-    
+
           <Text
             style={{
               ...typography.h5,
@@ -118,7 +119,7 @@ export const TokensCard: FunctionComponent<{
           >
             {item.oraiPrice}
           </Text>
-    
+
           <Text
             style={{
               ...typography.h5,
@@ -229,7 +230,7 @@ export const TokensCard: FunctionComponent<{
               if (index === 0) {
                 smartNavigation.navigateSmart('Tokens', {})
               } else {
-                //TODO: router to nft screen
+                smartNavigation.navigateSmart('Nfts', {})
               }
             }}
           >

@@ -16,8 +16,8 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       'Register.Intro': {
         upperScreenName: 'Register',
       },
-      'NewUser': {
-        upperScreenName: 'Register.NewUser'
+      NewUser: {
+        upperScreenName: 'Register.NewUser',
       },
       'Register.NewUser': {
         upperScreenName: 'Register',
@@ -62,7 +62,10 @@ const { SmartNavigatorProvider, useSmartNavigation } =
         upperScreenName: 'Main'
       },
       Nfts: {
-        upperScreenName: 'Main'
+        upperScreenName: 'Main',
+      },
+      'Tokens.Detail': {
+        upperScreenName: 'Main',
       },
       Camera: {
         upperScreenName: 'Others',

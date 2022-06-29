@@ -1,18 +1,18 @@
 import React, { FunctionComponent, ReactElement, useState } from 'react'
 import { StyleSheet, View, FlatList } from 'react-native'
-import { Text } from '@rneui/base'
 import { RectButton } from '../../../components/rect-button'
 import { colors, metrics, spacing, typography } from '../../../themes'
 import { _keyExtract } from '../../../utils/helper'
 import FastImage from 'react-native-fast-image'
 import { VectorCharacter } from '../../../components/vector-character'
+import { CText as Text} from "../../../components/text";
 
 export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
   const _renderItem = ({ item }) => {
     return (
       <RectButton
         style={{
-          ...styles.containerBtn
+          ...styles.containerBtn,
         }}
         onPress={() => {
           chainStore.selectChain(item.chainId)
@@ -24,7 +24,7 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
           style={{
             justifyContent: 'flex-start',
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
           }}
         >
           <View
@@ -42,11 +42,11 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
               <FastImage
                 style={{
                   width: 24,
-                  height: 24
+                  height: 24,
                 }}
                 resizeMode={FastImage.resizeMode.contain}
                 source={{
-                  uri: item.raw.chainSymbolImageUrl
+                  uri: item.raw.chainSymbolImageUrl,
                 }}
               />
             ) : (
@@ -68,7 +68,7 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
               style={{
                 ...typography.h6,
                 color: colors['gray-900'],
-                fontWeight: '900'
+                fontWeight: '900',
               }}
               numberOfLines={1}
             >
@@ -79,7 +79,7 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
                 ...typography.h7,
                 color: colors['gray-300'],
                 fontWeight: '900',
-                fontSize: 12
+                fontSize: 12,
               }}
             >{`$${item.price || 0}`}</Text>
           </View>
@@ -104,7 +104,7 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
                 width: 12,
                 height: 12,
                 borderRadius: spacing['32'],
-                backgroundColor: colors['white']
+                backgroundColor: colors['white'],
               }}
             />
           </View>

@@ -27,8 +27,6 @@ import {
   DotsIcon,
   DownArrowIcon,
   HistoryIcon,
-  RightArrowIcon,
-  ScanIcon,
   Scanner,
   SendIcon,
   SettingDashboardIcon
@@ -57,14 +55,14 @@ export const AccountCard: FunctionComponent<{
   const deterministicNumber = useCallback(chainInfo => {
     const bytes = Hash.sha256(
       Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
-    )
+    );
     return (
       (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0
-    )
-  }, [])
+    );
+  }, []);
 
   const profileColor = useCallback(
-    chainInfo => {
+    (chainInfo) => {
       const colors = [
         'sky-blue',
         'mint',
@@ -78,13 +76,13 @@ export const AccountCard: FunctionComponent<{
         'purple',
         'red',
         'orange',
-        'black'
-      ]
+        'black',
+      ];
 
-      return colors[deterministicNumber(chainInfo) % colors.length]
+      return colors[deterministicNumber(chainInfo) % colors.length];
     },
     [deterministicNumber]
-  )
+  );
 
   const smartNavigation = useSmartNavigation()
   const navigation = useNavigation()
@@ -132,13 +130,14 @@ export const AccountCard: FunctionComponent<{
     }
   };
 
+  // open model
   const _onPressNetworkModal = () => {
     modalStore.setOpen()
     modalStore.setChildren(
       NetworkModal({
         profileColor,
         chainStore,
-        modalStore
+        modalStore,
       })
     )
   }
@@ -147,11 +146,10 @@ export const AccountCard: FunctionComponent<{
     modalStore.setOpen();
     modalStore.setChildren(NamespaceModal(account));
   };
-
   const _onPressMyWallet = () => {
-    modalStore.setOpen()
-    modalStore.setChildren(MyWalletModal())
-  }
+    modalStore.setOpen();
+    modalStore.setChildren(MyWalletModal());
+  };
 
   const RenderBtnMain = ({ name }) => {
     let icon: ReactElement

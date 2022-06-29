@@ -1,11 +1,11 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import {
   Image,
-  Text,
   View,
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { CText as Text} from "../../components/text";
 import { useStyle } from '../../styles';
 import { TextInput } from '../../components/input';
 import { PageWithScrollView } from '../../components/page';
@@ -86,40 +86,39 @@ export const Browser: FunctionComponent<any> = observer((props) => {
         ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
   }, [navigation]);
 
-  useEffect(() => {
-    const deepLinkUri =
-      props?.route?.params?.path || deepLinkUriStore.getDeepLink();
-    if (deepLinkUri) {
-      updateScreen(deepLinkUri);
-    }
-  }, []);
-
-  const updateScreen = async (uri) => {
-    if (uri) {
-      deepLinkUriStore.updateDeepLink('');
-      navigation.navigate('Web.dApp', {
-        name: 'Browser',
-        uri: decodeURIComponent(uri) || 'https://oraidex.io',
-      });
-    }
-  };
-
   const [url, setUrl] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
     setTimeout(function () {
       if (checkValidDomain(props?.route?.params?.url?.toLowerCase())) {
+        const tabUri =
+          props.route.params.url?.toLowerCase().indexOf('http') >= 0
+            ? props.route.params.url?.toLowerCase()
+            : 'https://' + props.route.params?.url?.toLowerCase();
         navigation.navigate('Web.dApp', {
-          name: 'Browser',
-          uri:
-            props.route.params.url?.toLowerCase().indexOf('http') >= 0
-              ? props.route.params.url?.toLowerCase()
-              : 'https://' + props.route.params?.url?.toLowerCase(),
+          name: tabUri,
+          uri: tabUri,
         });
       }
     }, 1000);
-  }, [props, url]);
+  }, [props?.route?.params?.url]);
+
+  useEffect(() => {
+    setTimeout(function () {
+      deepLinkUriStore.updateDeepLink('');
+      if (checkValidDomain(deepLinkUriStore.link.toLowerCase())) {
+        const tabUri =
+          deepLinkUriStore.link?.toLowerCase().indexOf('http') >= 0
+            ? deepLinkUriStore.link?.toLowerCase()
+            : 'https://' + deepLinkUriStore.link?.toLowerCase();
+        navigation.navigate('Web.dApp', {
+          name: tabUri,
+          uri: tabUri,
+        });
+      }
+    }, 1000);
+  }, []);
 
   const onHandleUrl = () => {
     if (checkValidDomain(url?.toLowerCase())) {
@@ -132,7 +131,6 @@ export const Browser: FunctionComponent<any> = observer((props) => {
             : 'https://' + url?.toLowerCase(),
       };
       browserStore.addTab(tab);
-
       browserStore.updateSelectedTab(tab);
       navigation.navigate('Web.dApp', tab);
     } else {
@@ -140,7 +138,6 @@ export const Browser: FunctionComponent<any> = observer((props) => {
       if (InjectedProviderUrl) uri = InjectedProviderUrl;
       navigation.navigate('Web.dApp', {
         name: 'Google',
-        // uri: `https://staging.oraidex.io/ethereum`,
         uri,
       });
     }
