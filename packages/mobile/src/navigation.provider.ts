@@ -59,7 +59,10 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       //   upperScreenName: 'Others'
       // },
       Tokens: {
-        upperScreenName: 'Others',
+        upperScreenName: 'Main'
+      },
+      Nfts: {
+        upperScreenName: 'Main'
       },
       Camera: {
         upperScreenName: 'Others',

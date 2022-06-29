@@ -78,7 +78,6 @@ import {
   FocusedScreenProvider,
   useFocusedScreen
 } from './providers/focused-screen'
-// import Svg, { Path, Rect } from "react-native-svg";
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
@@ -88,7 +87,6 @@ import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon'
 import { BlurredBottomTabBar } from './components/bottom-tabbar'
 import { UnlockScreen } from './screens/unlock'
 import { OWalletVersionScreen } from './screens/setting/screens/version'
-
 import { DAppWebpageScreen } from './screens/web/webpages'
 import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen'
 import { Browser } from './screens/web/browser'
@@ -98,8 +96,9 @@ import { navigate, navigationRef } from './router/root'
 import { handleDeepLink } from './utils/helper'
 import {
   SmartNavigatorProvider,
-  useSmartNavigation
-} from './navigation.provider'
+  useSmartNavigation,
+} from './navigation.provider';
+import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
 import { NtfsScreen } from './screens/nfts'
 import { OnboardingIntroScreen } from './screens/onboarding'
 
@@ -260,7 +259,7 @@ export const MainNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: ''
+          title: 'Ntf detail'
         }}
         name="Nfts"
         component={NtfsScreen}
@@ -758,7 +757,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           title: 'Send'
         }}
         name="Send"
-        component={SendScreen}
+        component={TransferTokensScreen}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
           chainId: chainStore.current.chainId
