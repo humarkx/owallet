@@ -2,11 +2,13 @@ import React, { FunctionComponent } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../stores';
 import { Card, CardBody } from '../../../components/card';
-import { Text, View, ViewStyle } from 'react-native';
+import { View, ViewStyle } from 'react-native';
+import { CText as Text } from '../../../components/text';
 import { useStyle } from '../../../styles';
 import { Button } from '../../../components/button';
 import { Dec } from '@owallet/unit';
 import { useSmartNavigation } from '../../../navigation.provider';
+import { colors } from '../../../themes';
 
 export const MyRewardCard: FunctionComponent<{
   containerStyle?: ViewStyle;
@@ -32,7 +34,11 @@ export const MyRewardCard: FunctionComponent<{
 
   return (
     <Card style={containerStyle}>
-      <CardBody>
+      <CardBody
+        style={{
+          backgroundColor: colors['white']
+        }}
+      >
         <Text
           style={style.flatten([
             'body3',

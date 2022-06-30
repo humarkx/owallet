@@ -2,7 +2,8 @@ import React, { FunctionComponent, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../stores';
 import { Card, CardBody, CardDivider } from '../../../components/card';
-import { Text, View, ViewStyle } from 'react-native';
+import { View, ViewStyle } from 'react-native';
+import { CText as Text } from '../../../components/text';
 import { useStyle } from '../../../styles';
 import { StakedTokenSymbol } from '../../../components/token-symbol';
 import { Button } from '../../../components/button';
@@ -11,6 +12,7 @@ import { RightArrowIcon } from '../../../components/icon';
 import { useSmartNavigation } from '../../../navigation.provider';
 import { ValidatorThumbnail } from '../../../components/thumbnail';
 import { RectButton } from '../../../components/rect-button';
+import { colors } from '../../../themes';
 
 export const DelegationsCard: FunctionComponent<{
   containerStyle?: ViewStyle;
@@ -65,8 +67,16 @@ export const DelegationsCard: FunctionComponent<{
   const smartNavigation = useSmartNavigation();
 
   return (
-    <Card style={containerStyle}>
-      <CardBody style={style.flatten(['padding-bottom-28'])}>
+    <Card style={{
+      ...containerStyle,
+      backgroundColor: colors['white']
+    }}>
+      <CardBody
+        style={{
+          backgroundColor: 'white',
+          paddingBottom: 28
+        }}
+      >
         <Text
           style={style.flatten([
             'h4',
@@ -105,7 +115,9 @@ export const DelegationsCard: FunctionComponent<{
       </CardBody>
       {delegations && delegations.length > 0 && <CardDivider />}
       {delegations && delegations.length > 0 && (
-        <CardBody style={style.flatten(['padding-x-0', 'padding-y-14'])}>
+        <CardBody style={{
+        backgroundColor: colors['white']
+        }}>
           {delegations.map((del) => {
             const val = validatorsMap.get(del.validator_address);
             if (!val) {

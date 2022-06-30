@@ -1,7 +1,8 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { PageWithView } from '../../components/page';
 import { useStyle } from '../../styles';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import { CText as Text} from "../../components/text";
 import { Button } from '../../components/button';
 import { useSmartNavigation } from '../../navigation.provider';
 import { RouteProp, useRoute } from '@react-navigation/native';
@@ -53,7 +54,7 @@ export const RegisterEndScreen: FunctionComponent = observer(() => {
           style={style.flatten([
             'h2',
             'color-text-black-medium',
-            'margin-top-18'
+            'margin-top-18',
           ])}
         >
           You’re all set!
@@ -63,7 +64,7 @@ export const RegisterEndScreen: FunctionComponent = observer(() => {
             'subtitle1',
             'color-text-black-low',
             'text-center',
-            'margin-top-10'
+            'margin-top-10',
           ])}
         >
           Your cosmic interchain journey now begins.
@@ -106,9 +107,9 @@ export const RegisterEndScreen: FunctionComponent = observer(() => {
               index: 0,
               routes: [
                 {
-                  name: 'MainTabDrawer'
-                }
-              ]
+                  name: 'MainTab',
+                },
+              ],
             });
           } catch (e) {
             console.log(e);

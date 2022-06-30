@@ -1,34 +1,38 @@
-import React, { FunctionComponent } from 'react';
-import { Text, View } from 'react-native';
-import { RefreshIcon } from '../../../../components/icon/refresh';
-import { useStyle } from '../../../../styles';
+import React, { FunctionComponent } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { CText as Text} from "../../../../components/text";
+import { RefreshIcon } from '../../../../components/icon/refresh'
+import { colors, spacing, typography } from '../../../../themes'
 
 export const TransactionSectionTitle: FunctionComponent<{
-  title: string;
-  right?: React.ReactElement;
+  title: string
+  right?: React.ReactElement
 
   onPress?: () => void
-}> = ({ title , right , onPress }) => {
-  const style = useStyle();
+}> = ({ title, right, onPress }) => {
   return (
-    <View
-      style={style.flatten([
-        'padding-x-20',
-        'padding-top-16',
-        'padding-bottom-12',
-        'margin-top-16',
-        'flex-row',
-        'items-center',
-        'justify-between',
-      ])}
-    >
-      <Text style={style.flatten(['color-text-black-low','body2'])}>
+    <View style={styles.container}>
+      <Text h4 h4Style={styles.textTitle}>
         {title &&
-          title.replace(/(^\w{1})|(\s+\w{1})/g, (letter) =>
-            letter.toUpperCase()
-          )}
+          title.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
       </Text>
-      {right ? right : <RefreshIcon onPress={onPress} color={'#4334F1'} size={24} />}
+      <RefreshIcon onPress={onPress} color={'#4334F1'} size={24} />
     </View>
-  );
-};
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing['20'],
+    paddingTop: spacing['16'],
+    paddingBottom: spacing['12'],
+    marginTop: spacing['16'],
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  textTitle: {
+    color: colors['gray-300'],
+    ...typography.body2
+  }
+})

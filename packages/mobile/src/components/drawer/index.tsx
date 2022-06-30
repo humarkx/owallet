@@ -7,7 +7,8 @@ import {
 } from '@react-navigation/drawer';
 import { useStore } from '../../stores';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { Alert, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
+import { CText as Text} from "../text";
 import { useStyle } from '../../styles';
 import { RectButton } from '../rect-button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +16,7 @@ import { VectorCharacter } from '../vector-character';
 import FastImage from 'react-native-fast-image';
 import { Hash } from '@owallet/crypto';
 import { BrowserIcon } from '../icon/browser';
+import { colors, spacing, typography } from '../../themes';
 
 export type DrawerContentProps =
   DrawerContentComponentProps<DrawerContentOptions>;
@@ -44,8 +46,9 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
           'orange',
           'blue-violet',
           'green',
-          'yellow',
-          'yellow-green',
+          'sky-blue',
+          'mint',
+          'red',
           'purple',
           'red',
           'orange',
@@ -64,13 +67,18 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
             marginBottom: safeAreaInsets.bottom,
           }}
         >
-          <View style={style.flatten(['justify-center', 'height-50'])}>
+          <View
+            style={{
+              justifyContent: 'center',
+              height: 50,
+            }}
+          >
             <Text
-              style={style.flatten([
-                'h3',
-                'color-text-black-high',
-                'margin-left-24',
-              ])}
+              style={{
+                ...typography.h3,
+                color: colors['text-black-high'],
+                marginLeft: spacing['24'],
+              }}
             >
               Networks
             </Text>
@@ -99,33 +107,24 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
                         Alert.alert('Coming soon!');
                       }
                     }}
-                    style={style.flatten([
-                      'flex-row',
-                      'height-84',
-                      'items-center',
-                      'padding-x-20',
-                    ])}
+                    style={{
+                      flexDirection: 'row',
+                      height: 84,
+                      alignItems: 'center',
+                      paddingHorizontal: spacing['20'],
+                    }}
                     activeOpacity={1}
                     underlayColor={
                       style.get('color-drawer-rect-button-underlay').color
                     }
                   >
                     <View
-                      style={style.flatten(
-                        [
-                          'width-32',
-                          'height-32',
-                          'border-radius-64',
-                          'items-center',
-                          'justify-center',
-                          'overflow-hidden',
-                          'margin-right-16',
-                          `background-color-profile-${profileColor(
-                            chainInfo
-                          )}` as any,
-                        ],
-                        [selected && 'background-color-black']
-                      )}
+                      style={{
+                        ...styles.containerImage,
+                        backgroundColor: selected
+                          ? colors['black']
+                          : profileColor(chainInfo),
+                      }}
                     >
                       {chainInfo.raw.chainSymbolImageUrl ? (
                         <FastImage
@@ -147,51 +146,18 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
                       )}
                     </View>
                     <Text
-                      style={style.flatten(
-                        ['h5', 'color-text-black-very-very-low'],
-                        [selected && 'color-text-black-medium']
-                      )}
+                      style={{
+                        ...typography.h5,
+                        color: selected
+                          ? colors['text-black-medium']
+                          : colors['text-black-very-very-low'],
+                      }}
                     >
                       {chainInfo.chainName}
                     </Text>
                   </RectButton>
                 );
               })}
-              <RectButton
-                key={'browser'}
-                onPress={() => {
-                  navigation.navigate('Browser');
-                }}
-                style={style.flatten([
-                  'flex-row',
-                  'height-84',
-                  'items-center',
-                  'padding-x-20',
-                  'border-width-top-1',
-                ])}
-                activeOpacity={1}
-                underlayColor={
-                  style.get('color-drawer-rect-button-underlay').color
-                }
-              >
-                <View
-                  style={style.flatten([
-                    'width-32',
-                    'height-32',
-                    'border-radius-64',
-                    'items-center',
-                    'justify-center',
-                    'overflow-hidden',
-                    'margin-right-16',
-                    'background-color-profile-green',
-                  ])}
-                >
-                  <BrowserIcon />
-                </View>
-                <Text style={style.flatten(['h5', 'color-text-black-medium'])}>
-                  {'Browser'}
-                </Text>
-              </RectButton>
             </>
           </View>
         </View>
@@ -199,3 +165,31 @@ export const DrawerContent: FunctionComponent<DrawerContentProps> = observer(
     );
   }
 );
+
+const styles = StyleSheet.create({
+  containerBrowser: {
+    width: spacing['32'],
+    height: spacing['32'],
+    borderRadius: spacing['64'],
+    alignItems: 'center',
+    overflow: 'hidden',
+    marginRight: spacing['16'],
+    backgroundColor: colors['profile-green'],
+  },
+  containerBtn: {
+    flexDirection: 'row',
+    height: 84,
+    alignItems: 'center',
+    paddingHorizontal: spacing['20'],
+    borderTopWidth: 1,
+  },
+  containerImage: {
+    width: spacing['32'],
+    height: spacing['32'],
+    borderRadius: spacing['64'],
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    marginRight: spacing['16'],
+  },
+});

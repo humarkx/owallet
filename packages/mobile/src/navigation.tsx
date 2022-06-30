@@ -1,160 +1,162 @@
 /* eslint-disable react/display-name */
-import React, { FunctionComponent, useEffect } from 'react';
-import { Alert, Linking, Text, View } from 'react-native';
-import { KeyRingStatus } from '@owallet/background';
+import React, { FunctionComponent, useEffect } from 'react'
+import { Alert, Image, Linking, View } from 'react-native'
+import { CText as Text } from './components/text'
+import { KeyRingStatus } from '@owallet/background'
 import {
   DrawerActions,
   NavigationContainer,
   useNavigation
-} from '@react-navigation/native';
-import { useStore } from './stores';
-import { observer } from 'mobx-react-lite';
-import { HomeScreen } from './screens/home';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+} from '@react-navigation/native'
+import { useStore } from './stores'
+import { observer } from 'mobx-react-lite'
+import { HomeScreen } from './screens/home'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
   createStackNavigator,
   TransitionPresets
-} from '@react-navigation/stack';
-import { SendScreen } from './screens/send';
-import {
-  GovernanceDetailsScreen,
-  GovernanceScreen
-} from './screens/governance';
+} from '@react-navigation/stack'
+import { SendScreen } from './screens/send'
+import { GovernanceDetailsScreen, GovernanceScreen } from './screens/governance'
 import {
   createDrawerNavigator,
   useIsDrawerOpen
-} from '@react-navigation/drawer';
-import { DrawerContent } from './components/drawer';
-import { useStyle } from './styles';
-import { BorderlessButton } from 'react-native-gesture-handler';
+} from '@react-navigation/drawer'
+import { DrawerContent } from './components/drawer'
+import { useStyle } from './styles'
+import { BorderlessButton } from 'react-native-gesture-handler'
 
-import { SettingScreen } from './screens/setting';
-import { SettingSelectAccountScreen } from './screens/setting/screens/select-account';
-import { SettingSelectLangScreen } from './screens/setting/screens/select-lang';
-import { ViewPrivateDataScreen } from './screens/setting/screens/view-private-data';
-import { WebScreen } from './screens/web';
-import { RegisterIntroScreen } from './screens/register';
+import { SettingScreen } from './screens/setting'
+import { SettingSelectAccountScreen } from './screens/setting/screens/select-account'
+import { SettingSelectLangScreen } from './screens/setting/screens/select-lang'
+import { ViewPrivateDataScreen } from './screens/setting/screens/view-private-data'
+import { WebScreen } from './screens/web'
+import { RegisterIntroScreen } from './screens/register'
 import {
   NewMnemonicScreen,
   RecoverMnemonicScreen,
   VerifyMnemonicScreen
-} from './screens/register/mnemonic';
-import { RegisterEndScreen } from './screens/register/end';
-import { RegisterNewUserScreen } from './screens/register/new-user';
-import { RegisterNotNewUserScreen } from './screens/register/not-new-user';
+} from './screens/register/mnemonic'
+import { RegisterEndScreen } from './screens/register/end'
+import { RegisterNewUserScreen } from './screens/register/new-user'
+import { RegisterNotNewUserScreen } from './screens/register/not-new-user'
 
 import {
   DelegateScreen,
   StakingDashboardScreen,
   ValidatorDetailsScreen,
   ValidatorListScreen
-} from './screens/stake';
+} from './screens/stake'
 import {
-  DownArrowIcon,
-  SendIcon,
-  TransactionIcon,
-  WalletIcon,
-  WalletOutLineIcon,
-  ContactFillIcon,
-  ContactOutLineIcon,
-  TransactionOutlineIcon,
   SettingFillIcon,
-  SettingOutLineIcon
-} from './components/icon';
+  SettingOutLineIcon,
+  DotsIcon,
+  HomeFillIcon,
+  HomeOutlineIcon,
+  BrowserOutLineIcon,
+  BrowserFillIcon,
+  InvestOutlineIcon,
+  InvestFillIcon
+} from './components/icon'
 import {
   AddAddressBookScreen,
   AddressBookScreen
-} from './screens/setting/screens/address-book';
-import { NewLedgerScreen } from './screens/register/ledger';
-import { PageScrollPositionProvider } from './providers/page-scroll-position';
+} from './screens/setting/screens/address-book'
+import { NewLedgerScreen } from './screens/register/ledger'
+import { PageScrollPositionProvider } from './providers/page-scroll-position'
 import {
   BlurredHeaderScreenOptionsPreset,
   getPlainHeaderScreenOptionsPresetWithBackgroundColor,
   HeaderLeftButton,
   HeaderRightButton,
   PlainHeaderScreenOptionsPreset
-} from './components/header';
-import { TokensScreen } from './screens/tokens';
-import { UndelegateScreen } from './screens/stake/undelegate';
-import { RedelegateScreen } from './screens/stake/redelegate';
-import { CameraScreen } from './screens/camera';
+} from './components/header'
+import { TokensScreen, TokenDetailScreen } from './screens/tokens'
+import { UndelegateScreen } from './screens/stake/undelegate'
+import { RedelegateScreen } from './screens/stake/redelegate'
+import { CameraScreen } from './screens/camera'
 import {
   FocusedScreenProvider,
   useFocusedScreen
-} from './providers/focused-screen';
-// import Svg, { Path, Rect } from "react-native-svg";
+} from './providers/focused-screen'
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
   TxSuccessResultScreen
-} from './screens/tx-result';
-import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon';
-import { BlurredBottomTabBar } from './components/bottom-tabbar';
-import { UnlockScreen } from './screens/unlock';
-import { OWalletVersionScreen } from './screens/setting/screens/version';
+} from './screens/tx-result'
+import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon'
+import { BlurredBottomTabBar } from './components/bottom-tabbar'
+import { UnlockScreen } from './screens/unlock'
+import { OWalletVersionScreen } from './screens/setting/screens/version'
+import { DAppWebpageScreen } from './screens/web/webpages'
+import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen'
+import { Browser } from './screens/web/browser'
+import { BookMarks } from './screens/web/bookmarks'
+import { Transactions, TransactionDetail } from './screens/transactions'
+import { navigate, navigationRef } from './router/root'
+import { handleDeepLink } from './utils/helper'
+import {
+  SmartNavigatorProvider,
+  useSmartNavigation
+} from './navigation.provider'
+import TransferTokensScreen from './screens/transfer-tokens/transfer-screen'
+import { OnboardingIntroScreen } from './screens/onboarding'
+import { NftsScreen, NftDetailScreen } from './screens/nfts'
 
-import { DAppWebpageScreen } from './screens/web/webpages';
-import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
-import { Browser } from './screens/web/browser';
-import { BookMarks } from './screens/web/bookmarks';
-import { Transactions, TransactionDetail } from './screens/transactions';
-import { navigate, navigationRef } from './router/root';
-import { handleDeepLink } from './utils/helper';
-import { SmartNavigatorProvider } from './navigation.provider';
-
-const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator()
+const Drawer = createDrawerNavigator()
+const Tab = createBottomTabNavigator()
 
 const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
-  const { chainStore } = useStore();
+  const { chainStore } = useStore()
 
-  const style = useStyle();
+  const style = useStyle()
 
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   return (
     <HeaderLeftButton
       onPress={() => {
-        navigation.dispatch(DrawerActions.toggleDrawer());
+        navigation.dispatch(DrawerActions.toggleDrawer())
       }}
     >
       <View style={style.flatten(['flex-row', 'items-center'])}>
+        <DotsIcon />
         <Text
-          style={style.flatten(['h4', 'color-text-black-low', 'margin-left-4'])}
+          style={style.flatten(['h5', 'color-text-black-low', 'margin-left-4'])}
         >
           {chainStore.current.chainName + ' '}
         </Text>
-        <DownArrowIcon
+        {/* <DownArrowIcon
           height={12}
           color={style.get('color-text-black-low').color}
-        />
+        /> */}
       </View>
     </HeaderLeftButton>
-  );
-});
+  )
+})
 
-const ScreenHeaderLeft: FunctionComponent<{ uri: string }> = observer(
-  ({ uri = 'MainTabDrawer' }) => {
-    const style = useStyle();
-    return (
-      <HeaderLeftButton
-        onPress={() => {
-          navigate(uri);
-        }}
-      >
-        <View style={style.flatten(['flex-row', 'items-center'])}>
-          <Text style={style.flatten(['h4', 'color-text-black-low'])}>
-            <HeaderBackButtonIcon />
-          </Text>
-        </View>
-      </HeaderLeftButton>
-    );
-  }
-);
+const ScreenHeaderLeft: FunctionComponent<{ uri?: string }> = observer(({}) => {
+  const style = useStyle()
+  const smartNavigation = useSmartNavigation()
+  return (
+    <HeaderLeftButton
+      onPress={() => {
+        // navigate(uri);
+        smartNavigation.goBack()
+      }}
+    >
+      <View style={style.flatten(['flex-row', 'items-center'])}>
+        <Text style={style.flatten(['h4', 'color-text-black-low'])}>
+          <HeaderBackButtonIcon />
+        </Text>
+      </View>
+    </HeaderLeftButton>
+  )
+})
 
 const HomeScreenHeaderRight: FunctionComponent = observer(() => {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   return (
     <React.Fragment>
@@ -162,71 +164,38 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
         onPress={() => {
           navigation.navigate('Others', {
             screen: 'Camera'
-          });
+          })
         }}
       ></HeaderRightButton>
     </React.Fragment>
-  );
-});
+  )
+})
 
 export const MainNavigation: FunctionComponent = () => {
-  const { deepLinkUriStore } = useStore();
-
   return (
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
         headerTitle: ''
       }}
-      // initialRouteName="Home"
-      initialRouteName={deepLinkUriStore.getDeepLink() ? 'Browser' : 'Home'}
+      initialRouteName="Home"
       headerMode="screen"
     >
       <Stack.Screen
         options={{
-          headerLeft: () => <HomeScreenHeaderLeft />,
-          headerRight: () => <HomeScreenHeaderRight />
+          headerShown: false
+          // headerLeft: () => <HomeScreenHeaderLeft />,
+          // headerRight: () => <HomeScreenHeaderRight />,
         }}
         name="Home"
         component={HomeScreen}
       />
       <Stack.Screen
-        options={{
-          title: 'Browser'
-          // headerLeft: () => <ScreenHeaderLeft />,
-        }}
-        name="Browser"
-        component={Browser}
-      />
-      <Stack.Screen
-        options={{
-          title: 'BookMarks'
-          // headerLeft: () => <ScreenHeaderLeft uri="Browser"/>,
-        }}
-        name="BookMarks"
-        component={BookMarks}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Web',
-          headerShown: false
-        }}
-        name="Web"
-        component={WebNavigation}
-      />
-    </Stack.Navigator>
-  );
-};
-
-export const TransactionNavigation: FunctionComponent = () => {
-  return (
-    <Stack.Navigator initialRouteName="Transactions" headerMode="screen">
-      <Stack.Screen
         name="Transactions"
         component={Transactions}
         options={{
           title: 'Transactions',
-          headerLeft: null
+          headerLeft: () => <ScreenHeaderLeft />
         }}
       />
       <Stack.Screen
@@ -234,20 +203,91 @@ export const TransactionNavigation: FunctionComponent = () => {
           title: '',
           headerLeft: () => <ScreenHeaderLeft uri="Transactions" />
         }}
-        name="TransactionsDetails"
+        name="Transactions.Detail"
         component={TransactionDetail}
       />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: null
+        }}
+        name="RegisterMain"
+        component={NewMnemonicScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: null
+        }}
+        name="RegisterVerifyMnemonicMain"
+        component={VerifyMnemonicScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: null
+        }}
+        name="RegisterEnd"
+        component={RegisterEndScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: null
+        }}
+        name="RegisterRecoverMnemonicMain"
+        component={RecoverMnemonicScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: null
+        }}
+        name="RegisterNewLedgerMain"
+        component={NewLedgerScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: null
+        }}
+        name="Tokens"
+        component={TokensScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: null
+        }}
+        name="Nfts"
+        component={NftsScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Token detail'
+        }}
+        name="Tokens.Detail"
+        component={TokenDetailScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Ntf detail'
+        }}
+        name="Nfts.Detail"
+        component={NftDetailScreen}
+      />
     </Stack.Navigator>
-  );
-};
+  )
+}
 
 export const RegisterNavigation: FunctionComponent = () => {
-  const style = useStyle();
+  const style = useStyle()
 
   return (
     <Stack.Navigator
       screenOptions={{
-        ...PlainHeaderScreenOptionsPreset,
+        ...BlurredHeaderScreenOptionsPreset,
+        headerTitle: '',
         headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
       }}
       initialRouteName="Register.Intro"
@@ -276,7 +316,8 @@ export const RegisterNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'Create New Mnemonic'
+          title: '',
+          headerLeft: null
         }}
         name="Register.NewMnemonic"
         component={NewMnemonicScreen}
@@ -310,11 +351,11 @@ export const RegisterNavigation: FunctionComponent = () => {
         component={RegisterEndScreen}
       />
     </Stack.Navigator>
-  );
-};
+  )
+}
 
 export const OtherNavigation: FunctionComponent = () => {
-  const style = useStyle();
+  const style = useStyle()
 
   return (
     <Stack.Navigator
@@ -333,24 +374,10 @@ export const OtherNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'Tokens'
-        }}
-        name="Tokens"
-        component={TokensScreen}
-      />
-      <Stack.Screen
-        options={{
           headerShown: false
         }}
         name="Camera"
         component={CameraScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Validator List'
-        }}
-        name="Validator List"
-        component={ValidatorListScreen}
       />
       <Stack.Screen
         options={{
@@ -440,15 +467,15 @@ export const OtherNavigation: FunctionComponent = () => {
         component={TxFailedResultScreen}
       />
     </Stack.Navigator>
-  );
-};
+  )
+}
 
 export const SettingStackScreen: FunctionComponent = () => {
-  const style = useStyle();
+  const style = useStyle()
 
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
-  const { analyticsStore } = useStore();
+  const { analyticsStore } = useStore()
 
   return (
     <Stack.Navigator
@@ -477,10 +504,10 @@ export const SettingStackScreen: FunctionComponent = () => {
           headerRight: () => (
             <HeaderRightButton
               onPress={() => {
-                analyticsStore.logEvent('Add additional account started');
+                analyticsStore.logEvent('Add additional account started')
                 navigation.navigate('Register', {
                   screen: 'Register.Intro'
-                });
+                })
               }}
             >
               <HeaderAddIcon />
@@ -510,11 +537,11 @@ export const SettingStackScreen: FunctionComponent = () => {
         component={OWalletVersionScreen}
       />
     </Stack.Navigator>
-  );
-};
+  )
+}
 
 export const AddressBookStackScreen: FunctionComponent = () => {
-  const style = useStyle();
+  const style = useStyle()
 
   return (
     <Stack.Navigator
@@ -539,18 +566,33 @@ export const AddressBookStackScreen: FunctionComponent = () => {
         component={AddAddressBookScreen}
       />
     </Stack.Navigator>
-  );
-};
+  )
+}
 
 export const WebNavigation: FunctionComponent = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Web.Intro"
+      initialRouteName="Browser"
       screenOptions={{
         ...WebpageScreenScreenOptionsPreset
       }}
       headerMode="screen"
     >
+      <Stack.Screen
+        options={{
+          title: 'Browser'
+        }}
+        name="Browser"
+        component={Browser}
+      />
+      <Stack.Screen
+        options={{
+          title: 'BookMarks',
+          headerLeft: () => <ScreenHeaderLeft />
+        }}
+        name="BookMarks"
+        component={BookMarks}
+      />
       <Stack.Screen
         options={{ headerShown: false }}
         name="Web.Intro"
@@ -558,30 +600,108 @@ export const WebNavigation: FunctionComponent = () => {
       />
       <Stack.Screen name="Web.dApp" component={DAppWebpageScreen} />
     </Stack.Navigator>
-  );
-};
+  )
+}
+
+export const InvestNavigation: FunctionComponent = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        ...BlurredHeaderScreenOptionsPreset,
+        headerTitle: ''
+      }}
+      initialRouteName="Invest"
+      headerMode="screen"
+    >
+      <Stack.Screen
+        options={{
+          title: ''
+        }}
+        name="Invest"
+        component={StakingDashboardScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Validator List'
+        }}
+        name="Validator List"
+        component={ValidatorListScreen}
+      />
+    </Stack.Navigator>
+  )
+}
 
 export const MainTabNavigation: FunctionComponent = () => {
-  const style = useStyle();
+  const style = useStyle()
 
-  const navigation = useNavigation();
-  const { chainStore } = useStore();
+  const navigation = useNavigation()
+  const { chainStore } = useStore()
 
-  const focusedScreen = useFocusedScreen();
-  const isDrawerOpen = useIsDrawerOpen();
+  const focusedScreen = useFocusedScreen()
 
   useEffect(() => {
     // When the focused screen is not "Home" screen and the drawer is open,
     // try to close the drawer forcely.
     // navigate("Browser")
-    if (focusedScreen.name !== 'Home' && isDrawerOpen) {
-      navigation.dispatch(DrawerActions.toggleDrawer());
-    }
-  }, [focusedScreen.name, isDrawerOpen, navigation]);
+    // if (focusedScreen.name !== 'Home' && isDrawerOpen) {
+    //   navigation.dispatch(DrawerActions.toggleDrawer());
+    // }
+  }, [focusedScreen.name, navigation])
 
   const checkActiveTabBottom = (color: string) => {
-    return color == '#C6C6CD';
-  };
+    return color == '#C6C6CD'
+  }
+
+  const RenderTabsBarIcon = ({ color, name }) => {
+    let checkColor = checkActiveTabBottom(color)
+    let icon
+    let nameRoute = name
+    switch (name) {
+      case 'Main':
+        icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />
+        break
+      case 'Browser':
+        icon = checkColor ? <BrowserOutLineIcon /> : <BrowserFillIcon />
+        break
+      case 'Invest':
+        icon = checkColor ? <InvestOutlineIcon /> : <InvestFillIcon />
+        break
+      case 'Settings':
+        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />
+        break
+      default:
+        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />
+        break
+    }
+    return (
+      <View
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingTop: !checkColor ? 30 : 12
+        }}
+      >
+        {icon}
+        {!!nameRoute && (
+          <Text
+            style={{
+              fontSize: 12,
+              lineHeight: 16,
+              color: '#5F5E77'
+            }}
+          >
+            {nameRoute}
+          </Text>
+        )}
+
+        {!checkColor && (
+          <View style={{ paddingTop: 10 }}>
+            <DotsIcon />
+          </View>
+        )}
+      </View>
+    )
+  }
 
   return (
     <Tab.Navigator
@@ -589,34 +709,41 @@ export const MainTabNavigation: FunctionComponent = () => {
         tabBarIcon: ({ color }) => {
           switch (route.name) {
             case 'Main':
-              return checkActiveTabBottom(color) ? (
-                <WalletOutLineIcon size={24} />
-              ) : (
-                <WalletIcon size={24} />
-              );
-            case 'AddressBook':
-              return checkActiveTabBottom(color) ? (
-                <ContactOutLineIcon size={24} />
-              ) : (
-                <ContactFillIcon size={24} />
-              );
+              return <RenderTabsBarIcon color={color} name={'Main'} />
+            case 'Browser':
+              return <RenderTabsBarIcon color={color} name={'Browser'} />
             case 'Send':
-              return <SendIcon />;
-            case 'TransactionsTab':
-              return checkActiveTabBottom(color) ? (
-                <TransactionOutlineIcon size={24} />
-              ) : (
-                <TransactionIcon size={24} />
-              );
+              return (
+                <View
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    paddingTop: !checkActiveTabBottom(color) ? 30 : 8
+                  }}
+                >
+                  <Image
+                    style={{
+                      width: 50,
+                      height: 50
+                    }}
+                    source={require('./assets/image/push.png')}
+                    resizeMode="contain"
+                    fadeDuration={0}
+                  />
+                  {!checkActiveTabBottom(color) && (
+                    <View style={{ paddingTop: 14 }}>
+                      <DotsIcon />
+                    </View>
+                  )}
+                </View>
+              )
+            case 'Invest':
+              return <RenderTabsBarIcon color={color} name={'Invest'} />
             case 'Settings':
-              return checkActiveTabBottom(color) ? (
-                <SettingOutLineIcon size={24} />
-              ) : (
-                <SettingFillIcon size={24} />
-              );
+              return <RenderTabsBarIcon color={color} name={'Settings'} />
           }
         },
-        tabBarButton: (props) => (
+        tabBarButton: props => (
           <View
             style={{
               display: 'flex',
@@ -647,37 +774,30 @@ export const MainTabNavigation: FunctionComponent = () => {
           borderTopColor: style.get('border-color-border-white').borderColor,
           shadowColor: style.get('color-transparent').color,
           elevation: 0,
-          paddingLeft: 30,
-          paddingRight: 30,
+          paddingLeft: 10,
+          paddingRight: 10,
           height: 110
         },
         showLabel: false
       }}
-      tabBar={(props) => (
+      tabBar={props => (
         <BlurredBottomTabBar {...props} enabledScreens={['Home']} />
       )}
     >
       <Tab.Screen name="Main" component={MainNavigation} />
-      <Tab.Screen
-        name="AddressBook"
-        component={AddressBookScreen}
-        initialParams={{
-          currency: chainStore.current.stakeCurrency.coinMinimalDenom,
-          chainId: chainStore.current.chainId
-        }}
-      />
+      <Tab.Screen name="Browser" component={WebNavigation} />
       <Tab.Screen
         options={{
           title: 'Send'
         }}
         name="Send"
-        component={SendScreen}
+        component={TransferTokensScreen}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
           chainId: chainStore.current.chainId
         }}
       />
-      <Tab.Screen name="TransactionsTab" component={TransactionNavigation} />
+      <Tab.Screen name="Invest" component={InvestNavigation} />
       <Tab.Screen
         name="Settings"
         component={SettingStackScreen}
@@ -686,16 +806,16 @@ export const MainTabNavigation: FunctionComponent = () => {
         }}
       />
     </Tab.Navigator>
-  );
-};
+  )
+}
 
 export const MainTabNavigationWithDrawer: FunctionComponent = () => {
-  const focused = useFocusedScreen();
+  const focused = useFocusedScreen()
 
   return (
     <Drawer.Navigator
       drawerType="slide"
-      drawerContent={(props) => <DrawerContent {...props} />}
+      drawerContent={props => <DrawerContent {...props} />}
       screenOptions={{
         // If the focused screen is not "Home" screen,
         // disable the gesture to open drawer.
@@ -708,31 +828,30 @@ export const MainTabNavigationWithDrawer: FunctionComponent = () => {
     >
       <Drawer.Screen name="MainTab" component={MainTabNavigation} />
     </Drawer.Navigator>
-  );
-};
+  )
+}
 
 export const AppNavigation: FunctionComponent = observer(() => {
-  const { keyRingStore, deepLinkUriStore } = useStore();
+  const { keyRingStore, deepLinkUriStore } = useStore()
   useEffect(() => {
     Linking.getInitialURL()
-      .then((url) => {
+      .then(url => {
         if (url) {
-          // const SCHEME_IOS = 'owallet://open_url?url=';
-          // const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url=';
-          // deepLinkUriStore.updateDeepLink(
-          //   url.replace(SCHEME_ANDROID, '').replace(SCHEME_IOS, '')
-          // );
-          deepLinkUriStore.updateDeepLink('https://oraidex.io');
+          const SCHEME_IOS = 'owallet://open_url?url='
+          const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url='
+          deepLinkUriStore.updateDeepLink(
+            url.replace(SCHEME_ANDROID, '').replace(SCHEME_IOS, '')
+          )
         }
       })
-      .catch((err) => {
-        console.warn('Deeplinking error', err);
-      });
-    Linking.addEventListener('url', handleDeepLink);
+      .catch(err => {
+        console.warn('Deeplinking error', err)
+      })
+    Linking.addEventListener('url', handleDeepLink)
     return () => {
-      Linking.removeEventListener('url', handleDeepLink);
-    };
-  }, []);
+      Linking.removeEventListener('url', handleDeepLink)
+    }
+  }, [])
 
   return (
     <PageScrollPositionProvider>
@@ -743,7 +862,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
               initialRouteName={
                 keyRingStore.status !== KeyRingStatus.UNLOCKED
                   ? 'Unlock'
-                  : 'MainTabDrawer'
+                  : 'MainTab'
               }
               screenOptions={{
                 headerShown: false,
@@ -752,10 +871,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
               headerMode="screen"
             >
               <Stack.Screen name="Unlock" component={UnlockScreen} />
-              <Stack.Screen
-                name="MainTabDrawer"
-                component={MainTabNavigationWithDrawer}
-              />
+              <Stack.Screen name="MainTab" component={MainTabNavigation} />
               <Stack.Screen name="Register" component={RegisterNavigation} />
               <Stack.Screen name="Others" component={OtherNavigation} />
               <Stack.Screen
@@ -768,5 +884,5 @@ export const AppNavigation: FunctionComponent = observer(() => {
         </SmartNavigatorProvider>
       </FocusedScreenProvider>
     </PageScrollPositionProvider>
-  );
-});
+  )
+})

@@ -1,5 +1,7 @@
 import { StackActions } from '@react-navigation/routers';
 import * as React from 'react';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const navigationRef = React.createRef();
 
@@ -33,3 +35,18 @@ export const popToTop = () => {
   }
   goBack();
 };
+
+export const checkRouter = (uri, route) => {
+  return uri == route
+}
+
+function BottomTabBar() {
+  // const bottomTabBarHeight = useBottomTabBarHeight();
+  const { bottom } = useSafeAreaInsets();
+  return bottom + 20
+}
+
+export const checkRouterPaddingBottomBar = (uri, route) => {
+  if (BottomTabBar()) return uri == route ? BottomTabBar() : 0
+  return 0;
+} 
