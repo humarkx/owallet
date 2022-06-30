@@ -119,7 +119,7 @@ export const AccountCard: FunctionComponent<{
   const safeAreaInsets = useSafeAreaInsets();
   const onPressBtnMain = (name) => {
     if (name === 'Buy') {
-      navigate('Browser', { path: 'https://oraidex.io' });
+      navigate('MainTab', { screen: 'Browser', path: 'https://oraidex.io' });
     }
     if (name === 'Deposit') {
     }
