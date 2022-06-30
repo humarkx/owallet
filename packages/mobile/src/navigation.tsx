@@ -755,6 +755,7 @@ export const MainTabNavigation: FunctionComponent = () => {
             />
           </View>
         ),
+        tabBarVisible: false
       })}
       tabBarOptions={{
         activeTintColor: style.get('color-primary').color,
@@ -781,7 +782,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           title: 'Send',
         }}
         name="Send"
-        component={TransferTokensScreen}
+        component={OnboardingIntroScreen}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
           chainId: chainStore.current.chainId,

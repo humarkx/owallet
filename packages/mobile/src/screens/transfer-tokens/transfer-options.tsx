@@ -8,23 +8,30 @@ import {
   SendQRCodeIcon,
   SendWithinNetworkIcon
 } from '../../components/icon';
-import { colors, spacing } from '../../themes';
+import { colors, metrics, spacing } from '../../themes';
 
 const styles = StyleSheet.create({
   sendTokenCard: {
     borderRadius: spacing['24'],
-    padding: spacing['12']
   },
   sendTokenCardbody: {
+    display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between'
+    marginHorizontal: spacing['-6'],
+    justifyContent: 'space-between',
   },
   sendTokenCardContent: {
-    padding: spacing['16'],
+    paddingHorizontal: spacing['6'],
+    width: '50%',
+  },
+  sendTokenCardMain: {
     marginBottom: spacing['12'],
     borderRadius: spacing['12'],
+    height: 122,
     alignItems: 'center',
+    paddingVertical: spacing['16'],
+    paddingHorizontal: spacing['8'],
     backgroundColor: colors['white'],
     shadowColor: '#18274B1F',
     shadowOffset: {
@@ -32,7 +39,7 @@ const styles = StyleSheet.create({
       height: 12
     },
     shadowOpacity: 1,
-    shadowRadius: 16.0
+    shadowRadius: 16.0,
   },
   iconSendToken: {
     marginBottom: spacing['6']
@@ -71,12 +78,14 @@ const TransferTokensOptions: FunctionComponent = () => {
     <>
       <View style={styles.sendTokenCardbody}>
         {tokenTransferInfo.map((val, i) => (
-          <View style={{ width: '48%' }} key={i}>
-            <TouchableOpacity style={styles.sendTokenCardContent}>
-              <View style={styles.iconSendToken}>{val.icon}</View>
-              <Text style={styles.textSendToken}>{val.titleLine1}</Text>
-              <Text style={styles.textSendToken}>{val.titleLine2}</Text>
-            </TouchableOpacity>
+          <View style={styles.sendTokenCardContent} key={i}>
+            <View style={styles.sendTokenCardMain}>
+              <TouchableOpacity style={{ alignItems: 'center'}}>
+                <View style={styles.iconSendToken} >{val.icon}</View>
+                <Text style={styles.textSendToken}>{val.titleLine1}</Text>
+                <Text style={styles.textSendToken}>{val.titleLine2}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </View>
