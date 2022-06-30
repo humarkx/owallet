@@ -781,7 +781,7 @@ export const MainTabNavigation: FunctionComponent = () => {
           title: 'Send',
         }}
         name="Send"
-        component={OnboardingIntroScreen}
+        component={TransferTokensScreen}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
           chainId: chainStore.current.chainId,
