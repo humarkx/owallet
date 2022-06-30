@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { StyleSheet, TextStyle, View, ViewProps } from 'react-native';
-import { CText as Text} from "../text";
+import { CText as Text } from '../text';
 import { useStyle } from '../../styles';
 import { observer } from 'mobx-react-lite';
 import { action, makeObservable, observable } from 'mobx';
@@ -8,7 +8,7 @@ import {
   IFeeConfig,
   IGasConfig,
   InsufficientFeeError,
-  NotLoadedFeeError,
+  NotLoadedFeeError
 } from '@owallet/hooks';
 import { GasInput } from './gas';
 import { useStore } from '../../stores';
@@ -16,6 +16,7 @@ import { CoinPretty, PricePretty } from '@owallet/unit';
 import { LoadingSpinner } from '../spinner';
 import { RectButton } from '../rect-button';
 import { FastIcon, LowIcon, AverageIcon } from '../icon';
+import { colors, spacing } from '../../themes';
 export interface FeeButtonsProps {
   labelStyle?: TextStyle;
   containerStyle?: ViewProps;
@@ -48,11 +49,10 @@ class FeeButtonState {
 }
 
 export const FeeButtons: FunctionComponent<FeeButtonsProps> = observer(
-  (props) => {
+  props => {
     // This may be not the good way to handle the states across the components.
     // But, rather than using the context API with boilerplate code, just use the mobx state to simplify the logic.
     const [feeButtonState] = useState(() => new FeeButtonState());
-
     return (
       <React.Fragment>
         {props.feeConfig.feeCurrency ? <FeeButtonsInner {...props} /> : null}
@@ -82,7 +82,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
     buttonsContainerStyle,
     errorLabelStyle,
     label,
-    feeConfig,
+    feeConfig
   }) => {
     const { priceStore } = useStore();
 
@@ -150,24 +150,23 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
     ) => React.ReactElement = (label, price, amount, selected, onPress) => {
       return (
         <RectButton
-          style={style.flatten(
-            [
-              'flex-1',
-              'justify-between',
-              'padding-12',
-              'background-color-white',
-              'border-color-border-white',
-              'border-radius-12',
-            ],
-            [selected && 'border-color-button-primary', 'border-width-1']
-          )}
+          style={{
+            ...styles.containerBtnFee,
+            ...(selected
+              ? {
+                  borderColor: colors['primary'],
+                  borderWidth: 1,
+                }
+              : {
+                borderColor: colors['gray-10'],
+                  borderWidth: 1,
+              })
+          }}
           rippleColor={style.get('color-primary-100').color}
           onPress={onPress}
         >
           <View style={style.flatten(['flex-row', 'justify-between'])}>
-            <Text style={style.flatten(['body3'])}>
-              {label}
-            </Text>
+            <Text style={style.flatten(['body3'])}>{label}</Text>
             {renderIconTypeFee(label)}
           </View>
           {price ? (
@@ -175,7 +174,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
               style={style.flatten([
                 'padding-top-8',
                 'padding-bottom-8',
-                'text-caption2',
+                'text-caption2'
               ])}
             >
               {price.toString()}
@@ -185,7 +184,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
             style={{
               fontSize: 10.5,
               color: '#636366',
-              lineHeight: 16,
+              lineHeight: 16
             }}
           >
             {amount.maxDecimals(6).trim(true).separator('').toString()}
@@ -198,7 +197,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
       <View
         style={StyleSheet.flatten([
           style.flatten(['padding-bottom-28']),
-          containerStyle,
+          containerStyle
         ])}
       >
         <Text
@@ -206,24 +205,27 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
             style.flatten([
               'subtitle3',
               'color-text-black-medium',
-              'margin-bottom-3',
+              'margin-bottom-3'
             ]),
-            labelStyle,
+            labelStyle
           ])}
         >
           {label}
         </Text>
         <View
-          style={StyleSheet.flatten([
-            style.flatten([
-              'flex-row',
-              'border-radius-4',
-              'border-width-1',
-              'border-color-border-white',
-              'overflow-hidden',
-            ]),
-            buttonsContainerStyle,
-          ])}
+          // style={StyleSheet.flatten([
+          //   style.flatten([
+          //     'flex-row',
+          //     'border-radius-4',
+          //     'border-width-1',
+          //     'border-color-border-white',
+          //     'overflow-hidden'
+          //   ]),
+          //   buttonsContainerStyle
+          // ])}
+          style={{
+            flexDirection: 'row'
+          }}
         >
           {renderButton(
             'Low',
@@ -234,9 +236,6 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
               feeConfig.setFeeType('low');
             }
           )}
-          <View
-            style={style.flatten(['width-4', 'background-color-border-white'])}
-          />
           {renderButton(
             'Average',
             averageFeePrice,
@@ -246,9 +245,6 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
               feeConfig.setFeeType('average');
             }
           )}
-          <View
-            style={style.flatten(['width-4', 'background-color-border-white'])}
-          />
           {renderButton(
             'Fast',
             highFeePrice,
@@ -267,7 +263,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
                 'height-16',
                 'justify-center',
                 'margin-top-2',
-                'margin-left-4',
+                'margin-left-4'
               ])}
             >
               <LoadingSpinner
@@ -286,9 +282,9 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
                   'text-caption1',
                   'color-error',
                   'margin-top-2',
-                  'margin-left-4',
+                  'margin-left-4'
                 ]),
-                errorLabelStyle,
+                errorLabelStyle
               ])}
             >
               {errorText}
@@ -299,3 +295,26 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
     );
   }
 );
+
+const styles = StyleSheet.create({
+  // style={style.flatten(
+  //   [
+  //     'flex-1',
+  //     'justify-between',
+  //     'padding-12',
+  //     'background-color-white',
+  //     'border-color-border-white',
+  //     'border-radius-12',
+  //   ],
+  //   [selected && 'border-color-button-primary', 'border-width-1']
+  // )}
+  containerBtnFee: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: spacing['12'],
+    backgroundColor: colors['white'],
+    borderColor: colors['white'],
+    borderRadius: spacing['12'],
+    marginRight: 10 
+  }
+});

@@ -26,7 +26,7 @@ export const MemoInput: FunctionComponent<{
   }) => {
     return (
       <TextInput
-        label={label}
+        labels={[label]}
         labelStyle={labelStyle}
         containerStyle={containerStyle}
         inputContainerStyle={inputContainerStyle}

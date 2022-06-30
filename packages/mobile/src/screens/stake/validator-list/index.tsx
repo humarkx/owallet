@@ -114,6 +114,9 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
       />
 
       <PageWithSectionList
+        style={{
+          marginBottom: 80
+        }}
         sections={[
           {
             data
@@ -265,16 +268,16 @@ const ValidatorItem: FunctionComponent<{
         backgroundColor: colors['white'],
         alignItems: 'center'
       }}
-      // onPress={() => {
-      //   if (onSelectValidator) {
-      //     onSelectValidator(validatorAddress)
-      //     smartNavigation.goBack()
-      //   } else {
-      //     smartNavigation.navigateSmart('Validator.Details', {
-      //       validatorAddress
-      //     })
-      //   }
-      // }}
+      onPress={() => {
+        if (onSelectValidator) {
+          onSelectValidator(validatorAddress)
+          smartNavigation.goBack()
+        } else {
+          smartNavigation.navigateSmart('Validator.Details', {
+            validatorAddress
+          })
+        }
+      }}
     >
       <ValidatorThumbnail
         style={{

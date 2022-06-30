@@ -381,13 +381,6 @@ export const OtherNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'Validator Details'
-        }}
-        name="Validator Details"
-        component={ValidatorDetailsScreen}
-      />
-      <Stack.Screen
-        options={{
           title: 'Governance'
         }}
         name="Governance"
@@ -420,13 +413,6 @@ export const OtherNavigation: FunctionComponent = () => {
         }}
         name="Validator.List"
         component={ValidatorListScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Stake'
-        }}
-        name="Delegate"
-        component={DelegateScreen}
       />
       <Stack.Screen
         options={{
@@ -624,8 +610,22 @@ export const InvestNavigation: FunctionComponent = () => {
         options={{
           title: 'Validator List'
         }}
-        name="Validator List"
+        name="Validator.List"
         component={ValidatorListScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Validator Details'
+        }}
+        name="Validator.Details"
+        component={ValidatorDetailsScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Stake'
+        }}
+        name="Delegate"
+        component={DelegateScreen}
       />
     </Stack.Navigator>
   )
