@@ -244,7 +244,6 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
                         setValue('mnemonic', text, {
                           shouldValidate: true
                         });
-
                         setFocus('name');
                       }
                     }}
@@ -400,7 +399,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
             textAlign: 'center',
             fontWeight: '700',
             fontSize: 16,
-            padding: 18
+            padding: 16
           }}
         >
           Next
