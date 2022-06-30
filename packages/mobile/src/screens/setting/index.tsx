@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import {
   renderFlag,
@@ -18,35 +18,67 @@ import { SettingViewPrivateDataItem } from './items/view-private-data';
 import { useStyle } from '../../styles';
 import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { CText as Text } from '../../components/text';
-import { colors } from '../../themes';
+import { colors, metrics, spacing, typography } from '../../themes';
+import { DownArrowIcon } from '../../components/icon';
+import { CountryModal } from './components/country-modal';
+import LinearGradient from 'react-native-linear-gradient';
 
 export const SettingScreen: FunctionComponent = observer(() => {
-  const { keychainStore, keyRingStore, priceStore } = useStore();
-
+  const { keychainStore, keyRingStore, priceStore, modalStore } = useStore();
+  const currencyItems = useMemo(() => {
+    return Object.keys(priceStore.supportedVsCurrencies).map(key => {
+      return {
+        key,
+        label: key.toUpperCase()
+      };
+    });
+  }, [priceStore.supportedVsCurrencies]);
   const selected = keyRingStore.multiKeyStoreInfo.find(
-    (keyStore) => keyStore.selected
+    keyStore => keyStore.selected
   );
 
   const style = useStyle();
 
   const smartNavigation = useSmartNavigation();
+  const _onPressCountryModal = () => {
+    modalStore.setOpen();
+    modalStore.setChildren(
+      CountryModal({
+        data: currencyItems,
+        current: priceStore.defaultVsCurrency,
+        priceStore,
+        modalStore
+      })
+    );
+  };
 
   return (
     <PageWithScrollViewInBottomTabView
-      backgroundColor={style.get('color-setting-screen-background').color}
+      // backgroundColor={style.get('color-setting-screen-background').color}
     >
       <View
         style={{
-          backgroundColor: colors['purple-700'],
+          backgroundColor: colors['purple-400'],
           padding: 24,
           paddingTop: 76,
           paddingBottom: 101,
           marginBottom: 102,
           borderTopLeftRadius: Platform.OS === 'ios' ? 32 : 0,
-          borderTopRightRadius: Platform.OS === 'ios' ? 32 : 0
+          borderTopRightRadius: Platform.OS === 'ios' ? 32 : 0,
+          borderBottomLeftRadius: Platform.OS === 'ios' ? 32 : 0,
+          borderBottomRightRadius: Platform.OS === 'ios' ? 32 : 0,
         }}
       >
-        <Text style={style.flatten(['h1', 'color-white'])}>Setting</Text>
+        <Text
+          style={{
+            ...typography.h1,
+            color: colors['white'],
+            textAlign: 'center',
+            fontWeight: '700'
+          }}
+        >
+          Settings
+        </Text>
         <View
           style={[
             style.flatten([
@@ -93,12 +125,10 @@ export const SettingScreen: FunctionComponent = observer(() => {
                   : 'No Account'}
               </Text>
             </View>
-            <RightArrow />
+            <DownArrowIcon color={colors['black']} height={12} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              smartNavigation.navigateSmart('SettingSelectLang', {})
-            }
+            onPress={_onPressCountryModal}
             style={style.flatten([
               'flex-row',
               'items-center',
@@ -135,17 +165,23 @@ export const SettingScreen: FunctionComponent = observer(() => {
                 </Text>
               </View>
             </View>
-            <RightArrow />
+            <DownArrowIcon color={colors['black']} height={12} />
           </TouchableOpacity>
         </View>
       </View>
       {/* <SettingSelectAccountItem /> */}
       {/* <SettingFiatCurrencyItem topBorder={true} /> */}
       {/* <SettingSectionTitle title="General" /> */}
-      <View style={style.flatten(['background-color-white'])}>
+      <View
+        style={{
+          backgroundColor: colors['white'],
+          borderBottomLeftRadius: Platform.OS === 'ios' ? 32 : 0,
+          borderBottomRightRadius: Platform.OS === 'ios' ? 32 : 0,
+        }}
+      >
         <SettingSectionTitle title="Security" />
         <SettingItem
-          label="Address book"
+          label="Menemonic"
           right={<RightArrow />}
           onPress={() => {
             smartNavigation.navigateSmart('AddressBook', {});
@@ -153,7 +189,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
         />
 
         {canShowPrivateData(keyRingStore.keyRingType) && (
-          <SettingViewPrivateDataItem topBorder={false} />
+          <SettingViewPrivateDataItem  />
         )}
         {keychainStore.isBiometrySupported || keychainStore.isBiometryOn ? (
           <SettingBiometricLockItem
@@ -163,14 +199,11 @@ export const SettingScreen: FunctionComponent = observer(() => {
         {/* <SettingSectionTitle title="Others" /> */}
         <SettingItem
           label="About OWallet"
-          // topBorder={true}
           onPress={() => {
             smartNavigation.navigateSmart('Setting.Version', {});
           }}
         />
-        <SettingRemoveAccountItem topBorder={true} />
-        {/* Mock element for padding bottom */}
-        <View style={style.get('height-16')} />
+        <SettingRemoveAccountItem  />
       </View>
     </PageWithScrollViewInBottomTabView>
   );
