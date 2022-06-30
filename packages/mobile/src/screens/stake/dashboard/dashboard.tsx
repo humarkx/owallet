@@ -1,11 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../../components/page';
-// import { MyRewardCard } from './reward-card';
-// import { DelegationsCard } from './delegations-card';
-// import { UndelegationsCard } from './undelegations-card';
-import { useStyle } from '../../../styles';
-import { useStore } from '../../../stores';
-import { StyleSheet, View, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList, Image } from 'react-native';
 import { colors, typography, spacing, metrics } from '../../../themes';
 import { CText as Text } from '../../../components/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -38,18 +33,8 @@ const validators = [
 ];
 
 export const StakingDashboardScreen: FunctionComponent = () => {
-  const { chainStore, accountStore, queriesStore } = useStore();
   const smartNavigation = useSmartNavigation();
-
   const safeAreaInsets = useSafeAreaInsets();
-
-  const account = accountStore.getAccount(chainStore.current.chainId);
-  const queries = queriesStore.get(chainStore.current.chainId);
-
-  const unbondings =
-    queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
-      account.bech32Address
-    ).unbondingBalances;
 
   return (
     <PageWithScrollViewInBottomTabView>
@@ -139,7 +124,7 @@ export const StakingDashboardScreen: FunctionComponent = () => {
                 height: 40
               }}
               onPress={() => {
-                smartNavigation.navigate('Validator List', {});
+                smartNavigation.navigate('Validator.List', {});
               }}
             >
               <Text
@@ -154,11 +139,19 @@ export const StakingDashboardScreen: FunctionComponent = () => {
           <View
             style={{
               position: 'absolute',
-              right: 0,
-              bottom: 5
+              right: -10,
+              bottom: 0
             }}
           >
-            <GiftStakingLogo />
+            <Image
+              style={{
+                width: 148,
+                height: 148
+              }}
+              source={require('../../../assets/image/stake_gift.png')}
+              resizeMode="contain"
+              fadeDuration={0}
+            />
           </View>
         </View>
 
