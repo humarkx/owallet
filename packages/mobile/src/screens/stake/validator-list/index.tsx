@@ -114,6 +114,9 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
       />
 
       <PageWithSectionList
+        style={{
+          marginBottom: 80
+        }}
         sections={[
           {
             data
@@ -244,17 +247,11 @@ const ValidatorItem: FunctionComponent<{
   onSelectValidator?: (validatorAddress: string) => void
 }> = observer(({ validatorAddress, index, sort, onSelectValidator }) => {
   const { chainStore, queriesStore } = useStore()
-
   const queries = queriesStore.get(chainStore.current.chainId)
-
   const bondedValidators = queries.cosmos.queryValidators.getQueryStatus(
     BondStatus.Bonded
   )
-
-  const style = useStyle()
-
   const validator = bondedValidators.getValidator(validatorAddress)
-
   const smartNavigation = useSmartNavigation()
 
   return validator ? (
@@ -265,16 +262,16 @@ const ValidatorItem: FunctionComponent<{
         backgroundColor: colors['white'],
         alignItems: 'center'
       }}
-      // onPress={() => {
-      //   if (onSelectValidator) {
-      //     onSelectValidator(validatorAddress)
-      //     smartNavigation.goBack()
-      //   } else {
-      //     smartNavigation.navigateSmart('Validator.Details', {
-      //       validatorAddress
-      //     })
-      //   }
-      // }}
+      onPress={() => {
+        if (onSelectValidator) {
+          onSelectValidator(validatorAddress)
+          smartNavigation.goBack()
+        } else {
+          smartNavigation.navigateSmart('Validator.Details', {
+            validatorAddress
+          })
+        }
+      }}
     >
       <ValidatorThumbnail
         style={{
