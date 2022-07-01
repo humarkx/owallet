@@ -19,6 +19,7 @@ import {
 } from '../../../router/root';
 import { OWalletLogo } from '../owallet-logo';
 import { colors, typography } from '../../../themes';
+import { LoadingSpinner } from '../../../components/spinner';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bip39 = require('bip39');
 
@@ -202,7 +203,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
-              label="Mnemonic"
+              label="Mnemonic / Private key"
               returnKeyType="next"
               multiline={true}
               numberOfLines={4}
@@ -244,7 +245,6 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
                         setValue('mnemonic', text, {
                           shouldValidate: true
                         });
-
                         setFocus('name');
                       }
                     }}
@@ -394,17 +394,23 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
           borderRadius: 8
         }}
       >
-        <Text
-          style={{
-            color: 'white',
-            textAlign: 'center',
-            fontWeight: '700',
-            fontSize: 16,
-            padding: 18
-          }}
-        >
-          Next
-        </Text>
+        {isCreating ? (
+          <View style={{ padding: 16, alignItems: 'center' }}>
+            <LoadingSpinner color={colors['white']} size={20} />
+          </View>
+        ) : (
+          <Text
+            style={{
+              color: 'white',
+              textAlign: 'center',
+              fontWeight: '700',
+              fontSize: 16,
+              padding: 16
+            }}
+          >
+            Next
+          </Text>
+        )}
       </TouchableOpacity>
       <View
         style={{

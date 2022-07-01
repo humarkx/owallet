@@ -85,7 +85,6 @@ export const AccountCard: FunctionComponent<{
     account.bech32Address
   ).stakable;
   const stakable = queryStakable?.balance;
-
   const queryDelegated = queries.cosmos.queryDelegations.getQueryBech32Address(
     account.bech32Address
   );
@@ -121,7 +120,7 @@ export const AccountCard: FunctionComponent<{
     }
   };
 
-  // open model
+  // open modal
   const _onPressNetworkModal = () => {
     modalStore.setOpen();
     modalStore.setChildren(
@@ -204,59 +203,6 @@ export const AccountCard: FunctionComponent<{
           paddingTop: safeAreaInsets.top + 10
         }}
       >
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingBottom: spacing['26']
-          }}
-        >
-          <Text />
-
-          <TouchableWithoutFeedback onPress={_onPressNetworkModal}>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingLeft: 50
-              }}
-            >
-              <DotsIcon />
-              <Text
-                style={{
-                  ...typography['h5'],
-                  ...colors['color-text-black-low'],
-                  marginLeft: spacing['8']
-                }}
-              >
-                {chainStore.current.chainName + ' Network'}
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
-
-          <View style={{ display: 'flex', flexDirection: 'row' }}>
-            <TouchableOpacity
-              onPress={() => {
-                smartNavigation.navigateSmart('Transactions', {});
-              }}
-              style={{ paddingRight: 15 }}
-            >
-              <HistoryIcon size={28} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('Others', {
-                  screen: 'Camera'
-                });
-              }}
-            >
-              <Scanner size={28} color={'#5064fb'} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
         <View
           style={{
             height: 256,
