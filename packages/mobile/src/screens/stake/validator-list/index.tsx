@@ -1,26 +1,26 @@
-import React, { FunctionComponent, useMemo, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useStore } from '../../../stores'
-import { PageWithSectionList } from '../../../components/page'
-import { StyleSheet, View } from 'react-native'
-import { CText as Text } from '../../../components/text'
-import { BondStatus, Validator } from '@owallet/stores'
-import { useStyle } from '../../../styles'
-import { SelectorModal, TextInput } from '../../../components/input'
-import { CardDivider } from '../../../components/card'
-import { useSmartNavigation } from '../../../navigation.provider'
-import { CoinPretty, Dec } from '@owallet/unit'
+import React, { FunctionComponent, useMemo, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../../stores';
+import { PageWithSectionList } from '../../../components/page';
+import { StyleSheet, View } from 'react-native';
+import { CText as Text } from '../../../components/text';
+import { BondStatus, Validator } from '@owallet/stores';
+import { useStyle } from '../../../styles';
+import { SelectorModal, TextInput } from '../../../components/input';
+import { CardDivider } from '../../../components/card';
+import { useSmartNavigation } from '../../../navigation.provider';
+import { CoinPretty, Dec } from '@owallet/unit';
 import {
   ArrowOpsiteUpDownIcon,
   ValidatorOutlineIcon
-} from '../../../components/icon'
-import { ValidatorThumbnail } from '../../../components/thumbnail'
-import { RouteProp, useRoute } from '@react-navigation/native'
-import { RectButton } from '../../../components/rect-button'
-import { ValidatorThumbnails } from '@owallet/common'
-import { colors, spacing, typography } from '../../../themes'
+} from '../../../components/icon';
+import { ValidatorThumbnail } from '../../../components/thumbnail';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { RectButton } from '../../../components/rect-button';
+import { ValidatorThumbnails } from '@owallet/common';
+import { colors, spacing, typography } from '../../../themes';
 
-type Sort = 'APY' | 'Voting Power' | 'Name'
+type Sort = 'APY' | 'Voting Power' | 'Name';
 
 export const ValidatorListScreen: FunctionComponent = observer(() => {
   const route = useRoute<
@@ -28,31 +28,31 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
       Record<
         string,
         {
-          validatorSelector?: (validatorAddress: string) => void
+          validatorSelector?: (validatorAddress: string) => void;
         }
       >,
       string
     >
-  >()
+  >();
 
-  const { chainStore, queriesStore } = useStore()
+  const { chainStore, queriesStore } = useStore();
 
-  const queries = queriesStore.get(chainStore.current.chainId)
+  const queries = queriesStore.get(chainStore.current.chainId);
 
-  const [search, setSearch] = useState('')
-  const [sort, setSort] = useState<Sort>('Voting Power')
-  const [isSortModalOpen, setIsSortModalOpen] = useState(false)
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<Sort>('Voting Power');
+  const [isSortModalOpen, setIsSortModalOpen] = useState(false);
 
   const bondedValidators = queries.cosmos.queryValidators.getQueryStatus(
     BondStatus.Bonded
-  )
+  );
 
   const data = useMemo(() => {
-    let data = bondedValidators.validators
+    let data = bondedValidators.validators;
     if (search) {
       data = data.filter(val =>
         val.description.moniker?.toLowerCase().includes(search.toLowerCase())
-      )
+      );
     }
     switch (sort) {
       case 'APY':
@@ -61,51 +61,51 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
             new Dec(val2.commission.commission_rates.rate)
           )
             ? 1
-            : -1
-        })
-        break
+            : -1;
+        });
+        break;
       case 'Name':
         data.sort((val1, val2) => {
           if (!val1.description.moniker) {
-            return 1
+            return 1;
           }
           if (!val2.description.moniker) {
-            return -1
+            return -1;
           }
-          return val1.description.moniker > val2.description.moniker ? -1 : 1
-        })
-        break
+          return val1.description.moniker > val2.description.moniker ? -1 : 1;
+        });
+        break;
       case 'Voting Power':
         data.sort((val1, val2) => {
-          return new Dec(val1.tokens).gt(new Dec(val2.tokens)) ? -1 : 1
-        })
-        break
+          return new Dec(val1.tokens).gt(new Dec(val2.tokens)) ? -1 : 1;
+        });
+        break;
     }
 
-    return data
-  }, [bondedValidators.validators, search, sort])
+    return data;
+  }, [bondedValidators.validators, search, sort]);
 
   const items = useMemo(() => {
     return [
       { label: 'APY', key: 'APY' },
       { label: 'Amount Staked', key: 'Voting Power' },
       { label: 'Name', key: 'Name' }
-    ]
-  }, [])
+    ];
+  }, []);
 
   const sortItem = useMemo(() => {
-    const item = items.find(item => item.key === sort)
+    const item = items.find(item => item.key === sort);
     if (!item) {
-      throw new Error(`Can't find the item for sort (${sort})`)
+      throw new Error(`Can't find the item for sort (${sort})`);
     }
-    return item
-  }, [items, sort])
+    return item;
+  }, [items, sort]);
 
   return (
     <React.Fragment>
       <SelectorModal
         close={() => {
-          setIsSortModalOpen(false)
+          setIsSortModalOpen(false);
         }}
         isOpen={isSortModalOpen}
         items={items}
@@ -124,6 +124,9 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
         ]}
         stickySectionHeadersEnabled={false}
         keyExtractor={(item: Validator) => item.operator_address}
+        renderSectionFooter={() => {
+          return <View style={{ height: spacing['24'] }} />;
+        }}
         renderItem={({ item, index }: { item: Validator; index: number }) => {
           return (
             <View
@@ -140,7 +143,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                 onSelectValidator={route.params.validatorSelector}
               />
             </View>
-          )
+          );
         }}
         ItemSeparatorComponent={() => <CardDivider />}
         renderSectionHeader={() => {
@@ -174,7 +177,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                   }}
                   value={search}
                   onChangeText={text => {
-                    setSearch(text)
+                    setSearch(text);
                   }}
                   paragraph={
                     <View
@@ -210,7 +213,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                           paddingHorizontal: spacing['2']
                         }}
                         onPress={() => {
-                          setIsSortModalOpen(true)
+                          setIsSortModalOpen(true);
                         }}
                       >
                         <Text
@@ -232,27 +235,27 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                 />
               </View>
             </View>
-          )
+          );
         }}
       />
     </React.Fragment>
-  )
-})
+  );
+});
 
 const ValidatorItem: FunctionComponent<{
-  validatorAddress: string
-  index: number
-  sort: Sort
+  validatorAddress: string;
+  index: number;
+  sort: Sort;
 
-  onSelectValidator?: (validatorAddress: string) => void
+  onSelectValidator?: (validatorAddress: string) => void;
 }> = observer(({ validatorAddress, index, sort, onSelectValidator }) => {
-  const { chainStore, queriesStore } = useStore()
-  const queries = queriesStore.get(chainStore.current.chainId)
+  const { chainStore, queriesStore } = useStore();
+  const queries = queriesStore.get(chainStore.current.chainId);
   const bondedValidators = queries.cosmos.queryValidators.getQueryStatus(
     BondStatus.Bonded
-  )
-  const validator = bondedValidators.getValidator(validatorAddress)
-  const smartNavigation = useSmartNavigation()
+  );
+  const validator = bondedValidators.getValidator(validatorAddress);
+  const smartNavigation = useSmartNavigation();
 
   return validator ? (
     <RectButton
@@ -264,12 +267,12 @@ const ValidatorItem: FunctionComponent<{
       }}
       onPress={() => {
         if (onSelectValidator) {
-          onSelectValidator(validatorAddress)
-          smartNavigation.goBack()
+          onSelectValidator(validatorAddress);
+          smartNavigation.goBack();
         } else {
           smartNavigation.navigateSmart('Validator.Details', {
             validatorAddress
-          })
+          });
         }
       }}
     >
@@ -334,8 +337,8 @@ const ValidatorItem: FunctionComponent<{
           .toString() + '%'}
       </Text>
     </RectButton>
-  ) : null
-})
+  ) : null;
+});
 
 const styles = StyleSheet.create({
   title: {
@@ -348,7 +351,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingTop: spacing['8'],
     paddingBottom: spacing['8'],
-    flex: 1,
     paddingLeft: spacing['8'],
     paddingRight: spacing['16']
   },
@@ -360,4 +362,4 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: colors['gray-900']
   }
-})
+});
