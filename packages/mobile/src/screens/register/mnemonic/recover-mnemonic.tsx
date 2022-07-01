@@ -202,7 +202,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
-              label="Mnemonic"
+              label="Mnemonic / Private key"
               returnKeyType="next"
               multiline={true}
               numberOfLines={4}

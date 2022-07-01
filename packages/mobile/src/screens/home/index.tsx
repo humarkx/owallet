@@ -2,7 +2,7 @@ import React, {
   FunctionComponent,
   useCallback,
   useEffect,
-  useRef,
+  useRef
 } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import { AccountCard } from './account-card';
@@ -11,7 +11,7 @@ import {
   AppStateStatus,
   RefreshControl,
   ScrollView,
-  StyleSheet,
+  StyleSheet
 } from 'react-native';
 import { useStore } from '../../stores';
 import { StakingInfoCard } from './staking-info-card';
@@ -28,7 +28,7 @@ import { colors } from '../../themes';
 
 export const HomeScreen: FunctionComponent = observer((props) => {
   const [refreshing, setRefreshing] = React.useState(false);
-  
+
   const { chainStore, accountStore, queriesStore, priceStore } = useStore();
 
   const scrollViewRef = useRef<ScrollView | null>(null);
@@ -83,7 +83,7 @@ export const HomeScreen: FunctionComponent = observer((props) => {
       previousChainStoreIsInitializing,
       currentChainId,
       previousChainId,
-      checkAndUpdateChainInfo,
+      checkAndUpdateChainInfo
     ])
   );
 
@@ -115,7 +115,7 @@ export const HomeScreen: FunctionComponent = observer((props) => {
         .waitFreshResponse(),
       queries.cosmos.queryUnbondingDelegations
         .getQueryBech32Address(account.bech32Address)
-        .waitFreshResponse(),
+        .waitFreshResponse()
     ]);
 
     setRefreshing(false);
@@ -164,9 +164,9 @@ export const HomeScreen: FunctionComponent = observer((props) => {
 const styles = StyleSheet.create({
   containerStyle: {
     paddingBottom: 12,
-    backgroundColor: colors['gray-100'],
+    backgroundColor: colors['gray-100']
   },
   containerEarnStyle: {
-    backgroundColor: colors['gray-100'],
+    backgroundColor: colors['gray-100']
   }
 });
