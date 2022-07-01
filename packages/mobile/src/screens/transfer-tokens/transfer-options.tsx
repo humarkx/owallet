@@ -25,12 +25,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing['6'],
     width: '50%',
   },
-  sendTokenCardMain: {
+  sendTokenCardText: {
     marginBottom: spacing['12'],
     borderRadius: spacing['12'],
-    height: 122,
+    height: 130,
     alignItems: 'center',
-    paddingVertical: spacing['16'],
+    paddingTop: spacing['16'],
     paddingHorizontal: spacing['8'],
     backgroundColor: colors['white'],
     shadowColor: '#18274B1F',
@@ -79,13 +79,11 @@ const TransferTokensOptions: FunctionComponent = () => {
       <View style={styles.sendTokenCardbody}>
         {tokenTransferInfo.map((val, i) => (
           <View style={styles.sendTokenCardContent} key={i}>
-            <View style={styles.sendTokenCardMain}>
-              <TouchableOpacity style={{ alignItems: 'center'}}>
+              <TouchableOpacity style={styles.sendTokenCardText}>
                 <View style={styles.iconSendToken} >{val.icon}</View>
                 <Text style={styles.textSendToken}>{val.titleLine1}</Text>
                 <Text style={styles.textSendToken}>{val.titleLine2}</Text>
               </TouchableOpacity>
-            </View>
           </View>
         ))}
       </View>

@@ -18,7 +18,7 @@ import { BIP44AdvancedButton, useBIP44Option } from '../bip44';
 import {
   navigate,
   checkRouter,
-  checkRouterPaddingBottomBar,
+  checkRouterPaddingBottomBar
 } from '../../../router/root';
 import { OWalletLogo } from '../owallet-logo';
 import { colors, typography } from '../../../themes';
@@ -57,7 +57,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
     handleSubmit,
     setFocus,
     getValues,
-    formState: { errors },
+    formState: { errors }
   } = useForm<FormData>();
 
   const submit = handleSubmit(() => {
@@ -74,13 +74,13 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
       navigate('RegisterVerifyMnemonicMain', {
         registerConfig,
         newMnemonicConfig,
-        bip44HDPath: bip44Option.bip44HDPath,
+        bip44HDPath: bip44Option.bip44HDPath
       });
     } else {
       smartNavigation.navigateSmart('Register.VerifyMnemonic', {
         registerConfig,
         newMnemonicConfig,
-        bip44HDPath: bip44Option.bip44HDPath,
+        bip44HDPath: bip44Option.bip44HDPath
       });
     }
   });
@@ -89,7 +89,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
     <PageWithScrollView
       contentContainerStyle={{
         paddingLeft: 20,
-        paddingRight: 20,
+        paddingRight: 20
       }}
       backgroundColor={colors['white']}
     >
@@ -100,7 +100,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'space-between'
         }}
       >
         <Text
@@ -108,7 +108,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
             fontSize: 24,
             lineHeight: 34,
             fontWeight: '700',
-            color: colors['gray-900'],
+            color: colors['gray-900']
           }}
         >
           Create new wallet
@@ -121,17 +121,17 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
       <Controller
         control={control}
         rules={{
-          required: 'Name is required',
+          required: 'Name is required'
         }}
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
               label="Username"
               containerStyle={{
-                paddingBottom: 6,
+                paddingBottom: 6
               }}
               inputStyle={{
-                ...styles.borderInput,
+                ...styles.borderInput
               }}
               returnKeyType={mode === 'add' ? 'done' : 'next'}
               onSubmitEditing={() => {
@@ -164,7 +164,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
                 if (value.length < 8) {
                   return 'Password must be longer than 8 characters';
                 }
-              },
+              }
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -172,7 +172,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
                   label="Password"
                   returnKeyType="next"
                   inputStyle={{
-                    ...styles.borderInput,
+                    ...styles.borderInput
                   }}
                   secureTextEntry={true}
                   onSubmitEditing={() => {
@@ -201,7 +201,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
                 if (getValues('password') !== value) {
                   return "Password doesn't match";
                 }
-              },
+              }
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => {
               return (
@@ -213,7 +213,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
                     submit();
                   }}
                   inputStyle={{
-                    ...styles.borderInput,
+                    ...styles.borderInput
                   }}
                   error={errors.confirmPassword?.message}
                   onBlur={onBlur}
@@ -230,7 +230,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
       ) : null}
       <View
         style={{
-          flex: 1,
+          flex: 1
         }}
       />
       <TouchableOpacity
@@ -238,41 +238,36 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
         style={{
           marginBottom: 24,
           marginTop: 32,
-          backgroundColor: '#8B1BFB',
-          borderRadius: 8,
+          backgroundColor: colors['purple-900'],
+          borderRadius: 8
         }}
       >
-        <View
+        <Text
           style={{
-            padding: 18,
+            color: 'white',
+            textAlign: 'center',
+            fontWeight: '700',
+            fontSize: 16,
+            padding: 16
           }}
         >
-          <Text
-            style={{
-              color: 'white',
-              textAlign: 'center',
-              fontWeight: '700',
-              fontSize: 16,
-            }}
-          >
-            Next
-          </Text>
-        </View>
+          Next
+        </Text>
       </TouchableOpacity>
       <View
         style={{
           paddingBottom: checkRouterPaddingBottomBar(
             props?.route?.name,
             'RegisterMain'
-          ),
+          )
         }}
       >
         <Text
           style={{
-            color: '#8B1BFB',
+            color: colors['purple-900'],
             textAlign: 'center',
             fontWeight: '700',
-            fontSize: 16,
+            fontSize: 16
           }}
           onPress={() => {
             if (checkRouter(props?.route?.name, 'RegisterMain')) {
@@ -288,7 +283,7 @@ export const NewMnemonicScreen: FunctionComponent = observer((props) => {
       {/* Mock element for bottom padding */}
       <View
         style={{
-          height: 20,
+          height: 20
         }}
       />
     </PageWithScrollView>
@@ -332,7 +327,7 @@ const WordsCard: FunctionComponent<{
         borderRadius: 8,
         display: 'flex',
         flexDirection: 'row',
-        flexWrap: 1,
+        flexWrap: 1
       }}
     >
       {words.map((word, i) => {
@@ -350,7 +345,7 @@ const WordsCard: FunctionComponent<{
           width: '100%',
           borderBottomWidth: 1,
           padding: 10,
-          borderColor: colors['purple-50'],
+          borderColor: colors['purple-50']
         }}
       ></View>
       <View
@@ -359,17 +354,17 @@ const WordsCard: FunctionComponent<{
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'flex-end',
-          alignItems: 'center',
+          alignItems: 'center'
         }}
       >
-        {!isTimedOut && <CopyFillIcon />}
+        {!isTimedOut && <CopyFillIcon color={colors['purple-700']} />}
         <Button
           textStyle={{
             ...typography['text-button2'],
-            color: isTimedOut ? colors['success'] : colors['purple-900'],
+            color: isTimedOut ? colors['success'] : colors['purple-900']
           }}
           style={{
-            backgroundColor: colors['white'],
+            backgroundColor: colors['white']
           }}
           mode="text"
           {...(isTimedOut && {
@@ -377,7 +372,7 @@ const WordsCard: FunctionComponent<{
               <View style={{ paddingLeft: 10 }}>
                 <CheckIcon />
               </View>
-            ),
+            )
           })}
           text="Copy to clipboard"
           onPress={() => {
@@ -399,6 +394,6 @@ const styles = StyleSheet.create({
     paddingRight: 11,
     paddingTop: 12,
     paddingBottom: 12,
-    borderRadius: 4,
-  },
+    borderRadius: 4
+  }
 });

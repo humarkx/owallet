@@ -17,6 +17,7 @@ import { useStyle } from '../../styles';
 import { AddressBookIcon, NoteIcon } from '../icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSmartNavigation } from '../../navigation.provider';
+import { colors } from '../../themes';
 
 const styles = StyleSheet.create({
   absolute: {
@@ -152,7 +153,7 @@ export const AddressInput: FunctionComponent<{
                 }}
               >
                 <NoteIcon
-                  color={style.get('color-primary').color}
+                  color={colors["purple-900"]}
                   height={18}
                 />
               </TouchableOpacity>

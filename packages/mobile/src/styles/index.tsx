@@ -62,6 +62,7 @@ export const Colors = {
   "border-gray": "#C6C6CD",
   "border-white": "#F5F5F5",
   "border-pink": "#D7C4F5",
+  "border-purple": "#8B1BFB",
   white: "#fff",
   black: "#000",
   disabled: "#EEEEF3",
