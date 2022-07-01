@@ -64,19 +64,10 @@ export const AccountCard: FunctionComponent<{
   const profileColor = useCallback(
     (chainInfo) => {
       const colors = [
-        'sky-blue',
-        'mint',
         'red',
-        'orange',
-        'blue-violet',
         'green',
-        'sky-blue',
-        'mint',
-        'red',
         'purple',
-        'red',
         'orange',
-        'black'
       ];
 
       return colors[deterministicNumber(chainInfo) % colors.length];

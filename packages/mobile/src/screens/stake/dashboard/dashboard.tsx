@@ -29,6 +29,18 @@ const validators = [
     name: 'im6h',
     amount: '12.01',
     denom: 'ORAI'
+  },
+  {
+    imageUri: 'https://picsum.photos/id/1002/200',
+    name: 'im6h',
+    amount: '12.01',
+    denom: 'ORAI'
+  },
+  {
+    imageUri: 'https://picsum.photos/id/1002/200',
+    name: 'im6h',
+    amount: '12.01',
+    denom: 'ORAI'
   }
 ];
 
@@ -62,15 +74,10 @@ export const StakingDashboardScreen: FunctionComponent = () => {
 
         <View
           style={{
-            ...styles.containerMyStaking,
-            flex: 1
+            ...styles.containerMyStaking
           }}
         >
-          <View
-            style={{
-              flex: 1
-            }}
-          >
+          <View>
             <Text
               style={{
                 ...typography.h6,
@@ -112,7 +119,6 @@ export const StakingDashboardScreen: FunctionComponent = () => {
           </View>
           <View
             style={{
-              flex: 1,
               alignItems: 'flex-start',
               justifyContent: 'center',
               marginTop: spacing['32']
@@ -155,15 +161,10 @@ export const StakingDashboardScreen: FunctionComponent = () => {
           </View>
         </View>
 
-        <View style={{ flex: 1 }}>
+        <View>
           <View
             style={{
-              marginHorizontal: spacing['24'],
-              marginTop: spacing['32'],
-              marginBottom: spacing['16'],
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center'
+              ...styles.containerTitle
             }}
           >
             <Text
@@ -236,5 +237,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing['10'],
     borderRadius: spacing['8'],
     backgroundColor: colors['purple-900']
+  },
+  containerTitle: {
+    marginHorizontal: spacing['24'],
+    marginTop: spacing['32'],
+    marginBottom: spacing['16'],
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 });
