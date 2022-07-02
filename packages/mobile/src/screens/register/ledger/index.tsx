@@ -7,7 +7,7 @@ import { useSmartNavigation } from '../../../navigation.provider';
 import { Controller, useForm } from 'react-hook-form';
 import { PageWithScrollView } from '../../../components/page';
 import { TextInput } from '../../../components/input';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { CText as Text } from '../../../components/text'
 import { useStore } from '../../../stores';
 import { Button } from '../../../components/button';
@@ -58,7 +58,7 @@ export const NewLedgerScreen: FunctionComponent = observer((props) => {
   } = useForm<FormData>();
 
   const [isCreating, setIsCreating] = useState(false);
-
+  const [statusPass, setStatusPass] = useState(false);
   const submit = handleSubmit(async () => {
     setIsCreating(true);
 
@@ -140,9 +140,6 @@ export const NewLedgerScreen: FunctionComponent = observer((props) => {
           return (
             <TextInput
               label="Username"
-              containerStyle={{
-                paddingBottom: 6
-              }}
               returnKeyType={mode === 'add' ? 'done' : 'next'}
               onSubmitEditing={() => {
                 if (mode === 'add') {
@@ -166,7 +163,7 @@ export const NewLedgerScreen: FunctionComponent = observer((props) => {
         name="name"
         defaultValue=""
       />
-      <BIP44AdvancedButton bip44Option={bip44Option} />
+      {/* <BIP44AdvancedButton bip44Option={bip44Option} /> */}
       {mode === 'create' ? (
         <React.Fragment>
           <Controller
@@ -191,6 +188,22 @@ export const NewLedgerScreen: FunctionComponent = observer((props) => {
                   inputStyle={{
                     ...styles.borderInput
                   }}
+                  inputRight={
+                    <TouchableOpacity
+                      onPress={() => setStatusPass(!statusPass)}
+                    >
+                      <Image
+                        style={{
+                          width: 22,
+                          height: 22
+                        }}
+                        source={require('../../../assets/image/transactions/eye.png')}
+                        resizeMode="contain"
+                        fadeDuration={0}
+                      />
+                    </TouchableOpacity>
+                  }
+                  secureTextEntry={!statusPass}
                   error={errors.password?.message}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -241,6 +254,9 @@ export const NewLedgerScreen: FunctionComponent = observer((props) => {
           />
         </React.Fragment>
       ) : null}
+       <View style={{ alignItems: 'flex-start' }}>
+        <BIP44AdvancedButton bip44Option={bip44Option} />
+      </View>
       <View style={{ height: 20 }} />
       <TouchableOpacity
         disabled={isCreating}
@@ -308,6 +324,6 @@ const styles = StyleSheet.create({
     paddingRight: 11,
     paddingTop: 12,
     paddingBottom: 12,
-    borderRadius: 4
+    borderRadius: 8
   }
 });
