@@ -69,7 +69,7 @@ export const TokensCard: FunctionComponent<{
 
   const smartNavigation = useSmartNavigation();
   const [index, setIndex] = useState<number>(0);
-  const [price, setPrice] = useState<object>({});
+  // const [price, setPrice] = useState<object>({});
   const queryBalances = queriesStore
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(
@@ -80,26 +80,27 @@ export const TokensCard: FunctionComponent<{
     queryBalances.nonNativeBalances
   );
 
-  const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
+  // const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
 
-  const config = {
-    customDomain: 'https://api.coingecko.com/'
-  };
-  const getPriceCoinGecko = async () => {
-    console.log({ test: listTokens.join(',') });
+  // const config = {
+  //   customDomain: 'https://api.coingecko.com/'
+  // };
+  // const getPriceCoinGecko = async () => {
+  //   console.log({ test: listTokens.join(',') });
 
-    return await API.get(
-      `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
-      config
-    );
-  };
+  //   return await API.get(
+  //     `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
+  //     config
+  //   );
+  // };
 
-  useEffect(() => {
-    (async function get() {
-      const price = await getPriceCoinGecko();
-      setPrice(price);
-    })();
-  }, [index]);
+  // useEffect(() => {
+  //   (async function get() {
+  //     const price = await getPriceCoinGecko();
+  //     console.log({ price });
+  //     setPrice(price);
+  //   })();
+  // }, [index]);
 
   const _renderFlatlistItem = ({ item }) => (
     <TouchableOpacity
@@ -184,27 +185,38 @@ export const TokensCard: FunctionComponent<{
           }}
         >
           {['Tokens', 'NFTs'].map((title: string, i: number) => (
-            <TouchableOpacity
-              key={i}
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: spacing['12']
-              }}
-              onPress={() => {
-                setIndex(i);
-              }}
-            >
-              <Text
+            <View>
+              <TouchableOpacity
+                key={i}
                 style={{
-                  fontSize: 14,
-                  fontWeight: '700',
-                  color: index === i ? colors['gray-900'] : colors['gray-300']
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: spacing['12']
+                }}
+                onPress={() => {
+                  setIndex(i);
                 }}
               >
-                {title}
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '700',
+                    color: index === i ? colors['gray-900'] : colors['gray-300']
+                  }}
+                >
+                  {title}
+                </Text>
+              </TouchableOpacity>
+              <View
+                style={{
+                  width: 100,
+                  height: 2,
+                  marginTop: 8,
+                  backgroundColor:
+                    index === i ? colors['black'] : colors['white']
+                }}
+              />
+            </View>
           ))}
         </View>
 
