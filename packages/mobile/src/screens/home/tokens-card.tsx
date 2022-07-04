@@ -69,7 +69,7 @@ export const TokensCard: FunctionComponent<{
 
   const smartNavigation = useSmartNavigation();
   const [index, setIndex] = useState<number>(0);
-  const [price, setPrice] = useState<object>({});
+  // const [price, setPrice] = useState<object>({});
   const queryBalances = queriesStore
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(

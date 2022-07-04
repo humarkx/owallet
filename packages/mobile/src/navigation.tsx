@@ -220,11 +220,13 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
 
 const CustomHeader: FunctionComponent = observer(() => {
   const { top } = useSafeAreaInsets();
+  const navigation = useNavigation();
 
   return (
     <React.Fragment>
       <View
         style={{
+          backgroundColor: colors['white'],
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-around',
@@ -232,7 +234,15 @@ const CustomHeader: FunctionComponent = observer(() => {
           paddingBottom: spacing['26']
         }}
       >
-        <View />
+        <View>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              if (navigation.canGoBack) navigation.goBack();
+            }}
+          >
+            <HeaderBackButtonIcon />
+          </TouchableWithoutFeedback>
+        </View>
         <View>
           <HomeScreenHeaderTitle />
         </View>
@@ -389,7 +399,6 @@ export const SendNavigation: FunctionComponent = () => {
     >
       <Stack.Screen
         options={{
-          // headerShown: false,
           header: () => <CustomHeader />
         }}
         name="TransferTokensScreen"
@@ -839,7 +848,7 @@ export const MainTabNavigation: FunctionComponent = () => {
               return <RenderTabsBarIcon color={color} name={'Main'} />;
             case 'Browser':
               return <RenderTabsBarIcon color={color} name={'Browser'} />;
-            case 'Send':
+            case 'SendNavigation':
               return (
                 <View
                   style={{
@@ -915,9 +924,9 @@ export const MainTabNavigation: FunctionComponent = () => {
       <Tab.Screen name="Browser" component={WebNavigation} />
       <Tab.Screen
         options={{
-          title: 'Send'
+          title: 'SendNavigation'
         }}
-        name="Send"
+        name="SendNavigation"
         component={SendNavigation}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
