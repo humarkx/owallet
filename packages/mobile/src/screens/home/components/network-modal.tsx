@@ -7,7 +7,7 @@ import FastImage from 'react-native-fast-image';
 import { VectorCharacter } from '../../../components/vector-character';
 import { CText as Text } from '../../../components/text';
 
-export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
+export const NetworkModal = ({ profileColor, chainStore, modalStore }) => { 
   const _renderItem = ({ item }) => {
     return (
       <RectButton
