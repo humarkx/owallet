@@ -9,6 +9,8 @@ import {
   SendWithinNetworkIcon
 } from '../../components/icon';
 import { colors, spacing } from '../../themes';
+import { useSmartNavigation } from '../../navigation.provider';
+import { useStore } from '../../stores';
 
 const styles = StyleSheet.create({
   sendTokenCard: {
@@ -47,32 +49,56 @@ const tokenTransferInfo = [
   {
     icon: <SendWithinNetworkIcon />,
     titleLine1: 'Send',
+    type: 'send',
     titleLine2: 'within network'
   },
   {
     icon: <SendCrossChainIcon />,
     titleLine1: 'Send cross-chain',
+    type: 'send_cross',
     titleLine2: '(IBC Transfer)'
   },
   {
     icon: <SendBridgeIcon />,
     titleLine1: 'Bridge',
+    type: 'bridge',
     titleLine2: ''
   },
   {
     icon: <SendQRCodeIcon />,
     titleLine1: 'Send',
+    type: 'send_qr',
     titleLine2: 'via QR code'
   }
 ];
 
 const TransferTokensOptions: FunctionComponent = () => {
+  const smartNavigation = useSmartNavigation();
+  const { chainStore } = useStore();
+
+  const onPress = (type) => {
+    switch (type) {
+      case 'send':
+        smartNavigation.navigateSmart('Send', {
+          currency: chainStore.current.stakeCurrency.coinMinimalDenom
+        });
+        break;
+
+      default:
+        alert('Coming soon!');
+        break;
+    }
+  };
+
   return (
     <>
       <View style={styles.sendTokenCardbody}>
         {tokenTransferInfo.map((val, i) => (
           <View style={{ width: '48%' }} key={i}>
-            <TouchableOpacity style={styles.sendTokenCardContent}>
+            <TouchableOpacity
+              style={styles.sendTokenCardContent}
+              onPress={() => onPress(val.type)}
+            >
               <View style={styles.iconSendToken}>{val.icon}</View>
               <Text style={styles.textSendToken}>{val.titleLine1}</Text>
               <Text style={styles.textSendToken}>{val.titleLine2}</Text>
