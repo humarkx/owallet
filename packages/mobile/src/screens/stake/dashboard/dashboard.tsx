@@ -1,40 +1,28 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../../components/page';
-import { StyleSheet, View, FlatList, Image } from 'react-native';
+import { StyleSheet, View,  Image } from 'react-native';
 import { colors, typography, spacing, metrics } from '../../../themes';
 import { CText as Text } from '../../../components/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { ArrowOpsiteUpDownIcon, DownArrowIcon } from '../../../components/icon';
+import { ArrowOpsiteUpDownIcon,  } from '../../../components/icon';
 import { _keyExtract } from '../../../utils/helper';
-import { ValidatorItem } from '../components/validator-item';
-import { GiftStakingLogo } from '../../../components/svg';
 import { useSmartNavigation } from '../../../navigation.provider';
-
-const validators = [
-  {
-    imageUri: 'https://picsum.photos/id/1002/200',
-    name: 'megaorai2',
-    amount: '200,000.8',
-    denom: 'ORAI'
-  },
-  {
-    imageUri: 'https://picsum.photos/id/1002/200',
-    name: 'g1_moniker',
-    amount: '36.03',
-    denom: 'ORAI'
-  },
-  {
-    imageUri: 'https://picsum.photos/id/1002/200',
-    name: 'im6h',
-    amount: '12.01',
-    denom: 'ORAI'
-  }
-];
+import { MyRewardCard } from './reward-card';
+import { DelegationsCard } from './delegations-card';
+import { useStore } from '../../../stores';
 
 export const StakingDashboardScreen: FunctionComponent = () => {
   const smartNavigation = useSmartNavigation();
   const safeAreaInsets = useSafeAreaInsets();
+  const { chainStore, accountStore, queriesStore } = useStore();
+
+  const account = accountStore.getAccount(chainStore.current.chainId);
+  const queries = queriesStore.get(chainStore.current.chainId);
+
+  const staked = queries.cosmos.queryDelegations.getQueryBech32Address(
+    account.bech32Address
+  ).total;
 
   return (
     <PageWithScrollViewInBottomTabView>
@@ -62,57 +50,12 @@ export const StakingDashboardScreen: FunctionComponent = () => {
 
         <View
           style={{
-            ...styles.containerMyStaking,
-            flex: 1
+            ...styles.containerMyStaking
           }}
         >
+          <MyRewardCard containerStyle={{}} />
           <View
             style={{
-              flex: 1
-            }}
-          >
-            <Text
-              style={{
-                ...typography.h6,
-                color: colors['gray-900'],
-                fontWeight: '700'
-              }}
-            >{`Pending rewards`}</Text>
-            <Text
-              style={{
-                ...typography.h4,
-                color: colors['gray-900'],
-                fontWeight: '400',
-                marginTop: spacing['4']
-              }}
-            >{`0.0004 ORAI`}</Text>
-
-            <View
-              style={{
-                flexDirection: 'row'
-              }}
-            >
-              <Text
-                style={{
-                  ...typography.h6,
-                  color: colors['purple-700'],
-                  marginTop: spacing['8'],
-                  marginRight: spacing['12']
-                }}
-              >{`Claim`}</Text>
-
-              <View
-                style={{
-                  marginTop: spacing['10']
-                }}
-              >
-                <DownArrowIcon color={colors['purple-900']} height={18} />
-              </View>
-            </View>
-          </View>
-          <View
-            style={{
-              flex: 1,
               alignItems: 'flex-start',
               justifyContent: 'center',
               marginTop: spacing['32']
@@ -155,15 +98,10 @@ export const StakingDashboardScreen: FunctionComponent = () => {
           </View>
         </View>
 
-        <View style={{ flex: 1 }}>
+        <View>
           <View
             style={{
-              marginHorizontal: spacing['24'],
-              marginTop: spacing['32'],
-              marginBottom: spacing['16'],
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center'
+              ...styles.containerTitle
             }}
           >
             <Text
@@ -172,7 +110,11 @@ export const StakingDashboardScreen: FunctionComponent = () => {
                 fontWeight: '400'
               }}
             >
-              {`Total: 1000 ORAI`}
+              {`Total: ${staked
+                .maxDecimals(6)
+                .trim(true)
+                .shrink(true)
+                .toString()}`}
             </Text>
 
             <View
@@ -200,12 +142,7 @@ export const StakingDashboardScreen: FunctionComponent = () => {
               </View>
             </View>
           </View>
-
-          <FlatList
-            data={validators}
-            renderItem={({ item, index }) => <ValidatorItem validator={item} />}
-            keyExtractor={_keyExtract}
-          />
+          <DelegationsCard />
         </View>
       </View>
     </PageWithScrollViewInBottomTabView>
@@ -236,5 +173,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing['10'],
     borderRadius: spacing['8'],
     backgroundColor: colors['purple-900']
+  },
+  containerTitle: {
+    marginHorizontal: spacing['24'],
+    marginTop: spacing['32'],
+    marginBottom: spacing['16'],
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 });

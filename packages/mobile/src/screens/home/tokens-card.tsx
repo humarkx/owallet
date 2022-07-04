@@ -69,7 +69,7 @@ export const TokensCard: FunctionComponent<{
 
   const smartNavigation = useSmartNavigation();
   const [index, setIndex] = useState<number>(0);
-  const [price, setPrice] = useState<object>({});
+  // const [price, setPrice] = useState<object>({});
   const queryBalances = queriesStore
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(
@@ -80,27 +80,25 @@ export const TokensCard: FunctionComponent<{
     queryBalances.nonNativeBalances
   );
 
-  const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
+  // const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
 
-  const config = {
-    customDomain: 'https://api.coingecko.com/'
-  };
-  const getPriceCoinGecko = async () => {
-    console.log({ test: listTokens.join(',') });
-    
-    return await API.get(
-      `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
-      config
-    );
-  };
+  // const config = {
+  //   customDomain: 'https://api.coingecko.com/'
+  // };
 
-  useEffect(() => {
-    (async function get() {
-      const price = await getPriceCoinGecko();
-      console.log({ price });
-      setPrice(price);
-    })();
-  }, [index]);
+  // const getPriceCoinGecko = async () => {
+  //   return await API.get(
+  //     `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
+  //     config
+  //   );
+  // };
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const price = await getPriceCoinGecko();
+  //     setPrice(price);
+  //   })();
+  // }, [index]);
 
   const _renderFlatlistItem = ({ item }) => (
     <TouchableOpacity
@@ -212,6 +210,7 @@ export const TokensCard: FunctionComponent<{
         {index === 0 ? (
           <CardBody>
             {tokens.slice(0, 3).map((token) => {
+              const priceBalance = priceStore.calculatePrice(token.balance);
               return (
                 <TokenItem
                   key={token.currency.coinMinimalDenom}
@@ -219,14 +218,7 @@ export const TokensCard: FunctionComponent<{
                     stakeCurrency: chainStore.current.stakeCurrency
                   }}
                   balance={token.balance}
-                  priceToken={{
-                    airight: {
-                      usd: 0.00080235
-                    },
-                    tether: {
-                      usd: 1.001
-                    }
-                  }}
+                  priceBalance={priceBalance}
                 />
               );
             })}

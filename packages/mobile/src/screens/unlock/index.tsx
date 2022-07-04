@@ -231,7 +231,10 @@ export const UnlockScreen: FunctionComponent = observer(() => {
     }
   }, [keyRingStore.status, navigateToHome]);
 
-  return (
+  return !routeToRegisterOnce.current &&
+    keyRingStore.status === KeyRingStatus.EMPTY ? (
+    <View />
+  ) : (
     <React.Fragment>
       {/* <View
         style={{
