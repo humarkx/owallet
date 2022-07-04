@@ -80,27 +80,27 @@ export const TokensCard: FunctionComponent<{
     queryBalances.nonNativeBalances
   );
 
-  const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
+  // const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
 
-  const config = {
-    customDomain: 'https://api.coingecko.com/'
-  };
-  const getPriceCoinGecko = async () => {
-    console.log({ test: listTokens.join(',') });
+  // const config = {
+  //   customDomain: 'https://api.coingecko.com/'
+  // };
+  // const getPriceCoinGecko = async () => {
+  //   console.log({ test: listTokens.join(',') });
 
-    return await API.get(
-      `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
-      config
-    );
-  };
+  //   return await API.get(
+  //     `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
+  //     config
+  //   );
+  // };
 
-  useEffect(() => {
-    (async function get() {
-      const price = await getPriceCoinGecko();
-      console.log({ price });
-      setPrice(price);
-    })();
-  }, [index]);
+  // useEffect(() => {
+  //   (async function get() {
+  //     const price = await getPriceCoinGecko();
+  //     console.log({ price });
+  //     setPrice(price);
+  //   })();
+  // }, [index]);
 
   const _renderFlatlistItem = ({ item }) => (
     <TouchableOpacity
