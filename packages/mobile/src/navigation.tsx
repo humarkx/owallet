@@ -151,14 +151,16 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
         alignItems: 'center'
       }}
     >
-      <View style={{ display: 'flex', flexDirection: 'row' }}>
+      <View
+        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+      >
         <TouchableOpacity
           onPress={() => {
             smartNavigation.navigateSmart('Transactions', {});
           }}
           style={{ paddingRight: 15 }}
         >
-          <HistoryIcon size={28} color={colors['purple-700']}  />
+          <HistoryIcon size={24} color={colors['purple-700']} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -167,7 +169,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
             });
           }}
         >
-          <Scanner size={28} color={colors['purple-700']} />
+          <Scanner size={24} color={colors['purple-700']} />
         </TouchableOpacity>
       </View>
     </View>
@@ -240,7 +242,7 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
   );
 });
 
-const CustomHeader: FunctionComponent = observer(() => {
+export const CustomHeader: FunctionComponent = observer(() => {
   const { top } = useSafeAreaInsets();
   const navigation = useNavigation();
   const smartNavigation = useSmartNavigation();
@@ -378,7 +380,8 @@ export const MainNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: '',
-          headerLeft: null
+          header: () => <CustomHeader />
+          // headerLeft: null
         }}
         name="Tokens"
         component={TokensScreen}
@@ -517,7 +520,8 @@ export const OtherNavigation: FunctionComponent = () => {
     >
       <Stack.Screen
         options={{
-          title: 'Send'
+          title: 'Send',
+          header: () => <CustomHeader />
         }}
         name="Send"
         component={SendScreen}
@@ -697,7 +701,7 @@ export const AddressBookStackScreen: FunctionComponent = () => {
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
-        headerTitleStyle: style.flatten(['h5', 'color-text-black-high'])
+        headerTitleStyle: style.flatten(['h5', 'color-text-black-high']),
       }}
       headerMode="screen"
     >
@@ -710,7 +714,11 @@ export const AddressBookStackScreen: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'New Address Book'
+          title: 'Add new contact',
+          ...getPlainHeaderScreenOptionsPresetWithBackgroundColor(
+            style.get('color-setting-screen-background-transparent').color
+          ),
+          headerTitleStyle: style.flatten(['h3', 'color-text-black-high'])
         }}
         name="AddAddressBook"
         component={AddAddressBookScreen}
@@ -758,15 +766,14 @@ export const InvestNavigation: FunctionComponent = () => {
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
-        headerTitle: '',
+        headerTitle: ''
       }}
       initialRouteName="Invest"
       headerMode="screen"
     >
       <Stack.Screen
         options={{
-          title: '',
-
+          title: ''
         }}
         name="Invest"
         component={StakingDashboardScreen}
@@ -832,6 +839,9 @@ export const MainTabNavigation: FunctionComponent = () => {
       case 'Main':
         icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />;
         break;
+      case 'Home':
+        icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />;
+        break;
       case 'Browser':
         icon = checkColor ? <BrowserOutLineIcon /> : <BrowserFillIcon />;
         break;
@@ -881,7 +891,7 @@ export const MainTabNavigation: FunctionComponent = () => {
         tabBarIcon: ({ color }) => {
           switch (route.name) {
             case 'Main':
-              return <RenderTabsBarIcon color={color} name={'Main'} />;
+              return <RenderTabsBarIcon color={color} name={'Home'} />;
             case 'Browser':
               return <RenderTabsBarIcon color={color} name={'Browser'} />;
             case 'SendNavigation':

@@ -14,19 +14,26 @@ import { useStore } from '../../stores';
 
 const styles = StyleSheet.create({
   sendTokenCard: {
-    borderRadius: spacing['24'],
-    padding: spacing['12']
+    borderRadius: spacing['24']
   },
   sendTokenCardbody: {
+    display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginHorizontal: spacing['-6'],
     justifyContent: 'space-between'
   },
   sendTokenCardContent: {
-    padding: spacing['16'],
+    paddingHorizontal: spacing['6'],
+    width: '50%'
+  },
+  sendTokenCardText: {
     marginBottom: spacing['12'],
     borderRadius: spacing['12'],
+    height: 130,
     alignItems: 'center',
+    paddingTop: spacing['16'],
+    paddingHorizontal: spacing['8'],
     backgroundColor: colors['white'],
     shadowColor: '#18274B1F',
     shadowOffset: {
@@ -94,9 +101,9 @@ const TransferTokensOptions: FunctionComponent = () => {
     <>
       <View style={styles.sendTokenCardbody}>
         {tokenTransferInfo.map((val, i) => (
-          <View style={{ width: '48%' }} key={i}>
+          <View style={styles.sendTokenCardContent} key={i}>
             <TouchableOpacity
-              style={styles.sendTokenCardContent}
+              style={styles.sendTokenCardText}
               onPress={() => onPress(val.type)}
             >
               <View style={styles.iconSendToken}>{val.icon}</View>
@@ -106,9 +113,9 @@ const TransferTokensOptions: FunctionComponent = () => {
           </View>
         ))}
       </View>
-      <View style={{ marginTop: spacing['20'], alignItems: 'center' }}>
+      {/* <View style={{ marginTop: spacing['20'], alignItems: 'center' }}>
         <Text style={{ color: colors['gray-150'] }}>View lists</Text>
-      </View>
+      </View> */}
     </>
   );
 };
