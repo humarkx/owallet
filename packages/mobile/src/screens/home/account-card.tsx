@@ -256,7 +256,7 @@ export const AccountCard: FunctionComponent<{
                 display: 'flex',
                 flexDirection: 'row',
                 paddingTop: spacing['6'],
-                paddingLeft: spacing[22],
+                paddingLeft: spacing['22'],
                 paddingRight: spacing['22'],
                 justifyContent: 'center'
               }}

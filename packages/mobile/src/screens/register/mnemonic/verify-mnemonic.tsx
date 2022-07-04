@@ -58,20 +58,15 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
     const randomSortedWords = words.slice().sort(() => {
       return Math.random() > 0.5 ? 1 : -1;
     });
-
-    const candidateWords = randomSortedWords.slice(0, 5);
-    setCandidateWords(
-      candidateWords.map((word) => {
-        return {
-          word,
-          usedIndex: -1
-        };
-      })
-    );
-
+    setCandidateWords(randomSortedWords.map(word => {
+      return {
+        word,
+        usedIndex: -1
+      }
+    }))
     setWordSet(
-      newMnemonicConfig.mnemonic.split(' ').map((word) => {
-        return candidateWords.includes(word) ? undefined : word;
+      newMnemonicConfig.mnemonic.split(' ').map(() => {
+        return undefined;
       })
     );
   }, [newMnemonicConfig.mnemonic]);
@@ -249,7 +244,7 @@ const WordButton: FunctionComponent<{
           color: colors['white']
         }}
       >
-        {word}
+        {word} 
       </Text>
     </RectButton>
   );
@@ -269,7 +264,8 @@ const WordsCard: FunctionComponent<{
       style={{
         marginTop: 14,
         marginBottom: 16,
-        paddingTop: 24,
+        paddingTop: 10,
+        paddingBottom: 10,
         paddingLeft: 28,
         paddingRight: 28,
         borderColor: colors['purple-100'],

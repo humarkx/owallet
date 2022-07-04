@@ -60,7 +60,8 @@ import {
   InvestOutlineIcon,
   InvestFillIcon,
   HistoryIcon,
-  Scanner
+  Scanner,
+  GoBack
 } from './components/icon';
 import {
   AddAddressBookScreen,
@@ -97,7 +98,7 @@ import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpa
 import { Browser } from './screens/web/browser';
 import { BookMarks } from './screens/web/bookmarks';
 import { Transactions, TransactionDetail } from './screens/transactions';
-import { navigationRef } from './router/root';
+import { navigate, navigationRef } from './router/root';
 import { handleDeepLink } from './utils/helper';
 import {
   SmartNavigatorProvider,
@@ -110,6 +111,7 @@ import { DelegateDetailScreen } from './screens/stake/delegate/delegate-detail';
 import { NetworkModal } from './screens/home/components';
 import { colors, spacing, typography } from './themes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRoute } from '@react-navigation/core';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -153,11 +155,11 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('Transactions', {});
+            smartNavigation.navigateSmart('Transactions', {});
           }}
           style={{ paddingRight: 15 }}
         >
-          <HistoryIcon size={24} />
+          <HistoryIcon size={28} color={colors['purple-700']} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -166,7 +168,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
             });
           }}
         >
-          <Scanner size={24} />
+          <Scanner size={28} color={colors['purple-700']} />
         </TouchableOpacity>
       </View>
     </View>
@@ -222,11 +224,27 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
 
 const CustomHeader: FunctionComponent = observer(() => {
   const { top } = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const smartNavigation = useSmartNavigation();
+  const route = useRoute();
+
+  const onPressBack = () => {
+    if (navigation.canGoBack) {
+      navigation.goBack();
+      return;
+    }
+    if (smartNavigation.canGoBack) {
+      smartNavigation.goBack();
+      return;
+    }
+    navigate('MainTab');
+  };
 
   return (
     <React.Fragment>
       <View
         style={{
+          backgroundColor: colors['white'],
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-around',
@@ -234,9 +252,16 @@ const CustomHeader: FunctionComponent = observer(() => {
           paddingBottom: spacing['26']
         }}
       >
-        <View>
-          <HeaderBackButtonIcon />
-        </View>
+        {route.name === 'Home' ? (
+          <View />
+        ) : (
+          <TouchableWithoutFeedback onPress={onPressBack}>
+            <View>
+              <HeaderBackButtonIcon />
+            </View>
+          </TouchableWithoutFeedback>
+        )}
+
         <View>
           <HomeScreenHeaderTitle />
         </View>
@@ -278,27 +303,12 @@ export const MainNavigation: FunctionComponent = () => {
     >
       <Stack.Screen
         options={{
-          // headerShown: false,
           header: () => <CustomHeader />
         }}
         name="Home"
         component={HomeScreen}
       />
-      {/* <Stack.Screen
-        options={{
-          title: 'Browser'
-        }}
-        name="BrowserMain"
-        component={Browser}
-      /> */}
-      <Stack.Screen
-        name="Transactions"
-        component={Transactions}
-        options={{
-          title: 'Transactions',
-          headerLeft: () => <ScreenHeaderLeft />
-        }}
-      />
+
       <Stack.Screen
         options={{
           title: '',
@@ -350,7 +360,8 @@ export const MainNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: '',
-          headerLeft: null
+          header: () => <CustomHeader />
+          // headerLeft: null
         }}
         name="Tokens"
         component={TokensScreen}
@@ -393,7 +404,6 @@ export const SendNavigation: FunctionComponent = () => {
     >
       <Stack.Screen
         options={{
-          // headerShown: false,
           header: () => <CustomHeader />
         }}
         name="TransferTokensScreen"
@@ -494,6 +504,20 @@ export const OtherNavigation: FunctionComponent = () => {
         }}
         name="Send"
         component={SendScreen}
+      />
+      <Stack.Screen
+        options={{
+          header: () => <CustomHeader />
+        }}
+        name="Transactions"
+        component={Transactions}
+      />
+      <Stack.Screen
+        options={{
+          header: () => <CustomHeader />
+        }}
+        name="Transactions.Detail"
+        component={TransactionDetail}
       />
       <Stack.Screen
         options={{
@@ -845,7 +869,7 @@ export const MainTabNavigation: FunctionComponent = () => {
               return <RenderTabsBarIcon color={color} name={'Home'} />;
             case 'Browser':
               return <RenderTabsBarIcon color={color} name={'Browser'} />;
-            case 'Send':
+            case 'SendNavigation':
               return (
                 <View
                   style={{
@@ -921,9 +945,9 @@ export const MainTabNavigation: FunctionComponent = () => {
       <Tab.Screen name="Browser" component={WebNavigation} />
       <Tab.Screen
         options={{
-          title: 'Send'
+          title: 'SendNavigation'
         }}
-        name="Send"
+        name="SendNavigation"
         component={SendNavigation}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,

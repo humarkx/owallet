@@ -76,8 +76,9 @@ export const TokensCard: FunctionComponent<{
       accountStore.getAccount(chainStore.current.chainId).bech32Address
     );
 
-  const tokens = queryBalances.positiveNativeUnstakables.concat(
-    queryBalances.nonNativeBalances
+  const tokens = queryBalances.balances.concat(
+    queryBalances.nonNativeBalances,
+    queryBalances.positiveNativeUnstakables
   );
 
   // const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
@@ -85,8 +86,9 @@ export const TokensCard: FunctionComponent<{
   // const config = {
   //   customDomain: 'https://api.coingecko.com/'
   // };
-
   // const getPriceCoinGecko = async () => {
+  //   console.log({ test: listTokens.join(',') });
+
   //   return await API.get(
   //     `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
   //     config
@@ -94,8 +96,9 @@ export const TokensCard: FunctionComponent<{
   // };
 
   // useEffect(() => {
-  //   (async () => {
+  //   (async function get() {
   //     const price = await getPriceCoinGecko();
+  //     console.log({ price });
   //     setPrice(price);
   //   })();
   // }, [index]);
@@ -183,27 +186,38 @@ export const TokensCard: FunctionComponent<{
           }}
         >
           {['Tokens', 'NFTs'].map((title: string, i: number) => (
-            <TouchableOpacity
-              key={i}
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: spacing['12']
-              }}
-              onPress={() => {
-                setIndex(i);
-              }}
-            >
-              <Text
+            <View>
+              <TouchableOpacity
+                key={i}
                 style={{
-                  fontSize: 14,
-                  fontWeight: '700',
-                  color: index === i ? colors['gray-900'] : colors['gray-300']
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: spacing['12']
+                }}
+                onPress={() => {
+                  setIndex(i);
                 }}
               >
-                {title}
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '700',
+                    color: index === i ? colors['gray-900'] : colors['gray-300']
+                  }}
+                >
+                  {title}
+                </Text>
+              </TouchableOpacity>
+              <View
+                style={{
+                  width: 100,
+                  height: 2,
+                  marginTop: 8,
+                  backgroundColor:
+                    index === i ? colors['black'] : colors['white']
+                }}
+              />
+            </View>
           ))}
         </View>
 
