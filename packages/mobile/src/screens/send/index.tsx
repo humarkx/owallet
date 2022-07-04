@@ -19,6 +19,7 @@ import { Buffer } from 'buffer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, metrics, spacing, typography } from '../../themes';
 import { CText as Text } from '../../components/text';
+
 const styles = StyleSheet.create({
   sendInputRoot: {
     paddingHorizontal: spacing['20'],
@@ -111,17 +112,17 @@ export const SendScreen: FunctionComponent = observer(() => {
           </Text>
         </View>
         <View style={styles.sendInputRoot}>
-          <AddressInput
-            placeholder="Type the receiver"
-            label="Recipient"
-            recipientConfig={sendConfigs.recipientConfig}
-            memoConfig={sendConfigs.memoConfig}
-            labelStyle={styles.sendlabelInput}
-          />
           <CurrencySelector
-            label="Token"
+            label="Select a token"
             placeHolder="Select Token"
             amountConfig={sendConfigs.amountConfig}
+            labelStyle={styles.sendlabelInput}
+          />
+          <AddressInput
+            placeholder="Type the receiver"
+            label="Send to"
+            recipientConfig={sendConfigs.recipientConfig}
+            memoConfig={sendConfigs.memoConfig}
             labelStyle={styles.sendlabelInput}
           />
           <AmountInput
@@ -130,23 +131,22 @@ export const SendScreen: FunctionComponent = observer(() => {
             amountConfig={sendConfigs.amountConfig}
             labelStyle={styles.sendlabelInput}
           />
-          <MemoInput
-            label="Memo (Optional)"
-            placeholder="Type your memo here"
-            memoConfig={sendConfigs.memoConfig}
-            labelStyle={styles.sendlabelInput}
-          />
           <FeeButtons
-            label="Fee"
+            label="Transaction Fee"
             gasLabel="gas"
             feeConfig={sendConfigs.feeConfig}
             gasConfig={sendConfigs.gasConfig}
             labelStyle={styles.sendlabelInput}
           />
+           <MemoInput
+            label="Memo (Optional)"
+            placeholder="Type your memo here"
+            memoConfig={sendConfigs.memoConfig}
+            labelStyle={styles.sendlabelInput}
+          />
           <TouchableOpacity
             style={{
               marginBottom: 24,
-              marginTop: 32,
               backgroundColor: colors['purple-900'],
               borderRadius: 8
             }}
