@@ -20,6 +20,7 @@ export const TextInput = React.forwardRef<
     inputContainerStyle?: ViewStyle;
     errorLabelStyle?: TextStyle;
     inputStyle?: TextStyle;
+    iconLabel?: React.ReactNode;
 
     label?: string;
     error?: string;
@@ -31,6 +32,8 @@ export const TextInput = React.forwardRef<
 
     inputLeft?: React.ReactNode;
     inputRight?: React.ReactNode;
+
+    multiline?: boolean;
   }
 >((props, ref) => {
   const { style: propsStyle, ...restProps } = props;
@@ -68,7 +71,24 @@ export const TextInput = React.forwardRef<
       <View
         style={StyleSheet.flatten(
           props.inputStyle
-            ? [props.inputStyle, props.inputContainerStyle]
+            ? [
+                style.flatten(
+                  [
+                    'background-color-white',
+                    'padding-x-11',
+                    'padding-y-12',
+                    'border-radius-4',
+                    'border-width-1',
+                    'border-color-border-white'
+                  ],
+                  [
+                    props.error ? 'border-color-error' : undefined,
+                    !(props.editable ?? true) && 'background-color-disabled'
+                  ]
+                ),
+                props.inputStyle,
+                props.inputContainerStyle
+              ]
             : [
                 style.flatten(
                   [
@@ -92,9 +112,10 @@ export const TextInput = React.forwardRef<
         <View style={style.flatten(['flex-row', 'items-center'])}>
           {props.inputLeft}
           <NativeTextInput
+            multiline={props.multiline}
             placeholderTextColor={
               props.placeholderTextColor ??
-              style.get('color-text-black-low').color
+              style.get('color-text-gray-300').color
             }
             style={StyleSheet.flatten([
               style.flatten([

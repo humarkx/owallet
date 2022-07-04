@@ -38,7 +38,7 @@ export const AddressCopyable: FunctionComponent<{
       underlayColor={colors['primary-50']}
       activeOpacity={1}
     >
-      <Text style={{ fontSize: 14, color: '#5F5E77' }}>
+      <Text style={{ fontSize: 14, color: colors['gray-150'], fontWeight: '700'}}>
         {Bech32Address.shortenAddress(address, maxCharacters)}
       </Text>
       <View
@@ -50,7 +50,7 @@ export const AddressCopyable: FunctionComponent<{
         {isTimedOut ? (
            <CheckIcon />
         ) : (
-          <CopyFillIcon color={"#5F5E77"}/>
+          <CopyFillIcon color={colors['gray-150']} />
         )}
       </View>
     </RectButton>

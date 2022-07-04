@@ -279,7 +279,13 @@ export const AccountCard: FunctionComponent<{
                   source={require('../../assets/image/address_default.png')}
                   fadeDuration={0}
                 />
-                <Text style={{ paddingLeft: spacing['6'] }}>
+                <Text
+                  style={{
+                    paddingLeft: spacing['6'],
+                    fontWeight: '700',
+                    fontSize: 16
+                  }}
+                >
                   {account.name || '...'}
                 </Text>
               </View>
@@ -290,7 +296,7 @@ export const AccountCard: FunctionComponent<{
               />
             </View>
             <TouchableOpacity onPress={_onPressMyWallet}>
-              <DownArrowIcon height={30} color={colors['gray-150']} />
+              <DownArrowIcon height={28} color={colors['gray-150']} />
             </TouchableOpacity>
           </View>
 

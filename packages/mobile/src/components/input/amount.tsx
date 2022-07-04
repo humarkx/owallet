@@ -80,21 +80,15 @@ export const AmountInput: FunctionComponent<{
               text="MAX"
               mode={'light'}
               size="small"
-              style={{
-                paddingHorizontal: spacing['5'],
-                paddingVertical: spacing['3']
-              }}
               containerStyle={{
                 height: 24,
-                borderRadius: spacing['4'],
-                backgroundColor: colors['white'],
-                borderColor: colors['purple-900'],
-                borderWidth: 1,
+                borderRadius: spacing['8'],
+                backgroundColor: colors['purple-900'],
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
               }}
               textStyle={{
-                color: colors['purple-900'],
+                color: colors['white'],
                 textTransform: 'uppercase'
               }}
               onPress={() => {
