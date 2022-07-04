@@ -26,15 +26,6 @@ export const StakingDashboardScreen: FunctionComponent = () => {
 
   return (
     <PageWithScrollViewInBottomTabView>
-      {/* <MyRewardCard containerStyle={style.flatten(['margin-y-card-gap'])} />
-      <DelegationsCard
-        containerStyle={style.flatten(['margin-bottom-card-gap'])}
-      />
-      {unbondings.length > 0 ? (
-        <UndelegationsCard
-          containerStyle={style.flatten(['margin-bottom-card-gap'])}
-        />
-      ) : null} */}
       <View
         style={{
           marginTop: safeAreaInsets.top
