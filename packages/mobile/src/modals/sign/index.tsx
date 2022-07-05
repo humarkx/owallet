@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { registerModal } from '../base';
 import { CardModal } from '../card';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { CText as Text } from '../../components/text';
 import { useStyle } from '../../styles';
 import { useStore } from '../../stores';
@@ -21,7 +21,6 @@ import { useUnmount } from '../../hooks';
 import { FeeInSign } from './fee';
 import { renderAminoMessage } from './amino';
 import { renderDirectMessage } from './direct';
-import { colors } from '../../themes';
 
 export const SignModal: FunctionComponent<{
   isOpen: boolean;
@@ -180,7 +179,7 @@ export const SignModal: FunctionComponent<{
 
     return (
       <CardModal title="Confirm Transaction">
-        <View style={style.flatten(['margin-bottom-16'])}>
+        {/* <View style={style.flatten(['margin-bottom-16'])}>
           <Text style={style.flatten(['margin-bottom-3'])}>
             <Text style={style.flatten(['subtitle3', 'color-primary'])}>
               {`${msgs.length.toString()} `}
@@ -206,21 +205,24 @@ export const SignModal: FunctionComponent<{
               {renderedMsgs}
             </ScrollView>
           </View>
-        </View>
-        <MemoInput label="Memo" memoConfig={memoConfig} />
+        </View> */}
+        <MemoInput label="To" memoConfig={memoConfig} />
         <FeeInSign
           feeConfig={feeConfig}
           gasConfig={gasConfig}
           signOptions={signInteractionStore.waitingData?.data.signOptions}
           isInternal={isInternal}
         />
-        <TouchableOpacity
+        <Button
+          text="Approve"
+          size="large"
           disabled={
             signDocWapper == null ||
             signDocHelper.signDocWrapper == null ||
             memoConfig.getError() != null ||
             feeConfig.getError() != null
           }
+          loading={signInteractionStore.isLoading}
           onPress={async () => {
             console.log('on press sign');
             try {
@@ -234,25 +236,7 @@ export const SignModal: FunctionComponent<{
               console.log(error);
             }
           }}
-          style={{
-            marginTop: 32,
-            backgroundColor: colors['purple-900'],
-            borderRadius: 8
-          }}
-        >
-          <Text
-            style={{
-              color: 'white',
-              textAlign: 'center',
-              fontWeight: '700',
-              fontSize: 16,
-              padding: 16
-            }}
-          >
-            Approve
-          </Text>
-        </TouchableOpacity>
-        {/* loading={signInteractionStore.isLoading} */}
+        />
       </CardModal>
     );
   }),
