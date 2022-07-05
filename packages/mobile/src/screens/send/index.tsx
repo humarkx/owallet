@@ -37,8 +37,7 @@ const styles = StyleSheet.create({
 });
 
 export const SendScreen: FunctionComponent = observer(() => {
-  const { chainStore, accountStore, queriesStore, analyticsStore, modalStore } =
-    useStore();
+  const { chainStore, accountStore, queriesStore, analyticsStore } = useStore();
   const safeAreaInsets = useSafeAreaInsets();
   const route = useRoute<
     RouteProp<
@@ -178,6 +177,11 @@ export const SendScreen: FunctionComponent = observer(() => {
                   );
                 } catch (e) {
                   if (e?.message === 'Request rejected') {
+                    return;
+                  }
+                  if (
+                    e?.message.includes('Cannot read properties of undefined')
+                  ) {
                     return;
                   }
                   console.log('send error', e);
