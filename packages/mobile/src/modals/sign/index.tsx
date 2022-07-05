@@ -270,7 +270,7 @@ export const SignModal: FunctionComponent<{
               try {
                 if (signDocHelper.signDocWrapper) {
                   //
-                  signInteractionStore.reject();
+                  signInteractionStore.rejectAll();
                 }
               } catch (error) {
                 console.log(error);
