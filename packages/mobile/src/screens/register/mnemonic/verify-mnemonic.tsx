@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { PageWithScrollView } from '../../../components/page';
 import { View } from 'react-native';
 import { CText as Text } from '../../../components/text';
-import { useStyle } from '../../../styles';
 import { WordChip } from '../../../components/mnemonic';
 import { Button } from '../../../components/button';
 import { RouteProp, useRoute } from '@react-navigation/native';
@@ -36,9 +35,7 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
       string
     >
   >();
-
-  const style = useStyle();
-
+  
   const { analyticsStore } = useStore();
   const smartNavigation = useSmartNavigation();
 
@@ -168,7 +165,8 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
           });
           if (checkRouter(props?.route?.name, 'RegisterVerifyMnemonicMain')) {
             navigate('RegisterEnd', {
-              password: newMnemonicConfig.password
+              password: newMnemonicConfig.password,
+              type: 'new'
             });
           } else {
             smartNavigation.reset({
@@ -177,7 +175,8 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
                 {
                   name: 'Register.End',
                   params: {
-                    password: newMnemonicConfig.password
+                    password: newMnemonicConfig.password,
+                    type: 'new'
                   }
                 }
               ]
@@ -257,7 +256,6 @@ const WordsCard: FunctionComponent<{
     dashed: boolean;
   }[];
 }> = ({ wordSet }) => {
-  const style = useStyle();
 
   return (
     <View
