@@ -59,7 +59,11 @@ export const MyRewardCard: FunctionComponent<{
               return;
             }
             // console.log(e);
-            smartNavigation.navigateSmart('Home', {});
+            if (smartNavigation.canGoBack) {
+              smartNavigation.goBack();
+            } else {
+              smartNavigation.navigateSmart('Home', {});
+            }
           }
         }}
         icon={
