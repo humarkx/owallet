@@ -235,6 +235,7 @@ export const SignModal: FunctionComponent<{
             textStyle={{
               color: isDisable ? colors['gray-400'] : colors['white']
             }}
+            underlayColor={colors['purple-400']}
             size="large"
             disabled={isDisable}
             loading={signInteractionStore.isLoading}
@@ -264,6 +265,7 @@ export const SignModal: FunctionComponent<{
             textStyle={{
               color: colors['white']
             }}
+            underlayColor={colors['danger-400']}
             loading={signInteractionStore.isLoading}
             onPress={() => {
               console.log('on press sign');

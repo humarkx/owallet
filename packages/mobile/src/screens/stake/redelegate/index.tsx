@@ -108,7 +108,7 @@ export const RedelegateScreen: FunctionComponent = observer(() => {
     sendConfigs.memoConfig.getError() ??
     sendConfigs.gasConfig.getError() ??
     sendConfigs.feeConfig.getError();
-  const txStateIsValid = sendConfigError === null;
+  const txStateIsValid = sendConfigError == null;
 
   const isDisable = !account.isReadyToSendMsgs || !txStateIsValid;
 
@@ -254,8 +254,12 @@ export const RedelegateScreen: FunctionComponent = observer(() => {
         style={{
           backgroundColor: isDisable ? colors['disabled'] : colors['purple-900']
         }}
+        textStyle={{
+          color: colors['white']
+        }}
         text="Switch Validator"
         size="large"
+        underlayColor={colors['purple-400']}
         disabled={isDisable}
         loading={account.isSendingMsg === 'redelegate'}
         onPress={_onPressSwitchValidator}
