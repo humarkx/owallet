@@ -17,6 +17,7 @@ import { Buffer } from 'buffer';
 import { colors, metrics } from '../../themes';
 import { Card, CardBody } from '../../components/card';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CommonActions } from '@react-navigation/native';
 
 export const TxPendingResultScreen: FunctionComponent = observer(() => {
   const { chainStore } = useStore();
@@ -77,9 +78,13 @@ export const TxPendingResultScreen: FunctionComponent = observer(() => {
   }, [chainId, chainStore, isFocused, route.params.txHash, smartNavigation]);
 
   return (
-    <View >
+    <View>
       <Card
-        style={{ backgroundColor: colors['white'], marginTop: 78, borderRadius: 24 }}
+        style={{
+          backgroundColor: colors['white'],
+          marginTop: 78,
+          borderRadius: 24
+        }}
       >
         <View
           style={{
@@ -139,7 +144,7 @@ export const TxPendingResultScreen: FunctionComponent = observer(() => {
                 paddingBottom: 16
               }}
             >
-              Transaction pending
+              Transaction Processing...
             </Text>
             <Text
               style={{
@@ -149,19 +154,7 @@ export const TxPendingResultScreen: FunctionComponent = observer(() => {
                 color: colors['gray-150']
               }}
             >
-              The transaction has been broadcasted to the blockchain and is pending confirmation.
-            </Text>
-            <Text
-              style={{
-                fontWeight: '400',
-                fontSize: 14,
-                lineHeight: 20,
-                color: colors['gray-150'],
-                paddingBottom: 20,
-                paddingTop: 6
-              }}
-            >
-              Wait a little bit for processing...
+              Hang on as the process might take some time to complete.
             </Text>
             <Image
               style={{
@@ -189,9 +182,16 @@ export const TxPendingResultScreen: FunctionComponent = observer(() => {
                   fontSize: 16,
                   lineHeight: 22
                 }}
-                onPress={() => smartNavigation.navigateSmart('Home', {})}
+                onPress={() => {
+                  smartNavigation.dispatch(
+                    CommonActions.reset({
+                      index: 1,
+                      routes: [{ name: 'MainTab' }]
+                    })
+                  );
+                }}
               >
-                Go to home screen
+                Return to home screen
               </Text>
             </View>
           </View>

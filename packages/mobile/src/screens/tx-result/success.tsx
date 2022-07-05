@@ -20,6 +20,7 @@ import { Card } from '../../components/card';
 import { colors, metrics } from '../../themes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
+import { CommonActions } from '@react-navigation/native';
 
 export const TxSuccessResultScreen: FunctionComponent = observer(() => {
   const { chainStore } = useStore();
@@ -59,8 +60,8 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
         }}
       >
         <View
-          style={{ 
-            height: metrics.screenHeight  - bottom - 74,
+          style={{
+            height: metrics.screenHeight - bottom - 74,
             paddingTop: 80
           }}
         >
@@ -116,17 +117,7 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
                 paddingBottom: 16
               }}
             >
-              Transaction successful
-            </Text>
-            <Text
-              style={{
-                fontWeight: '400',
-                fontSize: 14,
-                lineHeight: 20,
-                color: colors['gray-150']
-              }}
-            >
-              Congratulation!
+              Transaction Completed!
             </Text>
             <Text
               style={{
@@ -137,7 +128,8 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
                 paddingTop: 6
               }}
             >
-              The transaction is completed.
+              Your transaction has been confirmed by the blockchain.
+              Congratulations!
             </Text>
             {chainInfo.raw.txExplorer ? (
               <TouchableOpacity
@@ -176,7 +168,7 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
                     lineHeight: 22
                   }}
                 >
-                  View on Oraiscan
+                  View on Explorer
                 </Text>
               </TouchableOpacity>
             ) : null}
@@ -190,7 +182,12 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
               borderRadius: 8
             }}
             onPress={() => {
-              smartNavigation.navigateSmart('Home', {});
+              smartNavigation.dispatch(
+                CommonActions.reset({
+                  index: 1,
+                  routes: [{ name: 'MainTab' }]
+                })
+              );
             }}
           >
             <Text
@@ -202,7 +199,7 @@ export const TxSuccessResultScreen: FunctionComponent = observer(() => {
                 padding: 16
               }}
             >
-              Go Home
+              Go Back
             </Text>
           </TouchableOpacity>
         </View>

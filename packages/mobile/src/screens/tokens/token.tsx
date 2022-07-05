@@ -1,42 +1,13 @@
-import React, { FunctionComponent, ReactElement } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@rneui/base';
-import { useSmartNavigation } from '../../navigation.provider';
 import { colors, spacing, typography } from '../../themes';
 import { FlatList } from 'react-native-gesture-handler';
 import { _keyExtract } from '../../utils/helper';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import { TokenItem } from './components/token-item';
-
-// hardcode data to test UI.
-const tokens = [
-  {
-    label: 'Recevier token 3',
-    date: 'Apr 25, 2022',
-    amount: '+100.02',
-    denom: 'ORAI'
-  },
-  {
-    label: 'Recevier token',
-    date: 'Apr 25, 2022',
-    amount: '+12.02',
-    denom: 'ORAI'
-  },
-  {
-    label: 'Recevier token',
-    date: 'Apr 25, 2022',
-    amount: '-100.02',
-    denom: 'ORAI'
-  },
-  {
-    label: 'Recevier token',
-    date: 'Apr 25, 2022',
-    amount: '-100.02',
-    denom: 'ORAI'
-  }
-];
 
 export const TokensScreen: FunctionComponent = observer(() => {
   const { chainStore, queriesStore, accountStore, priceStore } = useStore();
@@ -50,6 +21,20 @@ export const TokensScreen: FunctionComponent = observer(() => {
     queryBalances.nonNativeBalances,
     queryBalances.positiveNativeUnstakables
   );
+
+  const unique = useMemo(() => {
+    const uniqTokens = [];
+    tokens.map((token) =>
+      uniqTokens.filter(
+        (ut) =>
+          ut.balance.currency.coinDenom == token.balance.currency.coinDenom
+      ).length > 0
+        ? null
+        : uniqTokens.push(token)
+    );
+    return uniqTokens;
+  }, []);
+
   return (
     <PageWithScrollViewInBottomTabView>
       <View
@@ -71,7 +56,7 @@ export const TokensScreen: FunctionComponent = observer(() => {
           }}
         >
           <FlatList
-            data={tokens}
+            data={unique}
             renderItem={({ item }) => {
               const priceBalance = priceStore.calculatePrice(item.balance);
 
