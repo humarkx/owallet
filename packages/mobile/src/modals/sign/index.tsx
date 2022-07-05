@@ -5,7 +5,7 @@ import { ScrollView, View } from 'react-native';
 import { CText as Text } from '../../components/text';
 import { useStyle } from '../../styles';
 import { useStore } from '../../stores';
-import { MemoInput } from '../../components/input';
+import { AmountInput, MemoInput } from '../../components/input';
 import {
   useFeeConfig,
   useGasConfig,
@@ -21,6 +21,7 @@ import { useUnmount } from '../../hooks';
 import { FeeInSign } from './fee';
 import { renderAminoMessage } from './amino';
 import { renderDirectMessage } from './direct';
+import { colors, spacing } from '../../themes';
 
 export const SignModal: FunctionComponent<{
   isOpen: boolean;
@@ -102,6 +103,11 @@ export const SignModal: FunctionComponent<{
         ? signDocHelper.signDocWrapper.aminoSignDoc.msgs
         : signDocHelper.signDocWrapper.protoSignDoc.txMsgs
       : [];
+    const isDisable =
+      signDocWapper == null ||
+      signDocHelper.signDocWrapper == null ||
+      memoConfig.getError() != null ||
+      feeConfig.getError() != null;
 
     const renderedMsgs = (() => {
       if (mode === 'amino') {
@@ -116,24 +122,22 @@ export const SignModal: FunctionComponent<{
 
           return (
             <View key={i.toString()}>
-              <Msg title={title}>
-                {scrollViewHorizontal ? (
-                  <ScrollView horizontal={true}>
-                    <Text
-                      style={style.flatten(['body3', 'color-text-black-low'])}
-                    >
-                      {content}
-                    </Text>
-                  </ScrollView>
-                ) : (
+              {/* <Msg title={title}> */}
+              {scrollViewHorizontal ? (
+                <ScrollView horizontal={true}>
                   <Text
                     style={style.flatten(['body3', 'color-text-black-low'])}
                   >
                     {content}
                   </Text>
-                )}
-              </Msg>
-              {msgs.length - 1 !== i ? (
+                </ScrollView>
+              ) : (
+                <Text style={style.flatten(['body3', 'color-text-black-low'])}>
+                  {content}
+                </Text>
+              )}
+              {/* </Msg> */}
+              {/* {msgs.length - 1 !== i ? (
                 <View
                   style={style.flatten([
                     'height-1',
@@ -141,7 +145,7 @@ export const SignModal: FunctionComponent<{
                     'margin-x-16'
                   ])}
                 />
-              ) : null}
+              ) : null} */}
             </View>
           );
         });
@@ -155,12 +159,12 @@ export const SignModal: FunctionComponent<{
 
           return (
             <View key={i.toString()}>
-              <Msg title={title}>
-                <Text style={style.flatten(['body3', 'color-text-black-low'])}>
-                  {content}
-                </Text>
-              </Msg>
-              {msgs.length - 1 !== i ? (
+              {content}
+              {/* <Msg title={title}> */}
+              {/* <Text style={style.flatten(['body3', 'color-text-black-low'])}> */}
+              {/* </Text> */}
+              {/* </Msg> */}
+              {/* {msgs.length - 1 !== i ? (
                 <View
                   style={style.flatten([
                     'height-1',
@@ -168,7 +172,7 @@ export const SignModal: FunctionComponent<{
                     'margin-x-16'
                   ])}
                 />
-              ) : null}
+              ) : null} */}
             </View>
           );
         });
@@ -179,8 +183,8 @@ export const SignModal: FunctionComponent<{
 
     return (
       <CardModal title="Confirm Transaction">
-        {/* <View style={style.flatten(['margin-bottom-16'])}>
-          <Text style={style.flatten(['margin-bottom-3'])}>
+        <View style={style.flatten(['margin-bottom-16'])}>
+          {/* <Text style={style.flatten(['margin-bottom-3'])}>
             <Text style={style.flatten(['subtitle3', 'color-primary'])}>
               {`${msgs.length.toString()} `}
             </Text>
@@ -189,24 +193,23 @@ export const SignModal: FunctionComponent<{
             >
               Messages
             </Text>
-          </Text>
+          </Text> */}
           <View
             style={style.flatten([
               'border-radius-8',
-              'border-width-1',
-              'border-color-border-white',
-              'overflow-hidden'
+              'border-color-border-white'
+              // 'overflow-hidden'
             ])}
           >
-            <ScrollView
-              style={style.flatten(['max-height-214'])}
-              persistentScrollbar={true}
+            <View
+            // style={style.flatten(['max-height-214'])}
+            // persistentScrollbar={true}
             >
               {renderedMsgs}
-            </ScrollView>
+            </View>
           </View>
-        </View> */}
-        <MemoInput label="To" memoConfig={memoConfig} />
+        </View>
+        {/* <MemoInput label="To" memoConfig={memoConfig} /> */}
         <FeeInSign
           feeConfig={feeConfig}
           gasConfig={gasConfig}
@@ -215,13 +218,16 @@ export const SignModal: FunctionComponent<{
         />
         <Button
           text="Approve"
+          style={{
+            backgroundColor: isDisable
+              ? colors['gray-400']
+              : colors['purple-900']
+          }}
+          textStyle={{
+            color: isDisable ? colors['gray-400'] : colors['white']
+          }}
           size="large"
-          disabled={
-            signDocWapper == null ||
-            signDocHelper.signDocWrapper == null ||
-            memoConfig.getError() != null ||
-            feeConfig.getError() != null
-          }
+          disabled={isDisable}
           loading={signInteractionStore.isLoading}
           onPress={async () => {
             console.log('on press sign');
@@ -231,6 +237,30 @@ export const SignModal: FunctionComponent<{
                 await signInteractionStore.approveAndWaitEnd(
                   signDocHelper.signDocWrapper
                 );
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+        />
+
+        <View style={{ height: 8 }} />
+        <Button
+          text="Reject"
+          size="large"
+          style={{
+            backgroundColor: colors['disabled']
+          }}
+          textStyle={{
+            color: colors['red-500']
+          }}
+          loading={signInteractionStore.isLoading}
+          onPress={() => {
+            console.log('on press sign');
+            try {
+              if (signDocHelper.signDocWrapper) {
+                //
+                signInteractionStore.reject();
               }
             } catch (error) {
               console.log(error);
