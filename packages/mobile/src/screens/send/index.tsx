@@ -74,8 +74,14 @@ export const SendScreen: FunctionComponent = observer(() => {
   useEffect(() => {
     if (route?.params?.currency) {
       const currency = sendConfigs.amountConfig.sendableCurrencies.find(
-        (cur) => cur.coinMinimalDenom === route.params.currency
+        (cur) => {
+          if (cur.type === 'cw20') {
+            return cur.coinDenom === route.params.currency;
+          }
+          return cur.coinMinimalDenom === route.params.currency;
+        }
       );
+
       if (currency) {
         sendConfigs.amountConfig.setSendCurrency(currency);
       }
@@ -118,14 +124,14 @@ export const SendScreen: FunctionComponent = observer(() => {
             labelStyle={styles.sendlabelInput}
           />
           <AddressInput
-            placeholder="Type the receiver"
+            placeholder="Enter receiving address"
             label="Send to"
             recipientConfig={sendConfigs.recipientConfig}
             memoConfig={sendConfigs.memoConfig}
             labelStyle={styles.sendlabelInput}
           />
           <AmountInput
-            placeholder="Type the receiver"
+            placeholder="ex. 1000 ORAI"
             label="Amount"
             amountConfig={sendConfigs.amountConfig}
             labelStyle={styles.sendlabelInput}
