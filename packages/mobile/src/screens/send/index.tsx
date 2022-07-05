@@ -37,8 +37,7 @@ const styles = StyleSheet.create({
 });
 
 export const SendScreen: FunctionComponent = observer(() => {
-  const { chainStore, accountStore, queriesStore, analyticsStore, modalStore } =
-    useStore();
+  const { chainStore, accountStore, queriesStore, analyticsStore } = useStore();
   const safeAreaInsets = useSafeAreaInsets();
   const route = useRoute<
     RouteProp<
