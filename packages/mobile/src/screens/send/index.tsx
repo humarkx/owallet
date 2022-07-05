@@ -138,7 +138,7 @@ export const SendScreen: FunctionComponent = observer(() => {
             gasConfig={sendConfigs.gasConfig}
             labelStyle={styles.sendlabelInput}
           />
-           <MemoInput
+          <MemoInput
             label="Memo (Optional)"
             placeholder="Type your memo here"
             memoConfig={sendConfigs.memoConfig}
@@ -181,7 +181,11 @@ export const SendScreen: FunctionComponent = observer(() => {
                     return;
                   }
                   console.log('send error', e);
-                  smartNavigation.navigateSmart('Home', {});
+                  if (smartNavigation.canGoBack) {
+                    smartNavigation.goBack();
+                  } else {
+                    smartNavigation.navigateSmart('Home', {});
+                  }
                 }
               }
             }}
