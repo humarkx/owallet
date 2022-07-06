@@ -179,7 +179,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
 const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
   const { chainStore, modalStore } = useStore();
 
-  const deterministicNumber = useCallback((chainInfo) => {
+  const deterministicNumber = useCallback(chainInfo => {
     const bytes = Hash.sha256(
       Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
     );
@@ -189,10 +189,10 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
   }, []);
 
   const profileColor = useCallback(
-    (chainInfo) => {
-      const colors = ['red', 'green', 'orange', 'yellow'];
+    chainInfo => {
+      const random = [colors['purple-400']];
 
-      return colors[deterministicNumber(chainInfo) % colors.length];
+      return random[deterministicNumber(chainInfo) % random.length];
     },
     [deterministicNumber]
   );
@@ -928,7 +928,7 @@ export const MainTabNavigation: FunctionComponent = () => {
               return <RenderTabsBarIcon color={color} name={'Settings'} />;
           }
         },
-        tabBarButton: (props) => (
+        tabBarButton: props => (
           <View
             style={{
               display: 'flex',
@@ -965,7 +965,7 @@ export const MainTabNavigation: FunctionComponent = () => {
         },
         showLabel: false
       }}
-      tabBar={(props) => (
+      tabBar={props => (
         <BlurredBottomTabBar {...props} enabledScreens={['Home']} />
       )}
     >
@@ -1020,7 +1020,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
   const { keyRingStore, deepLinkUriStore } = useStore();
   useEffect(() => {
     Linking.getInitialURL()
-      .then((url) => {
+      .then(url => {
         if (url) {
           const SCHEME_IOS = 'owallet://open_url?url=';
           const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url=';
@@ -1029,7 +1029,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
           );
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.warn('Deeplinking error', err);
       });
     Linking.addEventListener('url', handleDeepLink);
