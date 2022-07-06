@@ -114,7 +114,6 @@ export const RedelegateScreen: FunctionComponent = observer(() => {
     sendConfigs.memoConfig.getError() ??
     sendConfigs.gasConfig.getError() ??
     sendConfigs.feeConfig.getError();
-
   const txStateIsValid = sendConfigError == null;
 
   const isDisable = !account.isReadyToSendMsgs || !txStateIsValid;
