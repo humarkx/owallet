@@ -1,17 +1,18 @@
-import React, { FunctionComponent, useRef, useState } from "react";
-import { PageWithScrollViewInBottomTabView } from "../../components/page";
+import React, { FunctionComponent, useRef, useState } from 'react';
+import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import {
   Image,
   ImageSourcePropType,
   StyleSheet,
-  Text,
   View,
-} from "react-native";
-import { useStyle } from "../../styles";
-import { useSmartNavigation } from "../../navigation";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { RectButton } from "../../components/rect-button";
-import Svg, { Path, G, Defs, ClipPath } from "react-native-svg";
+} from 'react-native';
+import { CText as Text} from "../../components/text";
+import { useStyle } from '../../styles';
+import { useSmartNavigation } from '../../navigation.provider';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RectButton } from '../../components/rect-button';
+import Svg, { Path, G, Defs, ClipPath } from 'react-native-svg';
+import { DAppInfos } from './config';
 
 export const WebScreen: FunctionComponent = () => {
   const style = useStyle();
@@ -22,9 +23,9 @@ export const WebScreen: FunctionComponent = () => {
 
   return (
     <PageWithScrollViewInBottomTabView
-      contentContainerStyle={style.get("flex-grow-1")}
+      contentContainerStyle={style.get('flex-grow-1')}
       style={StyleSheet.flatten([
-        style.flatten(["padding-x-20"]),
+        style.flatten(['padding-x-20']),
         {
           marginTop: safeAreaInsets.top,
         },
@@ -32,32 +33,25 @@ export const WebScreen: FunctionComponent = () => {
     >
       <Text
         style={style.flatten([
-          "h3",
-          "color-text-black-high",
-          "margin-top-44",
-          "margin-bottom-20",
+          'h3',
+          'color-text-black-high',
+          'margin-top-44',
+          'margin-bottom-20',
         ])}
       >
-        Discover DeFi
+        Access dApps
       </Text>
-      <WebpageImageButton
-        name="Osmosis"
-        source={require("../../assets/image/webpage/osmosis.png")}
-        onPress={() => {
-          smartNavigation.pushSmart("Web.Osmosis", {});
-        }}
-      />
-      <WebpageImageButton
-        overrideInner={
-          <View style={style.flatten(["flex-1", "items-center"])}>
-            <Text
-              style={style.flatten(["h4", "color-text-black-very-very-low"])}
-            >
-              Coming soon
-            </Text>
-          </View>
-        }
-      />
+      {DAppInfos.map(({ name, uri, logo }) => (
+        <WebpageImageButton
+          key={uri}
+          name={name}
+          source={logo}
+          logo={logo}
+          onPress={() => {
+            smartNavigation.pushSmart('Web.dApp', { name, uri });
+          }}
+        />
+      ))}
     </PageWithScrollViewInBottomTabView>
   );
 };
@@ -66,12 +60,12 @@ export const WebpageImageButton: FunctionComponent<{
   name?: string;
   source?: ImageSourcePropType;
   onPress?: () => void;
-
+  logo?: ImageSourcePropType;
   overrideInner?: React.ReactElement;
-}> = ({ name, source, onPress, overrideInner }) => {
+}> = ({ name, source, onPress, logo, overrideInner }) => {
   const style = useStyle();
 
-  const height = 104;
+  const height = 240;
 
   /*
     Adjust the size of image view manually because react native's resize mode doesn't provide the flexible API.
@@ -80,7 +74,7 @@ export const WebpageImageButton: FunctionComponent<{
    */
   const [imageSize, setImageSize] = useState<
     | {
-        width: number;
+        width: number | string;
         height: number;
       }
     | undefined
@@ -102,12 +96,12 @@ export const WebpageImageButton: FunctionComponent<{
     <View
       style={StyleSheet.flatten([
         style.flatten([
-          "flex-row",
-          "items-center",
-          "overflow-hidden",
-          "border-radius-8",
-          "background-color-big-image-placeholder",
-          "margin-bottom-16",
+          'flex-row',
+          'items-center',
+          'overflow-hidden',
+          'border-radius-16',
+          'background-color-big-image-placeholder',
+          'margin-bottom-16',
         ]),
         {
           height,
@@ -115,14 +109,15 @@ export const WebpageImageButton: FunctionComponent<{
       ])}
     >
       {source ? (
-        <View style={style.flatten(["absolute-fill", "items-end"])}>
+        <View style={style.flatten(['absolute-fill', 'items-end'])}>
           <Image
             ref={imageRef}
             style={
               imageSize
                 ? {
-                    width: imageSize.width,
-                    height: imageSize.height,
+                    resizeMode: 'stretch',
+                    width: '100%',
+                    height,
                   }
                 : {
                     opacity: 0,
@@ -132,25 +127,17 @@ export const WebpageImageButton: FunctionComponent<{
             source={source}
             fadeDuration={0}
           />
-          {imageSize ? (
-            <View
-              style={style.flatten([
-                "absolute-fill",
-                "background-color-black",
-                "opacity-40",
-              ])}
-            />
-          ) : null}
+          {imageSize ? <View style={style.flatten(['absolute-fill'])} /> : null}
         </View>
       ) : null}
-      <View style={style.flatten(["absolute-fill"])}>
+      <View style={style.flatten(['absolute-fill'])}>
         <RectButton
           style={StyleSheet.flatten([
-            style.flatten(["flex-row", "items-center", "padding-x-38"]),
+            style.flatten(['flex-row', 'padding-x-20', 'padding-y-20']),
             { height },
           ])}
           activeOpacity={0.2}
-          underlayColor={style.get("color-white").color}
+          underlayColor={style.get('color-white').color}
           enabled={onPress != null}
           onPress={onPress}
         >
@@ -158,13 +145,54 @@ export const WebpageImageButton: FunctionComponent<{
             overrideInner
           ) : (
             <React.Fragment>
-              <Text style={style.flatten(["h2", "color-white"])}>{name}</Text>
-              <View style={style.get("flex-1")} />
-              <GoIcon
-                width={34.7}
-                height={21}
-                color={style.get("color-white").color}
-              />
+              <View
+                style={[
+                  style.flatten([
+                    'flex-row',
+                    'items-center',
+                    'width-160',
+                    'height-44',
+                    'border-radius-32',
+                    'padding-x-12',
+                    'background-color-white',
+                  ]),
+                ]}
+              >
+                <Image
+                  ref={imageRef}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    marginRight: 8,
+                  }}
+                  onLoadEnd={onImageLoaded}
+                  source={logo}
+                  fadeDuration={0}
+                />
+                <Text style={style.flatten(['font-bold', 'subtitle1'])}>
+                  {name}
+                </Text>
+              </View>
+
+              <View style={style.get('flex-1')} />
+              <View
+                style={style.flatten([
+                  'flex-row',
+                  'items-center',
+                  'justify-center',
+                  'width-44',
+                  'height-44',
+                  'border-radius-32',
+                  'background-color-white',
+                  'font-bold',
+                ])}
+              >
+                <GoIcon
+                  width={20}
+                  height={20}
+                  color={style.get('color-black').color}
+                />
+              </View>
             </React.Fragment>
           )}
         </RectButton>
@@ -177,7 +205,7 @@ const GoIcon: FunctionComponent<{
   width?: number;
   height?: number;
   color?: string;
-}> = ({ width = 38, height = 23, color = "white" }) => {
+}> = ({ width = 38, height = 23, color = 'white' }) => {
   return (
     <Svg width={width} height={height} fill="none" viewBox="0 0 38 23">
       <G clipPath="url(#clip0_4026_25847)">

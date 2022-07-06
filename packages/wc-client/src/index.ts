@@ -10,7 +10,7 @@ import {
   OWalletMode,
   OWalletSignOptions,
   Key
-} from '@owallet-wallet/types';
+} from '@owallet/types';
 import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import {
   AminoSignResponse,
@@ -23,20 +23,18 @@ import {
 import {
   CosmJSOfflineSigner,
   CosmJSOfflineSignerOnlyAmino
-} from '@owallet-wallet/provider';
+} from '@owallet/provider';
 import { SecretUtils } from 'secretjs/types/enigmautils';
 import { payloadId } from '@walletconnect/utils';
 import deepmerge from 'deepmerge';
-import { Buffer } from 'buffer/';
-import { IndexedDBKVStore, KVStore } from '@owallet-wallet/common';
+import { Buffer } from 'buffer';
+import { IndexedDBKVStore, KVStore } from '@owallet/common';
 
 // VersionFormatRegExp checks if a chainID is in the format required for parsing versions
 // The chainID should be in the form: `{identifier}-{version}`
 const ChainVersionFormatRegExp = /(.+)-([\d]+)/;
 
-function parseChainId(
-  chainId: string
-): {
+function parseChainId(chainId: string): {
   identifier: string;
   version: number;
 } {
@@ -72,7 +70,7 @@ export type OWalletKeystoreMayChangedEventParam = {
   }[];
 };
 
-export class OWalletWalletConnectV1 implements OWallet {
+export class OWalletConnectV1 implements OWallet {
   constructor(
     public readonly connector: IConnector,
     public readonly options: {
@@ -90,7 +88,7 @@ export class OWalletWalletConnectV1 implements OWallet {
     } = {}
   ) {
     if (!options.kvStore) {
-      options.kvStore = new IndexedDBKVStore('owallet_wallet_connect');
+      options.kvStore = new IndexedDBKVStore('keplr_wallet_connect');
     }
 
     connector.on('disconnect', () => {
@@ -119,7 +117,7 @@ export class OWalletWalletConnectV1 implements OWallet {
     }
 
     if (
-      payload.method === 'owallet_keystore_may_changed_event_wallet_connect_v1'
+      payload.method === 'keplr_keystore_may_changed_event_wallet_connect_v1'
     ) {
       const param = payload.params[0] as
         | OWalletKeystoreMayChangedEventParam
@@ -174,7 +172,7 @@ export class OWalletWalletConnectV1 implements OWallet {
 
       if (hasChanged) {
         await this.saveAllLastSeenKey(lastSeenKeys);
-        window.dispatchEvent(new Event('owallet_keystorechange'));
+        window.dispatchEvent(new Event('keplr_keystorechange'));
       }
     }
   };
@@ -226,7 +224,7 @@ export class OWalletWalletConnectV1 implements OWallet {
     await this.sendCustomRequest({
       id: payloadId(),
       jsonrpc: '2.0',
-      method: 'owallet_enable_wallet_connect_v1',
+      method: 'keplr_enable_wallet_connect_v1',
       params: chainIds
     });
 
@@ -309,7 +307,7 @@ export class OWalletWalletConnectV1 implements OWallet {
       await this.sendCustomRequest({
         id: payloadId(),
         jsonrpc: '2.0',
-        method: 'owallet_get_key_wallet_connect_v1',
+        method: 'keplr_get_key_wallet_connect_v1',
         params: [chainId]
       })
     )[0] as OWalletGetKeyWalletCoonectV1Response;
@@ -414,7 +412,7 @@ export class OWalletWalletConnectV1 implements OWallet {
   /**
    * In the extension environment, this API let the extension to send the tx on behalf of the client.
    * But, in the wallet connect environment, in order to send the tx on behalf of the client, wallet should receive the tx data from remote.
-   * However, this approach is not efficient and hard to ensure the stability and `OWalletWalletConnect` should have the informations of rpc and rest endpoints.
+   * However, this approach is not efficient and hard to ensure the stability and `OWalletConnect` should have the informations of rpc and rest endpoints.
    * So, rather than implementing this, just fallback to the client sided implementation or throw error of the client sided implementation is not delivered to the `options`.
    * @param chainId
    * @param stdTx
@@ -442,7 +440,7 @@ export class OWalletWalletConnectV1 implements OWallet {
       await this.sendCustomRequest({
         id: payloadId(),
         jsonrpc: '2.0',
-        method: 'owallet_sign_amino_wallet_connect_v1',
+        method: 'keplr_sign_amino_wallet_connect_v1',
         params: [
           chainId,
           signer,

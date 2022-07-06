@@ -4,20 +4,23 @@ import {
   PrivKeySecp256k1,
   PubKeySecp256k1,
   RNG
-} from '@owallet-wallet/crypto';
-import { KVStore } from '@owallet-wallet/common';
+} from '@owallet/crypto';
+import { KVStore } from '@owallet/common';
 import { LedgerService } from '../ledger';
 import { BIP44HDPath, CommonCrypto, ExportKeyRingData } from './types';
-import { ChainInfo } from '@owallet-wallet/types';
-import { Env } from '@owallet-wallet/router';
+import { ChainInfo } from '@owallet/types';
+import { Env, OWalletError } from '@owallet/router';
 
-import { Buffer } from 'buffer/';
-import { ChainIdHelper } from '@owallet-wallet/cosmos';
+import { Buffer } from 'buffer';
+import { ChainIdHelper } from '@owallet/cosmos';
 
 import { Wallet } from '@ethersproject/wallet';
 import * as BytesUtils from '@ethersproject/bytes';
 import { ETH } from '@tharsis/address-converter';
 import { keccak256 } from '@ethersproject/keccak256';
+import Common from '@ethereumjs/common';
+import { TransactionOptions, Transaction } from 'ethereumjs-tx';
+import { request } from '../tx';
 
 export enum KeyRingStatus {
   NOTLOADED,
@@ -520,7 +523,7 @@ export class KeyRing {
         // If there is a key store left
         if (multiKeyStore.length > 0) {
           // Lock key store at first
-          await this.lock();
+          this.lock();
           // Select first key store
           this.keyStore = multiKeyStore[0];
           // And unlock it
@@ -670,13 +673,13 @@ export class KeyRing {
     message: Uint8Array
   ): Promise<Uint8Array> {
     if (this.status !== KeyRingStatus.UNLOCKED) {
-      throw new Error('Key ring is not unlocked');
+      throw new OWalletError('keyring', 143, 'Key ring is not unlocked');
     }
 
     if (!this.keyStore) {
-      throw new Error('Key Store is empty');
+      throw new OWalletError('keyring', 130, 'Key store is empty');
     }
-
+    // get here
     // Sign with Evmos/Ethereum
     const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
     if (coinType === 60) {
@@ -687,7 +690,11 @@ export class KeyRing {
       const pubKey = this.ledgerPublicKey;
 
       if (!pubKey) {
-        throw new Error('Ledger public key is not initialized');
+        throw new OWalletError(
+          'keyring',
+          151,
+          'Ledger public key is not initialized'
+        );
       }
 
       return await this.ledgerKeeper.sign(
@@ -701,6 +708,83 @@ export class KeyRing {
 
       const privKey = this.loadPrivKey(coinType);
       return privKey.sign(message);
+    }
+  }
+
+  validateChainId(chainId: string): number {
+    // chain id example: kawaii_6886-1. If chain id input is already a number in string => parse it immediately
+    if (isNaN(parseInt(chainId))) {
+      const firstSplit = chainId.split('_')[1];
+      if (firstSplit) {
+        const chainId = parseInt(firstSplit.split('-')[0]);
+        return chainId;
+      }
+      throw new Error('Invalid chain id. Please try again');
+    }
+    return parseInt(chainId);
+  }
+
+  public async signAndBroadcastEthereum(
+    chainId: string,
+    coinType: number,
+    rpc: string,
+    message: object
+  ): Promise<string> {
+    console.log('sign raw ethereum');
+    if (this.status !== KeyRingStatus.UNLOCKED) {
+      throw new Error('Key ring is not unlocked');
+    }
+
+    if (!this.keyStore) {
+      throw new Error('Key Store is empty');
+    }
+
+    const cType = this.computeKeyStoreCoinType(chainId, coinType);
+    if (cType !== 60) {
+      throw new Error(
+        'Invalid coin type passed in to Ethereum signing (expected 60)'
+      );
+    }
+
+    if (this.keyStore.type === 'ledger') {
+      // TODO: Ethereum Ledger Integration
+      throw new Error('Ethereum signing with Ledger is not yet supported');
+    } else {
+      const privKey = this.loadPrivKey(coinType);
+      const chainIdNumber = this.validateChainId(chainId);
+      const customCommon = Common.custom({
+        name: chainId,
+        networkId: chainIdNumber,
+        chainId: chainIdNumber
+      });
+
+      const signer = new Wallet(privKey.toBytes()).address;
+      const nonce = await request(rpc, 'eth_getTransactionCount', [
+        signer,
+        'latest'
+      ]);
+
+      // auto gas
+      const estimatedGas = await request(rpc, 'eth_estimateGas', [message]);
+      const gasPrice = await request(rpc, 'eth_gasPrice', []);
+      let finalMessage = { ...message };
+      if (!(message as any).gasPrice || !(message as any).gas) {
+        if (estimatedGas.substring(0, 2) === '0x') {
+          finalMessage = { ...message, gas: estimatedGas, gasPrice };
+        }
+      }
+
+      finalMessage = { ...finalMessage, nonce };
+
+      const opts: TransactionOptions = { common: customCommon } as any;
+      const tx = new Transaction(finalMessage, opts);
+      tx.sign(Buffer.from(privKey.toBytes()));
+
+      const serializedTx = tx.serialize();
+      const rawTxHex = '0x' + serializedTx.toString('hex');
+
+      const response = await request(rpc, 'eth_sendRawTransaction', [rawTxHex]);
+      return response;
     }
   }
 
@@ -733,9 +817,7 @@ export class KeyRing {
       // Use ether js to sign Ethereum tx
       const ethWallet = new Wallet(privKey.toBytes());
 
-      const signature = await ethWallet
-        ._signingKey()
-        .signDigest(keccak256(message));
+      const signature = ethWallet._signingKey().signDigest(keccak256(message));
       const splitSignature = BytesUtils.splitSignature(signature);
       return BytesUtils.arrayify(
         BytesUtils.concat([splitSignature.r, splitSignature.s])
@@ -865,9 +947,7 @@ export class KeyRing {
     };
   }
 
-  public async changeKeyStoreFromMultiKeyStore(
-    index: number
-  ): Promise<{
+  public async changeKeyStoreFromMultiKeyStore(index: number): Promise<{
     multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
   }> {
     if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
@@ -1037,9 +1117,7 @@ export class KeyRing {
     );
   }
 
-  private async assignKeyStoreIdMeta(meta: {
-    [key: string]: string;
-  }): Promise<{
+  private async assignKeyStoreIdMeta(meta: { [key: string]: string }): Promise<{
     [key: string]: string;
   }> {
     // `__id__` is used to distinguish the key store.

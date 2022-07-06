@@ -1,15 +1,17 @@
-import { AppCurrency } from '@owallet-wallet/types';
-import { cosmos, UnknownMessage } from '@owallet-wallet/cosmos';
+import { AppCurrency } from '@owallet/types';
+import { cosmos, cosmwasm, UnknownMessage } from '@owallet/cosmos';
+import { fromUtf8 } from '@cosmjs/encoding';
 import {
   renderMsgBeginRedelegate,
   renderMsgDelegate,
+  renderMsgExecuteContract,
   renderMsgSend,
   renderMsgUndelegate,
   renderUnknownMessage
 } from './messages';
-import { CoinPrimitive } from '@owallet-wallet/stores';
+import { CoinPrimitive } from '@owallet/stores';
 
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 
 export function renderDirectMessage(msg: any, currencies: AppCurrency[]) {
   if (msg instanceof cosmos.bank.v1beta1.MsgSend) {
@@ -42,6 +44,26 @@ export function renderDirectMessage(msg: any, currencies: AppCurrency[]) {
       currencies,
       msg.amount as CoinPrimitive,
       msg.validatorAddress
+    );
+  }
+
+  if (msg instanceof cosmwasm.wasm.v1.MsgExecuteContract) {
+    return renderMsgExecuteContract(
+      currencies,
+      msg.funds as CoinPrimitive[],
+      undefined,
+      msg.contract,
+      JSON.parse(fromUtf8(msg.msg))
+    );
+  }
+
+  if (msg instanceof cosmwasm.wasm.v1beta1.MsgExecuteContract) {
+    return renderMsgExecuteContract(
+      currencies,
+      msg.sent_funds as CoinPrimitive[],
+      undefined,
+      msg.contract,
+      JSON.parse(fromUtf8(msg.msg))
     );
   }
 

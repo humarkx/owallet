@@ -5,10 +5,11 @@ import { InteractionWaitingData } from './types';
 import {
   Env,
   FnRequestInteractionOptions,
-  MessageRequester
-} from '@owallet-wallet/router';
+  MessageRequester,
+  OWalletError
+} from '@owallet/router';
 import { PushEventDataMsg, PushInteractionDataMsg } from './foreground';
-import { RNG } from '@owallet-wallet/crypto';
+import { RNG } from '@owallet/crypto';
 
 @singleton()
 export class InteractionService {
@@ -49,7 +50,7 @@ export class InteractionService {
     options?: FnRequestInteractionOptions
   ): Promise<unknown> {
     if (!type) {
-      throw new Error('Type should not be empty');
+      throw new OWalletError('interaction', 101, 'Type should not be empty');
     }
 
     // TODO: Add timeout?
@@ -68,7 +69,7 @@ export class InteractionService {
 
   protected async wait(id: string, fn: () => void): Promise<unknown> {
     if (this.resolverMap.has(id)) {
-      throw new Error('Id is aleady in use');
+      throw new OWalletError('interaction', 100, 'Id is aleady in use');
     }
 
     return new Promise<unknown>((resolve, reject) => {
@@ -121,7 +122,7 @@ export class InteractionService {
     };
 
     if (this.waitingMap.has(id)) {
-      throw new Error('Id is aleady in use');
+      throw new OWalletError('interaction', 100, 'Id is aleady in use');
     }
 
     this.waitingMap.set(id, interactionWaitingData);

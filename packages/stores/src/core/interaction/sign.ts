@@ -1,9 +1,9 @@
 import { InteractionStore } from './interaction';
 import { autorun, computed, flow, makeObservable, observable } from 'mobx';
 import { StdSignDoc } from '@cosmjs/launchpad';
-import { InteractionWaitingData } from '@owallet-wallet/background';
-import { SignDocWrapper } from '@owallet-wallet/cosmos';
-import { OWalletSignOptions } from '@owallet-wallet/types';
+import { InteractionWaitingData } from '@owallet/background';
+import { SignDocWrapper } from '@owallet/cosmos';
+import { OWalletSignOptions } from '@owallet/types';
 
 export class SignInteractionStore {
   @observable
@@ -16,6 +16,7 @@ export class SignInteractionStore {
       // Reject all interactions that is not first one.
       // This interaction can have only one interaction at once.
       const datas = this.waitingDatas.slice();
+
       if (datas.length > 1) {
         for (let i = 1; i < datas.length; i++) {
           this.rejectWithId(datas[i].id);
@@ -27,36 +28,36 @@ export class SignInteractionStore {
   protected get waitingDatas() {
     return this.interactionStore.getDatas<
       | {
-          msgOrigin: string;
-          chainId: string;
-          mode: 'amino';
-          signer: string;
-          signDoc: StdSignDoc;
-          signOptions: OWalletSignOptions;
-          isADR36SignDoc: boolean;
-          isADR36WithString?: boolean;
-        }
+        msgOrigin: string;
+        chainId: string;
+        mode: 'amino';
+        signer: string;
+        signDoc: StdSignDoc;
+        signOptions: OWalletSignOptions;
+        isADR36SignDoc: boolean;
+        isADR36WithString?: boolean;
+      }
       | {
-          msgOrigin: string;
-          chainId: string;
-          mode: 'direct';
-          signer: string;
-          signDocBytes: Uint8Array;
-          signOptions: OWalletSignOptions;
-        }
+        msgOrigin: string;
+        chainId: string;
+        mode: 'direct';
+        signer: string;
+        signDocBytes: Uint8Array;
+        signOptions: OWalletSignOptions;
+      }
     >('request-sign');
   }
 
   @computed
   get waitingData():
     | InteractionWaitingData<{
-        chainId: string;
-        msgOrigin: string;
-        signer: string;
-        signDocWrapper: SignDocWrapper;
-        signOptions: OWalletSignOptions;
-        isADR36WithString?: boolean;
-      }>
+      chainId: string;
+      msgOrigin: string;
+      signer: string;
+      signDocWrapper: SignDocWrapper;
+      signOptions: OWalletSignOptions;
+      isADR36WithString?: boolean;
+    }>
     | undefined {
     const datas = this.waitingDatas;
 
@@ -114,6 +115,7 @@ export class SignInteractionStore {
 
   @flow
   *approveAndWaitEnd(newSignDocWrapper: SignDocWrapper) {
+    console.log("approve and wait end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     if (this.waitingDatas.length === 0) {
       return;
     }

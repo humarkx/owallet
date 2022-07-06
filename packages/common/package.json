@@ -1,5 +1,5 @@
 {
-  "name": "@owallet-wallet/common",
+  "name": "@owallet/common",
   "version": "0.9.10",
   "main": "build/index.js",
   "author": "chainapsis",
@@ -17,8 +17,14 @@
     "lint-fix": "eslint --fix \"src/**/*\" && prettier --write \"src/**/*\""
   },
   "dependencies": {
-    "@owallet-wallet/crypto": "^0.9.10",
+    "@owallet/crypto": "^0.9.10",
+    "@owallet/cosmos": "^0.9.16",
+    "@owallet/types": "^0.9.12",
     "buffer": "^6.0.3",
-    "delay": "^4.4.0"
+    "delay": "^4.4.0",
+    "axios": "^0.21.4"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0"
   }
 }

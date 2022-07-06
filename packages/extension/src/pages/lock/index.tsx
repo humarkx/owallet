@@ -14,7 +14,7 @@ import { EmptyLayout } from '../../layouts/empty-layout';
 import style from './style.module.scss';
 
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useInteractionInfo } from '@owallet-wallet/hooks';
+import { useInteractionInfo } from '@owallet/hooks';
 import { useHistory } from 'react-router';
 import delay from 'delay';
 
@@ -35,6 +35,7 @@ export const LockPage: FunctionComponent = observer(() => {
   });
 
   const { keyRingStore } = useStore();
+
   const [loading, setLoading] = useState(false);
 
   const interactionInfo = useInteractionInfo(() => {
@@ -88,7 +89,7 @@ export const LockPage: FunctionComponent = observer(() => {
         <Banner
           icon={require('../../public/assets/orai_wallet_logo.png')}
           logo={require('../../public/assets/logo-temp.png')}
-          subtitle="Wallet for the Interchain"
+          subtitle="Cosmos x EVM in one Wallet"
         />
         <PasswordInput
           label={intl.formatMessage({

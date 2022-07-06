@@ -1,19 +1,26 @@
 /* eslint-disable react/display-name */
 
-import React, { FunctionComponent, useMemo } from 'react';
-import { CoinUtils, Coin } from '@owallet-wallet/unit';
-import { AppCurrency } from '@owallet-wallet/types';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { CoinUtils, Coin } from '@owallet/unit';
+import { AppCurrency, Currency } from '@owallet/types';
 import yaml from 'js-yaml';
-import { CoinPrimitive } from '@owallet-wallet/stores';
-import { Text } from 'react-native';
+import { CoinPrimitive } from '@owallet/stores';
+import { CText as Text } from '../../components/text';
 import { useStyle } from '../../styles';
-import { Bech32Address } from '@owallet-wallet/cosmos';
+import { Bech32Address } from '@owallet/cosmos';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import Hypher from 'hypher';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import english from 'hyphenation.en-us';
+import { useStore } from '../../stores';
+import { Buffer } from 'buffer';
+import { observer } from 'mobx-react-lite';
+import { FormattedMessage } from 'react-intl';
+import { Badge } from '../../components/badge';
+import { StyleSheet, View } from 'react-native';
+import { colors, typography } from '../../themes';
 
 const h = new Hypher(english);
 
@@ -133,13 +140,20 @@ export interface MsgExecuteContract {
     // eslint-disable-next-line @typescript-eslint/ban-types
     msg: object | string;
     sender: string;
-    sent_funds: [
+    // The field is for wasm message.
+    funds?: [
       {
         amount: string;
         denom: string;
       }
     ];
-    // The bottom two fields are for secret-wasm message.
+    // The bottom fields are for secret-wasm message.
+    sent_funds?: [
+      {
+        amount: string;
+        denom: string;
+      }
+    ];
     callback_code_hash?: string;
     callback_sig?: string | null;
   };
@@ -186,21 +200,37 @@ export function renderMsgSend(
   return {
     title: 'Send',
     content: (
-      <Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(Bech32Address.shortenAddress(toAddress, 20))}
-        </Text>
-        <Text>{' will receive '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(
-            receives
-              .map((coin) => {
-                return `${coin.amount} ${coin.denom}`;
-              })
-              .join(',')
-          )}
-        </Text>
-      </Text>
+      <View style={{}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>To </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(Bech32Address.shortenAddress(toAddress, 20))}
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>Amount </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(
+              receives
+                .map(coin => {
+                  return `${coin.amount} ${coin.denom}`;
+                })
+                .join(',')
+            )}
+          </Text>
+        </View>
+        {/* <Text>{' will receive '}</Text> */}
+      </View>
     )
   };
 }
@@ -221,23 +251,50 @@ export function renderMsgTransfer(
 
   return {
     title: 'IBC Transfer',
+    // content: (
+    //   <Text>
+    //     <Text>{'Send '}</Text>
+    //     <Text
+    //       style={{
+    //         fontWeight: 'bold'
+    //       }}
+    //     >
+    //       {hyphen(`${amount.amount} ${amount.denom}`)}
+    //     </Text>
+    //     <Text>{' to '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>
+    //       {hyphen(Bech32Address.shortenAddress(receiver, 20))}
+    //     </Text>
+    //     <Text>{' on '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>{channelId}</Text>
+    //   </Text>
+    // )
     content: (
-      <Text>
-        <Text>{'Send '}</Text>
-        <Text
+      <View style={{}}>
+        <View
           style={{
-            fontWeight: 'bold'
+            flexDirection: 'row',
+            justifyContent: 'space-between'
           }}
         >
-          {hyphen(`${amount.amount} ${amount.denom}`)}
-        </Text>
-        <Text>{' to '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(Bech32Address.shortenAddress(receiver, 20))}
-        </Text>
-        <Text>{' on '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>{channelId}</Text>
-      </Text>
+          <Text style={{ ...styles.textInfo }}>To </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(Bech32Address.shortenAddress(receiver, 20))}
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>Amount </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(`${amount.amount} ${amount.denom}`)}
+          </Text>
+        </View>
+        {/* <Text>{' will receive '}</Text> */}
+      </View>
     )
   };
 }
@@ -297,20 +354,47 @@ export function renderMsgUndelegate(
   return {
     title: 'Unstake',
     content: (
-      <Text>
-        <Text>{'Unstake '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(`${amount.amount} ${amount.denom}`)}
-        </Text>
-        <Text>{' from '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(Bech32Address.shortenAddress(validatorAddress, 24))}
-        </Text>
-        <Text>{`\n${hyphen(
-          'Asset will be liquid after unbonding period'
-        )}`}</Text>
-      </Text>
+      <View style={{}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>To </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(Bech32Address.shortenAddress(validatorAddress, 24))}
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>Amount </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(`${amount.amount} ${amount.denom}`)}
+          </Text>
+        </View>
+        {/* <Text>{' will receive '}</Text> */}
+      </View>
     )
+    // content: (
+    //   <Text>
+    //     <Text>{'Unstake '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>
+    //       {hyphen(`${amount.amount} ${amount.denom}`)}
+    //     </Text>
+    //     <Text>{' from '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>
+    //       {hyphen(Bech32Address.shortenAddress(validatorAddress, 24))}
+    //     </Text>
+    //     <Text>{`\n${hyphen(
+    //       'Asset will be liquid after unbonding period'
+    //     )}`}</Text>
+    //   </Text>
+    // )
   };
 }
 
@@ -334,17 +418,44 @@ export function renderMsgDelegate(
   return {
     title: 'Stake',
     content: (
-      <Text>
-        <Text>{'Stake '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(`${amount.amount} ${amount.denom}`)}
-        </Text>
-        <Text>{' to '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(Bech32Address.shortenAddress(validatorAddress, 24))}
-        </Text>
-      </Text>
+      <View style={{}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>To </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(Bech32Address.shortenAddress(validatorAddress, 24))}
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>Amount </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(`${amount.amount} ${amount.denom}`)}
+          </Text>
+        </View>
+        {/* <Text>{' will receive '}</Text> */}
+      </View>
     )
+    // content: (
+    //   <Text>
+    //     <Text>{'Stake '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>
+    //       {hyphen(`${amount.amount} ${amount.denom}`)}
+    //     </Text>
+    //     <Text>{' to '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>
+    //       {hyphen(Bech32Address.shortenAddress(validatorAddress, 24))}
+    //     </Text>
+    //   </Text>
+    // )
   };
 }
 
@@ -352,13 +463,29 @@ export function renderMsgWithdrawDelegatorReward(validatorAddress: string) {
   return {
     title: 'Claim Staking Reward',
     content: (
-      <Text>
-        <Text>{'Claim pending staking reward from '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>
-          {hyphen(Bech32Address.shortenAddress(validatorAddress, 34))}
-        </Text>
-      </Text>
+      <View style={{}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>To </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {hyphen(Bech32Address.shortenAddress(validatorAddress, 20))}
+          </Text>
+        </View>
+        {/* <Text>{' will receive '}</Text> */}
+      </View>
     )
+    // content: (
+    //   <Text>
+    //     <Text>{'Claim pending staking reward from '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>
+    //       {hyphen(Bech32Address.shortenAddress(validatorAddress, 34))}
+    //     </Text>
+    //   </Text>
+    // )
   };
 }
 
@@ -389,73 +516,41 @@ export function renderMsgVote(proposalId: string, option: string | number) {
   return {
     title: 'Vote',
     content: (
-      <Text>
-        <Text>{'Vote '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>{textualOption}</Text>
-        <Text>{' on '}</Text>
-        <Text style={{ fontWeight: 'bold' }}>{`Proposal ${proposalId}`}</Text>
-      </Text>
-    )
-  };
-}
-
-/*
-export function renderMsgInstantiateContract(
-  currencies: Currency[],
-  intl: IntlShape,
-  initFunds: CoinPrimitive[],
-  admin: string | undefined,
-  codeId: string,
-  label: string,
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  initMsg: object
-) {
-  const funds: { amount: string; denom: string }[] = [];
-  for (const coinPrimitive of initFunds) {
-    const coin = new Coin(coinPrimitive.denom, coinPrimitive.amount);
-    const parsed = CoinUtils.parseDecAndDenomFromCoin(currencies, coin);
-
-    funds.push({
-      amount: clearDecimals(parsed.amount),
-      denom: parsed.denom,
-    });
-  }
-
-  return {
-    icon: "fas fa-cog",
-    title: intl.formatMessage({
-      id: "sign.list.message.wasm/MsgInstantiateContract.title",
-    }),
-    content: (
-      <React.Fragment>
-        <FormattedMessage
-          id="sign.list.message.wasm/MsgInstantiateContract.content"
-          values={{
-            b: (...chunks: any[]) => <b>{chunks}</b>,
-            br: <br />,
-            admin: admin ? Bech32Address.shortenAddress(admin, 30) : "",
-            ["only-admin-exist"]: (...chunks: any[]) => (admin ? chunks : ""),
-            codeId: codeId,
-            label: label,
-            ["only-funds-exist"]: (...chunks: any[]) =>
-              funds.length > 0 ? chunks : "",
-            funds: funds
-              .map((coin) => {
-                return `${coin.amount} ${coin.denom}`;
-              })
-              .join(","),
+      <View style={{}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
           }}
-        />
-        <br />
-        <WasmExecutionMsgView msg={initMsg} />
-      </React.Fragment>
-    ),
+        >
+          <Text style={{ ...styles.textInfo }}>Vote </Text>
+          <Text style={{ fontWeight: 'bold' }}>{textualOption}</Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Text style={{ ...styles.textInfo }}>Proposal </Text>
+          <Text style={{ fontWeight: 'bold' }}>{proposalId}</Text>
+        </View>
+        {/* <Text>{' will receive '}</Text> */}
+      </View>
+    )
+    // content: (
+    //   <Text>
+    //     <Text>{'Vote '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>{textualOption}</Text>
+    //     <Text>{' on '}</Text>
+    //     <Text style={{ fontWeight: 'bold' }}>{`Proposal ${proposalId}`}</Text>
+    //   </Text>
+    // )
   };
 }
 
 export function renderMsgExecuteContract(
   currencies: Currency[],
-  intl: IntlShape,
   sentFunds: CoinPrimitive[],
   callbackCodeHash: string | undefined,
   contract: string,
@@ -469,51 +564,48 @@ export function renderMsgExecuteContract(
 
     sent.push({
       amount: clearDecimals(parsed.amount),
-      denom: parsed.denom,
+      denom: parsed.denom
     });
   }
 
   const isSecretWasm = callbackCodeHash != null;
 
   return {
-    icon: "fas fa-cog",
-    title: intl.formatMessage({
-      id: "sign.list.message.wasm/MsgExecuteContract.title",
-    }),
+    icon: 'fas fa-cog',
+    title: 'Execute Wasm Contract',
     content: (
-      <React.Fragment>
-        <FormattedMessage
-          id="sign.list.message.wasm/MsgExecuteContract.content"
-          values={{
-            b: (...chunks: any[]) => <b>{chunks}</b>,
-            br: <br />,
-            address: Bech32Address.shortenAddress(contract, 26),
-            ["only-sent-exist"]: (...chunks: any[]) =>
-              sent.length > 0 ? chunks : "",
-            sent: sent
-              .map((coin) => {
-                return `${coin.amount} ${coin.denom}`;
-              })
-              .join(","),
-          }}
-        />
-        {isSecretWasm ? (
+      <Text>
+        <Text>
+          <Text>Execute contract </Text>
+          <Text style={{ fontWeight: 'bold' }}>
+            {Bech32Address.shortenAddress(contract, 26)}
+          </Text>
+          {sent.length > 0 ? (
+            <Text>
+              <Text> by sending </Text>
+              <Text style={{ fontWeight: 'bold' }}>
+                {sent
+                  .map(coin => {
+                    return `${coin.amount} ${coin.denom}`;
+                  })
+                  .join(',')}
+              </Text>
+            </Text>
+          ) : undefined}
+        </Text>
+        {isSecretWasm && (
           <React.Fragment>
-            <br />
             <Badge
               color="primary"
-              pill
-              style={{ marginTop: "6px", marginBottom: "6px" }}
+              style={{ marginTop: '6px', marginBottom: '6px' }}
             >
               <FormattedMessage id="sign.list.message.wasm/MsgExecuteContract.content.badge.secret-wasm" />
             </Badge>
           </React.Fragment>
-        ) : (
-          <br />
         )}
         <WasmExecutionMsgView msg={msg} />
-      </React.Fragment>
-    ),
+      </Text>
+    )
   };
 }
 
@@ -523,37 +615,38 @@ export const WasmExecutionMsgView: FunctionComponent<{
 }> = observer(({ msg }) => {
   const { chainStore, accountStore } = useStore();
 
-  const [isOpen, setIsOpen] = useState(true);
-  const intl = useIntl();
+  const style = useStyle();
 
-  const toggleOpen = () => setIsOpen((isOpen) => !isOpen);
+  // TODO: Toggle open button?
+  // const [isOpen, setIsOpen] = useState(true);
+  // const toggleOpen = () => setIsOpen((isOpen) => !isOpen);
 
   const [detailsMsg, setDetailsMsg] = useState(() =>
     JSON.stringify(msg, null, 2)
   );
-  const [warningMsg, setWarningMsg] = useState("");
+  const [warningMsg, setWarningMsg] = useState('');
 
   useEffect(() => {
     // If msg is string, it will be the message for secret-wasm.
     // So, try to decrypt.
-    // But, if this msg is not encrypted via OWallet, OWallet cannot decrypt it.
-    // TODO: Handle the error case. If an error occurs, rather than rejecting the signing, it informs the user that Kepler cannot decrypt it and allows the user to choose.
-    if (typeof msg === "string") {
+    // But, if this msg is not encrypted via Keplr, Keplr cannot decrypt it.
+    // TODO: Handle the error case. If an error occurs, rather than rejecting the signing, it informs the user that Keplr cannot decrypt it and allows the user to choose.
+    if (typeof msg === 'string') {
       (async () => {
         try {
-          let cipherText = Buffer.from(Buffer.from(msg, "base64"));
+          let cipherText = Buffer.from(Buffer.from(msg, 'base64'));
           // Msg is start with 32 bytes nonce and 32 bytes public key.
           const nonce = cipherText.slice(0, 32);
           cipherText = cipherText.slice(64);
 
-          const owallet = await accountStore
+          const keplr = await accountStore
             .getAccount(chainStore.current.chainId)
             .getOWallet();
-          if (!owallet) {
-            throw new Error("Can't get the owallet API");
+          if (!keplr) {
+            throw new Error("Can't get the keplr API");
           }
 
-          const enigmaUtils = owallet.getEnigmaUtils(chainStore.current.chainId);
+          const enigmaUtils = keplr.getEnigmaUtils(chainStore.current.chainId);
           let plainText = Buffer.from(
             await enigmaUtils.decrypt(cipherText, nonce)
           );
@@ -563,49 +656,25 @@ export const WasmExecutionMsgView: FunctionComponent<{
           setDetailsMsg(
             JSON.stringify(JSON.parse(plainText.toString()), null, 2)
           );
-          setWarningMsg("");
+          setWarningMsg('');
         } catch {
           setWarningMsg(
-            intl.formatMessage({
-              id:
-                "sign.list.message.wasm/MsgExecuteContract.content.warning.secret-wasm.failed-decryption",
-            })
+            'Failed to decrypt Secret message. This may be due to Keplr viewing key not matching the transaction viewing key.'
           );
         }
       })();
     }
-  }, [chainStore, chainStore.current.chainId, intl, msg]);
+  }, [accountStore, chainStore, chainStore.current.chainId, msg]);
 
   return (
-    <div>
-      {isOpen ? (
-        <React.Fragment>
-          <pre style={{ width: "280px" }}>{isOpen ? detailsMsg : ""}</pre>
-          {warningMsg ? <div>{warningMsg}</div> : null}
-        </React.Fragment>
+    <Text style={style.flatten(['margin-top-8'])}>
+      <Text>{`\n${detailsMsg}`}</Text>
+      {warningMsg ? (
+        <Text style={style.flatten(['color-danger-200'])}>{warningMsg}</Text>
       ) : null}
-      <Button
-        size="sm"
-        style={{ float: "right", marginRight: "6px" }}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          toggleOpen();
-        }}
-      >
-        {isOpen
-          ? intl.formatMessage({
-              id: "sign.list.message.wasm.button.close",
-            })
-          : intl.formatMessage({
-              id: "sign.list.message.wasm.button.details",
-            })}
-      </Button>
-    </div>
+    </Text>
   );
 });
- */
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const UnknownMsgView: FunctionComponent<{ msg: object }> = ({ msg }) => {
@@ -645,3 +714,11 @@ export function clearDecimals(dec: string): string {
 
   return dec;
 }
+
+const styles = StyleSheet.create({
+  textInfo: {
+    ...typography.h6,
+    fontWeight: '400',
+    color: colors['text-black-medium']
+  }
+});

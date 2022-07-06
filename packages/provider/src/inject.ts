@@ -2,12 +2,16 @@ import {
   ChainInfo,
   OWallet,
   OWallet as IOWallet,
+  Ethereum,
+  Ethereum as IEthereum,
   OWalletIntereactionOptions,
   OWalletMode,
   OWalletSignOptions,
-  Key
-} from '@owallet-wallet/types';
-import { Result, JSONUint8Array } from '@owallet-wallet/router';
+  Key,
+  EthereumMode,
+  RequestArguments
+} from '@owallet/types';
+import { Result, JSONUint8Array } from '@owallet/router';
 import {
   BroadcastMode,
   AminoSignResponse,
@@ -24,17 +28,20 @@ import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } from './cosmjs';
 import deepmerge from 'deepmerge';
 import Long from 'long';
+import { NAMESPACE, NAMESPACE_ETHEREUM } from './constants';
 
 export interface ProxyRequest {
   type: 'proxy-request';
   id: string;
-  method: keyof OWallet;
+  namespace: string;
+  method: keyof OWallet | Ethereum | string;
   args: any[];
 }
 
 export interface ProxyRequestResponse {
   type: 'proxy-request-response';
   id: string;
+  namespace: string;
   result: Result | undefined;
 }
 
@@ -58,11 +65,18 @@ export class InjectedOWallet implements IOWallet {
     },
     parseMessage?: (message: any) => any
   ) {
-    eventListener.addMessageListener(async (e: any) => {
+    // listen method when inject send to
+    eventListener.addMessageListener(async (e: MessageEvent) => {
       const message: ProxyRequest = parseMessage
         ? parseMessage(e.data)
         : e.data;
-      if (!message || message.type !== 'proxy-request') {
+
+      // filter proxy-request by namespace
+      if (
+        !message ||
+        message.type !== 'proxy-request' ||
+        message.namespace !== NAMESPACE
+      ) {
         return;
       }
 
@@ -84,8 +98,8 @@ export class InjectedOWallet implements IOWallet {
         }
 
         if (
-          !owallet[message.method] ||
-          typeof owallet[message.method] !== 'function'
+          !owallet[message.method as keyof OWallet] ||
+          typeof owallet[message.method as keyof OWallet] !== 'function'
         ) {
           throw new Error(`Invalid method: ${message.method}`);
         }
@@ -111,6 +125,10 @@ export class InjectedOWallet implements IOWallet {
         const result =
           message.method === 'signDirect'
             ? await (async () => {
+                console.log(
+                  'before sign docs ???????????????????????????????????????'
+                );
+
                 const receivedSignDoc: {
                   bodyBytes?: Uint8Array | null;
                   authInfoBytes?: Uint8Array | null;
@@ -142,7 +160,7 @@ export class InjectedOWallet implements IOWallet {
                   signature: result.signature
                 };
               })()
-            : await owallet[message.method](
+            : await owallet[message.method as any](
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 ...JSONUint8Array.unwrap(message.args)
@@ -150,6 +168,7 @@ export class InjectedOWallet implements IOWallet {
 
         const proxyResponse: ProxyRequestResponse = {
           type: 'proxy-request-response',
+          namespace: NAMESPACE,
           id: message.id,
           result: {
             return: JSONUint8Array.wrap(result)
@@ -160,6 +179,7 @@ export class InjectedOWallet implements IOWallet {
       } catch (e) {
         const proxyResponse: ProxyRequestResponse = {
           type: 'proxy-request-response',
+          namespace: NAMESPACE,
           id: message.id,
           result: {
             error: e.message || e.toString()
@@ -181,13 +201,14 @@ export class InjectedOWallet implements IOWallet {
 
     const proxyMessage: ProxyRequest = {
       type: 'proxy-request',
+      namespace: NAMESPACE,
       id,
       method,
       args: JSONUint8Array.wrap(args)
     };
 
     return new Promise((resolve, reject) => {
-      const receiveResponse = (e: any) => {
+      const receiveResponse = (e: MessageEvent) => {
         const proxyResponse: ProxyRequestResponse = this.parseMessage
           ? this.parseMessage(e.data)
           : e.data;
@@ -201,7 +222,6 @@ export class InjectedOWallet implements IOWallet {
         }
 
         this.eventListener.removeMessageListener(receiveResponse);
-
         const result = JSONUint8Array.unwrap(proxyResponse.result);
 
         if (!result) {
@@ -218,7 +238,6 @@ export class InjectedOWallet implements IOWallet {
       };
 
       this.eventListener.addMessageListener(receiveResponse);
-
       this.eventListener.postMessage(proxyMessage);
     });
   }
@@ -312,6 +331,9 @@ export class InjectedOWallet implements IOWallet {
       chainId: string;
       accountNumber: string;
     } = result.signed;
+
+    console.log('accountNumber', signed);
+    console.log('signed message after sign direct: ', signed);
 
     return {
       signed: {
@@ -437,4 +459,230 @@ export class InjectedOWallet implements IOWallet {
     this.enigmaUtils.set(chainId, enigmaUtils);
     return enigmaUtils;
   }
+}
+
+export class InjectedEthereum implements Ethereum {
+  // we use this chain id for chain id switching from user
+  public static chainId: string;
+
+  static startProxy(
+    ethereum: Ethereum,
+    eventListener: {
+      addMessageListener: (fn: (e: any) => void) => void;
+      postMessage: (message: any) => void;
+    } = {
+      addMessageListener: (fn: (e: any) => void) =>
+        window.addEventListener('message', fn),
+      postMessage: (message) =>
+        window.postMessage(message, window.location.origin)
+    },
+    parseMessage?: (message: any) => any
+  ) {
+    // listen method when inject send to
+    eventListener.addMessageListener(async (e: MessageEvent) => {
+      const message: ProxyRequest = parseMessage
+        ? parseMessage(e.data)
+        : e.data;
+
+      // filter proxy-request by namespace
+      if (
+        !message ||
+        message.type !== 'proxy-request' ||
+        message.namespace !== NAMESPACE_ETHEREUM
+      ) {
+        return;
+      }
+
+      try {
+        if (!message.id) {
+          throw new Error('Empty id');
+        }
+
+        if (message.method === 'version') {
+          throw new Error('Version is not function');
+        }
+
+        if (message.method === 'mode') {
+          throw new Error('Mode is not function');
+        }
+
+        if (message.method === 'chainId') {
+          throw new Error('chain id is not function');
+        }
+
+        // TODO: eth_sendTransaction is special case. Other case => pass through custom request RPC without signing
+        var result: any;
+        const chainId = message.args[1]
+          ? message.args[1]
+          : this.chainId
+          ? this.chainId
+          : ethereum.chainId;
+
+        switch (message.method) {
+          case 'eth_sendTransaction' as any:
+            result = await (async () => {
+              console.log(
+                'message before signing raw ethereum xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: ',
+                message.args
+              );
+
+              const { rawTxHex } = await ethereum.signAndBroadcastEthereum(
+                chainId,
+                message.args[0][0] // TODO: is this okay to assume that we only need the first item of the params?
+              );
+
+              console.log('raw tx hex after START PROXY: ', rawTxHex); // this is the transaction hash already
+
+              return rawTxHex;
+            })();
+            break;
+          case 'eth_chainId' as any:
+            result = chainId;
+            break;
+          case 'wallet_switchEthereumChain' as any:
+            this.chainId = await ethereum.request({
+              method: message.method as string,
+              params: message.args[0],
+              chainId
+            });
+            break;
+          default:
+            result = await ethereum.request({
+              method: message.method as string,
+              params: message.args[0],
+              chainId
+            });
+            break;
+        }
+
+        const proxyResponse: ProxyRequestResponse = {
+          type: 'proxy-request-response',
+          namespace: NAMESPACE_ETHEREUM,
+          id: message.id,
+          result: {
+            return: JSONUint8Array.wrap(result)
+          }
+        };
+
+        eventListener.postMessage(proxyResponse);
+      } catch (e) {
+        const proxyResponse: ProxyRequestResponse = {
+          type: 'proxy-request-response',
+          namespace: NAMESPACE_ETHEREUM,
+          id: message.id,
+          result: {
+            error: e.message || e.toString()
+          }
+        };
+
+        eventListener.postMessage(proxyResponse);
+      }
+    });
+  }
+
+  protected requestMethod(
+    method: keyof IEthereum | string,
+    args: any[]
+  ): Promise<any> {
+    const bytes = new Uint8Array(8);
+    const id: string = Array.from(crypto.getRandomValues(bytes))
+      .map((value) => {
+        return value.toString(16);
+      })
+      .join('');
+
+    const proxyMessage: ProxyRequest = {
+      type: 'proxy-request',
+      namespace: NAMESPACE_ETHEREUM,
+      id,
+      method,
+      args: JSONUint8Array.wrap(args)
+    };
+
+    return new Promise((resolve, reject) => {
+      const receiveResponse = (e: MessageEvent) => {
+        const proxyResponse: ProxyRequestResponse = this.parseMessage
+          ? this.parseMessage(e.data)
+          : e.data;
+
+        console.log('proxy response: ', proxyResponse);
+
+        if (!proxyResponse || proxyResponse.type !== 'proxy-request-response') {
+          return;
+        }
+
+        if (proxyResponse.id !== id) {
+          return;
+        }
+
+        this.eventListener.removeMessageListener(receiveResponse);
+        const result = JSONUint8Array.unwrap(proxyResponse.result);
+
+        if (!result) {
+          reject(new Error('Result is null'));
+          return;
+        }
+
+        if (result.error) {
+          reject(new Error(result.error));
+          return;
+        }
+
+        resolve(result.return);
+      };
+
+      this.eventListener.addMessageListener(receiveResponse);
+      this.eventListener.postMessage(proxyMessage);
+    });
+  }
+
+  public chainId: string;
+
+  constructor(
+    public readonly version: string,
+    public readonly mode: EthereumMode,
+    protected readonly eventListener: {
+      addMessageListener: (fn: (e: any) => void) => void;
+      removeMessageListener: (fn: (e: any) => void) => void;
+      postMessage: (message: any) => void;
+    } = {
+      addMessageListener: (fn: (e: any) => void) =>
+        window.addEventListener('message', fn),
+      removeMessageListener: (fn: (e: any) => void) =>
+        window.removeEventListener('message', fn),
+      postMessage: (message) =>
+        window.postMessage(message, window.location.origin)
+    },
+    protected readonly parseMessage?: (message: any) => any
+  ) {}
+
+  // async send(): Promise<void> {
+  //   console.log('console.log send');
+  // }
+
+  // THIS IS THE ENTRYPOINT OF THE INJECTED ETHEREUM WHEN USER CALLS window.ethereum.request
+  async request(args: RequestArguments): Promise<any> {
+    console.log(`arguments: ${JSON.stringify(args)}`);
+    return await this.requestMethod(args.method as string, [
+      args.params,
+      args.chainId
+    ]); // TODO: how to collect chain id, signer & rpc?
+  }
+
+  async signAndBroadcastEthereum(
+    chainId: string,
+    data: object
+  ): Promise<{ rawTxHex: string }> {
+    console.log('console.log sign');
+    return { rawTxHex: '' };
+  }
+
+  // async asyncRequest(): Promise<void> {
+  //   console.log('console.log asyncRequest');
+  //   alert('console.log asyncRequest');
+  // }
+
+  // async getKey(chainId: string): Promise<Key> {
+  //   return await this.requestMethod('getKey', [chainId]);
+  // }
 }

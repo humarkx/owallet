@@ -2,12 +2,12 @@ import { AccountSetBase, AccountSetOpts, MsgOpt } from './base';
 import { HasCosmwasmQueries, QueriesSetBase, QueriesStore } from '../query';
 import { ChainGetter, CoinPrimitive } from '../common';
 import { StdFee } from '@cosmjs/launchpad';
-import { DenomHelper } from '@owallet-wallet/common';
-import { Dec, DecUtils } from '@owallet-wallet/unit';
-import { AppCurrency, OWalletSignOptions } from '@owallet-wallet/types';
+import { DenomHelper } from '@owallet/common';
+import { Dec, DecUtils } from '@owallet/unit';
+import { AppCurrency, OWalletSignOptions } from '@owallet/types';
 import { DeepReadonly, Optional } from 'utility-types';
-import { cosmwasm } from '@owallet-wallet/cosmos';
-import { Buffer } from 'buffer/';
+import { cosmwasm } from '@owallet/cosmos';
+import { Buffer } from 'buffer';
 
 export interface HasCosmwasmAccount {
   cosmwasm: DeepReadonly<CosmwasmAccount>;
@@ -23,7 +23,8 @@ export interface CosmwasmMsgOpts {
 
 export class AccountWithCosmwasm
   extends AccountSetBase<CosmwasmMsgOpts, HasCosmwasmQueries>
-  implements HasCosmwasmAccount {
+  implements HasCosmwasmAccount
+{
   public readonly cosmwasm: DeepReadonly<CosmwasmAccount>;
 
   static readonly defaultMsgOpts: CosmwasmMsgOpts = {
@@ -107,7 +108,7 @@ export class CosmwasmAccount {
         }
         await this.sendExecuteContractMsg(
           'send',
-          currency.contractAddress,
+          currency.contractAddress || denomHelper.contractAddress,
           {
             transfer: {
               recipient: recipient,
@@ -166,12 +167,14 @@ export class CosmwasmAccount {
       value: {
         sender: this.base.bech32Address,
         contract: contractAddress,
-        msg: obj,
-        funds
+        msg: obj
       }
     };
-
     const chainInfo = this.chainGetter.getChain(this.chainId);
+
+    // dynamic msg based on beta
+    msg.value[chainInfo.beta ? 'sent_funds' : 'funds'] = funds;
+
     const protoMsgs = this.hasNoLegacyStdFeature()
       ? [
           chainInfo.beta
@@ -181,7 +184,7 @@ export class CosmwasmAccount {
                   sender: msg.value.sender,
                   contract: msg.value.contract,
                   msg: Buffer.from(JSON.stringify(msg.value.msg)),
-                  sent_funds: msg.value.funds
+                  sent_funds: funds
                 }).finish()
               }
             : {
@@ -190,7 +193,7 @@ export class CosmwasmAccount {
                   sender: msg.value.sender,
                   contract: msg.value.contract,
                   msg: Buffer.from(JSON.stringify(msg.value.msg)),
-                  funds: msg.value.funds
+                  funds: funds
                 }).finish()
               }
         ]

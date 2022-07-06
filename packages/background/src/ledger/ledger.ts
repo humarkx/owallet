@@ -1,15 +1,15 @@
-import { TransportIniter } from "./options";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const CosmosApp: any = require("ledger-cosmos-js").default;
-import TransportWebHID from "@ledgerhq/hw-transport-webhid";
-import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
-import { signatureImport } from "secp256k1";
+import { TransportIniter } from './options';
+import CosmosApp from '@ledgerhq/hw-app-cosmos';
+import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
+import { signatureImport } from 'secp256k1';
+import { Buffer } from 'buffer';
+import { fromPathArray } from 'bip32-path';
 
 export enum LedgerInitErrorOn {
   Transport,
   App,
-  Unknown,
+  Unknown
 }
 
 export const LedgerWebUSBIniter: TransportIniter = async () => {
@@ -46,7 +46,7 @@ export class Ledger {
       // However, it is almost same as that the device is not unlocked to user-side.
       // So, handle this case as initializing failed in `Transport`.
       if (versionResponse.deviceLocked) {
-        throw new Error("Device is on screen saver");
+        throw new Error('Device is on screen saver');
       }
 
       return ledger;
@@ -54,7 +54,7 @@ export class Ledger {
       if (transport) {
         await transport.close();
       }
-      if (e.message === "Device is on screen saver") {
+      if (e.message === 'Device is on screen saver') {
         throw new LedgerInitError(LedgerInitErrorOn.Transport, e.message);
       }
 
@@ -65,55 +65,53 @@ export class Ledger {
   async getVersion(): Promise<{
     deviceLocked: boolean;
     major: number;
-    minor: number;
-    patch: number;
-    targetId: string;
+    version: string;
     testMode: boolean;
   }> {
     if (!this.cosmosApp) {
-      throw new Error("Comsos App not initialized");
+      throw new Error('Cosmos App not initialized');
     }
 
-    const result = await this.cosmosApp.getVersion();
-    if (result.error_message !== "No errors") {
-      throw new Error(result.error_message);
-    }
+    const { version, device_locked, major, test_mode } =
+      await this.cosmosApp.getAppConfiguration();
 
     return {
-      deviceLocked: result.device_locked,
-      major: result.major,
-      minor: result.minor,
-      patch: result.patch,
-      targetId: result.target_id,
-      testMode: result.test_mode,
+      deviceLocked: device_locked,
+      major,
+      version,
+      testMode: test_mode
     };
   }
 
-  async getPublicKey(path: number[]): Promise<Uint8Array> {
+  async getPublicKey(path: number[] | string): Promise<Uint8Array> {
     if (!this.cosmosApp) {
-      throw new Error("Comsos App not initialized");
+      throw new Error('Cosmos App not initialized');
     }
 
-    const result = await this.cosmosApp.publicKey(path);
-    if (result.error_message !== "No errors") {
-      throw new Error(result.error_message);
-    }
+    // make compartible with ledger-cosmos-js
+    const { publicKey } = await this.cosmosApp.getAddress(
+      typeof path === 'string' ? path : fromPathArray(path).toString(),
+      'cosmos'
+    );
 
-    return result.compressed_pk;
+    return Buffer.from(publicKey, 'hex');
   }
 
-  async sign(path: number[], message: Uint8Array): Promise<Uint8Array> {
+  async sign(
+    path: number[] | string,
+    message: Uint8Array
+  ): Promise<Uint8Array> {
     if (!this.cosmosApp) {
-      throw new Error("Comsos App not initialized");
+      throw new Error('Cosmos App not initialized');
     }
 
-    const result = await this.cosmosApp.sign(path, message);
-    if (result.error_message !== "No errors") {
-      throw new Error(result.error_message);
-    }
+    const { signature } = await this.cosmosApp.sign(
+      typeof path === 'string' ? path : fromPathArray(path).toString(),
+      message
+    );
 
     // Parse a DER ECDSA signature
-    return signatureImport(result.signature);
+    return signatureImport(signature);
   }
 
   async close(): Promise<void> {

@@ -8,7 +8,7 @@ import style from './style.module.scss';
 import { Menu } from './menu';
 import { AccountView } from './account';
 import { TxButtonView } from './tx-button';
-import { AssetView } from './asset';
+import { AssetView, AssetViewEvm } from './asset';
 import { StakeView } from './stake';
 
 import classnames from 'classnames';
@@ -19,10 +19,8 @@ import { TokensView } from './token';
 import { BIP44SelectModal } from './bip44-select-modal';
 import { useIntl } from 'react-intl';
 import { useConfirm } from '../../components/confirm';
-import { ChainUpdaterService } from '@owallet-wallet/background';
+import { ChainUpdaterService } from '@owallet/background';
 import { IBCTransferView } from './ibc-transfer';
-import { DenomHelper } from '@owallet-wallet/common';
-import { Dec } from '@owallet-wallet/unit';
 
 export const MainPage: FunctionComponent = observer(() => {
   const history = useHistory();
@@ -72,14 +70,7 @@ export const MainPage: FunctionComponent = observer(() => {
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(accountInfo.bech32Address);
 
-  const tokens = queryBalances.unstakables.filter((bal) => {
-    // Temporary implementation for trimming the 0 balanced native tokens.
-    // TODO: Remove this part.
-    if (new DenomHelper(bal.currency.coinMinimalDenom).type === 'native') {
-      return bal.balance.toDec().gt(new Dec('0'));
-    }
-    return true;
-  });
+  const tokens = queryBalances.unstakables;
 
   const hasTokens = tokens.length > 0;
 
@@ -118,21 +109,25 @@ export const MainPage: FunctionComponent = observer(() => {
         <CardBody>
           <div className={style.containerAccountInner}>
             <AccountView />
-            <AssetView />
+            {chainStore.current.networkType === 'evm' ? (
+              <AssetViewEvm />
+            ) : (
+              <AssetView />
+            )}
             <TxButtonView />
           </div>
         </CardBody>
       </Card>
-      {chainStore.current.walletUrlForStaking ? (
+      {chainStore.current.networkType === 'cosmos' && (
         <Card className={classnames(style.card, 'shadow')}>
           <CardBody>
             <StakeView />
           </CardBody>
         </Card>
-      ) : null}
+      )}
       {hasTokens ? (
         <Card className={classnames(style.card, 'shadow')}>
-          <CardBody>{<TokensView />}</CardBody>
+          <CardBody>{<TokensView tokens={tokens} />}</CardBody>
         </Card>
       ) : null}
       {uiConfigStore.showAdvancedIBCTransfer &&

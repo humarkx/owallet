@@ -1,12 +1,13 @@
-import React, { FunctionComponent } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
-import { useHeaderHeight } from "@react-navigation/stack";
-import { useStyle } from "../../../../styles";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useWebViewState } from "../context";
-import Svg, { Path } from "react-native-svg";
-import { RectButton } from "../../../../components/rect-button";
-import { useSmartNavigation } from "../../../../navigation";
+import React, { FunctionComponent } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { CText as Text} from "../../../../components/text";
+import { useHeaderHeight } from '@react-navigation/stack';
+import { useStyle } from '../../../../styles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useWebViewState } from '../context';
+import Svg, { Path } from 'react-native-svg';
+import { RectButton } from '../../../../components/rect-button';
+import { useNavigation } from '@react-navigation/core';
 
 const ArrowLeftIcon: FunctionComponent<{
   size: number;
@@ -81,7 +82,7 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
   const headerHeight = useHeaderHeight();
   const actualHeaderHeight = headerHeight - safeAreaInsets.top;
 
-  const smartNavigation = useSmartNavigation();
+  const navigation = useNavigation();
 
   const webViewState = useWebViewState();
 
@@ -89,20 +90,20 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
     <View
       style={StyleSheet.flatten([
         {
-          width: "100%",
+          width: '100%',
           height: headerHeight,
           // If the iPhone has notch, add the extra bottom space for header.
           // Because of the lack of space, it slightly invades the notch, giving it a bit more space.
           paddingTop:
             safeAreaInsets.top -
-            (Platform.OS === "ios" && safeAreaInsets.top > 44 ? 6 : 0),
+            (Platform.OS === 'ios' && safeAreaInsets.top > 44 ? 6 : 0),
         },
-        style.flatten(["background-color-white", "flex-row", "items-center"]),
+        style.flatten(['background-color-white', 'flex-row', 'items-center']),
       ])}
     >
       <View
         style={StyleSheet.flatten([
-          style.flatten(["width-full", "items-center", "justify-center"]),
+          style.flatten(['width-full', 'items-center', 'justify-center']),
           {
             height: actualHeaderHeight,
           },
@@ -111,12 +112,12 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
         {/* Name and refresh icon on center */}
         <RectButton
           style={style.flatten([
-            "flex-row",
-            "items-center",
-            "border-radius-4",
-            "padding-left-12",
-            "padding-right-10",
-            "padding-y-5",
+            'flex-row',
+            'items-center',
+            'border-radius-4',
+            'padding-left-12',
+            'padding-right-10',
+            'padding-y-5',
           ])}
           onPress={() => {
             if (webViewState.webView) {
@@ -126,16 +127,16 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
         >
           <Text
             style={style.flatten([
-              "h4",
-              "color-text-black-medium",
-              "margin-right-8",
+              'h4',
+              'color-text-black-medium',
+              'margin-right-8',
             ])}
           >
             {webViewState.name}
           </Text>
           <RefreshIcon
             size={20}
-            color={style.get("color-text-black-very-very-low").color}
+            color={style.get('color-text-black-very-very-low').color}
           />
         </RectButton>
 
@@ -143,10 +144,10 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
         <View
           style={StyleSheet.flatten([
             style.flatten([
-              "absolute",
-              "width-full",
-              "flex-row",
-              "items-center",
+              'absolute',
+              'width-full',
+              'flex-row',
+              'items-center',
             ]),
             {
               left: 0,
@@ -155,15 +156,15 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
           ])}
           pointerEvents="box-none"
         >
-          <RectButton
+          {/* <RectButton
             style={style.flatten([
-              "border-radius-4",
-              "padding-4",
-              "margin-left-20",
+              'border-radius-4',
+              'padding-4',
+              'margin-left-20'
             ])}
-            rippleColor={style.get("color-primary-50").color}
+            rippleColor={style.get('color-primary-50').color}
             activeOpacity={1}
-            underlayColor={style.get("color-primary-10").color}
+            underlayColor={style.get('color-primary-10').color}
             onPress={() => {
               if (!webViewState.canGoBack) {
                 smartNavigation.goBack();
@@ -172,17 +173,17 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
               }
             }}
           >
-            <ArrowLeftIcon size={32} color={style.get("color-primary").color} />
+            <ArrowLeftIcon size={32} color={style.get('color-primary').color} />
           </RectButton>
           <RectButton
             style={style.flatten([
-              "border-radius-4",
-              "padding-4",
-              "margin-left-8",
+              'border-radius-4',
+              'padding-4',
+              'margin-left-8'
             ])}
-            rippleColor={style.get("color-primary-50").color}
+            rippleColor={style.get('color-primary-50').color}
             activeOpacity={1}
-            underlayColor={style.get("color-primary-10").color}
+            underlayColor={style.get('color-primary-10').color}
             onPress={() => {
               if (webViewState.webView) {
                 webViewState.webView.goForward();
@@ -191,25 +192,26 @@ export const OnScreenWebpageScreenHeader: FunctionComponent = () => {
           >
             <ArrowRightIcon
               size={32}
-              color={style.get("color-primary").color}
+              color={style.get('color-primary').color}
             />
-          </RectButton>
-          <View style={style.get("flex-1")} />
-          <RectButton
+          </RectButton> */}
+          <View style={style.get('flex-1')} />
+          {/* <RectButton
             style={style.flatten([
-              "border-radius-4",
-              "padding-4",
-              "margin-right-20",
+              'border-radius-4',
+              'padding-4',
+              'margin-right-20',
             ])}
-            rippleColor={style.get("color-primary-50").color}
+            rippleColor={style.get('color-primary-50').color}
             activeOpacity={1}
-            underlayColor={style.get("color-primary-10").color}
+            underlayColor={style.get('color-primary-10').color}
             onPress={() => {
-              smartNavigation.navigateSmart("Web.Intro", {});
+              navigation.navigate('Browser');
+              // smartNavigation.navigateSmart("Web.Intro", {});
             }}
           >
-            <HomeIcon size={32} color={style.get("color-primary").color} />
-          </RectButton>
+            <HomeIcon size={32} color={style.get('color-primary').color} />
+          </RectButton> */}
         </View>
       </View>
     </View>

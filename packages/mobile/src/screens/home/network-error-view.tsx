@@ -5,7 +5,8 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { CText as Text} from "../../components/text";
 import Animated, { Easing } from 'react-native-reanimated';
 import { AlertIcon, RefreshIcon } from '../../components/icon';
 import { useStyle } from '../../styles';
@@ -14,7 +15,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
 import { useSpinAnimated } from '../../components/spinner';
-import { ObservableQuery } from '@owallet-wallet/stores';
+import { ObservableQuery } from '@owallet/stores';
 
 export const NetworkErrorView: FunctionComponent = observer(() => {
   const { chainStore, accountStore, queriesStore } = useStore();
@@ -28,9 +29,10 @@ export const NetworkErrorView: FunctionComponent = observer(() => {
   const queryDelegated = queries.cosmos.queryDelegations.getQueryBech32Address(
     account.bech32Address
   );
-  const queryUnbonding = queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
-    account.bech32Address
-  );
+  const queryUnbonding =
+    queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
+      account.bech32Address
+    );
 
   const style = useStyle();
 

@@ -2,14 +2,15 @@ import React, { FunctionComponent, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
 import { useStyle } from '../../styles';
-import { Governance, ObservableQueryProposal } from '@owallet-wallet/stores';
+import { Governance, ObservableQueryProposal } from '@owallet/stores';
 import { Chip } from '../../components/chip';
 import { CardBody } from '../../components/card';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { CText as Text} from "../../components/text";
 import { LoadingSpinner } from '../../components/spinner';
 import { useIntl } from 'react-intl';
 import { dateToLocalString } from './utils';
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 import { RectButton } from '../../components/rect-button';
 
 export const GovernanceProposalStatusChip: FunctionComponent<{

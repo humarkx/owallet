@@ -1,4 +1,4 @@
-import { init, ScryptParams } from '@owallet-wallet/background';
+import { init, ScryptParams } from '@owallet/background';
 import {
   RNEnv,
   RNMessageRequesterInternalToUI,
@@ -6,17 +6,18 @@ import {
 } from '../router';
 import { AsyncKVStore } from '../common';
 import scrypt from 'react-native-scrypt';
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
-import { getRandomBytesAsync } from '../common';
-import { BACKGROUND_PORT } from '@owallet-wallet/router';
-
-import { EmbedChainInfos } from '../config';
+import { BACKGROUND_PORT } from '@owallet/router';
+import { EmbedChainInfos } from '@owallet/common';
 import {
   getLastUsedLedgerDeviceId,
   setLastUsedLedgerDeviceId
 } from '../utils/ledger';
+import { DAppInfos } from '../screens/web/config';
 
+// done polyfill
+const { webcrypto } = require('crypto');
 const router = new RNRouterBackground(RNEnv.produceEnv);
 
 init(
@@ -24,8 +25,10 @@ init(
   (prefix: string) => new AsyncKVStore(prefix),
   new RNMessageRequesterInternalToUI(),
   EmbedChainInfos,
-  ['https://app.osmosis.zone'],
-  getRandomBytesAsync,
+  // allow all dApps
+  DAppInfos.map((dApp) => dApp.uri),
+  // @ts-ignore
+  webcrypto.getRandomValues,
   {
     scrypt: async (text: string, params: ScryptParams) => {
       return Buffer.from(

@@ -1,9 +1,5 @@
-import {
-  MessageRequester,
-  Message,
-  JSONUint8Array
-} from '@owallet-wallet/router';
-import { getOWalletExtensionRouterId } from '../utils';
+import { MessageRequester, Message, JSONUint8Array } from '@owallet/router';
+import { ExtensionEnv } from '../env';
 
 // The message requester to send the message to the content scripts.
 // This will send message to the tab with the content script.
@@ -19,11 +15,10 @@ export class ContentScriptMessageRequester implements MessageRequester {
     // Set message's origin.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    msg['origin'] = window.location.origin;
-    msg.routerMeta = {
-      ...msg.routerMeta,
-      routerId: getOWalletExtensionRouterId()
-    };
+    msg['origin'] =
+      typeof window !== 'undefined' && window.location
+        ? window.location.origin
+        : new URL(browser.runtime.getURL('/')).origin;
 
     const wrappedMsg = JSONUint8Array.wrap(msg);
 

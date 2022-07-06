@@ -1,21 +1,23 @@
-import { BACKGROUND_PORT } from '@owallet-wallet/router';
+import { BACKGROUND_PORT } from '@owallet/router';
 import {
   ExtensionRouter,
   ExtensionGuards,
   ExtensionEnv,
   ContentScriptMessageRequester
-} from '@owallet-wallet/router-extension';
-import { ExtensionKVStore } from '@owallet-wallet/common';
-import { init, ScryptParams } from '@owallet-wallet/background';
+} from '@owallet/router-extension';
+import { ExtensionKVStore } from '@owallet/common';
+import { init, ScryptParams } from '@owallet/background';
 import scrypt from 'scrypt-js';
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 
-import { EmbedChainInfos, PrivilegedOrigins } from '../config';
+import { EmbedChainInfos, PrivilegedOrigins } from '@owallet/common';
 
 const router = new ExtensionRouter(ExtensionEnv.produceEnv);
 router.addGuard(ExtensionGuards.checkOriginIsValid);
 router.addGuard(ExtensionGuards.checkMessageIsInternal);
 
+// can extends more origins to PrivilegedOrigins
+console.log('re-init', 'service worker re-load again', Date.now());
 init(
   router,
   (prefix: string) => new ExtensionKVStore(prefix),

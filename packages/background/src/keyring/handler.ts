@@ -1,4 +1,4 @@
-import { Env, Handler, InternalHandler, Message } from '@owallet-wallet/router';
+import { Env, Handler, InternalHandler, Message } from '@owallet/router';
 import {
   CreateMnemonicKeyMsg,
   CreatePrivateKeyMsg,
@@ -21,12 +21,12 @@ import {
   GetIsKeyStoreCoinTypeSetMsg,
   CheckPasswordMsg,
   ExportKeyRingDatasMsg,
-  RequestVerifyADR36AminoSignDoc
+  RequestVerifyADR36AminoSignDoc,
+  RequestSignEthereumMsg
 } from './messages';
 import { KeyRingService } from './service';
-import { Bech32Address } from '@owallet-wallet/cosmos';
+import { Bech32Address, cosmos } from '@owallet/cosmos';
 
-import { cosmos } from '@owallet-wallet/cosmos';
 import Long from 'long';
 
 export const getHandler: (service: KeyRingService) => Handler = (
@@ -86,6 +86,11 @@ export const getHandler: (service: KeyRingService) => Handler = (
         return handleRequestSignDirectMsg(service)(
           env,
           msg as RequestSignDirectMsg
+        );
+      case RequestSignEthereumMsg:
+        return handleRequestSignEthereumMsg(service)(
+          env,
+          msg as RequestSignEthereumMsg
         );
       case GetMultiKeyStoreInfoMsg:
         return handleGetMultiKeyStoreInfoMsg(service)(
@@ -305,6 +310,7 @@ const handleRequestVerifyADR36AminoSignDoc: (
   };
 };
 
+//goes here
 const handleRequestSignDirectMsg: (
   service: KeyRingService
 ) => InternalHandler<RequestSignDirectMsg> = (service) => {
@@ -313,6 +319,11 @@ const handleRequestSignDirectMsg: (
       env,
       msg.chainId,
       msg.origin
+    );
+
+    console.log('signDoc msg', msg);
+    console.log(
+      'in handle request sign direct heheeeeeeeeeeeeeeeeeeeeeeeeehehehehehehehehehe'
     );
 
     const signDoc = cosmos.tx.v1beta1.SignDoc.create({
@@ -333,6 +344,8 @@ const handleRequestSignDirectMsg: (
       msg.signOptions
     );
 
+    console.log('response', response);
+
     return {
       signed: {
         bodyBytes: response.signed.bodyBytes,
@@ -342,6 +355,33 @@ const handleRequestSignDirectMsg: (
       },
       signature: response.signature
     };
+  };
+};
+
+const handleRequestSignEthereumMsg: (
+  service: KeyRingService
+) => InternalHandler<RequestSignEthereumMsg> = (service) => {
+  return async (env, msg) => {
+    await service.permissionService.checkOrGrantBasicAccessPermission(
+      env,
+      msg.chainId,
+      msg.origin
+    );
+
+    console.log(
+      'in handle request sign ethereum msg hohohohohohohohohohohohoho with msg: ',
+      msg
+    );
+
+    const response = await service.requestSignEthereum(
+      env,
+      msg.chainId,
+      msg.data
+    );
+
+    console.log('response sign ethereum msg', response);
+
+    return { rawTxHex: response };
   };
 };
 

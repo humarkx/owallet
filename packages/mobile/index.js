@@ -1,35 +1,26 @@
-/**
- * @format
- */
+import './shim';
 
-import Bugsnag from "@bugsnag/react-native";
-import BugsnagPluginReactNavigation from "@bugsnag/plugin-react-navigation";
-import { codeBundleId } from "./bugsnag.env";
+import 'text-encoding';
 
-Bugsnag.start({
-  plugins: [new BugsnagPluginReactNavigation()],
-  codeBundleId,
-});
+import 'react-native-gesture-handler';
 
-import "./shim";
+import 'react-native-url-polyfill/auto';
 
-import "text-encoding";
+import { AppRegistry } from 'react-native';
+// add router to send message
+import './init';
 
-import "react-native-gesture-handler";
+import CodePush from 'react-native-code-push';
+import { name as appName } from './app.json';
 
-import "react-native-url-polyfill/auto";
+const { App } = require('./src/app');
 
-import { AppRegistry } from "react-native";
+// not using CodePush for development
+const CodePushApp = __DEV__
+  ? App
+  : CodePush({
+      installMode: CodePush.InstallMode.ON_NEXT_RESTART,
+      checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME
+    })(App);
 
-import "./init";
-
-// The use of "require" is intentional.
-// In case of "import" statement, it is located before execution of the next line,
-// so `getPlugin()` can be executed before `Bugsnag.start()`.
-// To prevent this, "require" is used.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const App = require("./src/app").App;
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const appName = require("./app.json").name;
-
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => CodePushApp);

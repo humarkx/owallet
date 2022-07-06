@@ -7,17 +7,17 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import QRCode from 'qrcode.react';
 import style from './style.module.scss';
 import WalletConnect from '@walletconnect/client';
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 import { useLoadingIndicator } from '../../../components/loading-indicator';
 import { Button, Form } from 'reactstrap';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../stores';
 import useForm from 'react-hook-form';
 import { PasswordInput } from '../../../components/form';
-import { ExportKeyRingData } from '@owallet-wallet/background';
+import { ExportKeyRingData } from '@owallet/background';
 import AES, { Counter } from 'aes-js';
-import { AddressBookConfigMap, AddressBookData } from '@owallet-wallet/hooks';
-import { ExtensionKVStore } from '@owallet-wallet/common';
+import { AddressBookConfigMap, AddressBookData } from '@owallet/hooks';
+import { ExtensionKVStore } from '@owallet/common';
 import { toJS } from 'mobx';
 
 export interface QRCodeSharedData {
@@ -287,7 +287,7 @@ export const WalletConnectToExportKeyRingView: FunctionComponent<{
             if (
               error ||
               payload.method !==
-                'owallet_request_export_keyring_datas_wallet_connect_v1'
+                'keplr_request_export_keyring_datas_wallet_connect_v1'
             ) {
               console.log(error, payload?.method);
               history.replace('/');
@@ -315,9 +315,8 @@ export const WalletConnectToExportKeyRingView: FunctionComponent<{
                 if (payload.params && payload.params.length > 0) {
                   for (const chainId of payload.params[0].addressBookChainIds ??
                     []) {
-                    const addressBookConfig = addressBookConfigMap.getAddressBookConfig(
-                      chainId
-                    );
+                    const addressBookConfig =
+                      addressBookConfigMap.getAddressBookConfig(chainId);
 
                     await addressBookConfig.waitLoaded();
 

@@ -4,9 +4,9 @@ import {
   ChainGetter,
   CoinPrimitive,
   ObservableQueryDelegations
-} from '@owallet-wallet/stores';
+} from '@owallet/stores';
 import { action, computed, makeObservable, observable } from 'mobx';
-import { AppCurrency } from '@owallet-wallet/types';
+import { AppCurrency } from '@owallet/types';
 import {
   EmptyAmountError,
   InsufficientAmountError,
@@ -14,7 +14,7 @@ import {
   NegativeAmountError,
   ZeroAmountError
 } from './errors';
-import { Dec, DecUtils } from '@owallet-wallet/unit';
+import { Dec, DecUtils } from '@owallet/unit';
 import { useState } from 'react';
 
 export class StakedAmountConfig extends TxChainSetter implements IAmountConfig {
@@ -150,7 +150,9 @@ export class StakedAmountConfig extends TxChainSetter implements IAmountConfig {
       return {
         denom: sendCurrency.coinMinimalDenom,
         amount: new Dec(amountStr)
-          .mul(DecUtils.getPrecisionDec(sendCurrency.coinDecimals))
+          .mul(
+            DecUtils.getTenExponentNInPrecisionRange(sendCurrency.coinDecimals)
+          )
           .truncate()
           .toString()
       };

@@ -4,16 +4,17 @@ import styleToken from './token.module.scss';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
 import { useHistory } from 'react-router';
-import { Hash } from '@owallet-wallet/crypto';
-import { ObservableQueryBalanceInner } from '@owallet-wallet/stores/build/query/balances';
+import { Hash } from '@owallet/crypto';
+import { ObservableQueryBalanceInner } from '@owallet/stores';
 import classmames from 'classnames';
 import { UncontrolledTooltip } from 'reactstrap';
-import { WrongViewingKeyError } from '@owallet-wallet/stores';
+import { WrongViewingKeyError } from '@owallet/stores';
 import { useNotification } from '../../components/notification';
 import { useLoadingIndicator } from '../../components/loading-indicator';
-// import { DenomHelper } from '@owallet-wallet/common';
-// import { Dec } from '@owallet-wallet/unit';
-import { useLanguage } from '../../languages';
+import { DenomHelper } from '@owallet/common';
+
+import { useLanguage } from '@owallet/common';
+import { Bech32Address } from '@owallet/cosmos';
 
 const TokenView: FunctionComponent<{
   balance: ObservableQueryBalanceInner;
@@ -28,8 +29,9 @@ const TokenView: FunctionComponent<{
     ['#F6F7FB', '#0e0314']
   ]);
 
-  const name = balance.currency.coinDenom.toUpperCase();
+  let name = balance.currency.coinDenom;
   const minimalDenom = balance.currency.coinMinimalDenom;
+
   let amount = balance.balance.trim(true).shrink(true);
 
   const [backgroundColor, color] = useMemo(() => {
@@ -86,6 +88,14 @@ const TokenView: FunctionComponent<{
   // Show the actual coin denom to the top and just show the coin denom without channel info to the bottom.
   if ('originCurrency' in amount.currency && amount.currency.originCurrency) {
     amount = amount.setCurrency(amount.currency.originCurrency);
+  } else {
+    const denomHelper = new DenomHelper(amount.currency.coinMinimalDenom);
+    if (denomHelper.contractAddress) {
+      name += ` (${Bech32Address.shortenAddress(
+        denomHelper.contractAddress,
+        24
+      )})`;
+    }
   }
 
   const tokenPrice = priceStore.calculatePrice(amount, language.fiatCurrency);
@@ -207,23 +217,15 @@ const TokenView: FunctionComponent<{
   );
 });
 
-export const TokensView: FunctionComponent = observer(() => {
-  const { chainStore, accountStore, queriesStore } = useStore();
+export const TokensView: FunctionComponent<{
+  tokens: ObservableQueryBalanceInner[];
+}> = observer(({ tokens }) => {
+  // const { chainStore, accountStore, queriesStore } = useStore();
 
-  const accountInfo = accountStore.getAccount(chainStore.current.chainId);
+  // const accountInfo = accountStore.getAccount(chainStore.current.chainId);
 
-  const tokens = queriesStore
-    .get(chainStore.current.chainId)
-    .queryBalances.getQueryBech32Address(accountInfo.bech32Address)
-    .unstakables// .filter((bal) => {
-    //   const denomHelper = new DenomHelper(bal.currency.coinMinimalDenom);
-    //   // Temporary implementation for trimming the 0 balanced native tokens.
-    //   // TODO: Remove this part.
-    //   if (denomHelper.type === 'native') {
-    //     return bal.balance.toDec().gt(new Dec('0'));
-    //   }
-    //   return true;
-    // })
+  const displayTokens = tokens
+    .filter((token) => token?.balance)
     .sort((a, b) => {
       const aDecIsZero = a.balance.toDec().isZero();
       const bDecIsZero = b.balance.toDec().isZero();
@@ -243,7 +245,7 @@ export const TokensView: FunctionComponent = observer(() => {
   return (
     <div className={styleToken.tokensContainer}>
       <h1 className={styleToken.title}>Tokens</h1>
-      {tokens.map((token, i) => {
+      {displayTokens.map((token, i) => {
         return (
           <TokenView
             key={i.toString()}

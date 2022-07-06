@@ -23,9 +23,9 @@ import {
   IGasConfig,
   InsufficientFeeError,
   NotLoadedFeeError
-} from '@owallet-wallet/hooks';
-import { CoinGeckoPriceStore } from '@owallet-wallet/stores';
-import { useLanguage } from '../../../languages';
+} from '@owallet/hooks';
+import { CoinGeckoPriceStore } from '@owallet/stores';
+import { useLanguage } from '@owallet/common';
 import { useIntl } from 'react-intl';
 import { GasInput } from '../gas-input';
 import { action, makeObservable, observable } from 'mobx';
@@ -270,7 +270,7 @@ export const FeeButtonsInner: FunctionComponent<
         {errorText != null ? (
           <FormFeedback style={{ display: 'block' }}>{errorText}</FormFeedback>
         ) : null}
-        <div style={{ position: 'absolute', right: 0 }}>
+        <div style={{ float: 'right' }}>
           <Button
             size="sm"
             color="link"

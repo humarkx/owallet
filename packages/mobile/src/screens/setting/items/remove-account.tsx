@@ -20,13 +20,13 @@ export const SettingRemoveAccountItem: FunctionComponent<{
   return (
     <React.Fragment>
       <SettingItem
-        label="Delete this wallet"
+        label="Remove current wallet"
         onPress={() => {
           setIsOpenModal(true);
         }}
         containerStyle={style.flatten(["margin-top-16"])}
         labelStyle={style.flatten(["subtitle1", "color-danger"])}
-        style={style.flatten(["justify-center"])}
+        // style={style.flatten(["justify-center"])}
         topBorder={topBorder}
       />
       <PasswordInputModal

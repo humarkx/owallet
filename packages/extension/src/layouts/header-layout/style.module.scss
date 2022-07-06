@@ -7,7 +7,9 @@
 }
 
 .inner-container {
-  padding: 0 $layout-padding $layout-padding;
+  padding: $layout-padding;
   flex: 1;
-  margin-top:75px;
+  margin-top: $header-height;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

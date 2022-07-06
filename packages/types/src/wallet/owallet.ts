@@ -5,7 +5,7 @@ import {
   StdSignDoc,
   StdTx,
   OfflineSigner,
-  StdSignature
+  StdSignature,
 } from '@cosmjs/launchpad';
 import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { SecretUtils } from 'secretjs/types/enigmautils';
@@ -131,4 +131,32 @@ export interface OWallet {
     ciphertext: Uint8Array,
     nonce: Uint8Array
   ): Promise<Uint8Array>;
+}
+
+export type EthereumMode =
+  | 'core'
+  | 'extension'
+  | 'mobile-web'
+  | 'walletconnect';
+
+export interface RequestArguments {
+  method: string;
+  params?: any;
+  [key: string]: any;
+}
+
+export interface Ethereum {
+  readonly version: string;
+  /**
+   * mode means that how Ethereum is connected.
+   * If the connected Ethereum is browser's extension, the mode should be "extension".
+   * If the connected Ethereum is on the mobile app with the embeded web browser, the mode should be "mobile-web".
+   */
+  readonly mode: EthereumMode;
+  chainId: string;
+  // send(): Promise<void>;
+  request(args: RequestArguments): Promise<any>;
+  signAndBroadcastEthereum(chainId: string, data: object): Promise<{ rawTxHex: string }>;
+  // asyncRequest(): Promise<void>;
+  // getKey(chainId: string): Promise<Key>;
 }

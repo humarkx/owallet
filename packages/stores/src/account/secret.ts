@@ -1,13 +1,13 @@
 import { AccountSetBase, AccountSetOpts, MsgOpt } from './base';
 import { HasSecretQueries, QueriesSetBase, QueriesStore } from '../query';
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 import { ChainGetter, CoinPrimitive } from '../common';
 import { StdFee } from '@cosmjs/launchpad';
-import { DenomHelper } from '@owallet-wallet/common';
-import { Dec, DecUtils } from '@owallet-wallet/unit';
-import { AppCurrency, OWalletSignOptions } from '@owallet-wallet/types';
+import { DenomHelper } from '@owallet/common';
+import { Dec, DecUtils } from '@owallet/unit';
+import { AppCurrency, OWalletSignOptions } from '@owallet/types';
 import { DeepReadonly, Optional } from 'utility-types';
-import { cosmos } from '@owallet-wallet/cosmos';
+import { cosmos } from '@owallet/cosmos';
 
 export interface HasSecretAccount {
   secret: DeepReadonly<SecretAccount>;
@@ -24,7 +24,8 @@ export interface SecretMsgOpts {
 
 export class AccountWithSecret
   extends AccountSetBase<SecretMsgOpts, HasSecretQueries>
-  implements HasSecretAccount {
+  implements HasSecretAccount
+{
   public readonly secret: DeepReadonly<SecretAccount>;
 
   static readonly defaultMsgOpts: SecretMsgOpts = {
@@ -93,7 +94,9 @@ export class SecretAccount {
       case 'secret20':
         const actualAmount = (() => {
           let dec = new Dec(amount);
-          dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+          dec = dec.mul(
+            DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
+          );
           return dec.truncate().toString();
         })();
 
@@ -102,7 +105,7 @@ export class SecretAccount {
         }
         await this.sendExecuteSecretContractMsg(
           'send',
-          currency.contractAddress,
+          currency.contractAddress || denomHelper.contractAddress,
           {
             transfer: {
               recipient: recipient,
@@ -268,9 +271,10 @@ export class SecretAccount {
     // eslint-disable-next-line @typescript-eslint/ban-types
     obj: object
   ): Promise<Uint8Array> {
-    const queryContractCodeHashResponse = await this.queries.secret.querySecretContractCodeHash
-      .getQueryContract(contractAddress)
-      .waitResponse();
+    const queryContractCodeHashResponse =
+      await this.queries.secret.querySecretContractCodeHash
+        .getQueryContract(contractAddress)
+        .waitResponse();
 
     if (!queryContractCodeHashResponse) {
       throw new Error(

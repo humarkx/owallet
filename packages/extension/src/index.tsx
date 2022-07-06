@@ -1,7 +1,5 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-
-import { AppIntlProvider } from './languages';
 
 import './styles/global.scss';
 
@@ -28,7 +26,7 @@ import { configure } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { StoreProvider, useStore } from './stores';
-import { KeyRingStatus } from '@owallet-wallet/background';
+import { KeyRingStatus } from '@owallet/background';
 import { SignPage } from './pages/sign';
 import { ChainSuggestedPage } from './pages/chain/suggest';
 import Modal from 'react-modal';
@@ -49,20 +47,28 @@ import { AddTokenPage } from './pages/setting/token/add';
 import { ManageTokenPage } from './pages/setting/token/manage';
 
 // import * as BackgroundTxResult from "../../background/tx/foreground";
-
-import { AdditonalIntlMessages, LanguageToFiatCurrency } from './config.ui';
+import {
+  AppIntlProvider,
+  AdditonalIntlMessages,
+  LanguageToFiatCurrency
+} from '@owallet/common';
 
 import manifest from './manifest.json';
-import { OWallet } from '@owallet-wallet/provider';
-import { InExtensionMessageRequester } from '@owallet-wallet/router-extension';
+import { OWallet } from '@owallet/provider';
+import { InExtensionMessageRequester } from '@owallet/router-extension';
 import { ExportToMobilePage } from './pages/setting/export-to-mobile';
 import { LogPageViewWrapper } from './components/analytics';
+import { ValidatorListPage } from './pages/stake/validator-list';
+import { IntlProvider } from 'react-intl';
 
-window.owallet = new OWallet(
+const owallet = new OWallet(
   manifest.version,
   'core',
   new InExtensionMessageRequester()
 );
+
+//@ts-ignore
+window.owallet = owallet;
 
 // Make sure that icon file will be included in bundle
 require('./public/assets/orai_wallet_logo.png');
@@ -111,7 +117,7 @@ const StateRenderer: FunctionComponent = observer(() => {
         <Banner
           icon={require('./public/assets/orai_wallet_logo.png')}
           logo={require('./public/assets/logo-temp.png')}
-          subtitle="Wallet for the Interchain"
+          subtitle="Cosmos x EVM in one Wallet"
         />
       </div>
     );
@@ -121,7 +127,7 @@ const StateRenderer: FunctionComponent = observer(() => {
         <Banner
           icon={require('./public/assets/orai_wallet_logo.png')}
           logo={require('./public/assets/logo-temp.png')}
-          subtitle="Wallet for the Interchain"
+          subtitle="Cosmos x EVM in one Wallet"
         />
       </div>
     );
@@ -130,12 +136,33 @@ const StateRenderer: FunctionComponent = observer(() => {
   }
 });
 
-ReactDOM.render(
-  <StoreProvider>
+const AppIntlProviderWithStorage = ({ children }) => {
+  const store = useStore();
+
+  return (
     <AppIntlProvider
       additionalMessages={AdditonalIntlMessages}
       languageToFiatCurrency={LanguageToFiatCurrency}
+      // language without region code
+      defaultLocale={navigator.language.split(/[-_]/)[0]}
+      storage={store.uiConfigStore.Storage}
     >
+      {({ language, messages, automatic }) => (
+        <IntlProvider
+          locale={language}
+          messages={messages}
+          key={`${language}${automatic ? '-auto' : ''}`}
+        >
+          {children}
+        </IntlProvider>
+      )}
+    </AppIntlProvider>
+  );
+};
+
+ReactDOM.render(
+  <StoreProvider>
+    <AppIntlProviderWithStorage>
       <LoadingIndicatorProvider>
         <NotificationStoreProvider>
           <NotificationProvider>
@@ -224,6 +251,11 @@ ReactDOM.render(
                     path="/setting/token/manage"
                     component={ManageTokenPage}
                   />
+                  <Route
+                    exact
+                    path="/stake/validator-list"
+                    component={ValidatorListPage}
+                  />
                   <Route path="/sign" component={SignPage} />
                   <Route path="/suggest-chain" component={ChainSuggestedPage} />
                 </LogPageViewWrapper>
@@ -232,7 +264,7 @@ ReactDOM.render(
           </NotificationProvider>
         </NotificationStoreProvider>
       </LoadingIndicatorProvider>
-    </AppIntlProvider>
+    </AppIntlProviderWithStorage>
   </StoreProvider>,
   document.getElementById('app')
 );

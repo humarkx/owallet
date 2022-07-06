@@ -8,15 +8,34 @@ import {
   IMemoConfig,
   InvalidBech32Error,
   IRecipientConfig
-} from '@owallet-wallet/hooks';
-import { TextStyle, View, ViewStyle } from 'react-native';
+} from '@owallet/hooks';
+import { StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
 import { TextInput } from './input';
-import { ObservableEnsFetcher } from '@owallet-wallet/ens';
+import { ObservableEnsFetcher } from '@owallet/ens';
 import { LoadingSpinner } from '../spinner';
 import { useStyle } from '../../styles';
-import { AddressBookIcon } from '../icon';
+import { AddressBookIcon, NoteIcon } from '../icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
+import { colors } from '../../themes';
+
+const styles = StyleSheet.create({
+  absolute: {
+    position: 'absolute'
+  },
+  'height-16': {
+    height: 16
+  },
+  'justify-center': {
+    justifyContent: 'center'
+  },
+  'margin-top-2': {
+    marginTop: 2
+  },
+  'margin-left-4': {
+    marginLeft: 4
+  }
+});
 
 export const AddressInput: FunctionComponent<{
   labelStyle?: TextStyle;
@@ -26,10 +45,15 @@ export const AddressInput: FunctionComponent<{
 
   label: string;
 
+  inputRight?: React.ReactNode;
+
   recipientConfig: IRecipientConfig;
   memoConfig: IMemoConfig;
 
   disableAddressBook?: boolean;
+
+  placeholder?: string;
+  placeholderTextColor?: string;
 }> = observer(
   ({
     labelStyle,
@@ -39,7 +63,10 @@ export const AddressInput: FunctionComponent<{
     label,
     recipientConfig,
     memoConfig,
-    disableAddressBook
+    disableAddressBook,
+    placeholder,
+    placeholderTextColor,
+    inputRight
   }) => {
     const smartNavigation = useSmartNavigation();
 
@@ -84,23 +111,22 @@ export const AddressInput: FunctionComponent<{
         onChangeText={(text) => {
           recipientConfig.setRawRecipient(text);
         }}
+        placeholder={placeholder}
+        placeholderTextColor={placeholderTextColor}
         paragraph={
           isENSAddress ? (
             isENSLoading ? (
               <View>
                 <View
-                  style={style.flatten([
-                    'absolute',
-                    'height-16',
-                    'justify-center',
-                    'margin-top-2',
-                    'margin-left-4'
-                  ])}
+                  style={[
+                    styles['absolute'],
+                    styles['height-16'],
+                    styles['justify-center'],
+                    styles['margin-top-2'],
+                    styles['margin-left-4']
+                  ]}
                 >
-                  <LoadingSpinner
-                    size={14}
-                    color={style.get('color-loading-spinner').color}
-                  />
+                  <LoadingSpinner size={14} color={'#83838F'} />
                 </View>
               </View>
             ) : (
@@ -117,20 +143,21 @@ export const AddressInput: FunctionComponent<{
                 'justify-center'
               ])}
             >
-              <TouchableOpacity
-                style={style.flatten(['padding-4'])}
-                onPress={() => {
-                  smartNavigation.navigateSmart('AddressBook', {
-                    recipientConfig,
-                    memoConfig
-                  });
-                }}
-              >
-                <AddressBookIcon
-                  color={style.get('color-primary').color}
-                  height={18}
-                />
-              </TouchableOpacity>
+              {inputRight ? (
+                inputRight
+              ) : (
+                <TouchableOpacity
+                  style={style.flatten(['padding-4'])}
+                  onPress={() => {
+                    smartNavigation.navigateSmart('AddressBook', {
+                      recipientConfig,
+                      memoConfig
+                    });
+                  }}
+                >
+                  <NoteIcon color={colors['purple-900']} height={18} />
+                </TouchableOpacity>
+              )}
             </View>
           )
         }

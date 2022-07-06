@@ -2,12 +2,13 @@ import React, { FunctionComponent } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../stores';
 import { Card, CardBody } from '../../../components/card';
-import { Text, ViewStyle, View, StyleSheet } from 'react-native';
+import { ViewStyle, View, StyleSheet } from 'react-native';
+import { CText as Text } from '../../../components/text';
 import { useStyle } from '../../../styles';
 import { useIntl } from 'react-intl';
 import { ValidatorThumbnail } from '../../../components/thumbnail';
 import { ProgressBar } from '../../../components/progress-bar';
-import { BondStatus } from '@owallet-wallet/stores/build/query/cosmos/staking/types';
+import { BondStatus } from '@owallet/stores';
 
 export const UndelegationsCard: FunctionComponent<{
   containerStyle?: ViewStyle;
@@ -17,9 +18,10 @@ export const UndelegationsCard: FunctionComponent<{
   const account = accountStore.getAccount(chainStore.current.chainId);
   const queries = queriesStore.get(chainStore.current.chainId);
 
-  const unbondings = queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
-    account.bech32Address
-  ).unbondingBalances;
+  const unbondings =
+    queries.cosmos.queryUnbondingDelegations.getQueryBech32Address(
+      account.bech32Address
+    ).unbondingBalances;
 
   const bondedValidators = queries.cosmos.queryValidators.getQueryStatus(
     BondStatus.Bonded
@@ -38,7 +40,11 @@ export const UndelegationsCard: FunctionComponent<{
 
   return (
     <Card style={containerStyle}>
-      <CardBody>
+      <CardBody
+        style={{
+          backgroundColor: 'white',
+        }}
+      >
         <Text style={style.flatten(['h4', 'color-text-black-very-high'])}>
           My Unstaking
         </Text>

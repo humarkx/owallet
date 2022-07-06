@@ -5,13 +5,13 @@ import { EnigmaUtils } from 'secretjs';
 import { KeyRingService } from '../keyring';
 import { ChainsService } from '../chains';
 import { PermissionService } from '../permission';
-import { Hash } from '@owallet-wallet/crypto';
-import { KVStore, Debouncer } from '@owallet-wallet/common';
-import { ChainInfo } from '@owallet-wallet/types';
-import { Bech32Address } from '@owallet-wallet/cosmos';
-import { Env } from '@owallet-wallet/router';
+import { Hash } from '@owallet/crypto';
+import { KVStore, Debouncer } from '@owallet/common';
+import { ChainInfo } from '@owallet/types';
+import { Bech32Address } from '@owallet/cosmos';
+import { Env } from '@owallet/router';
 
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 
 @singleton()
 export class SecretWasmService {
@@ -46,7 +46,7 @@ export class SecretWasmService {
   async getPubkey(env: Env, chainId: string): Promise<Uint8Array> {
     const chainInfo = await this.chainsService.getChainInfo(chainId);
 
-    const keyRingType = await this.keyRingService.getKeyRingType();
+    const keyRingType = this.keyRingService.getKeyRingType();
     if (keyRingType === 'none') {
       throw new Error('Key ring is not initialized');
     }
@@ -64,7 +64,7 @@ export class SecretWasmService {
   ): Promise<Uint8Array> {
     const chainInfo = await this.chainsService.getChainInfo(chainId);
 
-    const keyRingType = await this.keyRingService.getKeyRingType();
+    const keyRingType = this.keyRingService.getKeyRingType();
     if (keyRingType === 'none') {
       throw new Error('Key ring is not initialized');
     }
@@ -84,7 +84,7 @@ export class SecretWasmService {
   ): Promise<Uint8Array> {
     const chainInfo = await this.chainsService.getChainInfo(chainId);
 
-    const keyRingType = await this.keyRingService.getKeyRingType();
+    const keyRingType = this.keyRingService.getKeyRingType();
     if (keyRingType === 'none') {
       throw new Error('Key ring is not initialized');
     }
@@ -108,7 +108,7 @@ export class SecretWasmService {
   ): Promise<Uint8Array> {
     const chainInfo = await this.chainsService.getChainInfo(chainId);
 
-    const keyRingType = await this.keyRingService.getKeyRingType();
+    const keyRingType = this.keyRingService.getKeyRingType();
     if (keyRingType === 'none') {
       throw new Error('Key ring is not initialized');
     }
@@ -185,8 +185,7 @@ export class SecretWasmService {
               account_number: 0,
               chain_id: chainInfo.chainId,
               fee: [],
-              memo:
-                'Create OWallet Secret encryption key. Only approve requests by OWallet.',
+              memo: 'Create OWallet Secret encryption key. Only approve requests by OWallet.',
               msgs: [],
               sequence: 0
             })

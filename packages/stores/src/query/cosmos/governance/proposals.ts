@@ -6,11 +6,11 @@ import {
   ObservableQueryGovParamTally,
   ObservableQueryGovParamVoting
 } from './params';
-import { KVStore } from '@owallet-wallet/common';
+import { KVStore } from '@owallet/common';
 import { ChainGetter } from '../../../common';
 import { StakingPool } from '../staking/types';
 import { DeepReadonly } from 'utility-types';
-import { Dec, DecUtils, Int, IntPretty } from '@owallet-wallet/unit';
+import { Dec, DecUtils, Int, IntPretty } from '@owallet/unit';
 import { computedFn } from 'mobx-utils';
 import { ObservableQueryProposal } from './proposal';
 
@@ -90,7 +90,7 @@ export class ObservableQueryGovernance extends ObservableChainQuery<GovProposals
 
     let quorum = new Dec(paramTally.response.data.result.quorum);
     // Multiply 100
-    quorum = quorum.mulTruncate(DecUtils.getPrecisionDec(2));
+    quorum = quorum.mulTruncate(DecUtils.getTenExponentNInPrecisionRange(2));
 
     return new IntPretty(quorum);
   }
@@ -107,7 +107,6 @@ export class ObservableQueryGovernance extends ObservableChainQuery<GovProposals
     // https://github.com/chainapsis/owallet-wallet/issues/275
     // https://github.com/chainapsis/owallet-wallet/issues/278
     // TODO: Erase this part soon
-    // console.log("proposals response data", this.response.data);
 
     const result: ObservableQueryProposal[] = [];
 
@@ -126,9 +125,9 @@ export class ObservableQueryGovernance extends ObservableChainQuery<GovProposals
     return result.reverse();
   }
 
-  readonly getProposal = computedFn((id: string):
-    | DeepReadonly<ObservableQueryProposal>
-    | undefined => {
-    return this.proposals.find((proposal) => proposal.id === id);
-  });
+  readonly getProposal = computedFn(
+    (id: string): DeepReadonly<ObservableQueryProposal> | undefined => {
+      return this.proposals.find((proposal) => proposal.id === id);
+    }
+  );
 }

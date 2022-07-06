@@ -10,26 +10,23 @@ import {
   AppState,
   AppStateStatus,
   RefreshControl,
-  ScrollView
+  ScrollView,
+  StyleSheet
 } from 'react-native';
 import { useStore } from '../../stores';
-import { StakingInfoCard } from './staking-info-card';
-import { useStyle } from '../../styles';
-import { GovernanceCard } from './governance-card';
+import { EarningCard } from './earning-card';
 import { observer } from 'mobx-react-lite';
-import { MyRewardCard } from './my-reward-card';
 import { TokensCard } from './tokens-card';
 import { usePrevious } from '../../hooks';
 import { BIP44Selectable } from './bip44-selectable';
 import { useFocusEffect } from '@react-navigation/native';
-import { ChainUpdaterService } from '@owallet-wallet/background';
+import { ChainUpdaterService } from '@owallet/background';
+import { colors } from '../../themes';
 
-export const HomeScreen: FunctionComponent = observer(() => {
+export const HomeScreen: FunctionComponent = observer((props) => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const { chainStore, accountStore, queriesStore, priceStore } = useStore();
-
-  const style = useStyle();
 
   const scrollViewRef = useRef<ScrollView | null>(null);
 
@@ -127,8 +124,9 @@ export const HomeScreen: FunctionComponent = observer(() => {
       accountStore.getAccount(chainStore.current.chainId).bech32Address
     );
 
-  const tokens = queryBalances.positiveNativeUnstakables.concat(
-    queryBalances.nonNativeBalances
+  const tokens = queryBalances.balances.concat(
+    queryBalances.nonNativeBalances,
+    queryBalances.positiveNativeUnstakables
   );
 
   return (
@@ -139,21 +137,34 @@ export const HomeScreen: FunctionComponent = observer(() => {
       ref={scrollViewRef}
     >
       <BIP44Selectable />
-      <AccountCard containerStyle={style.flatten(['margin-y-card-gap'])} />
+      <AccountCard containerStyle={styles.containerStyle} />
       {tokens.length > 0 ? (
-        <TokensCard
-          containerStyle={style.flatten(['margin-bottom-card-gap'])}
-        />
+        <TokensCard containerStyle={styles.containerStyle} />
       ) : null}
-      <MyRewardCard
-        containerStyle={style.flatten(['margin-bottom-card-gap'])}
-      />
-      <StakingInfoCard
-        containerStyle={style.flatten(['margin-bottom-card-gap'])}
-      />
-      <GovernanceCard
-        containerStyle={style.flatten(['margin-bottom-card-gap'])}
-      />
+      <EarningCard containerStyle={styles.containerEarnStyle} />
+      {/* {currentChain.networkType === 'cosmos' && (
+        <>
+          <MyRewardCard
+            containerStyle={style.flatten(['margin-bottom-card-gap'])}
+          />
+          <StakingInfoCard
+            containerStyle={style.flatten(['margin-bottom-card-gap'])}
+          />
+          <GovernanceCard
+            containerStyle={style.flatten(['margin-bottom-card-gap'])}
+          />
+        </>
+      )} */}
     </PageWithScrollViewInBottomTabView>
   );
+});
+
+const styles = StyleSheet.create({
+  containerStyle: {
+    paddingBottom: 12,
+    backgroundColor: colors['gray-100']
+  },
+  containerEarnStyle: {
+    backgroundColor: colors['gray-100']
+  }
 });

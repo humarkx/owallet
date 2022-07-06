@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
 import { useNotification } from '../../components/notification';
 import { useIntl } from 'react-intl';
-import { WalletStatus } from '@owallet-wallet/stores';
+import { WalletStatus } from '@owallet/stores';
 
 export const AccountView: FunctionComponent = observer(() => {
   const { accountStore, chainStore } = useStore();
@@ -51,23 +51,41 @@ export const AccountView: FunctionComponent = observer(() => {
               })
             : 'Loading...'}
         </div>
-        <div style={{ flex: 1 }} />
-      </div>
-      <div className={styleAccount.containerAccount}>
-        <div style={{ flex: 1 }} />
-        <div
-          className={styleAccount.address}
-          onClick={() => copyAddress(accountInfo.bech32Address)}
-        >
-          <Address maxCharacters={22} lineBreakBeforePrefix={false}>
-            {accountInfo.walletStatus === WalletStatus.Loaded &&
-            accountInfo.bech32Address
-              ? accountInfo.bech32Address
-              : '...'}
-          </Address>
+        <div style={{ flex: 1, textAlign: 'right' }}>
+          {chainStore.current.raw.txExplorer?.accountUrl && (
+            <a
+              target="_blank"
+              href={chainStore.current.raw.txExplorer.accountUrl.replace(
+                '{address}',
+                // accountInfo.bech32Address
+                chainStore.current.networkType === 'evm'
+                  ? accountInfo.evmosHexAddress
+                  : accountInfo.bech32Address
+              )}
+              title={intl.formatMessage({ id: 'setting.explorer' })}
+            >
+              <i className="fas fa-external-link-alt"></i>
+            </a>
+          )}
         </div>
-        <div style={{ flex: 1 }} />
       </div>
+      {chainStore.current.networkType === 'cosmos' && (
+        <div className={styleAccount.containerAccount}>
+          <div style={{ flex: 1 }} />
+          <div
+            className={styleAccount.address}
+            onClick={() => copyAddress(accountInfo.bech32Address)}
+          >
+            <Address maxCharacters={22} lineBreakBeforePrefix={false}>
+              {accountInfo.walletStatus === WalletStatus.Loaded &&
+              accountInfo.bech32Address
+                ? accountInfo.bech32Address
+                : '...'}
+            </Address>
+          </div>
+          <div style={{ flex: 1 }} />
+        </div>
+      )}
       {accountInfo.hasEvmosHexAddress && (
         <div
           className={styleAccount.containerAccount}

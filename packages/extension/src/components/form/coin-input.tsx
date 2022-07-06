@@ -21,10 +21,11 @@ import {
   NegativeAmountError,
   InsufficientAmountError,
   IAmountConfig
-} from '@owallet-wallet/hooks';
-import { CoinPretty, Dec, DecUtils, Int } from '@owallet-wallet/unit';
+} from '@owallet/hooks';
+import { CoinPretty, Dec, DecUtils, Int } from '@owallet/unit';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useStore } from '../../stores';
+import { DenomHelper } from '@owallet/common';
 
 export interface CoinInputProps {
   amountConfig: IAmountConfig;
@@ -101,6 +102,10 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
         return a.coinDenom < b.coinDenom ? -1 : 1;
       });
 
+    const denomHelper = new DenomHelper(
+      amountConfig.sendCurrency.coinMinimalDenom
+    );
+
     return (
       <React.Fragment>
         <FormGroup className={className}>
@@ -114,17 +119,20 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
           <ButtonDropdown
             id={`selector-${randomId}`}
             className={classnames(styleCoinInput.tokenSelector, {
-              disabled: amountConfig.isMax
+              disabled: amountConfig.fraction === 1
             })}
             isOpen={isOpenTokenSelector}
             toggle={() => setIsOpenTokenSelector((value) => !value)}
-            disabled={amountConfig.isMax}
+            disabled={amountConfig.fraction === 1}
           >
             <DropdownToggle caret>
-              {amountConfig.sendCurrency.coinDenom}
+              {amountConfig.sendCurrency.coinDenom}{' '}
+              {denomHelper.contractAddress &&
+                ` (${denomHelper.contractAddress})`}
             </DropdownToggle>
             <DropdownMenu>
               {selectableCurrencies.map((currency) => {
+                const denomHelper = new DenomHelper(currency.coinMinimalDenom);
                 return (
                   <DropdownItem
                     key={currency.coinMinimalDenom}
@@ -138,7 +146,9 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
                       amountConfig.setSendCurrency(currency);
                     }}
                   >
-                    {currency.coinDenom}
+                    {currency.coinDenom}{' '}
+                    {denomHelper.contractAddress &&
+                      ` (${denomHelper.contractAddress})`}
                   </DropdownItem>
                 );
               })}
@@ -188,7 +198,7 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
             }}
             step={new Dec(1)
               .quo(
-                DecUtils.getPrecisionDec(
+                DecUtils.getTenExponentNInPrecisionRange(
                   amountConfig.sendCurrency?.coinDecimals ?? 0
                 )
               )

@@ -5,17 +5,11 @@ import {
   ProposalStatus,
   ProposalTally
 } from './types';
-import { KVStore } from '@owallet-wallet/common';
+import { KVStore } from '@owallet/common';
 import { ChainGetter } from '../../../common';
 import { computed, makeObservable } from 'mobx';
 import { DeepReadonly } from 'utility-types';
-import {
-  CoinPretty,
-  Dec,
-  DecUtils,
-  Int,
-  IntPretty
-} from '@owallet-wallet/unit';
+import { CoinPretty, Dec, DecUtils, Int, IntPretty } from '@owallet/unit';
 import { ObservableQueryGovernance } from './proposals';
 
 export class ObservableQueryProposal extends ObservableChainQuery<ProposalTally> {
@@ -104,7 +98,9 @@ export class ObservableQueryProposal extends ObservableChainQuery<ProposalTally>
 
     const bondedToken = new Dec(
       pool.response.data.result.bonded_tokens
-    ).quoTruncate(DecUtils.getPrecisionDec(stakeCurrency.coinDecimals));
+    ).quoTruncate(
+      DecUtils.getTenExponentNInPrecisionRange(stakeCurrency.coinDecimals)
+    );
     const tally = this.tally;
     const tallySum = tally.yes
       .add(tally.no)
@@ -115,7 +111,7 @@ export class ObservableQueryProposal extends ObservableChainQuery<ProposalTally>
       tallySum
         .toDec()
         .quoTruncate(bondedToken)
-        .mulTruncate(DecUtils.getPrecisionDec(2))
+        .mulTruncate(DecUtils.getTenExponentNInPrecisionRange(2))
     ).ready(tally.yes.isReady);
   }
 
@@ -230,25 +226,25 @@ export class ObservableQueryProposal extends ObservableChainQuery<ProposalTally>
         tally.yes
           .toDec()
           .quoTruncate(tallySum.toDec())
-          .mulTruncate(DecUtils.getPrecisionDec(2))
+          .mulTruncate(DecUtils.getTenExponentNInPrecisionRange(2))
       ).ready(tally.yes.isReady),
       no: new IntPretty(
         tally.no
           .toDec()
           .quoTruncate(tallySum.toDec())
-          .mulTruncate(DecUtils.getPrecisionDec(2))
+          .mulTruncate(DecUtils.getTenExponentNInPrecisionRange(2))
       ).ready(tally.no.isReady),
       abstain: new IntPretty(
         tally.abstain
           .toDec()
           .quoTruncate(tallySum.toDec())
-          .mulTruncate(DecUtils.getPrecisionDec(2))
+          .mulTruncate(DecUtils.getTenExponentNInPrecisionRange(2))
       ).ready(tally.abstain.isReady),
       noWithVeto: new IntPretty(
         tally.noWithVeto
           .toDec()
           .quoTruncate(tallySum.toDec())
-          .mulTruncate(DecUtils.getPrecisionDec(2))
+          .mulTruncate(DecUtils.getTenExponentNInPrecisionRange(2))
       ).ready(tally.noWithVeto.isReady)
     };
   }

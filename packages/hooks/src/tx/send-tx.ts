@@ -3,9 +3,11 @@ import {
   CosmosMsgOpts,
   CosmwasmMsgOpts,
   SecretMsgOpts
-} from '@owallet-wallet/stores';
-import { ObservableQueryBalances } from '@owallet-wallet/stores/build/query/balances';
-import { useFeeConfig, useMemoConfig, useRecipientConfig } from './index';
+} from '@owallet/stores';
+import { ObservableQueryBalances } from '@owallet/stores';
+import { useFeeConfig } from './fee';
+import { useMemoConfig } from './memo';
+import { useRecipientConfig } from './recipient';
 import { useSendGasConfig } from './send-gas';
 import { useAmountConfig } from './amount';
 

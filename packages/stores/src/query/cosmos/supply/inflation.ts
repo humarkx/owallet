@@ -1,5 +1,5 @@
 import { computed, makeObservable } from 'mobx';
-import { Dec, DecUtils, Int, IntPretty } from '@owallet-wallet/unit';
+import { Dec, DecUtils, Int, IntPretty } from '@owallet/unit';
 import { ObservableQuerySupplyTotal } from './supply';
 import { MintingInflation } from './types';
 import { StakingPool } from '../staking/types';
@@ -58,7 +58,7 @@ export class ObservableQueryInflation {
       if (chainInfo.chainId.startsWith('irishub')) {
         dec = new Dec(
           this._queryIrisMint.response?.data.result.inflation ?? '0'
-        ).mul(DecUtils.getPrecisionDec(2));
+        ).mul(DecUtils.getTenExponentNInPrecisionRange(2));
       } else if (chainInfo.chainId.startsWith('sifchain')) {
         return new IntPretty(
           new Dec(this._querySifchainAPY.liquidityAPY.toString())
@@ -79,8 +79,8 @@ export class ObservableQueryInflation {
             mintParams.epochIdentifier
           ).duration;
           if (epochDuration) {
-            const epochProvision = this._queryOsmosisEpochProvisions
-              .epochProvisions;
+            const epochProvision =
+              this._queryOsmosisEpochProvisions.epochProvisions;
             if (
               epochProvision &&
               this._querySupplyTotal.getQueryStakeDenom().response
@@ -95,16 +95,16 @@ export class ObservableQueryInflation {
               const yearMintingProvision = mintingEpochProvision.mul(
                 new Dec(((365 * 24 * 3600) / epochDuration).toString())
               );
-              const total = DecUtils.getPrecisionDec(8);
+              const total = DecUtils.getTenExponentNInPrecisionRange(8);
               dec = yearMintingProvision
                 .quo(total)
-                .mul(DecUtils.getPrecisionDec(2));
+                .mul(DecUtils.getTenExponentNInPrecisionRange(2));
             }
           }
         }
       } else {
         dec = new Dec(this._queryMint.response?.data.result ?? '0').mul(
-          DecUtils.getPrecisionDec(2)
+          DecUtils.getTenExponentNInPrecisionRange(2)
         );
       }
 
@@ -122,12 +122,12 @@ export class ObservableQueryInflation {
         const totalStr = (() => {
           if (chainInfo.chainId.startsWith('osmosis')) {
             // For osmosis, for now, just assume that the curreny supply is 100,000,000 with 6 decimals.
-            return DecUtils.getPrecisionDec(8 + 6).toString();
+            return DecUtils.getTenExponentNInPrecisionRange(8 + 6).toString();
           }
 
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const response = this._querySupplyTotal.getQueryStakeDenom().response!
-            .data.result;
+          const response =
+            this._querySupplyTotal.getQueryStakeDenom().response!.data.result;
 
           if (typeof response === 'string') {
             return response;

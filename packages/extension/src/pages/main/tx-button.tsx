@@ -14,7 +14,7 @@ import { FormattedMessage } from 'react-intl';
 import { useHistory } from 'react-router';
 
 import classnames from 'classnames';
-import { Dec } from '@owallet-wallet/unit';
+import { Dec } from '@owallet/unit';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const QrCode = require('qrcode');
@@ -54,8 +54,9 @@ export const TxButtonView: FunctionComponent = observer(() => {
   const history = useHistory();
 
   const hasAssets =
-    queryBalances.balances.find((bal) => bal.balance.toDec().gt(new Dec(0))) !==
-    undefined;
+    queryBalances.balances.find((bal) =>
+      bal?.balance?.toDec().gt(new Dec(0))
+    ) !== undefined;
 
   const sendBtnRef = useRef<HTMLButtonElement>(null);
 

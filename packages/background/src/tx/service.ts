@@ -1,13 +1,14 @@
 import { delay, inject, singleton } from 'tsyringe';
 import { TYPES } from '../types';
-
+import { fetchAdapter } from '@owallet/common';
 import Axios from 'axios';
-import { ChainsService } from '../chains';
+import { ChainInfoWithEmbed, ChainsService } from '../chains';
 import { PermissionService } from '../permission';
-import { TendermintTxTracer } from '@owallet-wallet/cosmos/build/tx-tracer';
+import { TendermintTxTracer } from '@owallet/cosmos';
 import { Notification } from './types';
 
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
+import { KeyRingService } from '../keyring';
 
 interface CosmosSdkError {
   codespace: string;
@@ -22,11 +23,53 @@ interface ABCIMessageLog {
   // Events StringEvents
 }
 
+// TODO: is this place good to place this function?
+export async function request(
+  rpc: string,
+  method: string,
+  params: any[]
+): Promise<any> {
+  const restInstance = Axios.create({
+    ...{
+      baseURL: rpc
+    },
+    adapter: fetchAdapter
+  });
+
+  try {
+    const response = await restInstance.post(
+      '/',
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method,
+        params
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
+    if (response.data.result) return response.data.result;
+    if (response.data.error)
+      throw new Error(JSON.stringify(response.data.error));
+    throw new Error(
+      `Unexpected error from the network: ${JSON.stringify(response.data)}`
+    );
+  } catch (error) {
+    console.error('error calling request from ethereum provider: ', error);
+  }
+}
+
 @singleton()
 export class BackgroundTxService {
   constructor(
     @inject(delay(() => ChainsService))
     protected readonly chainsService: ChainsService,
+    @inject(delay(() => KeyRingService))
+    protected readonly keyRingService: KeyRingService,
     @inject(delay(() => PermissionService))
     public readonly permissionService: PermissionService,
     @inject(TYPES.Notification)
@@ -39,11 +82,13 @@ export class BackgroundTxService {
     mode: 'async' | 'sync' | 'block'
   ): Promise<Uint8Array> {
     const chainInfo = await this.chainsService.getChainInfo(chainId);
+
     const restInstance = Axios.create({
       ...{
         baseURL: chainInfo.rest
       },
-      ...chainInfo.restConfig
+      ...chainInfo.restConfig,
+      adapter: fetchAdapter
     });
 
     this.notification.create({
@@ -100,6 +145,43 @@ export class BackgroundTxService {
       console.log(e);
       BackgroundTxService.processTxErrorNotification(this.notification, e);
       throw e;
+    }
+  }
+
+  private parseChainId({ chainId }: { chainId: string }): {
+    chainId: string;
+    isEvm: boolean;
+  } {
+    if (!chainId)
+      throw new Error('Invalid empty chain id when switching Ethereum chain');
+    if (chainId.substring(0, 2) === '0x')
+      return { chainId: parseInt(chainId, 16).toString(), isEvm: true };
+    return { chainId, isEvm: false };
+  }
+
+  async request(chainId: string, method: string, params: any[]): Promise<any> {
+    let chainInfo: ChainInfoWithEmbed;
+    switch (method) {
+      case 'eth_accounts':
+      case 'eth_requestAccounts':
+        chainInfo = await this.chainsService.getChainInfo(chainId);
+        if (chainInfo.coinType !== 60) return undefined;
+        const chainIdOrCoinType = params.length ? parseInt(params[0]) : chainId; // default is cointype 60 for ethereum based
+        const key = await this.keyRingService.getKey(chainIdOrCoinType);
+        return [`0x${Buffer.from(key.address).toString('hex')}`];
+      case 'wallet_switchEthereumChain' as any:
+        const { chainId: inputChainId, isEvm } = this.parseChainId(params[0]);
+        chainInfo = isEvm
+          ? await this.chainsService.getChainInfo(inputChainId, 'evm')
+          : await this.chainsService.getChainInfo(inputChainId);
+        return chainInfo.chainId;
+      default:
+        chainInfo = await this.chainsService.getChainInfo(chainId);
+        if (!chainInfo.evmRpc)
+          throw new Error(
+            `The given chain ID: ${chainId} does not have a RPC endpoint to connect to`
+          );
+        return await request(chainInfo.evmRpc, method, params);
     }
   }
 

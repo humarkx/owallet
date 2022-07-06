@@ -1,5 +1,10 @@
-import { Message, MessageRequester, Result } from '@owallet-wallet/router';
-import { JSONUint8Array } from '@owallet-wallet/router/build/json-uint8-array';
+import {
+  Message,
+  MessageRequester,
+  OWalletError,
+  Result
+} from '@owallet/router';
+import { JSONUint8Array } from '@owallet/router';
 import EventEmitter from 'eventemitter3';
 import { RNRouterBackground, RNRouterUI } from './rn-router';
 
@@ -25,6 +30,8 @@ export class RNMessageRequesterBase implements MessageRequester {
   ): Promise<M extends Message<infer R> ? R : never> {
     msg.validateBasic();
 
+    console.log('in send message mobile with msg: ', msg);
+
     const sender = this.getSender();
 
     // Set message's origin.
@@ -33,7 +40,7 @@ export class RNMessageRequesterBase implements MessageRequester {
     msg['origin'] = sender.origin;
 
     if (this.eventEmitter.listenerCount('message') === 0) {
-      throw new Error('There is no router to send');
+      throw new Error('There is no router to send' + JSON.stringify(msg));
     }
 
     const result: Result = JSONUint8Array.unwrap(
@@ -54,12 +61,22 @@ export class RNMessageRequesterBase implements MessageRequester {
       })
     );
 
+    console.log('result send msg: ', result);
+
     if (!result) {
       throw new Error('Null result');
     }
 
     if (result.error) {
-      throw new Error(result.error);
+      if (typeof result.error === 'string') {
+        throw new Error(result.error);
+      } else {
+        throw new OWalletError(
+          result.error.module,
+          result.error.code,
+          result.error.message
+        );
+      }
     }
 
     return result.return;

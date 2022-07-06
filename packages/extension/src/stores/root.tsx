@@ -1,6 +1,10 @@
 import { ChainStore } from './chain';
-import { EmbedChainInfos } from '../config';
-import { FiatCurrencies, AmplitudeApiKey } from '../config.ui';
+import {
+  AmplitudeApiKey,
+  EmbedChainInfos,
+  ExtensionKVStore,
+  FiatCurrencies
+} from '@owallet/common';
 import {
   KeyRingStore,
   InteractionStore,
@@ -14,25 +18,24 @@ import {
   ChainSuggestStore,
   IBCChannelStore,
   IBCCurrencyRegsitrar,
-  QueriesWithCosmosAndSecretAndCosmwasm,
+  QueriesWithCosmosAndSecretAndCosmwasmAndEvm,
   AccountWithAll,
   getOWalletFromWindow
-} from '@owallet-wallet/stores';
-import { ExtensionKVStore } from '@owallet-wallet/common';
+} from '@owallet/stores';
 import {
   ExtensionRouter,
   ContentScriptEnv,
   ContentScriptGuards,
   InExtensionMessageRequester
-} from '@owallet-wallet/router-extension';
-import { APP_PORT } from '@owallet-wallet/router';
-import { ChainInfoWithEmbed } from '@owallet-wallet/background';
-import { FiatCurrency } from '@owallet-wallet/types';
-import { UIConfigStore } from './ui-config';
-import { FeeType } from '@owallet-wallet/hooks';
-import { AnalyticsStore, NoopAnalyticsClient } from '@owallet-wallet/analytics';
+} from '@owallet/router-extension';
+import { APP_PORT } from '@owallet/router';
+import { ChainInfoWithEmbed } from '@owallet/background';
+import { FiatCurrency } from '@owallet/types';
+import { UIConfigStore } from '@owallet/common';
+import { FeeType } from '@owallet/hooks';
+import { AnalyticsStore, NoopAnalyticsClient } from '@owallet/analytics';
 import Amplitude from 'amplitude-js';
-import { ChainIdHelper } from '@owallet-wallet/cosmos';
+import { ChainIdHelper } from '@owallet/cosmos';
 
 export class RootStore {
   public readonly uiConfigStore: UIConfigStore;
@@ -47,7 +50,7 @@ export class RootStore {
   public readonly ledgerInitStore: LedgerInitStore;
   public readonly chainSuggestStore: ChainSuggestStore;
 
-  public readonly queriesStore: QueriesStore<QueriesWithCosmosAndSecretAndCosmwasm>;
+  public readonly queriesStore: QueriesStore<QueriesWithCosmosAndSecretAndCosmwasmAndEvm>;
   public readonly accountStore: AccountStore<AccountWithAll>;
   public readonly priceStore: CoinGeckoPriceStore;
   public readonly tokensStore: TokensStore<ChainInfoWithEmbed>;
@@ -124,7 +127,7 @@ export class RootStore {
       new ExtensionKVStore('store_queries'),
       this.chainStore,
       getOWalletFromWindow,
-      QueriesWithCosmosAndSecretAndCosmwasm
+      QueriesWithCosmosAndSecretAndCosmwasmAndEvm
     );
 
     const chainOpts = this.chainStore.chainInfos.map((chainInfo) => {

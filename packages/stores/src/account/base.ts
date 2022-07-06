@@ -6,30 +6,27 @@ import {
   observable,
   runInAction
 } from 'mobx';
-import {
-  AppCurrency,
-  OWallet,
-  OWalletSignOptions
-} from '@owallet-wallet/types';
+import { AppCurrency, OWallet, OWalletSignOptions } from '@owallet/types';
 import { DeepReadonly } from 'utility-types';
 import { ChainGetter } from '../common';
 import { QueriesSetBase, QueriesStore } from '../query';
-import { DenomHelper, toGenerator } from '@owallet-wallet/common';
+import { DenomHelper, toGenerator, fetchAdapter } from '@owallet/common';
 import {
   BroadcastMode,
   makeSignDoc,
   makeStdTx,
   Msg,
-  StdFee
+  StdFee,
+  StdTx
 } from '@cosmjs/launchpad';
 import {
   BaseAccount,
   cosmos,
   google,
   TendermintTxTracer
-} from '@owallet-wallet/cosmos';
+} from '@owallet/cosmos';
 import Axios, { AxiosInstance } from 'axios';
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 import Long from 'long';
 import ICoin = cosmos.base.v1beta1.ICoin;
 import SignMode = cosmos.tx.signing.v1beta1.SignMode;
@@ -190,6 +187,7 @@ export class AccountSetBase<MsgOpts, Queries> {
   @flow
   public *init() {
     // If wallet status is not exist, there is no need to try to init because it always fails.
+
     if (this.walletStatus === WalletStatus.NotExist) {
       return;
     }
@@ -198,7 +196,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     if (!this.hasInited) {
       // If key store in the owallet extension is changed, this event will be dispatched.
       this.eventListener.addEventListener(
-        'owallet_keystorechange',
+        'keplr_keystorechange',
         this.handleInit
       );
     }
@@ -237,7 +235,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     this._walletStatus = WalletStatus.NotInit;
     this.hasInited = false;
     this.eventListener.removeEventListener(
-      'owallet_keystorechange',
+      'keplr_keystorechange',
       this.handleInit
     );
     this._bech32Address = '';
@@ -256,6 +254,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     );
   }
 
+  // get here 11
   async sendMsgs(
     type: string | 'unknown',
     msgs:
@@ -386,6 +385,8 @@ export class AccountSetBase<MsgOpts, Queries> {
           onFulfill?: (tx: any) => void;
         }
   ) {
+    console.log('get here');
+
     for (let i = 0; i < this.sendTokenFns.length; i++) {
       const fn = this.sendTokenFns[i];
 
@@ -408,6 +409,8 @@ export class AccountSetBase<MsgOpts, Queries> {
 
     throw new Error(`Unsupported type of currency (${denomHelper.type})`);
   }
+
+  // TODO; do we have to add a new broadcast msg for Ethereum?
 
   // Return the tx hash.
   protected async broadcastMsgs(
@@ -456,10 +459,11 @@ export class AccountSetBase<MsgOpts, Queries> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const owallet = (await this.getOWallet())!;
 
-    let signedTx;
+    let signedTx: Uint8Array | StdTx;
 
     if (this.hasNoLegacyStdFeature()) {
       const key = await owallet.getKey(this.chainId);
+
       const signDoc = {
         bodyBytes: cosmos.tx.v1beta1.TxBody.encode({
           messages: protoMsgs,
@@ -515,6 +519,7 @@ export class AccountSetBase<MsgOpts, Queries> {
         account.getAccountNumber().toString(),
         account.getSequence().toString()
       );
+
       const signResponse = await owallet.signAmino(
         this.chainId,
         this.bech32Address,
@@ -540,7 +545,8 @@ export class AccountSetBase<MsgOpts, Queries> {
       ...{
         baseURL: chainInfo.rest
       },
-      ...chainInfo.restConfig
+      ...chainInfo.restConfig,
+      adapter: fetchAdapter
     });
   }
 
@@ -565,6 +571,7 @@ export class AccountSetBase<MsgOpts, Queries> {
   }
 
   get evmosHexAddress(): string {
+    if (!this.bech32Address) return;
     return evmosToEth(this.bech32Address);
   }
 

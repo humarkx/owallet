@@ -1,23 +1,23 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react'
 import {
   Keyboard,
   KeyboardEvent,
   Platform,
   StyleSheet,
-  Text,
   View,
-  ViewStyle,
-} from "react-native";
-import { useStyle } from "../../styles";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { PanGestureHandler } from "react-native-gesture-handler";
-import { useModalState, useModalTransision } from "../base";
-import Animated, { Easing } from "react-native-reanimated";
+  ViewStyle
+} from 'react-native'
+import { CText as Text} from "../../components/text";
+import { useStyle } from '../../styles'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { PanGestureHandler } from 'react-native-gesture-handler'
+import { useModalState, useModalTransision } from '../base'
+import Animated, { Easing } from 'react-native-reanimated'
 import {
   DefaultAcceleration,
   DefaultCloseVelocity,
-  DefaultOpenVelocity,
-} from "../base/const";
+  DefaultOpenVelocity
+} from '../base/const'
 
 const useAnimatedValueSet = () => {
   const [state] = useState(() => {
@@ -26,63 +26,61 @@ const useAnimatedValueSet = () => {
       finished: new Animated.Value(0),
       time: new Animated.Value(0),
       frameTime: new Animated.Value(0),
-      value: new Animated.Value(0),
-    };
-  });
+      value: new Animated.Value(0)
+    }
+  })
 
-  return state;
-};
+  return state
+}
 
 // CONTRACT: Use with { disableSafeArea: true, align: "bottom" } modal options.
 export const CardModal: FunctionComponent<{
-  title?: string;
-  right?: React.ReactElement;
-  childrenContainerStyle?: ViewStyle;
+  title?: string
+  right?: React.ReactElement
+  childrenContainerStyle?: ViewStyle
 
-  disableGesture?: boolean;
+  disableGesture?: boolean
 }> = ({
   title,
   right,
   children,
   childrenContainerStyle,
-  disableGesture = false,
+  disableGesture = false
 }) => {
-  const style = useStyle();
-  const safeAreaInsets = useSafeAreaInsets();
+  const style = useStyle()
+  const safeAreaInsets = useSafeAreaInsets()
 
-  const [
-    softwareKeyboardBottomPadding,
-    setSoftwareKeyboardBottomPadding,
-  ] = useState(0);
+  const [softwareKeyboardBottomPadding, setSoftwareKeyboardBottomPadding] =
+    useState(0)
 
   useEffect(() => {
     const onKeyboarFrame = (e: KeyboardEvent) => {
       setSoftwareKeyboardBottomPadding(
         e.endCoordinates.height - safeAreaInsets.bottom
-      );
-    };
+      )
+    }
     const onKeyboardClearFrame = () => {
-      setSoftwareKeyboardBottomPadding(0);
-    };
+      setSoftwareKeyboardBottomPadding(0)
+    }
 
     // No need to do this on android
-    if (Platform.OS !== "android") {
-      Keyboard.addListener("keyboardWillShow", onKeyboarFrame);
-      Keyboard.addListener("keyboardWillChangeFrame", onKeyboarFrame);
-      Keyboard.addListener("keyboardWillHide", onKeyboardClearFrame);
+    // if (Platform.OS !== 'android') {
+    //   Keyboard.addListener('keyboardWillShow', onKeyboarFrame);
+    //   Keyboard.addListener('keyboardWillChangeFrame', onKeyboarFrame);
+    //   Keyboard.addListener('keyboardWillHide', onKeyboardClearFrame);
 
-      return () => {
-        Keyboard.removeListener("keyboardWillShow", onKeyboarFrame);
-        Keyboard.removeListener("keyboardWillChangeFrame", onKeyboarFrame);
-        Keyboard.removeListener("keyboardWillHide", onKeyboardClearFrame);
-      };
-    }
-  }, [safeAreaInsets.bottom]);
+    //   return () => {
+    //     Keyboard.removeListener('keyboardWillShow', onKeyboarFrame);
+    //     Keyboard.removeListener('keyboardWillChangeFrame', onKeyboarFrame);
+    //     Keyboard.removeListener('keyboardWillHide', onKeyboardClearFrame);
+    //   };
+    // }
+  }, [safeAreaInsets.bottom])
 
-  const animatedValueSet = useAnimatedValueSet();
+  const animatedValueSet = useAnimatedValueSet()
 
-  const modal = useModalState();
-  const modalTransition = useModalTransision();
+  const modal = useModalState()
+  const modalTransition = useModalTransision()
 
   const animatedKeyboardPaddingBottom = useMemo(() => {
     return Animated.block([
@@ -93,13 +91,13 @@ export const CardModal: FunctionComponent<{
         ),
         [
           Animated.debug(
-            "start clock for keyboard avoiding",
+            'start clock for keyboard avoiding',
             animatedValueSet.value
           ),
           Animated.set(animatedValueSet.finished, 0),
           Animated.set(animatedValueSet.time, 0),
           Animated.set(animatedValueSet.frameTime, 0),
-          Animated.startClock(animatedValueSet.clock),
+          Animated.startClock(animatedValueSet.clock)
         ]
       ),
       Animated.timing(
@@ -108,55 +106,55 @@ export const CardModal: FunctionComponent<{
           finished: animatedValueSet.finished,
           position: animatedValueSet.value,
           time: animatedValueSet.time,
-          frameTime: animatedValueSet.frameTime,
+          frameTime: animatedValueSet.frameTime
         },
         {
           toValue: softwareKeyboardBottomPadding,
           duration: 175,
-          easing: Easing.linear,
+          easing: Easing.linear
         }
       ),
       Animated.cond(
         animatedValueSet.finished,
         Animated.stopClock(animatedValueSet.clock)
       ),
-      animatedValueSet.value,
-    ]);
+      animatedValueSet.value
+    ])
   }, [
     animatedValueSet.clock,
     animatedValueSet.finished,
     animatedValueSet.frameTime,
     animatedValueSet.time,
     animatedValueSet.value,
-    softwareKeyboardBottomPadding,
-  ]);
+    softwareKeyboardBottomPadding
+  ])
 
-  const [startTranslateY] = useState(() => new Animated.Value(0));
-  const [openVelocityValue] = useState(() => new Animated.Value(0));
-  const [closeVelocityValue] = useState(() => new Animated.Value(0));
-  const [velocityYAcceleration] = useState(() => new Animated.Value(1));
+  const [startTranslateY] = useState(() => new Animated.Value(0))
+  const [openVelocityValue] = useState(() => new Animated.Value(0))
+  const [closeVelocityValue] = useState(() => new Animated.Value(0))
+  const [velocityYAcceleration] = useState(() => new Animated.Value(1))
 
   const onGestureEvent = useMemo(() => {
     const openVelocity =
       modal.openTransitionVelocity ??
       modal.transitionVelocity ??
-      DefaultOpenVelocity;
+      DefaultOpenVelocity
     const closeVelocity =
       modal.closeTransitionVelocity ??
       modal.transitionVelocity ??
-      DefaultCloseVelocity;
-    const acceleration = modal.transitionAcceleration ?? DefaultAcceleration;
+      DefaultCloseVelocity
+    const acceleration = modal.transitionAcceleration ?? DefaultAcceleration
 
     return Animated.event([
       {
         nativeEvent: ({
           velocityY,
           translationY,
-          state,
+          state
         }: {
-          velocityY: number;
-          translationY: number;
-          state: number;
+          velocityY: number
+          translationY: number
+          state: number
         }) => {
           return Animated.block([
             Animated.cond(
@@ -197,7 +195,7 @@ export const CardModal: FunctionComponent<{
                       Animated.divide(Animated.abs(velocityY), 1750)
                     )
                   )
-                ),
+                )
               ],
               // If the status is not active, and the "isPaused" is not yet changed to the 1,
               // it means that the it is the first time from the status is changed.
@@ -231,7 +229,7 @@ export const CardModal: FunctionComponent<{
                       // No need to set.
                       // Animated.set(modalTransition.translateY, transition.startY),
                       Animated.set(modalTransition.frameTime, 0),
-                      Animated.startClock(modalTransition.clock),
+                      Animated.startClock(modalTransition.clock)
                     ],
                     // Set the duration
                     Animated.cond(
@@ -261,7 +259,7 @@ export const CardModal: FunctionComponent<{
                           )
                         ),
                         Animated.debug(
-                          "velocityYAcceleration",
+                          'velocityYAcceleration',
                           velocityYAcceleration
                         ),
                         Animated.set(
@@ -273,12 +271,12 @@ export const CardModal: FunctionComponent<{
                             ),
                             1000
                           )
-                        ),
+                        )
                       ],
                       Animated.set(modalTransition.duration, 0)
                     ),
                     Animated.set(modalTransition.durationSetOnExternal, 1),
-                    Animated.set(modalTransition.isOpen, 1),
+                    Animated.set(modalTransition.isOpen, 1)
                   ],
                   [
                     [
@@ -288,7 +286,7 @@ export const CardModal: FunctionComponent<{
                       // No need to set.
                       // Animated.set(modalTransition.translateY, transition.startY),
                       Animated.set(modalTransition.frameTime, 0),
-                      Animated.startClock(modalTransition.clock),
+                      Animated.startClock(modalTransition.clock)
                     ],
                     // Set the duration
                     Animated.cond(
@@ -323,7 +321,7 @@ export const CardModal: FunctionComponent<{
                           )
                         ),
                         Animated.debug(
-                          "velocityYAcceleration",
+                          'velocityYAcceleration',
                           velocityYAcceleration
                         ),
                         Animated.set(
@@ -340,24 +338,24 @@ export const CardModal: FunctionComponent<{
                             ),
                             1000
                           )
-                        ),
+                        )
                       ],
                       Animated.set(modalTransition.duration, 0)
                     ),
                     Animated.set(modalTransition.durationSetOnExternal, 1),
                     Animated.set(modalTransition.isOpen, 0),
                     Animated.call([], () => {
-                      modal.close();
-                    }),
+                      modal.close()
+                    })
                   ]
                 ),
-                Animated.set(modalTransition.isPaused, 0),
+                Animated.set(modalTransition.isPaused, 0)
               ])
-            ),
-          ]);
-        },
-      },
-    ]);
+            )
+          ])
+        }
+      }
+    ])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     modal.close,
@@ -373,24 +371,24 @@ export const CardModal: FunctionComponent<{
     modalTransition.time,
     modalTransition.translateY,
     modalTransition.startY,
-    startTranslateY,
-  ]);
+    startTranslateY
+  ])
 
   return (
     <Animated.View
       style={StyleSheet.flatten([
         style.flatten([
-          "background-color-white",
-          "border-radius-top-left-8",
-          "border-radius-top-right-8",
-          "overflow-hidden",
+          'background-color-white',
+          'border-radius-top-left-8',
+          'border-radius-top-right-8',
+          'overflow-hidden'
         ]),
         {
           paddingBottom: Animated.add(
             safeAreaInsets.bottom,
             animatedKeyboardPaddingBottom
-          ),
-        },
+          )
+        }
       ])}
     >
       <PanGestureHandler
@@ -399,16 +397,16 @@ export const CardModal: FunctionComponent<{
         enabled={!disableGesture}
       >
         {/* Below view is not animated, but to let the gesture handler to accept the animated block, you should set the children of the gesture handler as the Animated.View */}
-        <Animated.View style={style.flatten(["padding-x-page"])}>
-          <View style={style.flatten(["items-center", "margin-bottom-16"])}>
+        <Animated.View style={style.flatten(['padding-x-page'])}>
+          <View style={style.flatten(['items-center', 'margin-bottom-16'])}>
             {!disableGesture ? (
               <View
                 style={style.flatten([
-                  "margin-top-8",
-                  "width-58",
-                  "height-5",
-                  "border-radius-16",
-                  "background-color-card-modal-handle",
+                  'margin-top-8',
+                  'width-58',
+                  'height-5',
+                  'border-radius-16',
+                  'background-color-card-modal-handle'
                 ])}
               />
             ) : null}
@@ -417,20 +415,20 @@ export const CardModal: FunctionComponent<{
             <React.Fragment>
               <View
                 style={style.flatten([
-                  "flex-row",
-                  "items-center",
-                  "margin-bottom-16",
+                  'flex-row',
+                  'items-center',
+                  'margin-bottom-16'
                 ])}
               >
-                <Text style={style.flatten(["h4", "color-text-black-high"])}>
+                <Text style={style.flatten(['h4', 'color-text-black-high'])}>
                   {title}
                 </Text>
                 {right}
               </View>
               <View
                 style={style.flatten([
-                  "height-1",
-                  "background-color-border-white",
+                  'height-1',
+                  'background-color-border-white'
                 ])}
               />
             </React.Fragment>
@@ -439,12 +437,12 @@ export const CardModal: FunctionComponent<{
       </PanGestureHandler>
       <View
         style={StyleSheet.flatten([
-          style.flatten(["padding-page", "padding-top-16"]),
-          childrenContainerStyle,
+          style.flatten(['padding-page', 'padding-top-16']),
+          childrenContainerStyle
         ])}
       >
         {children}
       </View>
     </Animated.View>
-  );
-};
+  )
+}

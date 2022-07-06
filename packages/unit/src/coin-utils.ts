@@ -2,7 +2,7 @@ import { Coin } from './coin';
 import { Int } from './int';
 import { Dec } from './decimal';
 import { DecUtils } from './dec-utils';
-import { Currency } from '@owallet-wallet/types';
+import { Currency } from '@owallet/types';
 
 export class CoinUtils {
   static createCoinsFromPrimitives(
@@ -179,7 +179,7 @@ export class CoinUtils {
     separator: string = ' '
   ): string {
     const dec = new Dec(coin.amount).quoTruncate(
-      DecUtils.getPrecisionDec(currency.coinDecimals)
+      DecUtils.getTenExponentNInPrecisionRange(currency.coinDecimals)
     );
 
     return `${DecUtils.trim(dec)}${separator}${currency.coinDenom}`;

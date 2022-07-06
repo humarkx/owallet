@@ -5,12 +5,12 @@ import { Ledger, LedgerWebHIDIniter, LedgerWebUSBIniter } from './ledger';
 
 import delay from 'delay';
 
-import { APP_PORT, Env } from '@owallet-wallet/router';
+import { APP_PORT, Env } from '@owallet/router';
 import { BIP44HDPath } from '../keyring';
-import { KVStore } from '@owallet-wallet/common';
+import { KVStore } from '@owallet/common';
 import { InteractionService } from '../interaction';
 import { LedgerOptions } from './options';
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 
 @singleton()
 export class LedgerService {
@@ -77,6 +77,7 @@ export class LedgerService {
           bip44HDPath.change,
           bip44HDPath.addressIndex
         ]);
+
         if (
           Buffer.from(expectedPubKey).toString('hex') !==
           Buffer.from(pubKey).toString('hex')
@@ -94,6 +95,7 @@ export class LedgerService {
           ],
           message
         );
+
         // Notify UI Ledger signing succeeded only when Ledger initialization is tried again.
         if (retryCount > 0) {
           this.interactionService.dispatchEvent(APP_PORT, 'ledger-init', {

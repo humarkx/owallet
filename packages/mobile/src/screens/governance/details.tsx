@@ -1,21 +1,22 @@
 import React, { FunctionComponent, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { PageWithScrollView } from '../../components/page';
-import { Platform, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Platform, StyleSheet, View, ViewStyle } from 'react-native';
+import { CText as Text } from '../../components/text';
 import { Card, CardBody, CardDivider } from '../../components/card';
 import { useStyle } from '../../styles';
 import { Button } from '../../components/button';
 import { useStore } from '../../stores';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { LoadingSpinner } from '../../components/spinner';
-import { Governance } from '@owallet-wallet/stores';
+import { Governance } from '@owallet/stores';
 import { GovernanceProposalStatusChip } from './card';
-import { IntPretty } from '@owallet-wallet/unit';
+import { IntPretty } from '@owallet/unit';
 import { useIntl } from 'react-intl';
 import { dateToLocalString } from './utils';
 import { registerModal } from '../../modals/base';
 import { RectButton } from '../../components/rect-button';
-import { useSmartNavigation } from '../../navigation';
+import { useSmartNavigation } from '../../navigation.provider';
 
 export const TallyVoteInfoView: FunctionComponent<{
   vote: 'yes' | 'no' | 'abstain' | 'noWithVeto';
@@ -264,12 +265,8 @@ export const GovernanceVoteModal: FunctionComponent<{
   smartNavigation: ReturnType<typeof useSmartNavigation>;
 }> = registerModal(
   observer(({ proposalId, close, smartNavigation }) => {
-    const {
-      chainStore,
-      accountStore,
-      queriesStore,
-      analyticsStore
-    } = useStore();
+    const { chainStore, accountStore, queriesStore, analyticsStore } =
+      useStore();
 
     const account = accountStore.getAccount(chainStore.current.chainId);
     const queries = queriesStore.get(chainStore.current.chainId);
@@ -458,8 +455,17 @@ export const GovernanceVoteModal: FunctionComponent<{
                 if (e?.message === 'Request rejected') {
                   return;
                 }
+                if (
+                  e?.message.includes('Cannot read properties of undefined')
+                ) {
+                  return;
+                }
                 console.log(e);
-                smartNavigation.navigateSmart('Home', {});
+                if (smartNavigation.canGoBack) {
+                  smartNavigation.goBack();
+                } else {
+                  smartNavigation.navigateSmart('Home', {});
+                }
               }
             }
           }}

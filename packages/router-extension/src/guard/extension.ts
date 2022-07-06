@@ -1,4 +1,4 @@
-import { Env, Guard, MessageSender, Message } from '@owallet-wallet/router';
+import { Env, Guard, MessageSender, Message } from '@owallet/router';
 
 export class ExtensionGuards {
   static readonly checkOriginIsValid: Guard = (
@@ -17,7 +17,9 @@ export class ExtensionGuards {
 
     const url = new URL(sender.url);
     if (url.origin !== msg.origin) {
-      throw new Error('Invalid origin');
+      throw new Error(
+        `Invalid origin: received: ${url.origin}, expected: ${msg.origin}`
+      );
     }
     return Promise.resolve();
   };

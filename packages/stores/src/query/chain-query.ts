@@ -1,5 +1,5 @@
 import { ObservableQuery } from '../common';
-import { KVStore } from '@owallet-wallet/common';
+import { KVStore, fetchAdapter } from '@owallet/common';
 import Axios, { AxiosInstance } from 'axios';
 import { override } from 'mobx';
 import { ChainGetter } from '../common';
@@ -18,7 +18,8 @@ export class ObservableChainQuery<
     kvStore: KVStore,
     chainId: string,
     chainGetter: ChainGetter,
-    url: string
+    url: string,
+    data?: { [key: string]: any }
   ) {
     const chainInfo = chainGetter.getChain(chainId);
 
@@ -26,10 +27,11 @@ export class ObservableChainQuery<
       ...{
         baseURL: chainInfo.rest
       },
-      ...chainInfo.restConfig
+      ...chainInfo.restConfig,
+      adapter: fetchAdapter
     });
 
-    super(kvStore, instance, url);
+    super(kvStore, instance, url, data ? { data } : null);
 
     this._chainId = chainId;
     this._beta = chainInfo.beta;

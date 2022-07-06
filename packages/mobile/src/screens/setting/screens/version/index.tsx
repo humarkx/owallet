@@ -1,10 +1,16 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../../../components/page';
-import { SettingItem, SettingSectionTitle } from '../../components';
+import { SettingSectionTitle } from '../../components';
 import DeviceInfo from 'react-native-device-info';
 import codePush from 'react-native-code-push';
-import { codeBundleId } from '../../../../../bugsnag.env';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import {
+  RectButton,
+  TouchableWithoutFeedback
+} from 'react-native-gesture-handler';
+import { colors, spacing, typography } from '../../../../themes';
+import { View, Text } from 'react-native';
+import { useStyle } from '../../../../styles';
+import { Divider } from '@rneui/base';
 
 export const OWalletVersionScreen: FunctionComponent = () => {
   const [appVersion] = useState(() => DeviceInfo.getVersion());
@@ -22,7 +28,7 @@ export const OWalletVersionScreen: FunctionComponent = () => {
   >(undefined);
 
   useEffect(() => {
-    codePush.getUpdateMetadata(codePush.UpdateState.RUNNING).then((update) => {
+    codePush.getUpdateMetadata(codePush.UpdateState.RUNNING).then(update => {
       if (update) {
         setCurrentCodeVersion(update.label);
       } else {
@@ -30,7 +36,7 @@ export const OWalletVersionScreen: FunctionComponent = () => {
       }
     });
 
-    codePush.getUpdateMetadata(codePush.UpdateState.LATEST).then((update) => {
+    codePush.getUpdateMetadata(codePush.UpdateState.LATEST).then(update => {
       if (update) {
         setLatestCodeVersion(update.label);
       } else {
@@ -38,7 +44,7 @@ export const OWalletVersionScreen: FunctionComponent = () => {
       }
     });
 
-    codePush.getUpdateMetadata(codePush.UpdateState.PENDING).then((update) => {
+    codePush.getUpdateMetadata(codePush.UpdateState.PENDING).then(update => {
       if (update) {
         setPendingCodeVersion(update.label);
       } else {
@@ -70,8 +76,18 @@ export const OWalletVersionScreen: FunctionComponent = () => {
 
   return (
     <PageWithScrollViewInBottomTabView>
-      <SettingSectionTitle title="App" />
+      <View
+        style={{
+          marginTop: spacing['32'],
+          marginBottom: spacing['12']
+        }}
+      />
       <TouchableWithoutFeedback
+        style={{
+          backgroundColor: colors['white'],
+          borderRadius: spacing['24'],
+          marginHorizontal: spacing['20']
+        }}
         onPress={() => {
           testErrorReportRef.current++;
 
@@ -89,27 +105,120 @@ export const OWalletVersionScreen: FunctionComponent = () => {
         <SettingItem
           label="App Version"
           paragraph={appVersion}
-          topBorder={true}
+          divider={false}
+        />
+        <SettingItem
+          label="Build Number"
+          paragraph={parseVersion(buildNumber)}
+          divider={false}
+        />
+        <SettingItem
+          label="Code Version"
+          paragraph={parseVersion(currentCodeVersion)}
         />
       </TouchableWithoutFeedback>
-      <SettingItem label="Build Number" paragraph={parseVersion(buildNumber)} />
-      <SettingItem
-        label="Code Version"
-        paragraph={parseVersion(currentCodeVersion)}
+
+      <View
+        style={{
+          marginTop: spacing['32'],
+          marginBottom: spacing['12']
+        }}
       />
-      {codeBundleId ? (
-        <SettingItem label="Code Bundle ID" paragraph={codeBundleId} />
-      ) : null}
-      <SettingSectionTitle title="Remote" />
-      <SettingItem
-        label="Latest Code Version"
-        paragraph={parseVersion(latestCodeVersion)}
-        topBorder={true}
-      />
-      <SettingItem
-        label="Pending Code Version"
-        paragraph={parseVersion(pendingCodeVersion)}
-      />
+      <TouchableWithoutFeedback
+        style={{
+          backgroundColor: colors['white'],
+          borderRadius: spacing['24'],
+          marginHorizontal: spacing['20']
+        }}
+      >
+        <SettingItem
+          label="Latest Code Version"
+          paragraph={parseVersion(latestCodeVersion)}
+          divider={false}
+        />
+        <SettingItem
+          label="Pending Code Version"
+          paragraph={parseVersion(pendingCodeVersion)}
+        />
+      </TouchableWithoutFeedback>
     </PageWithScrollViewInBottomTabView>
+  );
+};
+
+const SettingItem: FunctionComponent<{
+  label: string;
+  paragraph: string;
+  divider?: boolean;
+}> = ({ label, paragraph, divider }) => {
+  const style = useStyle();
+
+  const renderChildren = () => {
+    return (
+      <React.Fragment>
+        <View
+          style={{
+            width: '100%',
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: 20,
+              marginBottom: 20,
+              marginHorizontal: spacing['16']
+            }}
+          >
+            <Text
+              style={{
+                ...typography.h6,
+                color: colors['text-black-medium'],
+                fontWeight: '600',
+                textAlign: 'left'
+              }}
+            >
+              {label}
+            </Text>
+            {paragraph ? (
+              <Text
+                style={{
+                  ...typography.h6,
+                  color: colors['text-black-very-low'],
+                  textAlign: 'right'
+                }}
+              >
+                {paragraph}
+              </Text>
+            ) : null}
+          </View>
+          {divider ? (
+            <Divider
+              orientation="vertical"
+              width={1}
+              color={colors['gray-500']}
+              style={{
+                marginTop: spacing['24']
+              }}
+            />
+          ): null}
+        </View>
+      </React.Fragment>
+    );
+  };
+
+  return (
+    <View>
+      <TouchableWithoutFeedback
+        style={{
+          height: 80,
+          paddingHorizontal: spacing['20'],
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
+      >
+        {renderChildren()}
+      </TouchableWithoutFeedback>
+    </View>
   );
 };

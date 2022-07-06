@@ -1,13 +1,13 @@
 import { Rewards } from './types';
-import { KVStore } from '@owallet-wallet/common';
+import { KVStore } from '@owallet/common';
 import {
   ObservableChainQuery,
   ObservableChainQueryMap
 } from '../../chain-query';
 import { ChainGetter } from '../../../common';
 import { computed, makeObservable } from 'mobx';
-import { CoinPretty, Dec, Int } from '@owallet-wallet/unit';
-import { Currency } from '@owallet-wallet/types';
+import { CoinPretty, Dec, Int } from '@owallet/unit';
+import { Currency } from '@owallet/types';
 import { StoreUtils } from '../../../common';
 import { computedFn } from 'mobx-utils';
 
@@ -40,6 +40,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   get rewards(): CoinPretty[] {
     const chainInfo = this.chainGetter.getChain(this.chainId);
 
+    if (chainInfo.networkType === 'evm') {
+      return [];
+    }
+
     const currenciesMap = chainInfo.currencies.reduce<{
       [denom: string]: Currency;
     }>((obj, currency) => {
@@ -59,6 +63,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   readonly getRewardsOf = computedFn(
     (validatorAddress: string): CoinPretty[] => {
       const chainInfo = this.chainGetter.getChain(this.chainId);
+
+      if (chainInfo.networkType === 'evm') {
+        return [];
+      }
 
       const currenciesMap = chainInfo.currencies.reduce<{
         [denom: string]: Currency;
@@ -84,6 +92,9 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   @computed
   get stakableReward(): CoinPretty {
     const chainInfo = this.chainGetter.getChain(this.chainId);
+    if (chainInfo.networkType === 'evm') {
+      return;
+    }
 
     return StoreUtils.getBalanceFromCurrency(
       chainInfo.stakeCurrency,
@@ -94,6 +105,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   readonly getStakableRewardOf = computedFn(
     (validatorAddress: string): CoinPretty => {
       const chainInfo = this.chainGetter.getChain(this.chainId);
+
+      if (chainInfo.networkType === 'evm') {
+        return;
+      }
 
       const reward = this.response?.data.result.rewards?.find((r) => {
         return r.validator_address === validatorAddress;
@@ -109,6 +124,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   @computed
   get unstakableRewards(): CoinPretty[] {
     const chainInfo = this.chainGetter.getChain(this.chainId);
+
+    if (chainInfo.networkType === 'evm') {
+      return [];
+    }
 
     const currenciesMap = chainInfo.currencies.reduce<{
       [denom: string]: Currency;
@@ -132,6 +151,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   readonly getUnstakableRewardsOf = computedFn(
     (validatorAddress: string): CoinPretty[] => {
       const chainInfo = this.chainGetter.getChain(this.chainId);
+
+      if (chainInfo.networkType === 'evm') {
+        return [];
+      }
 
       const currenciesMap = chainInfo.currencies.reduce<{
         [denom: string]: Currency;
@@ -191,6 +214,10 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
       }
 
       const chainInfo = this.chainGetter.getChain(this.chainId);
+
+      if (chainInfo.networkType === 'evm') {
+        return [];
+      }
 
       const rewards = this.response.data.result.rewards?.slice() ?? [];
       rewards.sort((reward1, reward2) => {

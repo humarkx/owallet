@@ -1,22 +1,20 @@
 import React, { FunctionComponent, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import {
-  IFeeConfig,
-  IGasConfig,
-  NotLoadedFeeError
-} from '@owallet-wallet/hooks';
-import { Text, View } from 'react-native';
+import { IFeeConfig, IGasConfig, NotLoadedFeeError } from '@owallet/hooks';
+import { View } from 'react-native';
+import { CText as Text } from '../../components/text';
 import { useStore } from '../../stores';
 import { useStyle } from '../../styles';
-import { CoinPretty, Dec } from '@owallet-wallet/unit';
+import { CoinPretty, Dec } from '@owallet/unit';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { OWalletSignOptions } from '@owallet-wallet/types';
+import { OWalletSignOptions } from '@owallet/types';
 import { RightArrowIcon } from '../../components/icon';
 import { registerModal } from '../base';
 import { CardModal } from '../card';
 import { FeeButtons, getFeeErrorText } from '../../components/input';
 import { Button } from '../../components/button';
 import { LoadingSpinner } from '../../components/spinner';
+import { colors } from '../../themes';
 
 const FeeButtonsModal: FunctionComponent<{
   isOpen: boolean;
@@ -34,14 +32,27 @@ const FeeButtonsModal: FunctionComponent<{
           feeConfig={feeConfig}
           gasConfig={gasConfig}
         />
-        <Button
-          color="primary"
-          size="large"
-          text="Confirm"
-          onPress={() => {
-            close();
+        <TouchableOpacity
+          onPress={close}
+          style={{
+            marginBottom: 24,
+            marginTop: 32,
+            backgroundColor: colors['purple-900'],
+            borderRadius: 8
           }}
-        />
+        >
+          <Text
+            style={{
+              color: 'white',
+              textAlign: 'center',
+              fontWeight: '700',
+              fontSize: 16,
+              padding: 16
+            }}
+          >
+            Confirm
+          </Text>
+        </TouchableOpacity>
       </CardModal>
     );
   }),
@@ -71,6 +82,7 @@ export const FeeInSign: FunctionComponent<{
       chainStore.getChain(feeConfig.chainId).stakeCurrency,
       new Dec('0')
     );
+
   const feePrice = priceStore.calculatePrice(fee);
 
   // If the signing request is from internal and the "preferNoSetFee" option is set,
@@ -124,7 +136,7 @@ export const FeeInSign: FunctionComponent<{
             <Text
               style={style.flatten(
                 ['subtitle1', 'color-text-black-medium'],
-                [canFeeEditable && 'color-primary']
+                [canFeeEditable ? 'color-primary' : false]
               )}
             >
               {fee.trim(true).toString()}

@@ -1,10 +1,10 @@
 import { ObservableChainQuery } from '../chain-query';
-import { KVStore } from '@owallet-wallet/common';
+import { KVStore } from '@owallet/common';
 import { ChainGetter } from '../../common';
 import { CancelToken } from 'axios';
 import { QueryResponse } from '../../common';
 
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer';
 
 export class ObservableCosmwasmContractChainQuery<
   T
@@ -65,7 +65,7 @@ export class ObservableCosmwasmContractChainQuery<
   ): Promise<QueryResponse<T>> {
     const response = await super.fetchResponse(cancelToken);
 
-    const wasmResult = (response.data as unknown) as
+    const wasmResult = response.data as unknown as
       | {
           data: any;
         }

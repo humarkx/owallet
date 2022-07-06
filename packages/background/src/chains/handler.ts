@@ -1,11 +1,11 @@
-import { Env, Handler, InternalHandler, Message } from '@owallet-wallet/router';
+import { Env, Handler, InternalHandler, Message } from '@owallet/router';
 import { ChainsService } from './service';
 import {
   GetChainInfosMsg,
   RemoveSuggestedChainInfoMsg,
   SuggestChainInfoMsg
 } from './messages';
-import { ChainInfo } from '@owallet-wallet/types';
+import { ChainInfo } from '@owallet/types';
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
@@ -51,8 +51,10 @@ const handleSuggestChainInfoMsg: (
     }
 
     const chainInfo = msg.chainInfo as Writeable<ChainInfo>;
-    // And, always handle it as beta.
-    chainInfo.beta = true;
+    // And, always handle it as beta, if not specific.
+    if (chainInfo.beta === undefined) {
+      chainInfo.beta = true;
+    }
 
     await service.suggestChainInfo(env, chainInfo, msg.origin);
   };

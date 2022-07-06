@@ -4,10 +4,9 @@ import {
   AminoSignResponse,
   StdSignDoc
 } from '@cosmjs/launchpad';
-import { OWallet } from '@owallet-wallet/types';
-import { OfflineDirectSigner } from '@cosmjs/proto-signing';
-import { DirectSignResponse } from '@cosmjs/proto-signing/build/signer';
-import { SignDoc } from '@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx';
+import { OWallet } from '@owallet/types';
+import { OfflineDirectSigner, DirectSignResponse } from '@cosmjs/proto-signing';
+import { cosmos } from '@owallet/cosmos';
 
 export class CosmJSOfflineSignerOnlyAmino implements OfflineSigner {
   constructor(
@@ -56,7 +55,8 @@ export class CosmJSOfflineSignerOnlyAmino implements OfflineSigner {
 
 export class CosmJSOfflineSigner
   extends CosmJSOfflineSignerOnlyAmino
-  implements OfflineSigner, OfflineDirectSigner {
+  implements OfflineSigner, OfflineDirectSigner
+{
   constructor(
     protected readonly chainId: string,
     protected readonly owallet: OWallet
@@ -66,7 +66,7 @@ export class CosmJSOfflineSigner
 
   async signDirect(
     signerAddress: string,
-    signDoc: SignDoc
+    signDoc: cosmos.tx.v1beta1.SignDoc
   ): Promise<DirectSignResponse> {
     if (this.chainId !== signDoc.chainId) {
       throw new Error('Unmatched chain id with the offline signer');

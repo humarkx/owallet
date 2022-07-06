@@ -1,4 +1,4 @@
-import { APP_PORT, Env, MessageSender } from '@owallet-wallet/router';
+import { APP_PORT, Env, MessageSender } from '@owallet/router';
 import { RNMessageRequesterInternalToUI } from './requester';
 
 export class RNEnv {
@@ -13,6 +13,7 @@ export class RNEnv {
         // But, in mobile environment, the background and frontend are running in the same proccess.
         // So, there is no need to open the popup from background.
         // The interaction should be handled via the interaction stores.
+
         return await new RNMessageRequesterInternalToUI().sendMessage(
           APP_PORT,
           msg

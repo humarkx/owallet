@@ -60,19 +60,18 @@ export const Modal: FunctionComponent<{
         // Save the mobile link.
         saveMobileLinkInfo({
           name: 'OWallet',
-          href:
-            'intent://wcV1#Intent;package=com.chainapsis.owallet;scheme=owalletwallet;end;'
+          href: 'intent://wcV1#Intent;package=com.io.owallet;scheme=owallet;end;'
         });
 
-        return `intent://wcV1?${uri}#Intent;package=com.chainapsis.owallet;scheme=owalletwallet;end;`;
+        return `intent://wcV1?${uri}#Intent;package=com.io.owallet;scheme=owallet;end;`;
       } else {
         // Save the mobile link.
         saveMobileLinkInfo({
           name: 'OWallet',
-          href: 'owalletwallet://wcV1'
+          href: 'owallet://wcV1'
         });
 
-        return `owalletwallet://wcV1?${uri}`;
+        return `owallet://wcV1?${uri}`;
       }
     }
   }, [checkAndroid, checkMobile, uri]);
@@ -97,7 +96,7 @@ export const Modal: FunctionComponent<{
                 bottom: 0,
                 left: 0,
                 right: 0,
-                backgroundColor: 'rgba(0,0,0,0.1)',
+                backgroundColor: '#fff',
 
                 display: 'flex',
                 justifyContent: 'center',
