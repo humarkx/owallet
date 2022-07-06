@@ -9,6 +9,7 @@ import { useSmartNavigation } from '../../navigation.provider';
 import { PageWithScrollView } from '../../components/page';
 import { useStore } from '../../stores';
 import { API } from '../../common/api';
+import { useLoadingScreen } from '../../providers/loading-screen';
 
 export const Transactions: FunctionComponent = () => {
   const { chainStore, accountStore } = useStore();

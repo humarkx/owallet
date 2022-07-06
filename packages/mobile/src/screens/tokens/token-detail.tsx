@@ -33,6 +33,7 @@ import {
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import { navigate } from '../../router/root';
 import { API } from '../../common/api';
+import { useLoadingScreen } from '../../providers/loading-screen';
 
 export const TokenDetailScreen: FunctionComponent = observer((props) => {
   const { chainStore, queriesStore, accountStore } = useStore();
@@ -102,7 +103,7 @@ export const TokenDetailScreen: FunctionComponent = observer((props) => {
     offset.current = 0;
     fetchData();
   }, [account.bech32Address]);
-
+  const loadingScreen = useLoadingScreen();
   const _onPressBtnMain = (name) => {
     if (name === 'Buy') {
       navigate('MainTab', { screen: 'Browser', path: 'https://oraidex.io' });
@@ -275,7 +276,14 @@ export const TokenDetailScreen: FunctionComponent = observer((props) => {
           height: metrics.screenHeight / 2
         }}
       >
-        <TransactionSectionTitle title={'Transaction list'} />
+        <TransactionSectionTitle
+          title={'Transaction list'}
+          onPress={async () => {
+            await loadingScreen.openAsync();
+            await fetchData();
+            loadingScreen.setIsLoading(false);
+          }}
+        />
         <FlatList
           data={data}
           renderItem={({ item, index }) => (

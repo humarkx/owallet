@@ -14,7 +14,7 @@ import { CardModal } from '../card';
 import { FeeButtons, getFeeErrorText } from '../../components/input';
 import { Button } from '../../components/button';
 import { LoadingSpinner } from '../../components/spinner';
-import { colors } from '../../themes';
+import { colors, typography } from '../../themes';
 
 const FeeButtonsModal: FunctionComponent<{
   isOpen: boolean;
@@ -134,10 +134,10 @@ export const FeeInSign: FunctionComponent<{
             }}
           >
             <Text
-              style={style.flatten(
-                ['subtitle1', 'color-text-black-medium'],
-                [canFeeEditable ? 'color-primary' : false]
-              )}
+              style={{
+                ...typography['subtitle1'],
+                color: canFeeEditable ? colors['purple-700'] : colors['text-black-medium'],
+              }}
             >
               {fee.trim(true).toString()}
             </Text>
