@@ -5,7 +5,7 @@ import { useStore } from '../../../stores';
 import { useStyle } from '../../../styles';
 import { BondStatus } from '@owallet/stores';
 import { useRedelegateTxConfig } from '@owallet/hooks';
-import { PageWithScrollView } from '../../../components/page';
+import { PageWithScrollView, PageWithScrollViewInBottomTabView } from '../../../components/page';
 import { Card, CardBody, CardDivider } from '../../../components/card';
 import { Image, View } from 'react-native';
 import { CText as Text } from '../../../components/text';
@@ -24,6 +24,8 @@ import ValidatorsList from './validators-list';
 import { HeaderBackDownButtonIcon } from '../../../components/header/icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { DownArrowIcon } from '../../../components/icon';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export const RedelegateScreen: FunctionComponent = observer(() => {
   const route = useRoute<
@@ -46,7 +48,7 @@ export const RedelegateScreen: FunctionComponent = observer(() => {
     useStore();
 
   const style = useStyle();
-
+  const bottomTabBarHeight = useBottomTabBarHeight();
   const account = accountStore.getAccount(chainStore.current.chainId);
   const queries = queriesStore.get(chainStore.current.chainId);
 
@@ -172,7 +174,7 @@ export const RedelegateScreen: FunctionComponent = observer(() => {
     modalStore.close();
   };
   return (
-    <PageWithScrollView
+    <PageWithScrollViewInBottomTabView
       contentContainerStyle={{
         flexGrow: 1
       }}
@@ -421,7 +423,7 @@ export const RedelegateScreen: FunctionComponent = observer(() => {
             marginTop: 20,
             padding: 20,
             backgroundColor: colors['white'],
-            borderRadius: 24
+            borderRadius: 24,
           }}
         >
           <AmountInput label="Amount" amountConfig={sendConfigs.amountConfig} />
@@ -450,6 +452,6 @@ export const RedelegateScreen: FunctionComponent = observer(() => {
         </View>
       ) : null}
       <View style={style.flatten(['height-page-pad'])} />
-    </PageWithScrollView>
+    </PageWithScrollViewInBottomTabView>
   );
 });

@@ -59,6 +59,8 @@ export const SendScreen: FunctionComponent = observer(() => {
     ? route?.params?.chainId
     : chainStore?.current?.chainId;
 
+  console.log({ route: route });
+
   const account = accountStore.getAccount(chainId);
   const queries = queriesStore.get(chainId);
 
@@ -76,9 +78,12 @@ export const SendScreen: FunctionComponent = observer(() => {
       const currency = sendConfigs.amountConfig.sendableCurrencies.find(
         (cur) => {
           if (cur.type === 'cw20') {
+            return cur.coinDenom == route.params.currency;
+          }
+          if (cur.coinDenom === route.params.currency) {
             return cur.coinDenom === route.params.currency;
           }
-          return cur.coinMinimalDenom === route.params.currency;
+          return cur.coinMinimalDenom == route.params.currency;
         }
       );
 
