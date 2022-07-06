@@ -259,7 +259,6 @@ export const LedgerGranterModal: FunctionComponent<{
               >
                 <LoadingSpinner
                   size={20}
-                  color={style.get('color-primary').color}
                 />
               </View>
             </View>
