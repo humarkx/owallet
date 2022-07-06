@@ -21,7 +21,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "jest --detectOpenHandles",
     "postinstall": "patch-package && cd ../../ && yarn patch-package",
-    "code-push-ios": "appcenter codepush release-react -a Oraichain/Owallet -t 0.0.4 --output-dir build",
+    "code-push-ios": "appcenter codepush release-react -a Oraichain/Owallet -t 0.0.5 --output-dir build",
     "code-push-android": "appcenter codepush release-react -a Oraichain/Owallet-1 -t 1.0.1 --output-dir build"
   },
   "dependencies": {
@@ -85,6 +85,7 @@
     "react-hook-form": "^7.16.1",
     "react-intl": "^5.20.4",
     "react-native": "0.68",
+    "react-native-app-intro-slider": "^4.0.4",
     "react-native-ble-plx": "^2.0.3",
     "react-native-camera": "^4.0.1",
     "react-native-circular-progress": "^1.3.7",

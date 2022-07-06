@@ -1,53 +1,72 @@
-import React, { FunctionComponent} from 'react'
-import { StyleSheet, View, ViewStyle, Image } from 'react-native'
-import { Text } from '@rneui/base'
-import { CoinPretty } from '@owallet/unit'
-import { useSmartNavigation } from '../../../navigation.provider'
-import { Currency } from '@owallet/types'
-import { TokenSymbol } from '../../../components/token-symbol'
-import { DenomHelper } from '@owallet/common'
-import { Bech32Address } from '@owallet/cosmos'
-import { colors,  spacing, typography } from '../../../themes'
-import { AnimatedCircularProgress } from 'react-native-circular-progress'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import { _keyExtract } from '../../../utils/helper'
+import React, { FunctionComponent } from 'react';
+import { StyleSheet, View, ViewStyle, Image } from 'react-native';
+import { CText as Text } from '../../../components/text';
+import { CoinPretty, Dec, IntPretty, PricePretty } from '@owallet/unit';
+import { useSmartNavigation } from '../../../navigation.provider';
+import { Currency } from '@owallet/types';
+import { TokenSymbol } from '../../../components/token-symbol';
+import { DenomHelper } from '@owallet/common';
+import { Bech32Address } from '@owallet/cosmos';
+import { colors, spacing, typography } from '../../../themes';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { _keyExtract } from '../../../utils/helper';
+import { CoinGeckoPriceStore } from '@owallet/stores';
+import { RightArrowIcon } from '../../../components/icon';
 
 interface TokenItemProps {
-  containerStyle?: ViewStyle
+  containerStyle?: ViewStyle;
   chainInfo: {
-    stakeCurrency: Currency
-  }
-  balance: CoinPretty
-  balanceUsd?: number
-  totalBalance?: number
+    stakeCurrency: Currency;
+  };
+  balance: CoinPretty;
+  totalBalance?: number;
+  priceBalance: PricePretty;
 }
 
 export const TokenItem: FunctionComponent<TokenItemProps> = ({
   containerStyle,
   chainInfo,
   balance,
-  balanceUsd = 41.39, // defautl value to test use
-  totalBalance = 100
+  priceBalance,
+  totalBalance = 1000
 }) => {
-  const smartNavigation = useSmartNavigation()
+  const smartNavigation = useSmartNavigation();
 
   // The IBC currency could have long denom (with the origin chain/channel information).
   // Because it is shown in the title, there is no need to show such long denom twice in the actual balance.
-  let balanceCoinDenom: string
-  let name = balance.currency.coinDenom
+  let balanceCoinDenom: string;
+  let name = balance.currency.coinDenom;
 
   if ('originCurrency' in balance.currency && balance.currency.originCurrency) {
-    balanceCoinDenom = balance.currency.originCurrency.coinDenom
+    balanceCoinDenom = balance.currency.originCurrency.coinDenom;
   } else {
-    const denomHelper = new DenomHelper(balance.currency.coinMinimalDenom)
-    balanceCoinDenom = balance.currency.coinDenom
+    const denomHelper = new DenomHelper(balance.currency.coinMinimalDenom);
+    balanceCoinDenom = balance.currency.coinDenom;
     if (denomHelper.contractAddress) {
       name += ` (${Bech32Address.shortenAddress(
         denomHelper.contractAddress,
         24
-      )})`
+      )})`;
     }
   }
+  const amountBalance = balance
+    .trim(true)
+    .shrink(true)
+    .maxDecimals(6)
+    .upperCase(true)
+    .hideDenom(true)
+    .toString();
+
+  const balanceUsdInPercent = priceBalance
+    ? new IntPretty(
+        priceBalance.toDec().mul(new Dec(100)).quo(new Dec(totalBalance))
+      )
+        .moveDecimalPointRight(2)
+        .maxDecimals(3)
+        .trim(true)
+        .toString() + '%'
+    : '';
 
   return (
     <TouchableOpacity
@@ -55,7 +74,10 @@ export const TokenItem: FunctionComponent<TokenItemProps> = ({
       style={{ ...styles.containerToken, ...containerStyle }}
       onPress={() => {
         smartNavigation.navigateSmart('Tokens.Detail', {
-        })
+          balanceCoinDenom,
+          amountBalance,
+          priceBalance
+        });
       }}
     >
       <View
@@ -82,14 +104,23 @@ export const TokenItem: FunctionComponent<TokenItemProps> = ({
         >
           <Text
             style={{
-              ...typography.subtitle2,
-              color: colors['gray-900'],
-              marginBottom: spacing['4'],
-              fontWeight: '800'
+              fontSize: 13,
+              color: colors['gray-300'],
+              fontWeight: '700'
             }}
           >
-            {`${balance}`}
+            {name}
           </Text>
+          <Text
+            style={{
+              ...typography.subtitle2,
+              color: colors['gray-900'],
+              fontWeight: '700'
+            }}
+          >
+            {`${amountBalance} ${balanceCoinDenom}`}
+          </Text>
+
           <Text
             style={{
               ...typography.subtitle3,
@@ -97,12 +128,20 @@ export const TokenItem: FunctionComponent<TokenItemProps> = ({
               marginBottom: spacing['4']
             }}
           >
-            {`$${balanceUsd}`}
+            {priceBalance?.toString() || '$0'}
           </Text>
         </View>
       </View>
-
       <View
+        style={{
+          flex: 0.5,
+          justifyContent: 'center',
+          alignItems: 'flex-end'
+        }}
+      >
+        <RightArrowIcon height={10} color={colors['gray-150']} />
+      </View>
+      {/* <View
         style={{
           flex: 0.5,
           justifyContent: 'center',
@@ -112,25 +151,27 @@ export const TokenItem: FunctionComponent<TokenItemProps> = ({
         <AnimatedCircularProgress
           size={56}
           width={6}
-          fill={(balanceUsd / totalBalance) * 100}
+          fill={amountBalance ? +amountBalance / totalBalance : 0}
           tintColor={colors['purple-700']}
           backgroundColor={colors['gray-50']}
           rotation={0}
         >
-          {fill => (
+          {(fill) => (
             <Text
               h4
               h4Style={{
                 ...typography.h7,
                 fontSize: 11
               }}
-            >{`${((balanceUsd / totalBalance) * 100).toFixed(2)}%`}</Text>
+            >
+              {balanceUsdInPercent}
+            </Text>
           )}
         </AnimatedCircularProgress>
-      </View>
+      </View> */}
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   containerToken: {
@@ -138,7 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: spacing['4'],
     marginVertical: spacing['8'],
-    paddingTop: spacing['18'],
-    paddingBottom: spacing['18']
-  },
-})
+    paddingTop: spacing['10'],
+    paddingBottom: spacing['10']
+  }
+});

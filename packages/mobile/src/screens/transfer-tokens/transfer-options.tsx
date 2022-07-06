@@ -9,22 +9,31 @@ import {
   SendWithinNetworkIcon
 } from '../../components/icon';
 import { colors, spacing } from '../../themes';
+import { useSmartNavigation } from '../../navigation.provider';
+import { useStore } from '../../stores';
 
 const styles = StyleSheet.create({
   sendTokenCard: {
-    borderRadius: spacing['24'],
-    padding: spacing['12']
+    borderRadius: spacing['24']
   },
   sendTokenCardbody: {
+    display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginHorizontal: spacing['-6'],
     justifyContent: 'space-between'
   },
   sendTokenCardContent: {
-    padding: spacing['16'],
+    paddingHorizontal: spacing['6'],
+    width: '50%'
+  },
+  sendTokenCardText: {
     marginBottom: spacing['12'],
     borderRadius: spacing['12'],
+    height: 130,
     alignItems: 'center',
+    paddingTop: spacing['16'],
+    paddingHorizontal: spacing['8'],
     backgroundColor: colors['white'],
     shadowColor: '#18274B1F',
     shadowOffset: {
@@ -47,32 +56,56 @@ const tokenTransferInfo = [
   {
     icon: <SendWithinNetworkIcon />,
     titleLine1: 'Send',
+    type: 'send',
     titleLine2: 'within network'
   },
   {
     icon: <SendCrossChainIcon />,
     titleLine1: 'Send cross-chain',
+    type: 'send_cross',
     titleLine2: '(IBC Transfer)'
   },
   {
     icon: <SendBridgeIcon />,
     titleLine1: 'Bridge',
+    type: 'bridge',
     titleLine2: ''
   },
   {
     icon: <SendQRCodeIcon />,
     titleLine1: 'Send',
+    type: 'send_qr',
     titleLine2: 'via QR code'
   }
 ];
 
 const TransferTokensOptions: FunctionComponent = () => {
+  const smartNavigation = useSmartNavigation();
+  const { chainStore } = useStore();
+
+  const onPress = (type) => {
+    switch (type) {
+      case 'send':
+        smartNavigation.navigateSmart('Send', {
+          currency: chainStore.current.stakeCurrency.coinMinimalDenom
+        });
+        break;
+
+      default:
+        alert('Coming soon!');
+        break;
+    }
+  };
+
   return (
     <>
       <View style={styles.sendTokenCardbody}>
         {tokenTransferInfo.map((val, i) => (
-          <View style={{ width: '48%' }} key={i}>
-            <TouchableOpacity style={styles.sendTokenCardContent}>
+          <View style={styles.sendTokenCardContent} key={i}>
+            <TouchableOpacity
+              style={styles.sendTokenCardText}
+              onPress={() => onPress(val.type)}
+            >
               <View style={styles.iconSendToken}>{val.icon}</View>
               <Text style={styles.textSendToken}>{val.titleLine1}</Text>
               <Text style={styles.textSendToken}>{val.titleLine2}</Text>
@@ -80,9 +113,9 @@ const TransferTokensOptions: FunctionComponent = () => {
           </View>
         ))}
       </View>
-      <View style={{ marginTop: spacing['20'], alignItems: 'center' }}>
+      {/* <View style={{ marginTop: spacing['20'], alignItems: 'center' }}>
         <Text style={{ color: colors['gray-150'] }}>View lists</Text>
-      </View>
+      </View> */}
     </>
   );
 };

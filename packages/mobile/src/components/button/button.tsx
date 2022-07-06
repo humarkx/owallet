@@ -1,12 +1,12 @@
 import React, { FunctionComponent, ReactElement, useState } from 'react';
 import { useStyle } from '../../styles';
 import { StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
-import {CText as Text} from '../text';
+import { CText as Text } from '../text';
 import { LoadingSpinner } from '../spinner';
 import { RectButton } from '../rect-button';
 
 export const Button: FunctionComponent<{
-  color?: 'primary' | 'secondary' | 'danger';
+  color?: 'primary' | 'secondary' | 'danger' ;
   mode?: 'fill' | 'light' | 'outline' | 'text';
   size?: 'default' | 'small' | 'large';
   text: string;
@@ -37,7 +37,7 @@ export const Button: FunctionComponent<{
   style: buttonStyle,
   textStyle,
   rippleColor: propRippleColor,
-  underlayColor: propUnderlayColor,
+  underlayColor: propUnderlayColor
 }) => {
   const style = useStyle();
 
@@ -55,7 +55,7 @@ export const Button: FunctionComponent<{
       case 'outline':
         return 'background-color-white';
       default:
-        return 'background-color-transparent';
+        return `background-color-button-${color}-light`;
     }
   })();
 
@@ -146,14 +146,14 @@ export const Button: FunctionComponent<{
             backgroundColorDefinition as any,
             `height-button-${size}` as any,
             'border-radius-8',
-            'overflow-hidden',
+            'overflow-hidden'
           ],
           [
             mode === 'outline' && 'border-width-1',
-            outlineBorderDefinition as any,
+            outlineBorderDefinition as any
           ]
         ),
-        containerStyle,
+        containerStyle
       ])}
     >
       <RectButton
@@ -163,9 +163,9 @@ export const Button: FunctionComponent<{
             'justify-center',
             'items-center',
             'height-full',
-            'padding-x-8',
+            'padding-x-8'
           ]),
-          buttonStyle,
+          buttonStyle
         ])}
         onPress={onPress}
         onActiveStateChange={(active) => setIsPressed(active)}
@@ -188,7 +188,7 @@ export const Button: FunctionComponent<{
               [textDefinition, 'text-center', textColorDefinition as any],
               [loading && 'opacity-transparent']
             ),
-            textStyle,
+            textStyle
           ])}
         >
           {text}
@@ -206,7 +206,7 @@ export const Button: FunctionComponent<{
             style={style.flatten([
               'absolute-fill',
               'justify-center',
-              'items-center',
+              'items-center'
             ])}
           >
             <LoadingSpinner

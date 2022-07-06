@@ -7,7 +7,7 @@ import {
   ENSNotSupportedError,
   IMemoConfig,
   InvalidBech32Error,
-  IRecipientConfig,
+  IRecipientConfig
 } from '@owallet/hooks';
 import { StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
 import { TextInput } from './input';
@@ -17,23 +17,24 @@ import { useStyle } from '../../styles';
 import { AddressBookIcon, NoteIcon } from '../icon';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSmartNavigation } from '../../navigation.provider';
+import { colors } from '../../themes';
 
 const styles = StyleSheet.create({
   absolute: {
-    position: 'absolute',
+    position: 'absolute'
   },
   'height-16': {
-    height: 16,
+    height: 16
   },
   'justify-center': {
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   'margin-top-2': {
-    marginTop: 2,
+    marginTop: 2
   },
   'margin-left-4': {
-    marginLeft: 4,
-  },
+    marginLeft: 4
+  }
 });
 
 export const AddressInput: FunctionComponent<{
@@ -43,6 +44,8 @@ export const AddressInput: FunctionComponent<{
   errorLabelStyle?: TextStyle;
 
   label: string;
+
+  inputRight?: React.ReactNode;
 
   recipientConfig: IRecipientConfig;
   memoConfig: IMemoConfig;
@@ -63,6 +66,7 @@ export const AddressInput: FunctionComponent<{
     disableAddressBook,
     placeholder,
     placeholderTextColor,
+    inputRight
   }) => {
     const smartNavigation = useSmartNavigation();
 
@@ -119,13 +123,10 @@ export const AddressInput: FunctionComponent<{
                     styles['height-16'],
                     styles['justify-center'],
                     styles['margin-top-2'],
-                    styles['margin-left-4'],
+                    styles['margin-left-4']
                   ]}
                 >
-                  <LoadingSpinner
-                    size={14}
-                    color={"#83838F"}
-                  />
+                  <LoadingSpinner size={14} color={'#83838F'} />
                 </View>
               </View>
             ) : (
@@ -139,23 +140,24 @@ export const AddressInput: FunctionComponent<{
               style={style.flatten([
                 'height-1',
                 'overflow-visible',
-                'justify-center',
+                'justify-center'
               ])}
             >
-              <TouchableOpacity
-                style={style.flatten(['padding-4'])}
-                onPress={() => {
-                  smartNavigation.navigateSmart('AddressBook', {
-                    recipientConfig,
-                    memoConfig,
-                  });
-                }}
-              >
-                <NoteIcon
-                  color={style.get('color-primary').color}
-                  height={18}
-                />
-              </TouchableOpacity>
+              {inputRight ? (
+                inputRight
+              ) : (
+                <TouchableOpacity
+                  style={style.flatten(['padding-4'])}
+                  onPress={() => {
+                    smartNavigation.navigateSmart('AddressBook', {
+                      recipientConfig,
+                      memoConfig
+                    });
+                  }}
+                >
+                  <NoteIcon color={colors['purple-900']} height={18} />
+                </TouchableOpacity>
+              )}
             </View>
           )
         }

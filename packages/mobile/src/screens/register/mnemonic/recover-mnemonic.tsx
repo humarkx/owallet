@@ -3,11 +3,10 @@ import { PageWithScrollView } from '../../../components/page';
 import { observer } from 'mobx-react-lite';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RegisterConfig } from '@owallet/hooks';
-import { useStyle } from '../../../styles';
 import { useSmartNavigation } from '../../../navigation.provider';
 import { Controller, useForm } from 'react-hook-form';
 import { TextInput } from '../../../components/input';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button } from '../../../components/button';
 import Clipboard from 'expo-clipboard';
 import { useStore } from '../../../stores';
@@ -19,7 +18,8 @@ import {
   navigate
 } from '../../../router/root';
 import { OWalletLogo } from '../owallet-logo';
-import { colors } from '../../../themes';
+import { colors, typography } from '../../../themes';
+import { LoadingSpinner } from '../../../components/spinner';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bip39 = require('bip39');
 
@@ -68,8 +68,6 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
     >
   >();
 
-  const style = useStyle();
-
   const { analyticsStore } = useStore();
 
   const smartNavigation = useSmartNavigation();
@@ -88,7 +86,8 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
   } = useForm<FormData>();
 
   const [isCreating, setIsCreating] = useState(false);
-
+  const [statusPass, setStatusPass] = useState(false);
+  const [statusConfirmPass, setStatusConfirmPass] = useState(false);
   const submit = handleSubmit(async () => {
     setIsCreating(true);
 
@@ -119,7 +118,8 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
     }
     if (checkRouter(props?.route?.name, 'RegisterRecoverMnemonicMain')) {
       navigate('RegisterEnd', {
-        password: getValues('password')
+        password: getValues('password'),
+        type: 'recover'
       });
     } else {
       smartNavigation.reset({
@@ -128,7 +128,8 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
           {
             name: 'Register.End',
             params: {
-              password: getValues('password')
+              password: getValues('password'),
+              type: 'recover'
             }
           }
         ]
@@ -205,7 +206,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
-              label="Mnemonic"
+              label="Mnemonic / Private key"
               returnKeyType="next"
               multiline={true}
               numberOfLines={4}
@@ -247,25 +248,23 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
                         setValue('mnemonic', text, {
                           shouldValidate: true
                         });
-
                         setFocus('name');
                       }
                     }}
                   />
                 </View>
               }
-              style={StyleSheet.flatten([
-                style.flatten(['h6', 'color-text-black-medium']),
-                {
-                  minHeight: 20 * 4,
-                  textAlignVertical: 'top'
-                }
-              ])}
+              style={{
+                minHeight: 20 * 4,
+                textAlignVertical: 'top',
+                ...typography['h6'],
+                color: colors['text-black-medium']
+              }}
               onSubmitEditing={() => {
                 setFocus('name');
               }}
               inputStyle={{
-                ...styles.borderInput,
+                ...styles.borderInput
               }}
               error={errors.mnemonic?.message}
               onBlur={onBlur}
@@ -287,7 +286,6 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
           return (
             <TextInput
               label="Username"
-              containerStyle={style.flatten(['padding-bottom-6'])}
               returnKeyType={mode === 'add' ? 'done' : 'next'}
               onSubmitEditing={() => {
                 if (mode === 'add') {
@@ -298,7 +296,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
                 }
               }}
               inputStyle={{
-                ...styles.borderInput,
+                ...styles.borderInput
               }}
               error={errors.name?.message}
               onBlur={onBlur}
@@ -311,7 +309,7 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
         name="name"
         defaultValue=""
       />
-      <BIP44AdvancedButton bip44Option={bip44Option} />
+
       {mode === 'create' ? (
         <React.Fragment>
           <Controller
@@ -334,8 +332,24 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
                     setFocus('confirmPassword');
                   }}
                   inputStyle={{
-                    ...styles.borderInput,
+                    ...styles.borderInput
                   }}
+                  inputRight={
+                    <TouchableOpacity
+                      onPress={() => setStatusPass(!statusPass)}
+                    >
+                      <Image
+                        style={{
+                          width: 22,
+                          height: 22
+                        }}
+                        source={require('../../../assets/image/transactions/eye.png')}
+                        resizeMode="contain"
+                        fadeDuration={0}
+                      />
+                    </TouchableOpacity>
+                  }
+                  secureTextEntry={!statusPass}
                   error={errors.password?.message}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -366,12 +380,27 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
                 <TextInput
                   label="Confirm password"
                   returnKeyType="done"
-                  secureTextEntry={true}
                   onSubmitEditing={() => {
                     submit();
                   }}
+                  inputRight={
+                    <TouchableOpacity
+                      onPress={() => setStatusConfirmPass(!statusConfirmPass)}
+                    >
+                      <Image
+                        style={{
+                          width: 22,
+                          height: 22
+                        }}
+                        source={require('../../../assets/image/transactions/eye.png')}
+                        resizeMode="contain"
+                        fadeDuration={0}
+                      />
+                    </TouchableOpacity>
+                  }
+                  secureTextEntry={!statusConfirmPass}
                   inputStyle={{
-                    ...styles.borderInput,
+                    ...styles.borderInput
                   }}
                   error={errors.confirmPassword?.message}
                   onBlur={onBlur}
@@ -386,33 +415,38 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
           />
         </React.Fragment>
       ) : null}
+      {/* <View style={{ alignItems: 'flex-start' }}> */}
+        <BIP44AdvancedButton bip44Option={bip44Option} />
+      {/* </View> */}
       <TouchableOpacity
         disabled={isCreating}
         onPress={submit}
         style={{
           marginBottom: 24,
           marginTop: 32,
-          backgroundColor: '#8B1BFB',
+          backgroundColor: colors['purple-900'],
           borderRadius: 8
         }}
       >
-        <View
-          style={{
-            padding: 18
-          }}
-        >
+        {isCreating ? (
+          <View style={{ padding: 16, alignItems: 'center' }}>
+            <LoadingSpinner color={colors['white']} size={20} />
+          </View>
+        ) : (
           <Text
             style={{
               color: 'white',
               textAlign: 'center',
               fontWeight: '700',
-              fontSize: 16
+              fontSize: 16,
+              padding: 16
             }}
           >
             Next
           </Text>
-        </View>
+        )}
       </TouchableOpacity>
+
       <View
         style={{
           paddingBottom: checkRouterPaddingBottomBar(
@@ -423,13 +457,19 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
       >
         <Text
           style={{
-            color: '#8B1BFB',
+            color: colors['purple-900'],
             textAlign: 'center',
             fontWeight: '700',
             fontSize: 16
           }}
           onPress={() => {
-            smartNavigation.navigateSmart('Register.Intro', {});
+            if (
+              checkRouter(props?.route?.name, 'RegisterRecoverMnemonicMain')
+            ) {
+              smartNavigation.goBack();
+            } else {
+              smartNavigation.navigateSmart('Register.Intro', {});
+            }
           }}
         >
           Go back
@@ -445,7 +485,6 @@ export const RecoverMnemonicScreen: FunctionComponent = observer((props) => {
   );
 });
 
-
 const styles = StyleSheet.create({
   borderInput: {
     borderColor: colors['purple-100'],
@@ -455,6 +494,6 @@ const styles = StyleSheet.create({
     paddingRight: 11,
     paddingTop: 12,
     paddingBottom: 12,
-    borderRadius: 4,
-  },
+    borderRadius: 8
+  }
 });

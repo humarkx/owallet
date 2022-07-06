@@ -1,52 +1,54 @@
 /* eslint-disable react/display-name */
-import React, { FunctionComponent, useEffect } from 'react'
-import { Alert, Image, Linking, View } from 'react-native'
-import { CText as Text } from './components/text'
-import { KeyRingStatus } from '@owallet/background'
+import React, { FunctionComponent, useCallback, useEffect } from 'react';
 import {
-  DrawerActions,
-  NavigationContainer,
-  useNavigation
-} from '@react-navigation/native'
-import { useStore } from './stores'
-import { observer } from 'mobx-react-lite'
-import { HomeScreen } from './screens/home'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+  Image,
+  Linking,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
+} from 'react-native';
+import { CText as Text } from './components/text';
+import { KeyRingStatus } from '@owallet/background';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { useStore } from './stores';
+import { observer } from 'mobx-react-lite';
+import { HomeScreen } from './screens/home';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   createStackNavigator,
   TransitionPresets
-} from '@react-navigation/stack'
-import { SendScreen } from './screens/send'
-import { GovernanceDetailsScreen, GovernanceScreen } from './screens/governance'
+} from '@react-navigation/stack';
+import { SendScreen } from './screens/send';
 import {
-  createDrawerNavigator,
-  useIsDrawerOpen
-} from '@react-navigation/drawer'
-import { DrawerContent } from './components/drawer'
-import { useStyle } from './styles'
-import { BorderlessButton } from 'react-native-gesture-handler'
+  GovernanceDetailsScreen,
+  GovernanceScreen
+} from './screens/governance';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+// import { DrawerContent } from './components/drawer';
+import { useStyle } from './styles';
+import { BorderlessButton } from 'react-native-gesture-handler';
 
-import { SettingScreen } from './screens/setting'
-import { SettingSelectAccountScreen } from './screens/setting/screens/select-account'
-import { SettingSelectLangScreen } from './screens/setting/screens/select-lang'
-import { ViewPrivateDataScreen } from './screens/setting/screens/view-private-data'
-import { WebScreen } from './screens/web'
-import { RegisterIntroScreen } from './screens/register'
+import { SettingScreen } from './screens/setting';
+import { SettingSelectAccountScreen } from './screens/setting/screens/select-account';
+import { SettingSelectLangScreen } from './screens/setting/screens/select-lang';
+import { ViewPrivateDataScreen } from './screens/setting/screens/view-private-data';
+import { WebScreen } from './screens/web';
+import { RegisterIntroScreen } from './screens/register';
 import {
   NewMnemonicScreen,
   RecoverMnemonicScreen,
   VerifyMnemonicScreen
-} from './screens/register/mnemonic'
-import { RegisterEndScreen } from './screens/register/end'
-import { RegisterNewUserScreen } from './screens/register/new-user'
-import { RegisterNotNewUserScreen } from './screens/register/not-new-user'
+} from './screens/register/mnemonic';
+import { RegisterEndScreen } from './screens/register/end';
+import { RegisterNewUserScreen } from './screens/register/new-user';
+import { RegisterNotNewUserScreen } from './screens/register/not-new-user';
 
 import {
   DelegateScreen,
   StakingDashboardScreen,
   ValidatorDetailsScreen,
   ValidatorListScreen
-} from './screens/stake'
+} from './screens/stake';
 import {
   SettingFillIcon,
   SettingOutLineIcon,
@@ -56,94 +58,75 @@ import {
   BrowserOutLineIcon,
   BrowserFillIcon,
   InvestOutlineIcon,
-  InvestFillIcon
-} from './components/icon'
+  InvestFillIcon,
+  HistoryIcon,
+  Scanner,
+  GoBack
+} from './components/icon';
 import {
   AddAddressBookScreen,
   AddressBookScreen
-} from './screens/setting/screens/address-book'
-import { NewLedgerScreen } from './screens/register/ledger'
-import { PageScrollPositionProvider } from './providers/page-scroll-position'
+} from './screens/setting/screens/address-book';
+import { NewLedgerScreen } from './screens/register/ledger';
+import { PageScrollPositionProvider } from './providers/page-scroll-position';
 import {
   BlurredHeaderScreenOptionsPreset,
   getPlainHeaderScreenOptionsPresetWithBackgroundColor,
   HeaderLeftButton,
   HeaderRightButton,
   PlainHeaderScreenOptionsPreset
-} from './components/header'
-import { TokensScreen, TokenDetailScreen } from './screens/tokens'
-import { UndelegateScreen } from './screens/stake/undelegate'
-import { RedelegateScreen } from './screens/stake/redelegate'
-import { CameraScreen } from './screens/camera'
+} from './components/header';
+import { TokensScreen, TokenDetailScreen } from './screens/tokens';
+import { UndelegateScreen } from './screens/stake/undelegate';
+import { RedelegateScreen } from './screens/stake/redelegate';
+import { CameraScreen } from './screens/camera';
 import {
   FocusedScreenProvider,
   useFocusedScreen
-} from './providers/focused-screen'
+} from './providers/focused-screen';
 import {
   TxFailedResultScreen,
   TxPendingResultScreen,
   TxSuccessResultScreen
-} from './screens/tx-result'
-import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon'
-import { BlurredBottomTabBar } from './components/bottom-tabbar'
-import { UnlockScreen } from './screens/unlock'
-import { OWalletVersionScreen } from './screens/setting/screens/version'
-import { DAppWebpageScreen } from './screens/web/webpages'
-import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen'
-import { Browser } from './screens/web/browser'
-import { BookMarks } from './screens/web/bookmarks'
-import { Transactions, TransactionDetail } from './screens/transactions'
-import { navigate, navigationRef } from './router/root'
-import { handleDeepLink } from './utils/helper'
+} from './screens/tx-result';
+import { HeaderAddIcon, HeaderBackButtonIcon } from './components/header/icon';
+import { BlurredBottomTabBar } from './components/bottom-tabbar';
+import { UnlockScreen } from './screens/unlock';
+import { OWalletVersionScreen } from './screens/setting/screens/version';
+import { DAppWebpageScreen } from './screens/web/webpages';
+import { WebpageScreenScreenOptionsPreset } from './screens/web/components/webpage-screen';
+import { Browser } from './screens/web/browser';
+import { BookMarks } from './screens/web/bookmarks';
+import { Transactions, TransactionDetail } from './screens/transactions';
+import { navigate, navigationRef } from './router/root';
+import { handleDeepLink } from './utils/helper';
 import {
   SmartNavigatorProvider,
   useSmartNavigation
-} from './navigation.provider'
-import TransferTokensScreen from './screens/transfer-tokens/transfer-screen'
-import { OnboardingIntroScreen } from './screens/onboarding'
-import { NftsScreen, NftDetailScreen } from './screens/nfts'
+} from './navigation.provider';
+import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
+// import { OnboardingIntroScreen } from './screens/onboarding';
+import { NftsScreen, NftDetailScreen } from './screens/nfts';
+import { DelegateDetailScreen } from './screens/stake/delegate/delegate-detail';
+import { NetworkModal } from './screens/home/components';
+import { colors, spacing, typography } from './themes';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Hash } from '@owallet/crypto';
+import { useRoute } from '@react-navigation/core';
 
-const Stack = createStackNavigator()
-const Drawer = createDrawerNavigator()
-const Tab = createBottomTabNavigator()
+const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
 
 const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
-  const { chainStore } = useStore()
+  const style = useStyle();
 
-  const style = useStyle()
-
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   return (
     <HeaderLeftButton
       onPress={() => {
-        navigation.dispatch(DrawerActions.toggleDrawer())
-      }}
-    >
-      <View style={style.flatten(['flex-row', 'items-center'])}>
-        <DotsIcon />
-        <Text
-          style={style.flatten(['h5', 'color-text-black-low', 'margin-left-4'])}
-        >
-          {chainStore.current.chainName + ' '}
-        </Text>
-        {/* <DownArrowIcon
-          height={12}
-          color={style.get('color-text-black-low').color}
-        /> */}
-      </View>
-    </HeaderLeftButton>
-  )
-})
-
-const ScreenHeaderLeft: FunctionComponent<{ uri?: string }> = observer(({}) => {
-  const style = useStyle()
-  const smartNavigation = useSmartNavigation()
-  return (
-    <HeaderLeftButton
-      onPress={() => {
-        // navigate(uri);
-        smartNavigation.goBack()
+        if (navigation.canGoBack) navigation.goBack();
       }}
     >
       <View style={style.flatten(['flex-row', 'items-center'])}>
@@ -152,24 +135,182 @@ const ScreenHeaderLeft: FunctionComponent<{ uri?: string }> = observer(({}) => {
         </Text>
       </View>
     </HeaderLeftButton>
-  )
-})
+  );
+});
 
 const HomeScreenHeaderRight: FunctionComponent = observer(() => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+  const smartNavigation = useSmartNavigation();
+
+  return (
+    <View
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}
+    >
+      <View
+        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            smartNavigation.navigateSmart('Transactions', {});
+          }}
+          style={{ paddingRight: 8 }}
+        >
+          <HistoryIcon size={24} color={colors['purple-700']} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Others', {
+              screen: 'Camera'
+            });
+          }}
+        >
+          <Scanner size={24} color={colors['purple-700']} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+});
+
+const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
+  const { chainStore, modalStore } = useStore();
+
+  const deterministicNumber = useCallback((chainInfo) => {
+    const bytes = Hash.sha256(
+      Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
+    );
+    return (
+      (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0
+    );
+  }, []);
+
+  const profileColor = useCallback(
+    (chainInfo) => {
+      const colors = ['red', 'green', 'orange', 'yellow'];
+
+      return colors[deterministicNumber(chainInfo) % colors.length];
+    },
+    [deterministicNumber]
+  );
+
+  const _onPressNetworkModal = () => {
+    modalStore.setOpen();
+    modalStore.setChildren(
+      NetworkModal({
+        profileColor,
+        chainStore,
+        modalStore
+      })
+    );
+  };
+  return (
+    <React.Fragment>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
+      >
+        <TouchableWithoutFeedback onPress={_onPressNetworkModal}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingLeft: 50
+            }}
+          >
+            <DotsIcon />
+            <Text
+              style={{
+                ...typography['h5'],
+                ...colors['color-text-black-low'],
+                marginLeft: spacing['8']
+              }}
+            >
+              {chainStore.current.chainName + ' Network'}
+            </Text>
+          </View>
+        </TouchableWithoutFeedback>
+      </View>
+    </React.Fragment>
+  );
+});
+
+export const CustomHeader: FunctionComponent = observer(() => {
+  const { top } = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const smartNavigation = useSmartNavigation();
+  const route = useRoute();
+
+  const onPressBack = () => {
+    if (navigation.canGoBack) {
+      navigation.goBack();
+      return;
+    }
+    if (smartNavigation.canGoBack) {
+      smartNavigation.goBack();
+      return;
+    }
+    navigate('MainTab');
+  };
 
   return (
     <React.Fragment>
-      <HeaderRightButton
-        onPress={() => {
-          navigation.navigate('Others', {
-            screen: 'Camera'
-          })
+      <View
+        style={{
+          backgroundColor: colors['white'],
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+          paddingTop: top,
+          paddingBottom: spacing['20'],
+          paddingHorizontal: spacing['12']
         }}
-      ></HeaderRightButton>
+      >
+        {route.name === 'Home' ? (
+          <View />
+        ) : (
+          <TouchableWithoutFeedback onPress={onPressBack}>
+            <View>
+              <HeaderBackButtonIcon />
+            </View>
+          </TouchableWithoutFeedback>
+        )}
+
+        <View>
+          <HomeScreenHeaderTitle />
+        </View>
+        <View>
+          <HomeScreenHeaderRight />
+        </View>
+      </View>
     </React.Fragment>
-  )
-})
+  );
+});
+const ScreenHeaderLeft: FunctionComponent<{ uri?: string }> = observer(({}) => {
+  const style = useStyle();
+  const smartNavigation = useSmartNavigation();
+  return (
+    <HeaderLeftButton
+      onPress={() => {
+        // navigate(uri);
+        smartNavigation.goBack();
+      }}
+    >
+      <View style={style.flatten(['flex-row', 'items-center'])}>
+        <Text style={style.flatten(['h4', 'color-text-black-low'])}>
+          <HeaderBackButtonIcon />
+        </Text>
+      </View>
+    </HeaderLeftButton>
+  );
+});
 
 export const MainNavigation: FunctionComponent = () => {
   return (
@@ -183,21 +324,12 @@ export const MainNavigation: FunctionComponent = () => {
     >
       <Stack.Screen
         options={{
-          headerShown: false
-          // headerLeft: () => <HomeScreenHeaderLeft />,
-          // headerRight: () => <HomeScreenHeaderRight />,
+          header: () => <CustomHeader />
         }}
         name="Home"
         component={HomeScreen}
       />
-      <Stack.Screen
-        name="Transactions"
-        component={Transactions}
-        options={{
-          title: 'Transactions',
-          headerLeft: () => <ScreenHeaderLeft />
-        }}
-      />
+
       <Stack.Screen
         options={{
           title: '',
@@ -249,7 +381,8 @@ export const MainNavigation: FunctionComponent = () => {
       <Stack.Screen
         options={{
           title: '',
-          headerLeft: null
+          header: () => <CustomHeader />
+          // headerLeft: null
         }}
         name="Tokens"
         component={TokensScreen}
@@ -277,11 +410,32 @@ export const MainNavigation: FunctionComponent = () => {
         component={NftDetailScreen}
       />
     </Stack.Navigator>
-  )
-}
+  );
+};
+
+export const SendNavigation: FunctionComponent = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        ...BlurredHeaderScreenOptionsPreset,
+        headerTitle: ''
+      }}
+      initialRouteName="TransferTokensScreen"
+      headerMode="screen"
+    >
+      <Stack.Screen
+        options={{
+          header: () => <CustomHeader />
+        }}
+        name="TransferTokensScreen"
+        component={TransferTokensScreen}
+      />
+    </Stack.Navigator>
+  );
+};
 
 export const RegisterNavigation: FunctionComponent = () => {
-  const style = useStyle()
+  const style = useStyle();
 
   return (
     <Stack.Navigator
@@ -351,11 +505,11 @@ export const RegisterNavigation: FunctionComponent = () => {
         component={RegisterEndScreen}
       />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
 export const OtherNavigation: FunctionComponent = () => {
-  const style = useStyle()
+  const style = useStyle();
 
   return (
     <Stack.Navigator
@@ -367,10 +521,25 @@ export const OtherNavigation: FunctionComponent = () => {
     >
       <Stack.Screen
         options={{
-          title: 'Send'
+          title: 'Send',
+          header: () => <CustomHeader />
         }}
         name="Send"
         component={SendScreen}
+      />
+      <Stack.Screen
+        options={{
+          header: () => <CustomHeader />
+        }}
+        name="Transactions"
+        component={Transactions}
+      />
+      <Stack.Screen
+        options={{
+          header: () => <CustomHeader />
+        }}
+        name="Transactions.Detail"
+        component={TransactionDetail}
       />
       <Stack.Screen
         options={{
@@ -378,13 +547,6 @@ export const OtherNavigation: FunctionComponent = () => {
         }}
         name="Camera"
         component={CameraScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Validator Details'
-        }}
-        name="Validator Details"
-        component={ValidatorDetailsScreen}
       />
       <Stack.Screen
         options={{
@@ -400,13 +562,13 @@ export const OtherNavigation: FunctionComponent = () => {
         name="Governance Details"
         component={GovernanceDetailsScreen}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{
           title: 'Staking Dashboard'
         }}
         name="Staking.Dashboard"
         component={StakingDashboardScreen}
-      />
+      /> */}
       <Stack.Screen
         options={{
           title: 'Validator Details'
@@ -421,27 +583,7 @@ export const OtherNavigation: FunctionComponent = () => {
         name="Validator.List"
         component={ValidatorListScreen}
       />
-      <Stack.Screen
-        options={{
-          title: 'Stake'
-        }}
-        name="Delegate"
-        component={DelegateScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Unstake'
-        }}
-        name="Undelegate"
-        component={UndelegateScreen}
-      />
-      <Stack.Screen
-        options={{
-          title: 'Switch Validator'
-        }}
-        name="Redelegate"
-        component={RedelegateScreen}
-      />
+
       <Stack.Screen
         options={{
           gestureEnabled: false,
@@ -467,15 +609,15 @@ export const OtherNavigation: FunctionComponent = () => {
         component={TxFailedResultScreen}
       />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
 export const SettingStackScreen: FunctionComponent = () => {
-  const style = useStyle()
+  const style = useStyle();
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
-  const { analyticsStore } = useStore()
+  const { analyticsStore } = useStore();
 
   return (
     <Stack.Navigator
@@ -504,10 +646,10 @@ export const SettingStackScreen: FunctionComponent = () => {
           headerRight: () => (
             <HeaderRightButton
               onPress={() => {
-                analyticsStore.logEvent('Add additional account started')
+                analyticsStore.logEvent('Add additional account started');
                 navigation.navigate('Register', {
                   screen: 'Register.Intro'
-                })
+                });
               }}
             >
               <HeaderAddIcon />
@@ -537,11 +679,11 @@ export const SettingStackScreen: FunctionComponent = () => {
         component={OWalletVersionScreen}
       />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
 export const AddressBookStackScreen: FunctionComponent = () => {
-  const style = useStyle()
+  const style = useStyle();
 
   return (
     <Stack.Navigator
@@ -560,14 +702,18 @@ export const AddressBookStackScreen: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: 'New Address Book'
+          title: 'Add new contact',
+          ...getPlainHeaderScreenOptionsPresetWithBackgroundColor(
+            style.get('color-setting-screen-background-transparent').color
+          ),
+          headerTitleStyle: style.flatten(['h3', 'color-text-black-high'])
         }}
         name="AddAddressBook"
         component={AddAddressBookScreen}
       />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
 export const WebNavigation: FunctionComponent = () => {
   return (
@@ -600,15 +746,16 @@ export const WebNavigation: FunctionComponent = () => {
       />
       <Stack.Screen name="Web.dApp" component={DAppWebpageScreen} />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
 export const InvestNavigation: FunctionComponent = () => {
   return (
     <Stack.Navigator
       screenOptions={{
         ...BlurredHeaderScreenOptionsPreset,
-        headerTitle: ''
+        headerTitle: '',
+        header: () => <CustomHeader />
       }}
       initialRouteName="Invest"
       headerMode="screen"
@@ -624,20 +771,55 @@ export const InvestNavigation: FunctionComponent = () => {
         options={{
           title: 'Validator List'
         }}
-        name="Validator List"
+        name="Validator.List"
         component={ValidatorListScreen}
       />
+      <Stack.Screen
+        options={{
+          title: 'Validator Details'
+        }}
+        name="Validator.Details"
+        component={ValidatorDetailsScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Stake'
+        }}
+        name="Delegate"
+        component={DelegateScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Delegate Detail'
+        }}
+        name="Delegate.Detail"
+        component={DelegateDetailScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Switch Validator'
+        }}
+        name="Redelegate"
+        component={RedelegateScreen}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Unstake'
+        }}
+        name="Undelegate"
+        component={UndelegateScreen}
+      />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
 export const MainTabNavigation: FunctionComponent = () => {
-  const style = useStyle()
+  const style = useStyle();
 
-  const navigation = useNavigation()
-  const { chainStore } = useStore()
+  const navigation = useNavigation();
+  const { chainStore } = useStore();
 
-  const focusedScreen = useFocusedScreen()
+  const focusedScreen = useFocusedScreen();
 
   useEffect(() => {
     // When the focused screen is not "Home" screen and the drawer is open,
@@ -646,32 +828,35 @@ export const MainTabNavigation: FunctionComponent = () => {
     // if (focusedScreen.name !== 'Home' && isDrawerOpen) {
     //   navigation.dispatch(DrawerActions.toggleDrawer());
     // }
-  }, [focusedScreen.name, navigation])
+  }, [focusedScreen.name, navigation]);
 
   const checkActiveTabBottom = (color: string) => {
-    return color == '#C6C6CD'
-  }
+    return color == '#C6C6CD';
+  };
 
   const RenderTabsBarIcon = ({ color, name }) => {
-    let checkColor = checkActiveTabBottom(color)
-    let icon
-    let nameRoute = name
+    let checkColor = checkActiveTabBottom(color);
+    let icon;
+    let nameRoute = name;
     switch (name) {
       case 'Main':
-        icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />
-        break
+        icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />;
+        break;
+      case 'Home':
+        icon = checkColor ? <HomeOutlineIcon /> : <HomeFillIcon />;
+        break;
       case 'Browser':
-        icon = checkColor ? <BrowserOutLineIcon /> : <BrowserFillIcon />
-        break
+        icon = checkColor ? <BrowserOutLineIcon /> : <BrowserFillIcon />;
+        break;
       case 'Invest':
-        icon = checkColor ? <InvestOutlineIcon /> : <InvestFillIcon />
-        break
+        icon = checkColor ? <InvestOutlineIcon /> : <InvestFillIcon />;
+        break;
       case 'Settings':
-        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />
-        break
+        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />;
+        break;
       default:
-        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />
-        break
+        icon = checkColor ? <SettingOutLineIcon /> : <SettingFillIcon />;
+        break;
     }
     return (
       <View
@@ -700,8 +885,8 @@ export const MainTabNavigation: FunctionComponent = () => {
           </View>
         )}
       </View>
-    )
-  }
+    );
+  };
 
   return (
     <Tab.Navigator
@@ -709,10 +894,10 @@ export const MainTabNavigation: FunctionComponent = () => {
         tabBarIcon: ({ color }) => {
           switch (route.name) {
             case 'Main':
-              return <RenderTabsBarIcon color={color} name={'Main'} />
+              return <RenderTabsBarIcon color={color} name={'Home'} />;
             case 'Browser':
-              return <RenderTabsBarIcon color={color} name={'Browser'} />
-            case 'Send':
+              return <RenderTabsBarIcon color={color} name={'Browser'} />;
+            case 'SendNavigation':
               return (
                 <View
                   style={{
@@ -736,14 +921,14 @@ export const MainTabNavigation: FunctionComponent = () => {
                     </View>
                   )}
                 </View>
-              )
+              );
             case 'Invest':
-              return <RenderTabsBarIcon color={color} name={'Invest'} />
+              return <RenderTabsBarIcon color={color} name={'Invest'} />;
             case 'Settings':
-              return <RenderTabsBarIcon color={color} name={'Settings'} />
+              return <RenderTabsBarIcon color={color} name={'Settings'} />;
           }
         },
-        tabBarButton: props => (
+        tabBarButton: (props) => (
           <View
             style={{
               display: 'flex',
@@ -780,7 +965,7 @@ export const MainTabNavigation: FunctionComponent = () => {
         },
         showLabel: false
       }}
-      tabBar={props => (
+      tabBar={(props) => (
         <BlurredBottomTabBar {...props} enabledScreens={['Home']} />
       )}
     >
@@ -788,10 +973,10 @@ export const MainTabNavigation: FunctionComponent = () => {
       <Tab.Screen name="Browser" component={WebNavigation} />
       <Tab.Screen
         options={{
-          title: 'Send'
+          title: 'SendNavigation'
         }}
-        name="Send"
-        component={TransferTokensScreen}
+        name="SendNavigation"
+        component={SendNavigation}
         initialParams={{
           currency: chainStore.current.stakeCurrency.coinMinimalDenom,
           chainId: chainStore.current.chainId
@@ -806,52 +991,52 @@ export const MainTabNavigation: FunctionComponent = () => {
         }}
       />
     </Tab.Navigator>
-  )
-}
+  );
+};
 
-export const MainTabNavigationWithDrawer: FunctionComponent = () => {
-  const focused = useFocusedScreen()
+// export const MainTabNavigationWithDrawer: FunctionComponent = () => {
+//   const focused = useFocusedScreen();
 
-  return (
-    <Drawer.Navigator
-      drawerType="slide"
-      drawerContent={props => <DrawerContent {...props} />}
-      screenOptions={{
-        // If the focused screen is not "Home" screen,
-        // disable the gesture to open drawer.
-        swipeEnabled: focused.name === 'Home',
-        gestureEnabled: focused.name === 'Home'
-      }}
-      gestureHandlerProps={{
-        hitSlop: {}
-      }}
-    >
-      <Drawer.Screen name="MainTab" component={MainTabNavigation} />
-    </Drawer.Navigator>
-  )
-}
+//   return (
+//     <Drawer.Navigator
+//       drawerType="slide"
+//       drawerContent={(props) => <DrawerContent {...props} />}
+//       screenOptions={{
+//         // If the focused screen is not "Home" screen,
+//         // disable the gesture to open drawer.
+//         swipeEnabled: focused.name === 'Home',
+//         gestureEnabled: focused.name === 'Home'
+//       }}
+//       gestureHandlerProps={{
+//         hitSlop: {}
+//       }}
+//     >
+//       <Drawer.Screen name="MainTab" component={MainTabNavigation} />
+//     </Drawer.Navigator>
+//   );
+// };
 
 export const AppNavigation: FunctionComponent = observer(() => {
-  const { keyRingStore, deepLinkUriStore } = useStore()
+  const { keyRingStore, deepLinkUriStore } = useStore();
   useEffect(() => {
     Linking.getInitialURL()
-      .then(url => {
+      .then((url) => {
         if (url) {
-          const SCHEME_IOS = 'owallet://open_url?url='
-          const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url='
+          const SCHEME_IOS = 'owallet://open_url?url=';
+          const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url=';
           deepLinkUriStore.updateDeepLink(
             url.replace(SCHEME_ANDROID, '').replace(SCHEME_IOS, '')
-          )
+          );
         }
       })
-      .catch(err => {
-        console.warn('Deeplinking error', err)
-      })
-    Linking.addEventListener('url', handleDeepLink)
+      .catch((err) => {
+        console.warn('Deeplinking error', err);
+      });
+    Linking.addEventListener('url', handleDeepLink);
     return () => {
-      Linking.removeEventListener('url', handleDeepLink)
-    }
-  }, [])
+      Linking.removeEventListener('url', handleDeepLink);
+    };
+  }, []);
 
   return (
     <PageScrollPositionProvider>
@@ -884,5 +1069,5 @@ export const AppNavigation: FunctionComponent = observer(() => {
         </SmartNavigatorProvider>
       </FocusedScreenProvider>
     </PageScrollPositionProvider>
-  )
-})
+  );
+});

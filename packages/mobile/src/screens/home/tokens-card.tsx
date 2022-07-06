@@ -1,21 +1,22 @@
-import React, { FunctionComponent, useState } from 'react'
-import { Card, CardBody } from '../../components/card'
-import { SectionList, StyleSheet, View, ViewStyle } from 'react-native'
-import { Image, Tab } from '@rneui/base'
-import { CText as Text} from "../../components/text";
-import { observer } from 'mobx-react-lite'
-import { useStore } from '../../stores'
-import { TokenItem } from '../tokens/components/token-item'
-import { useSmartNavigation } from '../../navigation.provider'
-import { RectButton } from '../../components/rect-button'
-import { colors, metrics, spacing, typography } from '../../themes'
-import { FlatList, TouchableOpacity } from 'react-native-gesture-handler'
+import React, { FunctionComponent, useEffect, useState } from 'react';
+import { Card, CardBody } from '../../components/card';
+import { SectionList, StyleSheet, View, ViewStyle } from 'react-native';
+import { Image, Tab } from '@rneui/base';
+import { CText as Text } from '../../components/text';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../stores';
+import { TokenItem } from '../tokens/components/token-item';
+import { useSmartNavigation } from '../../navigation.provider';
+import { RectButton } from '../../components/rect-button';
+import { colors, metrics, spacing, typography } from '../../themes';
+import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import {
   capitalizedText,
   formatContractAddress,
   _keyExtract
-} from '../../utils/helper'
-import { DownArrowIcon } from '../../components/icon'
+} from '../../utils/helper';
+import { DownArrowIcon } from '../../components/icon';
+import { API } from '../../common/api';
 
 // hard code data to test UI
 const nftsData = [
@@ -59,77 +60,111 @@ const nftsData = [
       }
     ]
   }
-]
-
-
+];
 
 export const TokensCard: FunctionComponent<{
-  containerStyle?: ViewStyle
+  containerStyle?: ViewStyle;
 }> = observer(({ containerStyle }) => {
-  const { chainStore, queriesStore, accountStore } = useStore()
+  const { chainStore, queriesStore, accountStore, priceStore } = useStore();
 
-  const smartNavigation = useSmartNavigation()
-  const [index, setIndex] = useState<number>(0)
-
+  const smartNavigation = useSmartNavigation();
+  const [index, setIndex] = useState<number>(0);
+  // const [price, setPrice] = useState<object>({});
   const queryBalances = queriesStore
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(
       accountStore.getAccount(chainStore.current.chainId).bech32Address
-    )
+    );
 
-  const tokens = queryBalances.positiveNativeUnstakables
-    .concat(queryBalances.nonNativeBalances)
-    .slice(0, 2)
+  const tokens = queryBalances.balances.concat(
+    queryBalances.nonNativeBalances,
+    queryBalances.positiveNativeUnstakables
+  );
 
-    const _renderFlatlistItem = ({ item }) => (
-      <TouchableOpacity style={styles.flatListItem} onPress={() => {
-        smartNavigation.navigateSmart('Nfts.Detail',{})
-      }}>
-        <Image
-          source={{
-            uri: item.uri
-          }}
-          style={styles.itemPhoto}
-          resizeMode="cover"
-        />
-        <View
+  // const listTokens = tokens.map((e) => e.balance.currency.coinGeckoId);
+
+  // const config = {
+  //   customDomain: 'https://api.coingecko.com/'
+  // };
+  // const getPriceCoinGecko = async () => {
+  //   console.log({ test: listTokens.join(',') });
+
+  //   return await API.get(
+  //     `api/v3/simple/price?ids=${listTokens.join(',')}&vs_currencies=usd`,
+  //     config
+  //   );
+  // };
+
+  // useEffect(() => {
+  //   (async function get() {
+  //     const price = await getPriceCoinGecko();
+  //     console.log({ price });
+  //     setPrice(price);
+  //   })();
+  // }, [index]);
+
+  const _renderFlatlistItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.flatListItem}
+      onPress={() => {
+        smartNavigation.navigateSmart('Nfts.Detail', {});
+      }}
+    >
+      <Image
+        source={{
+          uri: item.uri
+        }}
+        style={styles.itemPhoto}
+        resizeMode="cover"
+      />
+      <View
+        style={{
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          marginTop: spacing['12'],
+          alignItems: 'flex-start'
+        }}
+      >
+        <Text
           style={{
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            marginTop: spacing['12'],
-            alignItems: 'flex-start'
+            ...typography.h7,
+            color: colors['gray-900'],
+            fontWeight: '700'
           }}
         >
-          <Text
-            style={{
-              ...typography.h7,
-              color: colors['gray-900'],
-              fontWeight: '700'
-            }}
-          >
-            {formatContractAddress(item.title)}
-          </Text>
+          {formatContractAddress(item.title)}
+        </Text>
 
-          <Text
-            style={{
-              ...typography.h5,
-              color: colors['gray-900'],
-              fontWeight: '700'
-            }}
-          >
-            {item.oraiPrice}
-          </Text>
+        <Text
+          style={{
+            ...typography.h5,
+            color: colors['gray-900'],
+            fontWeight: '700'
+          }}
+        >
+          {formatContractAddress(item.title)}
+        </Text>
 
-          <Text
-            style={{
-              ...typography.h5,
-              color: colors['gray-900'],
-              fontWeight: '700'
-            }}
-          >{`$ ${58.23}`}</Text>
-        </View>
-      </TouchableOpacity>
-    )
+        <Text
+          style={{
+            ...typography.h5,
+            color: colors['gray-900'],
+            fontWeight: '700'
+          }}
+        >
+          {item.oraiPrice}
+        </Text>
+
+        <Text
+          style={{
+            ...typography.h5,
+            color: colors['gray-900'],
+            fontWeight: '700'
+          }}
+        >{`$ ${58.23}`}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={containerStyle}>
@@ -141,41 +176,55 @@ export const TokensCard: FunctionComponent<{
           backgroundColor: colors['white']
         }}
       >
-        <Tab
-          value={index}
-          onChange={e => {
-            setIndex(e)
-          }}
-          indicatorStyle={{
-            height: spacing['1'],
-            backgroundColor: colors['black']
-          }}
-          variant="default"
-          containerStyle={{
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            alignItems: 'center',
             width: metrics.screenWidth - 64,
-            marginHorizontal: spacing['32'],
-            justifyContent: 'space-between'
+            marginHorizontal: spacing['32']
           }}
         >
-          {['Tokens', 'NFTs'].map((title: string, index: number) => (
-            <Tab.Item
-              key={index}
-              title={title}
-              titleStyle={active => ({
-                fontSize: 14,
-                fontWeight: '700',
-                color: active ? colors['gray-900'] : colors['gray-300']
-              })}
-              containerStyle={{
-                backgroundColor: colors['transparent']
-              }}
-              variant="default"
-            />
+          {['Tokens', 'NFTs'].map((title: string, i: number) => (
+            <View>
+              <TouchableOpacity
+                key={i}
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: spacing['12']
+                }}
+                onPress={() => {
+                  setIndex(i);
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '700',
+                    color: index === i ? colors['gray-900'] : colors['gray-300']
+                  }}
+                >
+                  {title}
+                </Text>
+              </TouchableOpacity>
+              <View
+                style={{
+                  width: 100,
+                  height: 2,
+                  marginTop: 8,
+                  backgroundColor:
+                    index === i ? colors['black'] : colors['white']
+                }}
+              />
+            </View>
           ))}
-        </Tab>
+        </View>
+
         {index === 0 ? (
           <CardBody>
-            {tokens.map(token => {
+            {tokens.slice(0, 3).map((token) => {
+              const priceBalance = priceStore.calculatePrice(token.balance);
               return (
                 <TokenItem
                   key={token.currency.coinMinimalDenom}
@@ -183,8 +232,9 @@ export const TokensCard: FunctionComponent<{
                     stakeCurrency: chainStore.current.stakeCurrency
                   }}
                   balance={token.balance}
+                  priceBalance={priceBalance}
                 />
-              )
+              );
             })}
           </CardBody>
         ) : (
@@ -229,9 +279,9 @@ export const TokensCard: FunctionComponent<{
             style={styles.containerBtn}
             onPress={() => {
               if (index === 0) {
-                smartNavigation.navigateSmart('Tokens', {})
+                smartNavigation.navigateSmart('Tokens', {});
               } else {
-                smartNavigation.navigateSmart('Nfts', {})
+                smartNavigation.navigateSmart('Nfts', {});
               }
             }}
           >
@@ -242,8 +292,8 @@ export const TokensCard: FunctionComponent<{
         </View>
       </Card>
     </View>
-  )
-})
+  );
+});
 
 const styles = StyleSheet.create({
   textLoadMore: {
@@ -280,4 +330,4 @@ const styles = StyleSheet.create({
   itemText: {
     color: colors['gray-800']
   }
-})
+});

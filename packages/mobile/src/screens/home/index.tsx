@@ -2,7 +2,7 @@ import React, {
   FunctionComponent,
   useCallback,
   useEffect,
-  useRef,
+  useRef
 } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import { AccountCard } from './account-card';
@@ -11,14 +11,11 @@ import {
   AppStateStatus,
   RefreshControl,
   ScrollView,
-  StyleSheet,
+  StyleSheet
 } from 'react-native';
 import { useStore } from '../../stores';
-import { StakingInfoCard } from './staking-info-card';
 import { EarningCard } from './earning-card';
-import { GovernanceCard } from './governance-card';
 import { observer } from 'mobx-react-lite';
-import { MyRewardCard } from './my-reward-card';
 import { TokensCard } from './tokens-card';
 import { usePrevious } from '../../hooks';
 import { BIP44Selectable } from './bip44-selectable';
@@ -26,7 +23,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ChainUpdaterService } from '@owallet/background';
 import { colors } from '../../themes';
 
-export const HomeScreen: FunctionComponent = observer(() => {
+export const HomeScreen: FunctionComponent = observer((props) => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const { chainStore, accountStore, queriesStore, priceStore } = useStore();
@@ -83,7 +80,7 @@ export const HomeScreen: FunctionComponent = observer(() => {
       previousChainStoreIsInitializing,
       currentChainId,
       previousChainId,
-      checkAndUpdateChainInfo,
+      checkAndUpdateChainInfo
     ])
   );
 
@@ -115,7 +112,7 @@ export const HomeScreen: FunctionComponent = observer(() => {
         .waitFreshResponse(),
       queries.cosmos.queryUnbondingDelegations
         .getQueryBech32Address(account.bech32Address)
-        .waitFreshResponse(),
+        .waitFreshResponse()
     ]);
 
     setRefreshing(false);
@@ -127,8 +124,9 @@ export const HomeScreen: FunctionComponent = observer(() => {
       accountStore.getAccount(chainStore.current.chainId).bech32Address
     );
 
-  const tokens = queryBalances.positiveNativeUnstakables.concat(
-    queryBalances.nonNativeBalances
+  const tokens = queryBalances.balances.concat(
+    queryBalances.nonNativeBalances,
+    queryBalances.positiveNativeUnstakables
   );
 
   return (
@@ -164,9 +162,9 @@ export const HomeScreen: FunctionComponent = observer(() => {
 const styles = StyleSheet.create({
   containerStyle: {
     paddingBottom: 12,
-    backgroundColor: colors['gray-100'],
+    backgroundColor: colors['gray-100']
   },
   containerEarnStyle: {
-    backgroundColor: colors['gray-100'],
+    backgroundColor: colors['gray-100']
   }
 });

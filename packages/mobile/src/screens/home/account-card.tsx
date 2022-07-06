@@ -1,38 +1,16 @@
-import React, {
-  FunctionComponent,
-  ReactElement,
-  useCallback,
-  useEffect
-} from 'react';
+import React, { FunctionComponent, ReactElement, useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Card, CardBody } from '../../components/card';
-import {
-  View,
-  ViewStyle,
-  Image,
-  Touchable,
-  TouchableWithoutFeedback,
-  LogBox
-} from 'react-native';
+import { View, ViewStyle, Image } from 'react-native';
 import { CText as Text } from '../../components/text';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useStore } from '../../stores';
 import { AddressCopyable } from '../../components/address-copyable';
-import { Button } from '../../components/button';
 import { LoadingSpinner } from '../../components/spinner';
 import { useSmartNavigation } from '../../navigation.provider';
 import { NetworkErrorView } from './network-error-view';
-import { ProgressBar } from '../../components/progress-bar';
-import {
-  DotsIcon,
-  DownArrowIcon,
-  HistoryIcon,
-  Scanner,
-  SendIcon,
-  SettingDashboardIcon
-} from '../../components/icon';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { DownArrowIcon, SettingDashboardIcon } from '../../components/icon';
+import { useNavigation } from '@react-navigation/native';
 import {
   BuyIcon,
   DepositIcon,
@@ -41,7 +19,7 @@ import {
 import { colors, metrics, spacing, typography } from '../../themes';
 import { navigate } from '../../router/root';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { NamespaceModal, NetworkModal } from './components';
+import { NamespaceModal, AddressQRCodeModal } from './components';
 import { Hash } from '@owallet/crypto';
 import LinearGradient from 'react-native-linear-gradient';
 import MyWalletModal from './components/my-wallet-modal/my-wallet-modal';
@@ -52,7 +30,7 @@ export const AccountCard: FunctionComponent<{
   const { chainStore, accountStore, queriesStore, priceStore, modalStore } =
     useStore();
 
-  const deterministicNumber = useCallback((chainInfo) => {
+  const deterministicNumber = useCallback(chainInfo => {
     const bytes = Hash.sha256(
       Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
     );
@@ -62,22 +40,8 @@ export const AccountCard: FunctionComponent<{
   }, []);
 
   const profileColor = useCallback(
-    (chainInfo) => {
-      const colors = [
-        'sky-blue',
-        'mint',
-        'red',
-        'orange',
-        'blue-violet',
-        'green',
-        'sky-blue',
-        'mint',
-        'red',
-        'purple',
-        'red',
-        'orange',
-        'black'
-      ];
+    chainInfo => {
+      const colors = ['red', 'green', 'purple', 'orange'];
 
       return colors[deterministicNumber(chainInfo) % colors.length];
     },
@@ -94,7 +58,6 @@ export const AccountCard: FunctionComponent<{
     account.bech32Address
   ).stakable;
   const stakable = queryStakable?.balance;
-
   const queryDelegated = queries.cosmos.queryDelegations.getQueryBech32Address(
     account.bech32Address
   );
@@ -117,29 +80,18 @@ export const AccountCard: FunctionComponent<{
     parseFloat(stakedSum.toDec().toString())
   ];
   const safeAreaInsets = useSafeAreaInsets();
-  const onPressBtnMain = (name) => {
+  const onPressBtnMain = name => {
     if (name === 'Buy') {
-      navigate('Browser', { path: 'https://oraidex.io' });
+      navigate('MainTab', { screen: 'Browser', path: 'https://oraidex.io' });
     }
-    if (name === 'Deposit') {
+    if (name === 'Receive') {
+      _onPressReceiveModal()
     }
     if (name === 'Send') {
       smartNavigation.navigateSmart('Send', {
         currency: chainStore.current.stakeCurrency.coinMinimalDenom
       });
     }
-  };
-
-  // open model
-  const _onPressNetworkModal = () => {
-    modalStore.setOpen();
-    modalStore.setChildren(
-      NetworkModal({
-        profileColor,
-        chainStore,
-        modalStore
-      })
-    );
   };
 
   const _onPressNamespace = () => {
@@ -150,6 +102,14 @@ export const AccountCard: FunctionComponent<{
     modalStore.setOpen();
     modalStore.setChildren(MyWalletModal());
   };
+  const _onPressReceiveModal = () => {
+    modalStore.setOpen();
+    modalStore.setChildren(
+      AddressQRCodeModal({
+        account
+      })
+    );
+  };
 
   const RenderBtnMain = ({ name }) => {
     let icon: ReactElement;
@@ -157,7 +117,7 @@ export const AccountCard: FunctionComponent<{
       case 'Buy':
         icon = <BuyIcon />;
         break;
-      case 'Deposit':
+      case 'Receive':
         icon = <DepositIcon />;
         break;
       case 'Send':
@@ -215,59 +175,6 @@ export const AccountCard: FunctionComponent<{
       >
         <View
           style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingBottom: spacing['26']
-          }}
-        >
-          <Text />
-
-          <TouchableWithoutFeedback onPress={_onPressNetworkModal}>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingLeft: 50
-              }}
-            >
-              <DotsIcon />
-              <Text
-                style={{
-                  ...typography['h5'],
-                  ...colors['color-text-black-low'],
-                  marginLeft: spacing['8']
-                }}
-              >
-                {chainStore.current.chainName + ' Network'}
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
-
-          <View style={{ display: 'flex', flexDirection: 'row' }}>
-            <TouchableOpacity
-              onPress={() => {
-                smartNavigation.navigateSmart('Transactions', {});
-              }}
-              style={{ paddingRight: 15 }}
-            >
-              <HistoryIcon size={28} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('Others', {
-                  screen: 'Camera'
-                });
-              }}
-            >
-              <Scanner size={28} color={'#5064fb'} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View
-          style={{
             height: 256,
             borderWidth: spacing['0.5'],
             borderColor: colors['gray-100'],
@@ -319,12 +226,12 @@ export const AccountCard: FunctionComponent<{
                 display: 'flex',
                 flexDirection: 'row',
                 paddingTop: spacing['6'],
-                paddingLeft: spacing[22],
+                paddingLeft: spacing['22'],
                 paddingRight: spacing['22'],
                 justifyContent: 'center'
               }}
             >
-              {['Buy', 'Deposit', 'Send'].map((e, i) => (
+              {['Buy', 'Receive', 'Send'].map((e, i) => (
                 <RenderBtnMain key={i} name={e} />
               ))}
             </View>
@@ -372,7 +279,13 @@ export const AccountCard: FunctionComponent<{
                   source={require('../../assets/image/address_default.png')}
                   fadeDuration={0}
                 />
-                <Text style={{ paddingLeft: spacing['6'] }}>
+                <Text
+                  style={{
+                    paddingLeft: spacing['6'],
+                    fontWeight: '700',
+                    fontSize: 16
+                  }}
+                >
                   {account.name || '...'}
                 </Text>
               </View>
@@ -383,7 +296,7 @@ export const AccountCard: FunctionComponent<{
               />
             </View>
             <TouchableOpacity onPress={_onPressMyWallet}>
-              <DownArrowIcon height={30} color={colors['gray-150']} />
+              <DownArrowIcon height={28} color={colors['gray-150']} />
             </TouchableOpacity>
           </View>
 
