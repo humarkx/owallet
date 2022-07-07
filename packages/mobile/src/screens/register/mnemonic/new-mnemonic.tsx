@@ -1,13 +1,13 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { RouteProp, useIsFocused, useRoute } from '@react-navigation/native';
 import { RegisterConfig } from '@owallet/hooks';
 import { useNewMnemonicConfig } from './hook';
 import { PageWithScrollView } from '../../../components/page';
-import { CheckIcon } from '../../../components/icon';
-import { useStyle } from '../../../styles';
+import { CheckIcon, CopyFillIcon } from '../../../components/icon';
 import { WordChip } from '../../../components/mnemonic';
+import { CText as Text } from '../../../components/text';
 import { Button } from '../../../components/button';
 import Clipboard from 'expo-clipboard';
 import { TextInput } from '../../../components/input';
@@ -15,6 +15,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { useSmartNavigation } from '../../../navigation.provider';
 import { useSimpleTimer } from '../../../hooks';
 import { BIP44AdvancedButton, useBIP44Option } from '../bip44';
+import {
+  navigate,
+  checkRouter,
+  checkRouterPaddingBottomBar
+} from '../../../router/root';
+import { OWalletLogo } from '../owallet-logo';
+import { colors, typography } from '../../../themes';
 
 interface FormData {
   name: string;
@@ -22,7 +29,7 @@ interface FormData {
   confirmPassword: string;
 }
 
-export const NewMnemonicScreen: FunctionComponent = observer(() => {
+export const NewMnemonicScreen: FunctionComponent = observer((props) => {
   const route = useRoute<
     RouteProp<
       Record<
@@ -35,8 +42,6 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
     >
   >();
 
-  const style = useStyle();
-
   const smartNavigation = useSmartNavigation();
 
   const registerConfig: RegisterConfig = route.params.registerConfig;
@@ -44,6 +49,8 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
 
   const newMnemonicConfig = useNewMnemonicConfig(registerConfig);
   const [mode] = useState(registerConfig.mode);
+  const [statusPass, setStatusPass] = useState(false);
+  const [statusConfirmPass, setStatusConfirmPass] = useState(false);
 
   const words = newMnemonicConfig.mnemonic.split(' ');
 
@@ -58,30 +65,60 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
   const submit = handleSubmit(() => {
     newMnemonicConfig.setName(getValues('name'));
     newMnemonicConfig.setPassword(getValues('password'));
-    smartNavigation.navigateSmart('Register.VerifyMnemonic', {
-      registerConfig,
-      newMnemonicConfig,
-      bip44HDPath: bip44Option.bip44HDPath
-    });
+
+    // smartNavigation.navigateSmart('Register.VerifyMnemonic', {
+    //   registerConfig,
+    //   newMnemonicConfig,
+    //   bip44HDPath: bip44Option.bip44HDPath,
+    // });
+
+    if (checkRouter(props?.route?.name, 'RegisterMain')) {
+      navigate('RegisterVerifyMnemonicMain', {
+        registerConfig,
+        newMnemonicConfig,
+        bip44HDPath: bip44Option.bip44HDPath
+      });
+    } else {
+      smartNavigation.navigateSmart('Register.VerifyMnemonic', {
+        registerConfig,
+        newMnemonicConfig,
+        bip44HDPath: bip44Option.bip44HDPath,
+      });
+    }
   });
 
   return (
     <PageWithScrollView
-      contentContainerStyle={style.get('flex-grow-1')}
-      style={style.flatten(['padding-x-page'])}
+      contentContainerStyle={{
+        paddingLeft: 20,
+        paddingRight: 20
+      }}
+      backgroundColor={colors['white']}
     >
       {/* Mock for flexible margin top */}
-      <View style={style.flatten(['max-height-32', 'flex-1'])} />
-      <Text
-        style={style.flatten([
-          'h5',
-          'color-text-black-medium',
-          'margin-bottom-4',
-          'text-center'
-        ])}
+      <View
+        style={{
+          height: 72,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
       >
-        Backup your mnemonic securely
-      </Text>
+        <Text
+          style={{
+            fontSize: 24,
+            lineHeight: 34,
+            fontWeight: '700',
+            color: colors['gray-900']
+          }}
+        >
+          Create new wallet
+        </Text>
+        <View>
+          <OWalletLogo size={72} />
+        </View>
+      </View>
       <WordsCard words={words} />
       <Controller
         control={control}
@@ -91,8 +128,10 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
         render={({ field: { onChange, onBlur, value, ref } }) => {
           return (
             <TextInput
-              label="Wallet nickname"
-              containerStyle={style.flatten(['padding-bottom-6'])}
+              label="Username"
+              inputStyle={{
+                ...styles.borderInput
+              }}
               returnKeyType={mode === 'add' ? 'done' : 'next'}
               onSubmitEditing={() => {
                 if (mode === 'add') {
@@ -113,7 +152,6 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
         name="name"
         defaultValue=""
       />
-      <BIP44AdvancedButton bip44Option={bip44Option} />
       {mode === 'create' ? (
         <React.Fragment>
           <Controller
@@ -131,10 +169,29 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
                 <TextInput
                   label="Password"
                   returnKeyType="next"
+                  inputStyle={{
+                    ...styles.borderInput
+                  }}
                   secureTextEntry={true}
                   onSubmitEditing={() => {
                     setFocus('confirmPassword');
                   }}
+                  inputRight={
+                    <TouchableOpacity
+                      onPress={() => setStatusPass(!statusPass)}
+                    >
+                      <Image
+                        style={{
+                          width: 22,
+                          height: 22
+                        }}
+                        source={require('../../../assets/image/transactions/eye.png')}
+                        resizeMode="contain"
+                        fadeDuration={0}
+                      />
+                    </TouchableOpacity>
+                  }
+                  secureTextEntry={!statusPass}
                   error={errors.password?.message}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -165,9 +222,27 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
                 <TextInput
                   label="Confirm password"
                   returnKeyType="done"
-                  secureTextEntry={true}
+                  inputRight={
+                    <TouchableOpacity
+                      onPress={() => setStatusConfirmPass(!statusConfirmPass)}
+                    >
+                      <Image
+                        style={{
+                          width: 22,
+                          height: 22
+                        }}
+                        source={require('../../../assets/image/transactions/eye.png')}
+                        resizeMode="contain"
+                        fadeDuration={0}
+                      />
+                    </TouchableOpacity>
+                  }
+                  secureTextEntry={!statusConfirmPass}
                   onSubmitEditing={() => {
                     submit();
+                  }}
+                  inputStyle={{
+                    ...styles.borderInput
                   }}
                   error={errors.confirmPassword?.message}
                   onBlur={onBlur}
@@ -182,10 +257,65 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
           />
         </React.Fragment>
       ) : null}
-      <View style={style.flatten(['flex-1'])} />
-      <Button text="Next" size="large" onPress={submit} />
+      <BIP44AdvancedButton bip44Option={bip44Option} />
+      <View
+        style={{
+          flex: 1
+        }}
+      />
+      <TouchableOpacity
+        onPress={submit}
+        style={{
+          marginBottom: 24,
+          marginTop: 32,
+          backgroundColor: colors['purple-900'],
+          borderRadius: 8
+        }}
+      >
+        <Text
+          style={{
+            color: 'white',
+            textAlign: 'center',
+            fontWeight: '700',
+            fontSize: 16,
+            padding: 16
+          }}
+        >
+          Next
+        </Text>
+      </TouchableOpacity>
+      <View
+        style={{
+          paddingBottom: checkRouterPaddingBottomBar(
+            props?.route?.name,
+            'RegisterMain'
+          )
+        }}
+      >
+        <Text
+          style={{
+            color: colors['purple-900'],
+            textAlign: 'center',
+            fontWeight: '700',
+            fontSize: 16
+          }}
+          onPress={() => {
+            if (checkRouter(props?.route?.name, 'RegisterMain')) {
+              smartNavigation.goBack();
+            } else {
+              smartNavigation.navigateSmart('Register.Intro', {});
+            }
+          }}
+        >
+          Go back
+        </Text>
+      </View>
       {/* Mock element for bottom padding */}
-      <View style={style.flatten(['height-page-pad'])} />
+      <View
+        style={{
+          height: 20
+        }}
+      />
     </PageWithScrollView>
   );
 });
@@ -193,7 +323,6 @@ export const NewMnemonicScreen: FunctionComponent = observer(() => {
 const WordsCard: FunctionComponent<{
   words: string[];
 }> = ({ words }) => {
-  const style = useStyle();
   const { isTimedOut, setTimer } = useSimpleTimer();
 
   /*
@@ -217,17 +346,20 @@ const WordsCard: FunctionComponent<{
 
   return (
     <View
-      style={style.flatten([
-        'margin-top-14',
-        'margin-bottom-16',
-        'padding-24',
-        'padding-x-28',
-        'padding-bottom-12',
-        'background-color-white',
-        'border-radius-8',
-        'flex-row',
-        'flex-wrap'
-      ])}
+      style={{
+        marginTop: 14,
+        marginBottom: 16,
+        paddingTop: 16,
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingBottom: 10,
+        borderColor: colors['purple-100'],
+        borderWidth: 1,
+        borderRadius: 8,
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 1
+      }}
     >
       {words.map((word, i) => {
         return (
@@ -239,27 +371,44 @@ const WordsCard: FunctionComponent<{
           />
         );
       })}
-      <View style={style.flatten(['width-full'])}>
-        <Button
-          textStyle={style.flatten([
-            'text-button1',
-            isTimedOut ? 'color-success' : 'color-primary'
-          ])}
-          mode="text"
-          {...(isTimedOut && {
-            rightIcon: (
-              <View style={style.flatten(['margin-left-8'])}>
-                <CheckIcon />
-              </View>
-            )
-          })}
-          text="Copy to clipboard"
+
+      <View
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          alignItems: 'center'
+        }}
+      >
+        <TouchableOpacity
           onPress={() => {
             Clipboard.setString(words.join(' '));
             setTimer(3000);
           }}
-        />
+        >
+          <View style={{ height: 20 }}>
+            {isTimedOut ? (
+              <CheckIcon />
+            ) : (
+              <CopyFillIcon color={colors['purple-700']} size={20} />
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  borderInput: {
+    borderColor: colors['purple-100'],
+    borderWidth: 1,
+    backgroundColor: colors['white'],
+    paddingLeft: 11,
+    paddingRight: 11,
+    paddingTop: 12,
+    paddingBottom: 12,
+    borderRadius: 8
+  }
+});

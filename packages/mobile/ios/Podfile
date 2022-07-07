@@ -13,26 +13,14 @@ target 'mobile' do
     :hermes_enabled => true
   )
 
-  target 'mobileTests' do
-    inherit! :complete
-    # Pods for testing
-  end
-
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
-  # use_flipper!({ 'Flipper' => '0.147.0' })
-  # post_install do |installer|
-  #   flipper_post_install(installer)
-  # end
-end
-
-target 'mobile-tvOS' do
-  # Pods for mobile-tvOS
-
-  target 'mobile-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
+  use_flipper!({ 'Flipper' => '0.147.0' })
+  post_install do |installer|
+    flipper_post_install(installer)
   end
 end
+
+

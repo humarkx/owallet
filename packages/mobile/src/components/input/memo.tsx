@@ -8,11 +8,13 @@ export const MemoInput: FunctionComponent<{
   labelStyle?: TextStyle;
   containerStyle?: ViewStyle;
   inputContainerStyle?: ViewStyle;
+  inputStyle?: ViewStyle;
   errorLabelStyle?: TextStyle;
-
+  placeholder?: string;
   label: string;
-
+  placeholderTextColor?: string;
   memoConfig: IMemoConfig;
+  multiline?: boolean
 }> = observer(
   ({
     labelStyle,
@@ -20,7 +22,11 @@ export const MemoInput: FunctionComponent<{
     inputContainerStyle,
     errorLabelStyle,
     label,
-    memoConfig
+    memoConfig,
+    placeholder,
+    placeholderTextColor,
+    inputStyle,
+    multiline
   }) => {
     return (
       <TextInput
@@ -28,8 +34,12 @@ export const MemoInput: FunctionComponent<{
         labelStyle={labelStyle}
         containerStyle={containerStyle}
         inputContainerStyle={inputContainerStyle}
+        inputStyle={inputStyle}
+        multiline={multiline}
         errorLabelStyle={errorLabelStyle}
         value={memoConfig.memo}
+        placeholder={placeholder}
+        placeholderTextColor={placeholderTextColor}
         onChangeText={(text) => {
           memoConfig.setMemo(text);
         }}

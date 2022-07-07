@@ -1,61 +1,66 @@
 import { ImageSourcePropType } from 'react-native';
-import { INJECTED_PROVIDER_URL } from '@env';
 
-export const InjectedProviderUrl = INJECTED_PROVIDER_URL;
+export const InjectedProviderUrl =
+  process.env.INJECTED_PROVIDER_URL || 'https://owallet-provider.oraidex.io';
 
 export type DAppInfo = {
+  id: number;
   name: string;
   uri: string;
-  thumbnail: ImageSourcePropType;
   logo?: ImageSourcePropType;
 };
 
 const oraiLogo = require('../../assets/image/webpage/orai_logo.png');
 const balconyLogo = require('../../assets/image/webpage/balcony.png');
-const oraiThumbnail = require('../../assets/image/webpage/bgoraidex.png');
+
 export const DAppInfos: DAppInfo[] = [
   {
+    id: 1,
     name: 'Oraidex',
-    thumbnail: oraiThumbnail,
     uri: 'https://oraidex.io',
     logo: oraiLogo
   },
   {
+    id: 2,
     name: 'Oraidex',
-    thumbnail: oraiThumbnail,
     uri: 'https://staging.oraidex.io',
     logo: oraiLogo
   },
   {
+    id: 3,
     name: 'Osmosis',
-    thumbnail: require('../../assets/image/webpage/bgomosis.png'),
     uri: 'https://app.osmosis.zone',
     logo: require('../../assets/image/webpage/osmosis_logo.png')
   },
   {
+    id: 4,
     name: 'Oraiscan testnet',
-    thumbnail: oraiThumbnail,
     uri: 'https://testnet.scan.orai.io',
+    logo: oraiLogo
+  },
+  {
+    id: 5,
+    name: 'Oraiscan',
+    uri: 'https://scan.orai.io',
     logo: oraiLogo
   },
   // {
   //   name: 'Balcony Subnet',
-  //   thumbnail: balconyLogo,
   //   uri: 'https://bignft.web.app',
   //   logo: balconyLogo,
   // },
   {
+    id: 6,
     name: 'Balcony Subnet',
-    thumbnail: balconyLogo,
     uri: 'https://re.bignft.app',
     logo: balconyLogo
   }
 ];
 
 if (__DEV__) {
-  DAppInfos.push({
+  DAppInfos.unshift({
+    id: 1,
     name: 'Oraidex',
-    thumbnail: oraiThumbnail,
     uri: InjectedProviderUrl,
     logo: oraiLogo
   });

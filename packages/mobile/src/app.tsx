@@ -3,7 +3,7 @@ import { StoreProvider, useStore } from './stores';
 import { StyleProvider } from './styles';
 import { AppNavigation } from './navigation';
 import { ModalsProvider } from './modals/base';
-import { Platform, StatusBar, LogBox } from 'react-native';
+import { Platform, StatusBar, LogBox, Text } from 'react-native';
 import { AdditonalIntlMessages, LanguageToFiatCurrency } from '@owallet/common';
 import { InteractionModalsProivder } from './providers/interaction-modals-provider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -62,7 +62,8 @@ SplashScreen.preventAutoHideAsync()
   )
   .catch(console.warn);
 
-LogBox.ignoreLogs(['EventEmitter.removeListener']);
+// we already log in debugging tools
+LogBox.ignoreAllLogs();
 
 const AppIntlProviderWithStorage = ({ children }) => {
   const store = useStore();
@@ -102,7 +103,7 @@ const AppIntlProviderWithStorage = ({ children }) => {
   );
 };
 
-const AppBody: FunctionComponent = () => {
+export const App = () => {
   return (
     <StyleProvider>
       <StoreProvider>
@@ -128,10 +129,3 @@ const AppBody: FunctionComponent = () => {
     </StyleProvider>
   );
 };
-
-export const App: FunctionComponent = AppBody;
-// ? AppBody
-// : codePush({
-//     installMode: codePush.InstallMode.IMMEDIATE,
-//     checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
-//   })(AppBody);

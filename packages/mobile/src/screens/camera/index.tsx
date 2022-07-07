@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useCallback, useState } from 'react';
 import { RNCamera } from 'react-native-camera';
-import { useStyle } from '../../styles';
 import { PageWithView } from '../../components/page';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
@@ -16,21 +15,13 @@ import { useNavigation } from '@react-navigation/native';
 
 import { Bech32Address } from '@owallet/cosmos';
 import { FullScreenCameraView } from '../../components/camera';
-import {
-  importFromMobile,
-  parseQRCodeDataForImportFromMobile,
-  registerExportedAddressBooks,
-  registerExportedKeyRingDatas,
-} from '../../utils/import-from-mobile';
 import { AddressBookConfigMap, useRegisterConfig } from '@owallet/hooks';
 import { AsyncKVStore } from '../../common';
 import { useFocusEffect } from '@react-navigation/native';
 import { checkValidDomain } from '../../utils/helper';
 
 export const CameraScreen: FunctionComponent = observer(() => {
-  const { chainStore, walletConnectStore, keyRingStore } = useStore();
-
-  const style = useStyle();
+  const { chainStore, keyRingStore } = useStore();
   const navigation = useNavigation();
   const smartNavigation = useSmartNavigation();
 
@@ -70,7 +61,7 @@ export const CameraScreen: FunctionComponent = observer(() => {
         onBarCodeRead={async ({ data }) => {
           if (!isLoading && !isCompleted) {
             setIsLoading(true);
-
+            
             try {
               if (checkValidDomain(data.toLowerCase())) {
                 console.log('data', data);
@@ -78,71 +69,31 @@ export const CameraScreen: FunctionComponent = observer(() => {
 
                 return;
               }
-              if (data.startsWith('wc:')) {
-                await walletConnectStore.initClient(data);
 
-                smartNavigation.navigateSmart('Home', {});
-              } else {
-                const isBech32Address = (() => {
-                  try {
-                    // Check that the data is bech32 address.
-                    // If this is not valid bech32 address, it will throw an error.
-                    Bech32Address.validate(data);
-                  } catch {
-                    return false;
-                  }
-                  return true;
-                })();
+              const isBech32Address = (() => {
+                try {
+                  // Check that the data is bech32 address.
+                  // If this is not valid bech32 address, it will throw an error.
+                  Bech32Address.validate(data);
+                } catch {
+                  return false;
+                }
+                return true;
+              })();
 
-                if (isBech32Address) {
-                  const prefix = data.slice(0, data.indexOf('1'));
-                  const chainInfo = chainStore.chainInfosInUI.find(
-                    (chainInfo) =>
-                      chainInfo.bech32Config.bech32PrefixAccAddr === prefix
-                  );
-                  if (chainInfo) {
-                    smartNavigation.pushSmart('Send', {
-                      chainId: chainInfo.chainId,
-                      recipient: data,
-                    });
-                  } else {
-                    smartNavigation.navigateSmart('Home', {});
-                  }
-                } else {
-                  const sharedData = parseQRCodeDataForImportFromMobile(data);
-
-                  const improted = await importFromMobile(
-                    sharedData,
-                    chainStore.chainInfosInUI.map(
-                      (chainInfo) => chainInfo.chainId
-                    )
-                  );
-
-                  // In this case, there are other accounts definitely.
-                  // So, there is no need to consider the password.
-                  await registerExportedKeyRingDatas(
-                    keyRingStore,
-                    registerConfig,
-                    improted.KeyRingDatas,
-                    ''
-                  );
-
-                  await registerExportedAddressBooks(
-                    addressBookConfigMap,
-                    improted.addressBooks
-                  );
-
-                  smartNavigation.reset({
-                    index: 0,
-                    routes: [
-                      {
-                        name: 'Register',
-                        params: {
-                          screen: 'Register.End',
-                        },
-                      },
-                    ],
+              if (isBech32Address) {
+                const prefix = data.slice(0, data.indexOf('1'));
+                const chainInfo = chainStore.chainInfosInUI.find(
+                  (chainInfo) =>
+                    chainInfo.bech32Config.bech32PrefixAccAddr === prefix
+                );
+                if (chainInfo) {
+                  smartNavigation.pushSmart('Send', {
+                    chainId: chainInfo.chainId,
+                    recipient: data
                   });
+                } else {
+                  smartNavigation.navigateSmart('Home', {});
                 }
               }
 
@@ -154,22 +105,7 @@ export const CameraScreen: FunctionComponent = observer(() => {
             }
           }
         }}
-        containerBottom={
-          <Button
-            text="Show my QR code"
-            mode="light"
-            size="large"
-            containerStyle={style.flatten([
-              'margin-top-64',
-              'border-radius-64',
-              'opacity-90',
-            ])}
-            style={style.flatten(['padding-x-52'])}
-            onPress={() => {
-              setIsSelectChainModalOpen(true);
-            }}
-          />
-        }
+     
       />
       <ChainSelectorModal
         isOpen={isSelectChainModalOpen}
@@ -202,13 +138,16 @@ export const AddressQRCodeModal: FunctionComponent<{
 
     const account = accountStore.getAccount(chainId);
 
-    const style = useStyle();
-
     return (
       <CardModal title="Scan QR code">
-        <View style={style.flatten(['items-center'])}>
+        <View style={{
+          alignItems: 'center'
+        }}>
           <AddressCopyable address={account.bech32Address} maxCharacters={22} />
-          <View style={style.flatten(['margin-y-32'])}>
+          <View style={{
+            marginTop: 32,
+            marginBottom: 32,
+          }}>
             {account.bech32Address ? (
               <QRCode size={200} value={account.bech32Address} />
             ) : (
@@ -217,22 +156,27 @@ export const AddressQRCodeModal: FunctionComponent<{
                   {
                     width: 200,
                     height: 200,
+                    backgroundColor: '#EEEEF3'
                   },
-                  style.flatten(['background-color-disabled']),
                 ])}
               />
             )}
           </View>
-          <View style={style.flatten(['flex-row'])}>
+          <View style={{
+            display: 'flex',
+            flexDirection: 'row'
+          }}>
             <Button
-              containerStyle={style.flatten(['flex-1'])}
+              containerStyle={{
+                flex: 1
+              }}
               text="Share Address"
               mode="light"
               size="large"
               loading={account.bech32Address === ''}
               onPress={() => {
                 Share.share({
-                  message: account.bech32Address,
+                  message: account.bech32Address
                 }).catch((e) => {
                   console.log(e);
                 });
@@ -244,6 +188,6 @@ export const AddressQRCodeModal: FunctionComponent<{
     );
   }),
   {
-    disableSafeArea: true,
+    disableSafeArea: true
   }
 );

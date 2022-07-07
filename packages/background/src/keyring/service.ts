@@ -5,14 +5,14 @@ import {
   Key,
   KeyRing,
   KeyRingStatus,
-  MultiKeyStoreInfoWithSelected,
+  MultiKeyStoreInfoWithSelected
 } from './keyring';
 
 import {
   Bech32Address,
   checkAndValidateADR36AminoSignDoc,
   makeADR36AminoSignDoc,
-  verifyADR36AminoSignDoc,
+  verifyADR36AminoSignDoc
 } from '@owallet/cosmos';
 import { BIP44HDPath, CommonCrypto, ExportKeyRingData } from './types';
 
@@ -21,7 +21,7 @@ import { KVStore } from '@owallet/common';
 import { ChainsService } from '../chains';
 import { LedgerService } from '../ledger';
 import { BIP44, ChainInfo, OWalletSignOptions } from '@owallet/types';
-import { APP_PORT, Env, WEBPAGE_PORT } from '@owallet/router';
+import { APP_PORT, Env, OWalletError, WEBPAGE_PORT } from '@owallet/router';
 import { InteractionService } from '../interaction';
 import { PermissionService } from '../permission';
 
@@ -30,7 +30,7 @@ import {
   serializeSignDoc,
   AminoSignResponse,
   StdSignDoc,
-  StdSignature,
+  StdSignature
 } from '@cosmjs/launchpad';
 import { DirectSignResponse, makeSignBytes } from '@cosmjs/proto-signing';
 
@@ -76,7 +76,7 @@ export class KeyRingService {
     await this.keyRing.restore();
     return {
       status: this.keyRing.status,
-      multiKeyStoreInfo: this.keyRing.getMultiKeyStoreInfo(),
+      multiKeyStoreInfo: this.keyRing.getMultiKeyStoreInfo()
     };
   }
 
@@ -115,7 +115,7 @@ export class KeyRingService {
       keyStoreChanged = result.keyStoreChanged;
       return {
         multiKeyStoreInfo: result.multiKeyStoreInfo,
-        status: this.keyRing.status,
+        status: this.keyRing.status
       };
     } finally {
       if (keyStoreChanged) {
@@ -136,7 +136,7 @@ export class KeyRingService {
   }> {
     const multiKeyStoreInfo = await this.keyRing.updateNameKeyRing(index, name);
     return {
-      multiKeyStoreInfo,
+      multiKeyStoreInfo
     };
   }
 
@@ -206,10 +206,14 @@ export class KeyRingService {
     return this.keyRing.status;
   }
 
-  async getKey(chainId: string): Promise<Key> {
+  async getKey(chainIdOrCoinType: string | number): Promise<Key> {
+    // if getKey directly from cointype as number
+    if (typeof chainIdOrCoinType === 'number') {
+      return this.keyRing.getKeyFromCoinType(chainIdOrCoinType);
+    }
     return this.keyRing.getKey(
-      chainId,
-      await this.chainsService.getChainCoinType(chainId)
+      chainIdOrCoinType,
+      await this.chainsService.getChainCoinType(chainIdOrCoinType)
     );
   }
 
@@ -248,12 +252,14 @@ export class KeyRingService {
     );
     if (isADR36SignDoc) {
       if (signDoc.msgs[0].value.signer !== signer) {
-        throw new Error('Unmatched signer in sign doc');
+        throw new OWalletError('keyring', 233, 'Unmatched signer in sign doc');
       }
     }
 
     if (signOptions.isADR36WithString != null && !isADR36SignDoc) {
-      throw new Error(
+      throw new OWalletError(
+        'keyring',
+        236,
         'Sign doc is not for ADR-36. But, "isADR36WithString" option is defined'
       );
     }
@@ -270,7 +276,7 @@ export class KeyRingService {
         signer,
         signOptions,
         isADR36SignDoc,
-        isADR36WithString: signOptions.isADR36WithString,
+        isADR36WithString: signOptions.isADR36WithString
       }
     )) as StdSignDoc;
 
@@ -278,10 +284,16 @@ export class KeyRingService {
       // Validate the new sign doc, if it was for ADR-36.
       if (checkAndValidateADR36AminoSignDoc(signDoc, bech32Prefix)) {
         if (signDoc.msgs[0].value.signer !== signer) {
-          throw new Error('Unmatched signer in new sign doc');
+          throw new OWalletError(
+            'keyring',
+            232,
+            'Unmatched signer in new sign doc'
+          );
         }
       } else {
-        throw new Error(
+        throw new OWalletError(
+          'keyring',
+          237,
           'Signing request was for ADR-36. But, accidentally, new sign doc is not for ADR-36'
         );
       }
@@ -297,7 +309,7 @@ export class KeyRingService {
 
       return {
         signed: newSignDoc,
-        signature: encodeSecp256k1Signature(key.pubKey, signature),
+        signature: encodeSecp256k1Signature(key.pubKey, signature)
       };
     } finally {
       this.interactionService.dispatchEvent(APP_PORT, 'request-sign-end', {});
@@ -312,9 +324,6 @@ export class KeyRingService {
     signDoc: cosmos.tx.v1beta1.SignDoc,
     signOptions: OWalletSignOptions
   ): Promise<DirectSignResponse> {
-    console.log(
-      'in request sign direct heheeeeeeeeeeeeeeeeeeeeeeeeehehehehehehehehehe'
-    );
     const coinType = await this.chainsService.getChainCoinType(chainId);
 
     const key = this.keyRing.getKey(chainId, coinType);
@@ -337,7 +346,7 @@ export class KeyRingService {
         mode: 'direct',
         signDocBytes: cosmos.tx.v1beta1.SignDoc.encode(signDoc).finish(),
         signer,
-        signOptions,
+        signOptions
       }
     )) as Uint8Array;
 
@@ -355,7 +364,7 @@ export class KeyRingService {
 
       return {
         signed: newSignDoc,
-        signature: encodeSecp256k1Signature(key.pubKey, signature),
+        signature: encodeSecp256k1Signature(key.pubKey, signature)
       };
     } catch (e) {
       console.log('e', e.message);
@@ -367,9 +376,12 @@ export class KeyRingService {
   async requestSignEthereum(
     env: Env,
     chainId: string,
-    data: object,
+    data: object
   ): Promise<string> {
-    console.log("in request sign ethereum hahahahahahahhhhhhhhhhhhhhhhhhhhhhhhhhhaahahahaha with data: ", data);
+    console.log(
+      'in request sign ethereum hahahahahahahhhhhhhhhhhhhhhhhhhhhhhhhhhaahahahaha with data: ',
+      data
+    );
     const coinType = await this.chainsService.getChainCoinType(chainId);
     const rpc = (await this.chainsService.getChainInfo(chainId)).evmRpc;
 
@@ -399,7 +411,7 @@ export class KeyRingService {
         chainId,
         coinType,
         rpc,
-        data,
+        data
       );
 
       return rawTxHex;
@@ -552,7 +564,7 @@ export class KeyRingService {
 
       result.push({
         path,
-        bech32Address,
+        bech32Address
       });
     }
 

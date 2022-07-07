@@ -1,75 +1,58 @@
-import React, { FunctionComponent } from 'react';
-import { StyleSheet, Text, ViewStyle, View } from 'react-native';
-import { useStyle } from '../../styles';
-import { Bech32Address } from '@owallet/cosmos';
-import Clipboard from 'expo-clipboard';
-import { RectButton } from '../rect-button';
-import { CopyIcon } from '../icon';
-import { useSimpleTimer } from '../../hooks';
-import LottieView from 'lottie-react-native';
+import React, { FunctionComponent } from 'react'
+import { ViewStyle, View } from 'react-native'
+import { CText as Text} from "../text";
+import { Bech32Address } from '@owallet/cosmos'
+import Clipboard from 'expo-clipboard'
+import { RectButton } from '../rect-button'
+import { CheckIcon, CopyAccountIcon, CopyFillIcon, CopyIcon } from '../icon'
+import { useSimpleTimer } from '../../hooks'
+import { colors } from '../../themes'
 
 export const AddressCopyable: FunctionComponent<{
-  style?: ViewStyle;
-  address: string;
-  maxCharacters: number;
+  style?: ViewStyle
+  address: string
+  maxCharacters: number
 }> = ({ style: propStyle, address, maxCharacters }) => {
-  const style = useStyle();
-  const { isTimedOut, setTimer } = useSimpleTimer();
+  const { isTimedOut, setTimer } = useSimpleTimer()
 
   return (
     <RectButton
-      style={StyleSheet.flatten([
-        style.flatten([
-          'padding-left-12',
-          'padding-right-8',
-          'padding-y-2',
-          'border-radius-12',
-          'background-color-primary-10',
-          'flex-row',
-          'items-center'
-        ]),
-        propStyle
-      ])}
-      onPress={() => {
-        Clipboard.setString(address);
-        setTimer(2000);
+      style={{
+        backgroundColor: '#F8EFFF',
+        paddingLeft: 12,
+        paddingRight: 8,
+        marginTop: 2,
+        marginBottom: 2,
+        borderRadius: 12,
+        height: 30,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        ...propStyle
       }}
-      rippleColor={style.get('color-button-primary-outline-ripple').color}
-      underlayColor={style.get('color-button-primary-outline-underlay').color}
+      onPress={() => {
+        Clipboard.setString(address)
+        setTimer(2000)
+      }}
+      rippleColor={colors['primary-100']}
+      underlayColor={colors['primary-50']}
       activeOpacity={1}
     >
-      <Text style={style.flatten(['subtitle3', 'color-primary-400'])}>
+      <Text style={{ fontSize: 14, color: colors['gray-150'], fontWeight: '700'}}>
         {Bech32Address.shortenAddress(address, maxCharacters)}
       </Text>
-      <View style={style.flatten(['margin-left-4', 'width-20'])}>
+      <View
+        style={{
+          marginLeft: 4,
+          width: 20
+        }}
+      >
         {isTimedOut ? (
-          <View style={style.flatten(['margin-left-2'])}>
-            <View style={style.flatten(['width-20', 'height-20'])}>
-              <View
-                style={StyleSheet.flatten([
-                  style.flatten(['absolute', 'justify-center', 'items-center']),
-                  {
-                    left: 0,
-                    right: 4,
-                    top: 0,
-                    bottom: 0
-                  }
-                ])}
-              >
-                <LottieView
-                  source={require('../../assets/lottie/check.json')}
-                  autoPlay
-                  speed={2}
-                  loop={false}
-                  style={style.flatten(['width-58', 'height-58'])}
-                />
-              </View>
-            </View>
-          </View>
+           <CheckIcon />
         ) : (
-          <CopyIcon color={style.get('color-primary').color} size={19} />
+          <CopyFillIcon color={colors['gray-150']} />
         )}
       </View>
     </RectButton>
-  );
-};
+  )
+}

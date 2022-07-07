@@ -28,7 +28,7 @@ export class LedgerService {
   ) {
     this.options = {
       defaultMode: options.defaultMode || 'webusb',
-      transportIniters: options.transportIniters ?? {},
+      transportIniters: options.transportIniters ?? {}
     };
 
     if (!this.options.transportIniters['webusb']) {
@@ -48,14 +48,14 @@ export class LedgerService {
           118,
           bip44HDPath.account,
           bip44HDPath.change,
-          bip44HDPath.addressIndex,
+          bip44HDPath.addressIndex
         ]);
       } finally {
         // Notify UI Ledger pubkey derivation succeeded only when Ledger initialization is tried again.
         if (retryCount > 0) {
           this.interactionService.dispatchEvent(APP_PORT, 'ledger-init', {
             event: 'get-pubkey',
-            success: true,
+            success: true
           });
         }
       }
@@ -75,7 +75,7 @@ export class LedgerService {
           118,
           bip44HDPath.account,
           bip44HDPath.change,
-          bip44HDPath.addressIndex,
+          bip44HDPath.addressIndex
         ]);
 
         if (
@@ -91,7 +91,7 @@ export class LedgerService {
             118,
             bip44HDPath.account,
             bip44HDPath.change,
-            bip44HDPath.addressIndex,
+            bip44HDPath.addressIndex
           ],
           message
         );
@@ -100,18 +100,16 @@ export class LedgerService {
         if (retryCount > 0) {
           this.interactionService.dispatchEvent(APP_PORT, 'ledger-init', {
             event: 'sign',
-            success: true,
+            success: true
           });
         }
         return signature;
       } catch (e) {
-        console.log('e ledger', e.message);
-
         // Notify UI Ledger signing failed only when Ledger initialization is tried again.
         if (retryCount > 0) {
           this.interactionService.dispatchEvent(APP_PORT, 'ledger-init', {
             event: 'sign',
-            success: false,
+            success: false
           });
         }
         throw e;
@@ -156,7 +154,7 @@ export class LedgerService {
           if (_reject) {
             _reject(e);
           }
-        },
+        }
       };
     })();
 
@@ -178,7 +176,7 @@ export class LedgerService {
         this.previousInitAborter = undefined;
         return {
           ledger,
-          retryCount,
+          retryCount
         };
       } catch (e) {
         console.log(e);
@@ -194,11 +192,11 @@ export class LedgerService {
                 'ledger-init',
                 {
                   event: 'init-failed',
-                  mode,
+                  mode
                 },
                 {
                   forceOpenWindow: true,
-                  channel: 'ledger',
+                  channel: 'ledger'
                 }
               )) as
                 | {
@@ -214,7 +212,7 @@ export class LedgerService {
               if (response?.initArgs) {
                 initArgs = response.initArgs;
               }
-            })(),
+            })()
           ];
 
           promises.push(
@@ -223,7 +221,7 @@ export class LedgerService {
               // If ledger is not inited in 5 minutes, abort it.
               try {
                 await delay(5 * 60 * 1000, {
-                  signal: timeoutAbortController.signal,
+                  signal: timeoutAbortController.signal
                 });
               } catch (e) {
                 if (e.name === 'AbortError') {
@@ -235,7 +233,7 @@ export class LedgerService {
               if (!timeoutAborted) {
                 this.interactionService.dispatchEvent(APP_PORT, 'ledger-init', {
                   event: 'init-aborted',
-                  mode,
+                  mode
                 });
                 throw new Error('Ledger init timeout');
               }
@@ -245,7 +243,7 @@ export class LedgerService {
           promises.push(aborter.wait());
 
           // Check that the Ledger Popup is opened only if the environment is extension.
-          if (typeof browser !== 'undefined') {
+          if (typeof browser !== 'undefined' && browser.extension.getViews) {
             promises.push(this.testLedgerGrantUIOpened());
           }
 

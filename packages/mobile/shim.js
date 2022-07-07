@@ -1,8 +1,7 @@
-import { polyfillWebCrypto } from 'react-native-crypto-polyfill';
+// implement window crypto
+window.crypto = require('./polyfill/crypto').webcrypto;
 
-polyfillWebCrypto();
 // crypto is now globally defined
-
 if (typeof __dirname === 'undefined') global.__dirname = '/';
 if (typeof __filename === 'undefined') global.__filename = '';
 if (typeof process === 'undefined') {
@@ -35,8 +34,11 @@ if (!global.atob || !global.btoa) {
 
 const isDev = typeof __DEV__ === 'boolean' && __DEV__;
 env = process.env ?? {};
+import { INJECTED_PROVIDER_URL } from '@env';
 env['NODE_ENV'] = isDev ? 'development' : 'production';
+env['INJECTED_PROVIDER_URL'] = INJECTED_PROVIDER_URL;
 process.env = env;
+
 import EventEmitter from 'eventemitter3';
 
 const eventListener = new EventEmitter();
