@@ -74,14 +74,14 @@ export const NetworkModal = ({ profileColor, chainStore, modalStore }) => {
             >
               {item.chainName}
             </Text>
-            <Text
+            {/* <Text
               style={{
                 ...typography.h7,
                 color: colors['gray-300'],
                 fontWeight: '900',
                 fontSize: 12
               }}
-            >{`$${item.price || 0}`}</Text>
+            >{`$${item.price || 0}`}</Text> */}
           </View>
         </View>
 
