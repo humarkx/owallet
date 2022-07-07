@@ -606,8 +606,6 @@ export class InjectedEthereum implements Ethereum {
           ? this.parseMessage(e.data)
           : e.data;
 
-        console.log('proxy response: ', proxyResponse);
-
         if (!proxyResponse || proxyResponse.type !== 'proxy-request-response') {
           return;
         }
