@@ -169,8 +169,7 @@ export const AddressBookScreen: FunctionComponent = observer(() => {
       : addressBookConfig.addressBookDatas;
 
   return (
-    <PageWithScrollView
-    >
+    <PageWithScrollView>
       <View style={{ alignItems: 'center', marginTop: spacing['16'] }}>
         <Text style={{ ...typography.h3, fontWeight: '700' }}>
           Address book
@@ -178,7 +177,7 @@ export const AddressBookScreen: FunctionComponent = observer(() => {
       </View>
       <View
         style={{
-          ...styles.addressBookRoot,
+          ...styles.addressBookRoot
         }}
       >
         <View>
@@ -271,17 +270,15 @@ export const AddressBookScreen: FunctionComponent = observer(() => {
                       >
                         {data.name}
                       </Text>
-                      {data.memo ? (
-                        <Text
-                          style={style.flatten([
-                            'body3',
-                            'color-text-black-low',
-                            'margin-bottom-4'
-                          ])}
-                        >
-                          {data.memo}
-                        </Text>
-                      ) : null}
+                      <Text
+                        style={style.flatten([
+                          'body3',
+                          'color-text-black-low',
+                          'margin-bottom-4'
+                        ])}
+                      >
+                        {data.memo}
+                      </Text>
                       <Text
                         style={{
                           fontSize: 12,
