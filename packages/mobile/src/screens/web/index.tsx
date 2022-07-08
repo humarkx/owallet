@@ -4,9 +4,9 @@ import {
   Image,
   ImageSourcePropType,
   StyleSheet,
-  Text,
-  View
+  View,
 } from 'react-native';
+import { CText as Text} from "../../components/text";
 import { useStyle } from '../../styles';
 import { useSmartNavigation } from '../../navigation.provider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,8 +27,8 @@ export const WebScreen: FunctionComponent = () => {
       style={StyleSheet.flatten([
         style.flatten(['padding-x-20']),
         {
-          marginTop: safeAreaInsets.top
-        }
+          marginTop: safeAreaInsets.top,
+        },
       ])}
     >
       <Text
@@ -36,16 +36,16 @@ export const WebScreen: FunctionComponent = () => {
           'h3',
           'color-text-black-high',
           'margin-top-44',
-          'margin-bottom-20'
+          'margin-bottom-20',
         ])}
       >
         Access dApps
       </Text>
-      {DAppInfos.map(({ name, thumbnail, uri, logo }) => (
+      {DAppInfos.map(({ name, uri, logo }) => (
         <WebpageImageButton
           key={uri}
           name={name}
-          source={thumbnail}
+          source={logo}
           logo={logo}
           onPress={() => {
             smartNavigation.pushSmart('Web.dApp', { name, uri });
@@ -86,7 +86,7 @@ export const WebpageImageButton: FunctionComponent<{
       imageRef.current.measure((_x, _y, measureWidth, measureHeight) => {
         setImageSize({
           width: (measureWidth / measureHeight) * height,
-          height
+          height,
         });
       });
     }
@@ -101,11 +101,11 @@ export const WebpageImageButton: FunctionComponent<{
           'overflow-hidden',
           'border-radius-16',
           'background-color-big-image-placeholder',
-          'margin-bottom-16'
+          'margin-bottom-16',
         ]),
         {
-          height
-        }
+          height,
+        },
       ])}
     >
       {source ? (
@@ -117,10 +117,10 @@ export const WebpageImageButton: FunctionComponent<{
                 ? {
                     resizeMode: 'stretch',
                     width: '100%',
-                    height
+                    height,
                   }
                 : {
-                    opacity: 0
+                    opacity: 0,
                   }
             }
             onLoadEnd={onImageLoaded}
@@ -134,7 +134,7 @@ export const WebpageImageButton: FunctionComponent<{
         <RectButton
           style={StyleSheet.flatten([
             style.flatten(['flex-row', 'padding-x-20', 'padding-y-20']),
-            { height }
+            { height },
           ])}
           activeOpacity={0.2}
           underlayColor={style.get('color-white').color}
@@ -154,8 +154,8 @@ export const WebpageImageButton: FunctionComponent<{
                     'height-44',
                     'border-radius-32',
                     'padding-x-12',
-                    'background-color-white'
-                  ])
+                    'background-color-white',
+                  ]),
                 ]}
               >
                 <Image
@@ -163,7 +163,7 @@ export const WebpageImageButton: FunctionComponent<{
                   style={{
                     width: 30,
                     height: 30,
-                    marginRight: 8
+                    marginRight: 8,
                   }}
                   onLoadEnd={onImageLoaded}
                   source={logo}
@@ -184,7 +184,7 @@ export const WebpageImageButton: FunctionComponent<{
                   'height-44',
                   'border-radius-32',
                   'background-color-white',
-                  'font-bold'
+                  'font-bold',
                 ])}
               >
                 <GoIcon

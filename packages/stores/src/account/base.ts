@@ -519,6 +519,7 @@ export class AccountSetBase<MsgOpts, Queries> {
         account.getAccountNumber().toString(),
         account.getSequence().toString()
       );
+
       const signResponse = await owallet.signAmino(
         this.chainId,
         this.bech32Address,

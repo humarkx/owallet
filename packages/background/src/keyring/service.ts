@@ -21,7 +21,7 @@ import { KVStore } from '@owallet/common';
 import { ChainsService } from '../chains';
 import { LedgerService } from '../ledger';
 import { BIP44, ChainInfo, OWalletSignOptions } from '@owallet/types';
-import { APP_PORT, Env, WEBPAGE_PORT } from '@owallet/router';
+import { APP_PORT, Env, OWalletError, WEBPAGE_PORT } from '@owallet/router';
 import { InteractionService } from '../interaction';
 import { PermissionService } from '../permission';
 
@@ -211,9 +211,11 @@ export class KeyRingService {
     if (typeof chainIdOrCoinType === 'number') {
       return this.keyRing.getKeyFromCoinType(chainIdOrCoinType);
     }
+
     return this.keyRing.getKey(
       chainIdOrCoinType,
-      await this.chainsService.getChainCoinType(chainIdOrCoinType)
+      await this.chainsService.getChainCoinType(chainIdOrCoinType),
+      (await this.chainsService.getChainInfo(chainIdOrCoinType)).bip44.algo
     );
   }
 
@@ -236,9 +238,13 @@ export class KeyRingService {
       isADR36WithString?: boolean;
     }
   ): Promise<AminoSignResponse> {
-    const coinType = await this.chainsService.getChainCoinType(chainId);
+    const chainInfo = await this.chainsService.getChainInfo(chainId);
 
-    const key = this.keyRing.getKey(chainId, coinType);
+    const key = this.keyRing.getKey(
+      chainId,
+      chainInfo.bip44.coinType,
+      chainInfo.bip44.algo
+    );
     const bech32Prefix = (await this.chainsService.getChainInfo(chainId))
       .bech32Config.bech32PrefixAccAddr;
     const bech32Address = new Bech32Address(key.address).toBech32(bech32Prefix);
@@ -252,12 +258,14 @@ export class KeyRingService {
     );
     if (isADR36SignDoc) {
       if (signDoc.msgs[0].value.signer !== signer) {
-        throw new Error('Unmatched signer in sign doc');
+        throw new OWalletError('keyring', 233, 'Unmatched signer in sign doc');
       }
     }
 
     if (signOptions.isADR36WithString != null && !isADR36SignDoc) {
-      throw new Error(
+      throw new OWalletError(
+        'keyring',
+        236,
         'Sign doc is not for ADR-36. But, "isADR36WithString" option is defined'
       );
     }
@@ -282,10 +290,16 @@ export class KeyRingService {
       // Validate the new sign doc, if it was for ADR-36.
       if (checkAndValidateADR36AminoSignDoc(signDoc, bech32Prefix)) {
         if (signDoc.msgs[0].value.signer !== signer) {
-          throw new Error('Unmatched signer in new sign doc');
+          throw new OWalletError(
+            'keyring',
+            232,
+            'Unmatched signer in new sign doc'
+          );
         }
       } else {
-        throw new Error(
+        throw new OWalletError(
+          'keyring',
+          237,
           'Signing request was for ADR-36. But, accidentally, new sign doc is not for ADR-36'
         );
       }
@@ -295,8 +309,9 @@ export class KeyRingService {
       const signature = await this.keyRing.sign(
         env,
         chainId,
-        coinType,
-        serializeSignDoc(newSignDoc)
+        chainInfo.bip44.coinType,
+        serializeSignDoc(newSignDoc),
+        chainInfo.bip44.algo
       );
 
       return {
@@ -316,12 +331,13 @@ export class KeyRingService {
     signDoc: cosmos.tx.v1beta1.SignDoc,
     signOptions: OWalletSignOptions
   ): Promise<DirectSignResponse> {
-    console.log(
-      'in request sign direct heheeeeeeeeeeeeeeeeeeeeeeeeehehehehehehehehehe'
-    );
-    const coinType = await this.chainsService.getChainCoinType(chainId);
+    const chainInfo = await this.chainsService.getChainInfo(chainId);
 
-    const key = this.keyRing.getKey(chainId, coinType);
+    const key = this.keyRing.getKey(
+      chainId,
+      chainInfo.bip44.coinType,
+      chainInfo.bip44.algo
+    );
     const bech32Address = new Bech32Address(key.address).toBech32(
       (await this.chainsService.getChainInfo(chainId)).bech32Config
         .bech32PrefixAccAddr
@@ -353,8 +369,9 @@ export class KeyRingService {
       const signature = await this.keyRing.sign(
         env,
         chainId,
-        coinType,
-        makeSignBytes(newSignDoc)
+        chainInfo.bip44.coinType,
+        makeSignBytes(newSignDoc),
+        chainInfo.bip44.algo
       );
 
       return {
@@ -377,8 +394,11 @@ export class KeyRingService {
       'in request sign ethereum hahahahahahahhhhhhhhhhhhhhhhhhhhhhhhhhhaahahahaha with data: ',
       data
     );
-    const coinType = await this.chainsService.getChainCoinType(chainId);
-    const rpc = (await this.chainsService.getChainInfo(chainId)).evmRpc;
+
+    const {
+      evmRpc: rpc,
+      bip44: { coinType }
+    } = await this.chainsService.getChainInfo(chainId);
 
     // TODO: add UI here so users can change gas, memo & fee
     // const newSignDocBytes = (await this.interactionService.waitApprove(
@@ -457,11 +477,13 @@ export class KeyRingService {
     chainId: string,
     message: Uint8Array
   ): Promise<Uint8Array> {
+    const chainInfo = await this.chainsService.getChainInfo(chainId);
     return this.keyRing.sign(
       env,
       chainId,
-      await this.chainsService.getChainCoinType(chainId),
-      message
+      chainInfo.bip44.coinType,
+      message,
+      chainInfo.bip44.algo
     );
   }
 

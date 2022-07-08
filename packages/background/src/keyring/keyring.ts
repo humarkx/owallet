@@ -8,8 +8,8 @@ import {
 import { KVStore } from '@owallet/common';
 import { LedgerService } from '../ledger';
 import { BIP44HDPath, CommonCrypto, ExportKeyRingData } from './types';
-import { ChainInfo } from '@owallet/types';
-import { Env } from '@owallet/router';
+import { ChainInfo, AlgoType } from '@owallet/types';
+import { Env, OWalletError } from '@owallet/router';
 
 import { Buffer } from 'buffer';
 import { ChainIdHelper } from '@owallet/cosmos';
@@ -21,8 +21,6 @@ import { keccak256 } from '@ethersproject/keccak256';
 import Common from '@ethereumjs/common';
 import { TransactionOptions, Transaction } from 'ethereumjs-tx';
 import { request } from '../tx';
-import { ETHEREUM_BASE_FEE } from './constants';
-import { Big as BigInt } from 'big.js';
 
 export enum KeyRingStatus {
   NOTLOADED,
@@ -178,8 +176,15 @@ export class KeyRing {
     ];
   }
 
-  public getKey(chainId: string, defaultCoinType: number): Key {
-    return this.loadKey(this.computeKeyStoreCoinType(chainId, defaultCoinType));
+  public getKey(
+    chainId: string,
+    defaultCoinType: number,
+    algo?: AlgoType
+  ): Key {
+    return this.loadKey(
+      this.computeKeyStoreCoinType(chainId, defaultCoinType),
+      algo
+    );
   }
 
   public getKeyStoreMeta(key: string): string {
@@ -240,7 +245,7 @@ export class KeyRing {
 
     return {
       status: this.status,
-      multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.getMultiKeyStoreInfo()
     };
   }
 
@@ -273,7 +278,7 @@ export class KeyRing {
 
     return {
       status: this.status,
-      multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.getMultiKeyStoreInfo()
     };
   }
 
@@ -315,7 +320,7 @@ export class KeyRing {
 
     return {
       status: this.status,
-      multiKeyStoreInfo: await this.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.getMultiKeyStoreInfo()
     };
   }
 
@@ -576,7 +581,7 @@ export class KeyRing {
     return this.getMultiKeyStoreInfo();
   }
 
-  private loadKey(coinType: number): Key {
+  private loadKey(coinType: number, algo?: AlgoType): Key {
     if (this.status !== KeyRingStatus.UNLOCKED) {
       throw new Error('Key ring is not unlocked');
     }
@@ -593,7 +598,7 @@ export class KeyRing {
       const pubKey = new PubKeySecp256k1(this.ledgerPublicKey);
 
       return {
-        algo: 'secp256k1',
+        algo: algo ?? 'secp256k1',
         pubKey: pubKey.toBytes(),
         address: pubKey.getAddress(),
         isNanoLedger: true
@@ -602,13 +607,13 @@ export class KeyRing {
       const privKey = this.loadPrivKey(coinType);
       const pubKey = privKey.getPubKey();
 
-      if (coinType === 60) {
+      if (algo === 'ethsecp256k1') {
         // For Ethereum Key-Gen Only:
         const wallet = new Wallet(privKey.toBytes());
         const ethereumAddress = ETH.decoder(wallet.address);
 
         return {
-          algo: 'ethsecp256k1',
+          algo,
           pubKey: pubKey.toBytes(),
           address: ethereumAddress,
           isNanoLedger: false
@@ -617,7 +622,7 @@ export class KeyRing {
 
       // Default
       return {
-        algo: 'secp256k1',
+        algo: algo ?? 'secp256k1',
         pubKey: pubKey.toBytes(),
         address: pubKey.getAddress(),
         isNanoLedger: false
@@ -672,22 +677,20 @@ export class KeyRing {
     env: Env,
     chainId: string,
     defaultCoinType: number,
-    message: Uint8Array
+    message: Uint8Array,
+    algo?: AlgoType
   ): Promise<Uint8Array> {
-    console.log(
-      'ready to sign the transaction FOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO'
-    );
     if (this.status !== KeyRingStatus.UNLOCKED) {
-      throw new Error('Key ring is not unlocked');
+      throw new OWalletError('keyring', 143, 'Key ring is not unlocked');
     }
 
     if (!this.keyStore) {
-      throw new Error('Key Store is empty');
+      throw new OWalletError('keyring', 130, 'Key store is empty');
     }
     // get here
     // Sign with Evmos/Ethereum
     const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-    if (coinType === 60) {
+    if (algo === 'ethsecp256k1') {
       return this.signEthereum(chainId, defaultCoinType, message);
     }
 
@@ -695,10 +698,12 @@ export class KeyRing {
       const pubKey = this.ledgerPublicKey;
 
       if (!pubKey) {
-        throw new Error('Ledger public key is not initialized');
+        throw new OWalletError(
+          'keyring',
+          151,
+          'Ledger public key is not initialized'
+        );
       }
-
-      console.log('ledger goes here');
 
       return await this.ledgerKeeper.sign(
         env,
@@ -707,8 +712,6 @@ export class KeyRing {
         message
       );
     } else {
-      const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-
       const privKey = this.loadPrivKey(coinType);
       return privKey.sign(message);
     }
@@ -742,12 +745,11 @@ export class KeyRing {
       throw new Error('Key Store is empty');
     }
 
-    const cType = this.computeKeyStoreCoinType(chainId, coinType);
-    if (cType !== 60) {
-      throw new Error(
-        'Invalid coin type passed in to Ethereum signing (expected 60)'
-      );
-    }
+    // if (coinType !== 60) {
+    //   throw new Error(
+    //     'Invalid coin type passed in to Ethereum signing (expected 60)'
+    //   );
+    // }
 
     if (this.keyStore.type === 'ledger') {
       // TODO: Ethereum Ledger Integration
@@ -809,11 +811,11 @@ export class KeyRing {
       throw new Error('Ethereum signing with Ledger is not yet supported');
     } else {
       const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-      if (coinType !== 60) {
-        throw new Error(
-          'Invalid coin type passed in to Ethereum signing (expected 60)'
-        );
-      }
+      // if (coinType !== 60) {
+      //   throw new Error(
+      //     'Invalid coin type passed in to Ethereum signing (expected 60)'
+      //   );
+      // }
 
       const privKey = this.loadPrivKey(coinType);
 

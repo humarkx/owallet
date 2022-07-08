@@ -1,117 +1,122 @@
 import React from 'react';
 import { FunctionComponent } from 'react';
-import { StyleSheet, Text, TextStyle, View } from 'react-native';
+import { StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
+import { CText as Text } from '../../../../components/text';
 import { RectButton } from '../../../../components/rect-button';
-import { useStyle } from '../../../../styles';
+import { colors, metrics, spacing, typography } from '../../../../themes';
+import { getTransactionValue } from '../../../../utils/helper';
+import moment from 'moment';
 
-export const TransactionItem: FunctionComponent<{
-  label?: string;
-  paragraph?: string;
-  left?: React.ReactElement;
-  right?: React.ReactElement;
-
-  colorStyleAmount?: TextStyle;
-  styleReactButton?: TextStyle;
-  amount?: string;
-  denom?: string;
-  topBorder?: boolean;
+interface TransactionItemProps {
+  item: any;
+  address: string;
   onPress?: () => void;
-  bottomBorder?: boolean;
-}> = ({
-  label,
-  onPress,
-  paragraph,
-  colorStyleAmount,
-  topBorder,
-  amount,
-  denom,
-  right,
-  styleReactButton,
-}) => {
-  const style = useStyle();
+  containerStyle?: ViewStyle;
+}
 
+export const TransactionItem: FunctionComponent<TransactionItemProps> = ({
+  item,
+  address,
+  onPress,
+  containerStyle
+}) => {
+  const { txhash, tx, timestamp } = item || {};
+  const date = moment(timestamp).format('MMM DD, YYYY [at] HH:mm');
+  const { messages } = tx?.body || {};
+  const { title, isPlus, amount, denom, unbond } = getTransactionValue({
+    data: [
+      {
+        type: messages?.[0]?.['@type']
+      }
+    ],
+    address,
+    logs: item.logs
+  });
   const renderChildren = () => {
     return (
-      <React.Fragment>
-        <View
-          style={StyleSheet.flatten([
-            style.flatten([
-              'flex-row',
-              'justify-between',
-              'items-center',
-              'width-full',
-            ]),
-          ])}
-        >
-          <View>
-            <Text
-              style={StyleSheet.flatten([
-                style.flatten(['h5', 'color-text-black-high']),
-              ])}
-            >
-              {label}
-            </Text>
-            {paragraph ? (
-              <Text
-                style={StyleSheet.flatten([
-                  style.flatten([
-                    'subtitle3',
-                    'color-text-black-low',
-                    'margin-top-4',
-                  ]),
-                ])}
-              >
-                {paragraph}
-              </Text>
-            ) : null}
-          </View>
-          <View>
-            {right ? (
-              right
-            ) : (
-              <Text
-                style={StyleSheet.flatten([
-                  style.flatten(['h5']),
-                  colorStyleAmount,
-                ])}
-              >
-                {amount} {denom}
-              </Text>
-            )}
-          </View>
+      <View
+        style={{
+          ...styles.innerButton,
+          flex: 1
+        }}
+      >
+        <View>
+          <Text
+            style={{
+              ...styles.textInfo
+            }}
+          >
+            {title}
+          </Text>
         </View>
-      </React.Fragment>
+
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'flex-end'
+          }}
+        >
+          <Text
+            style={{
+              ...styles.textInfo,
+              color: colors['gray-300']
+            }}
+          >
+            {date}
+          </Text>
+          <Text
+            style={{
+              ...styles.textAmount,
+              marginTop: spacing['8'],
+              color: amount.includes('-')
+                ? colors['red-500']
+                : colors['green-500']
+            }}
+          >
+            {amount} {denom}
+          </Text>
+        </View>
+      </View>
     );
   };
 
   return (
-    <View style={style.flatten(['padding-x-20'])}>
-      {topBorder ? (
-        <View
-          style={style.flatten([
-            'height-1',
-            'margin-x-20',
-            'background-color-border-white',
-          ])}
-        />
-      ) : null}
-      <RectButton
-        style={StyleSheet.flatten([
-          style.flatten([
-            'height-87',
-            'flex-row',
-            'items-center',
-            'padding-x-20',
-            'background-color-white',
-          ]),
-          styleReactButton
-            ? styleReactButton
-            : style.flatten(['margin-y-8', 'border-radius-12']),
-        ])}
-        onPress={onPress}
-      >
-        {renderChildren()}
-      </RectButton>
-    </View>
+    <RectButton
+      style={{
+        ...styles.container, // default style for container
+        ...containerStyle
+      }}
+      onPress={onPress}
+    >
+      {renderChildren()}
+    </RectButton>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginLeft: spacing['24'],
+    marginRight: spacing['24'],
+    borderRadius: spacing['8'],
+    backgroundColor: colors['red-50'],
+    marginTop: spacing['4'],
+    marginBottom: spacing['8']
+  },
+  textInfo: {
+    ...typography.h7,
+    color: colors['gray-900'],
+    fontWeight: '600'
+  },
+  textAmount: {
+    ...typography.h6,
+    fontWeight: '800'
+  },
+  innerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: spacing['8'],
+    marginHorizontal: spacing['16']
+  }
+});
