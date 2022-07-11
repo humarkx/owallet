@@ -21,7 +21,7 @@ import { colors, typography } from '../../../themes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { LoadingSpinner } from '../../../components/spinner';
 
-export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
+export const VerifyMnemonicScreen: FunctionComponent = observer(() => {
   const route = useRoute<
     RouteProp<
       Record<
@@ -35,7 +35,7 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
       string
     >
   >();
-  
+
   const { analyticsStore } = useStore();
   const smartNavigation = useSmartNavigation();
 
@@ -55,12 +55,14 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
     const randomSortedWords = words.slice().sort(() => {
       return Math.random() > 0.5 ? 1 : -1;
     });
-    setCandidateWords(randomSortedWords.map(word => {
-      return {
-        word,
-        usedIndex: -1
-      }
-    }))
+    setCandidateWords(
+      randomSortedWords.map((word) => {
+        return {
+          word,
+          usedIndex: -1
+        };
+      })
+    );
     setWordSet(
       newMnemonicConfig.mnemonic.split(' ').map(() => {
         return undefined;
@@ -108,7 +110,7 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
         style={{
           display: 'flex',
           flexDirection: 'row',
-          flexWrap: 1
+          flexWrap: 'wrap'
         }}
       >
         {candidateWords.map(({ word, usedIndex }, i) => {
@@ -163,7 +165,7 @@ export const VerifyMnemonicScreen: FunctionComponent = observer((props) => {
             registerType: 'seed',
             accountType: 'mnemonic'
           });
-          if (checkRouter(props?.route?.name, 'RegisterVerifyMnemonicMain')) {
+          if (checkRouter(route.name, 'RegisterVerifyMnemonicMain')) {
             navigate('RegisterEnd', {
               password: newMnemonicConfig.password,
               type: 'new'
@@ -243,7 +245,7 @@ const WordButton: FunctionComponent<{
           color: colors['white']
         }}
       >
-        {word} 
+        {word}
       </Text>
     </RectButton>
   );
@@ -256,7 +258,6 @@ const WordsCard: FunctionComponent<{
     dashed: boolean;
   }[];
 }> = ({ wordSet }) => {
-
   return (
     <View
       style={{
@@ -271,7 +272,7 @@ const WordsCard: FunctionComponent<{
         borderRadius: 8,
         display: 'flex',
         flexDirection: 'row',
-        flexWrap: 1
+        flexWrap: 'wrap'
       }}
     >
       {wordSet.map((word, i) => {

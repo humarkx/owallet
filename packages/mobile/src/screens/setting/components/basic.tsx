@@ -59,7 +59,7 @@ export const SettingItem: FunctionComponent<{
 
   const renderChildren = () => {
     return (
-      <React.Fragment>
+      <>
         {left}
         <View
           style={{
@@ -88,12 +88,12 @@ export const SettingItem: FunctionComponent<{
           ) : null}
         </View>
         {right ? (
-          <React.Fragment>
+          <>
             <View style={{ flex: 1 }} />
             {right}
-          </React.Fragment>
+          </>
         ) : null}
-      </React.Fragment>
+      </>
     );
   };
 
@@ -144,7 +144,7 @@ export const RightArrow: FunctionComponent<{
   const style = useStyle();
 
   return (
-    <React.Fragment>
+    <>
       {paragraph ? (
         <Text
           style={style.flatten([
@@ -160,7 +160,7 @@ export const RightArrow: FunctionComponent<{
         color={style.get('color-text-black-low').color}
         height={15}
       />
-    </React.Fragment>
+    </>
   );
 };
 
