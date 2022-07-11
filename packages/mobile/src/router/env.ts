@@ -25,8 +25,6 @@ export class RNEnv {
   protected static readonly checkIsInternalMessage = (
     sender: MessageSender
   ): boolean => {
-    return (
-      sender.id === 'react-native' && sender.url === 'react-native://internal'
-    );
+    return sender.id === 'react-native' && sender.url === 'owallet://internal';
   };
 }

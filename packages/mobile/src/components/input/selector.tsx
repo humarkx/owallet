@@ -114,7 +114,7 @@ export const SelectorModal: FunctionComponent<{
         ...style.flatten(['border-radius-8']),
         backgroundColor: colors['white'],
         borderRadius: 24,
-        alignItems: 'center',
+        alignItems: 'center'
       }}
     >
       <Text
@@ -122,7 +122,7 @@ export const SelectorModal: FunctionComponent<{
           fontSize: 16,
           fontWeight: '700',
           color: colors['gray-900'],
-          marginBottom: spacing['12'],
+          marginBottom: spacing['12']
         }}
       >
         Select a token
@@ -148,7 +148,7 @@ export const SelectorModal: FunctionComponent<{
                 backgroundColor: colors['gray-10'],
                 borderRadius: 12,
                 marginBottom: 16,
-                width: '100%',
+                width: '100%'
               }}
               onPress={async () => {
                 setSelectedKey(item.key);
@@ -221,7 +221,7 @@ export const Selector: FunctionComponent<{
   };
 
   return (
-    <React.Fragment>
+    <>
       <SelectorButtonWithoutModal
         labelStyle={labelStyle}
         containerStyle={containerStyle}
@@ -232,7 +232,7 @@ export const Selector: FunctionComponent<{
         selected={selected}
         onPress={onPress}
       />
-    </React.Fragment>
+    </>
   );
 };
 

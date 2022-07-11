@@ -176,7 +176,7 @@ export const UnlockScreen: FunctionComponent = observer(() => {
     keyRingStore.status === KeyRingStatus.EMPTY ? (
     <View />
   ) : (
-    <React.Fragment>
+    <>
       <View
         style={{
           flex: 1,
@@ -290,6 +290,6 @@ export const UnlockScreen: FunctionComponent = observer(() => {
           />
         </KeyboardAwareScrollView>
       </View>
-    </React.Fragment>
+    </>
   );
 });

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import {
   AppState,
   BackHandler,
@@ -6,19 +6,19 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   View,
-  ViewStyle,
-} from "react-native";
-import { action, makeObservable, observable } from "mobx";
-import { observer } from "mobx-react-lite";
-import { ModalBase } from "./base";
-import { ModalContext, useModalState } from "./hooks";
-import { useStyle } from "../../styles";
-import Animated from "react-native-reanimated";
-import { ModalTransisionProvider, useModalTransision } from "./transition";
-import { BlurView } from "@react-native-community/blur";
+  ViewStyle
+} from 'react-native';
+import { action, makeObservable, observable } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import { ModalBase } from './base';
+import { ModalContext, useModalState } from './hooks';
+import { useStyle } from '../../styles';
+import Animated from 'react-native-reanimated';
+import { ModalTransisionProvider, useModalTransision } from './transition';
+import { BlurView } from '@react-native-community/blur';
 
 export interface ModalOptions {
-  readonly align?: "top" | "center" | "bottom";
+  readonly align?: 'top' | 'center' | 'bottom';
   readonly transitionVelocity?: number;
   readonly openTransitionVelocity?: number;
   readonly closeTransitionVelocity?: number;
@@ -70,7 +70,7 @@ export class ModalsRendererState {
     close: () => void,
     onCloseTransitionEnd: () => void,
     options: ModalOptions = {
-      align: "bottom",
+      align: 'bottom'
     }
   ): string {
     const key = ModalsRendererState.getKey();
@@ -82,7 +82,7 @@ export class ModalsRendererState {
       close,
       onCloseTransitionEnd,
       props,
-      options,
+      options
     });
 
     return key;
@@ -94,7 +94,7 @@ export class ModalsRendererState {
     if (index >= 0) {
       this._modals[index] = {
         ...this._modals[index],
-        isOpen: false,
+        isOpen: false
       };
     }
   }
@@ -105,7 +105,7 @@ export class ModalsRendererState {
     if (index >= 0) {
       this._modals[index] = {
         ...this._modals[index],
-        props,
+        props
       };
     }
   }
@@ -128,8 +128,8 @@ export const globalModalRendererState = new ModalsRendererState();
  It looks strange and it make hard to estimate the modal unmounted.
  So, to prevent this problem, if the state is not in foreground, forcely remove the modals.
  */
-AppState.addEventListener("change", (state) => {
-  if (state !== "active" && state !== "inactive") {
+AppState.addEventListener('change', (state) => {
+  if (state !== 'active' && state !== 'inactive') {
     for (const modal of globalModalRendererState.modals) {
       if (!modal.isOpen) {
         globalModalRendererState.removeModal(modal.key);
@@ -139,8 +139,9 @@ AppState.addEventListener("change", (state) => {
 });
 
 export const ModalsProvider: FunctionComponent = observer(({ children }) => {
-  const hasOpenedModal =
-    globalModalRendererState.modals.find((modal) => modal.isOpen) != null;
+  const hasOpenedModal = globalModalRendererState.modals.some(
+    (modal) => modal.isOpen
+  );
 
   useEffect(() => {
     if (hasOpenedModal) {
@@ -162,42 +163,42 @@ export const ModalsProvider: FunctionComponent = observer(({ children }) => {
         }
       };
 
-      BackHandler.addEventListener("hardwareBackPress", handler);
+      BackHandler.addEventListener('hardwareBackPress', handler);
 
       return () => {
-        BackHandler.removeEventListener("hardwareBackPress", handler);
+        BackHandler.removeEventListener('hardwareBackPress', handler);
       };
     }
   }, [hasOpenedModal]);
 
   return (
-    <React.Fragment>
+    <>
       {children}
       {globalModalRendererState.modals.length > 0 ? (
         <View
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: 0,
             bottom: 0,
             left: 0,
-            right: 0,
+            right: 0
           }}
           pointerEvents="box-none"
         >
           <ModalRenderersRoot />
         </View>
       ) : null}
-    </React.Fragment>
+    </>
   );
 });
 
 export const ModalRenderersRoot: FunctionComponent = observer(() => {
   return (
-    <React.Fragment>
+    <>
       {globalModalRendererState.modals.map((modal) => {
         return <ModalRenderer key={modal.key} modal={modal} />;
       })}
-    </React.Fragment>
+    </>
   );
 }) as FunctionComponent;
 
@@ -225,7 +226,7 @@ export const ModalRenderer: FunctionComponent<{
           transparentBackdrop: modal.options.transparentBackdrop,
           backdropMaxOpacity: modal.options.backdropMaxOpacity,
           blurBackdropOnIOS: modal.options.blurBackdropOnIOS,
-          close: modal.close,
+          close: modal.close
         };
       }, [
         isOpenTransitioning,
@@ -242,7 +243,7 @@ export const ModalRenderer: FunctionComponent<{
         modal.options.transitionAcceleration,
         modal.options.transitionVelocity,
         modal.options.transparentBackdrop,
-        modal.props.isOpen,
+        modal.props.isOpen
       ])}
     >
       <ModalTransisionProvider>
@@ -307,23 +308,23 @@ const ModalBackdrop: FunctionComponent = () => {
               1
             ),
             maxOpacity
-          ),
+          )
         ],
         new Animated.Value(0)
-      ),
+      )
     ]);
   }, [
     modal.backdropMaxOpacity,
     modal.transparentBackdrop,
     modalTransition.isInitialized,
     modalTransition.startY,
-    modalTransition.translateY,
+    modalTransition.translateY
   ]);
 
-  const blurBackdropOnIOS = modal.blurBackdropOnIOS && Platform.OS === "ios";
+  const blurBackdropOnIOS = modal.blurBackdropOnIOS && Platform.OS === 'ios';
 
   return (
-    <React.Fragment>
+    <>
       {!modal.disableBackdrop ? (
         <TouchableWithoutFeedback
           disabled={modal.disableClosingOnBackdropPress}
@@ -334,23 +335,23 @@ const ModalBackdrop: FunctionComponent = () => {
           <Animated.View
             style={StyleSheet.flatten([
               style.flatten(
-                ["absolute-fill"],
-                [!blurBackdropOnIOS && "background-color-modal-backdrop"]
+                ['absolute-fill'],
+                [!blurBackdropOnIOS && 'background-color-modal-backdrop']
               ),
               {
-                opacity,
-              },
+                opacity
+              }
             ])}
           >
             {blurBackdropOnIOS ? (
               <BlurView
-                style={style.flatten(["absolute-fill"])}
+                style={style.flatten(['absolute-fill'])}
                 blurType="dark"
               />
             ) : null}
           </Animated.View>
         </TouchableWithoutFeedback>
       ) : null}
-    </React.Fragment>
+    </>
   );
 };
