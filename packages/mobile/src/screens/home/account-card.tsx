@@ -5,7 +5,7 @@ import { View, ViewStyle, Image } from 'react-native';
 import { CText as Text } from '../../components/text';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useStore } from '../../stores';
-import { AddressCopyable } from '../../components/address-copyable';
+import { Copyable } from '../../components/copyable';
 import { LoadingSpinner } from '../../components/spinner';
 import { useSmartNavigation } from '../../navigation.provider';
 import { NetworkErrorView } from './network-error-view';
@@ -23,30 +23,14 @@ import { NamespaceModal, AddressQRCodeModal } from './components';
 import { Hash } from '@owallet/crypto';
 import LinearGradient from 'react-native-linear-gradient';
 import MyWalletModal from './components/my-wallet-modal/my-wallet-modal';
+import { Bech32Address } from '@owallet/cosmos';
+import { Dec } from '@owallet/unit';
 
 export const AccountCard: FunctionComponent<{
   containerStyle?: ViewStyle;
 }> = observer(({ containerStyle }) => {
   const { chainStore, accountStore, queriesStore, priceStore, modalStore } =
     useStore();
-
-  const deterministicNumber = useCallback(chainInfo => {
-    const bytes = Hash.sha256(
-      Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
-    );
-    return (
-      (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0
-    );
-  }, []);
-
-  const profileColor = useCallback(
-    chainInfo => {
-      const colors = ['red', 'green', 'purple', 'orange'];
-
-      return colors[deterministicNumber(chainInfo) % colors.length];
-    },
-    [deterministicNumber]
-  );
 
   const smartNavigation = useSmartNavigation();
   const navigation = useNavigation();
@@ -80,12 +64,12 @@ export const AccountCard: FunctionComponent<{
     parseFloat(stakedSum.toDec().toString())
   ];
   const safeAreaInsets = useSafeAreaInsets();
-  const onPressBtnMain = name => {
+  const onPressBtnMain = (name) => {
     if (name === 'Buy') {
       navigate('MainTab', { screen: 'Browser', path: 'https://oraidex.io' });
     }
     if (name === 'Receive') {
-      _onPressReceiveModal()
+      _onPressReceiveModal();
     }
     if (name === 'Send') {
       smartNavigation.navigateSmart('Send', {
@@ -290,12 +274,14 @@ export const AccountCard: FunctionComponent<{
                 </Text>
               </View>
 
-              <AddressCopyable
-                address={account.bech32Address}
-                maxCharacters={22}
+              <Copyable
+                text={Bech32Address.shortenAddress(account.bech32Address, 22)}
               />
             </View>
-            <TouchableOpacity onPress={_onPressMyWallet}>
+            <TouchableOpacity
+              onPress={_onPressMyWallet}
+              disabled={stakable.toDec().lte(new Dec(0))}
+            >
               <DownArrowIcon height={28} color={colors['gray-150']} />
             </TouchableOpacity>
           </View>
