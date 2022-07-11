@@ -268,11 +268,11 @@ export const LedgerGranterModal: FunctionComponent<{
       >
         {isBLEAvailable &&
         permissionStatus === BLEPermissionGrantStatus.Granted ? (
-          <React.Fragment>
+          <>
             {errorOnListen ? (
               <LedgerErrorView text={errorOnListen} />
             ) : (
-              <React.Fragment>
+              <>
                 <Text
                   style={style.flatten(['subtitle3', 'color-text-black-high'])}
                 >
@@ -283,7 +283,7 @@ export const LedgerGranterModal: FunctionComponent<{
                 >
                   2. Select the hardware wallet you'd like to pair.
                 </Text>
-              </React.Fragment>
+              </>
             )}
 
             {devices.map((device) => {
@@ -299,7 +299,7 @@ export const LedgerGranterModal: FunctionComponent<{
                 />
               );
             })}
-          </React.Fragment>
+          </>
         ) : permissionStatus === BLEPermissionGrantStatus.Failed ||
           BLEPermissionGrantStatus.FailedAndRetry ? (
           <LedgerErrorView text="OWallet doesn't have permission to use bluetooth">

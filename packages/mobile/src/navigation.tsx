@@ -208,7 +208,7 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
     );
   };
   return (
-    <React.Fragment>
+    <>
       <View
         style={{
           display: 'flex',
@@ -238,7 +238,7 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
           </View>
         </TouchableWithoutFeedback>
       </View>
-    </React.Fragment>
+    </>
   );
 });
 
@@ -261,7 +261,7 @@ export const CustomHeader: FunctionComponent = observer(() => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <View
         style={{
           backgroundColor: colors['white'],
@@ -290,7 +290,7 @@ export const CustomHeader: FunctionComponent = observer(() => {
           <HomeScreenHeaderRight />
         </View>
       </View>
-    </React.Fragment>
+    </>
   );
 });
 const ScreenHeaderLeft: FunctionComponent<{ uri?: string }> = observer(({}) => {

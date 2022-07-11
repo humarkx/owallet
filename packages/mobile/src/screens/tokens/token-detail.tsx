@@ -33,13 +33,14 @@ import {
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import { navigate } from '../../router/root';
 import { API } from '../../common/api';
+import { useRoute } from '@react-navigation/native';
 
-export const TokenDetailScreen: FunctionComponent = observer((props) => {
+export const TokenDetailScreen: FunctionComponent = observer(() => {
   const { chainStore, queriesStore, accountStore } = useStore();
   const smartNavigation = useSmartNavigation();
+  const route = useRoute();
 
-  const { amountBalance, balanceCoinDenom, priceBalance } =
-    props?.route?.params ?? {};
+  const { amountBalance, balanceCoinDenom, priceBalance } = route.params ?? {};
   const account = accountStore.getAccount(chainStore.current.chainId);
   const queries = queriesStore.get(chainStore.current.chainId);
 

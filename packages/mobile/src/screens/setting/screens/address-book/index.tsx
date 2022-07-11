@@ -1,6 +1,10 @@
-import React, { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState
+} from 'react';
 import { observer } from 'mobx-react-lite';
-import { PageWithScrollView } from '../../../../components/page';
 import { useStyle } from '../../../../styles';
 import { StyleSheet, View } from 'react-native';
 import { CText as Text } from '../../../../components/text';
@@ -17,15 +21,6 @@ import { Bech32Address } from '@owallet/cosmos';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RectButton } from '../../../../components/rect-button';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import {
-  HeaderLeftButton,
-  HeaderRightButton
-} from '../../../../components/header';
-import {
-  HeaderAddIcon,
-  HeaderBackButtonIcon
-} from '../../../../components/header/icon';
-import { AddressBookIcon } from '../../../../components/icon';
 import { useConfirmModal } from '../../../../providers/confirm-modal';
 import { colors, metrics, spacing, typography } from '../../../../themes';
 import { TextInput } from '../../../../components/input';
@@ -62,7 +57,7 @@ const debounce = (fn, delay) => {
   return (...args) => {
     clearTimeout(timerId);
     timerId = setTimeout(() => fn(...args), delay);
-  }
+  };
 };
 
 export const AddressBookScreen: FunctionComponent = observer(() => {
@@ -139,7 +134,7 @@ export const AddressBookScreen: FunctionComponent = observer(() => {
     addressBookItemComponent[isInTransaction ? 'inTransaction' : 'inSetting'];
 
   const onNameSearch = (txt) => {
-    const searchWord = txt ?? nameSearch
+    const searchWord = txt ?? nameSearch;
     if (searchWord) {
       const addressList = addressBookConfig.addressBookDatas;
       if (addressList.length > 0) {
@@ -154,7 +149,12 @@ export const AddressBookScreen: FunctionComponent = observer(() => {
 
   const debouncedHandler = useCallback(debounce(onNameSearch, 300), []);
 
-  const contractData = contractList.length > 0 ? contractList :nameSearch !=='' && contractList.length === 0 ? [] :  addressBookConfig.addressBookDatas;
+  const contractData =
+    contractList.length > 0
+      ? contractList
+      : nameSearch !== '' && contractList.length === 0
+      ? []
+      : addressBookConfig.addressBookDatas;
 
   return (
     <>
@@ -187,7 +187,7 @@ export const AddressBookScreen: FunctionComponent = observer(() => {
             value={nameSearch}
             onChangeText={(text) => {
               setNameSearch(text);
-              debouncedHandler(text)
+              debouncedHandler(text);
             }}
           />
         </View>

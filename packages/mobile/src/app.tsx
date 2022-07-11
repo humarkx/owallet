@@ -91,9 +91,9 @@ const AppIntlProviderWithStorage = ({ children }) => {
                 hour: '2-digit',
                 hour12: false,
                 minute: '2-digit',
-                timeZoneName: 'short',
-              },
-            },
+                timeZoneName: 'short'
+              }
+            }
           }}
         >
           {children}

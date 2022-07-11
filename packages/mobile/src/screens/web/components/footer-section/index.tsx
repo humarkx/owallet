@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useMemo, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { CText as Text} from "../../../../components/text";
+import { CText as Text } from '../../../../components/text';
 import { useStyle } from '../../../../styles';
 import { useWebViewState } from '../context';
 import { useNavigation } from '@react-navigation/core';
@@ -9,11 +9,12 @@ import {
   RightArrowIcon,
   HomeIcon,
   ThreeDotsIcon,
-  TabIcon,
+  TabIcon
 } from '../../../../components/icon';
 import { BrowserSectionModal } from '../section-title';
 import { useStore } from '../../../../stores';
 import { observer } from 'mobx-react-lite';
+import { oraiLogo } from '../../config';
 
 export const BrowserFooterSection: FunctionComponent<{
   isSwitchTab: boolean;
@@ -26,8 +27,6 @@ export const BrowserFooterSection: FunctionComponent<{
   const navigation = useNavigation();
   const webViewState = useWebViewState();
 
-  const oraiLogo = require('../../../../assets/image/webpage/orai_logo.png');
-
   const onPressBookmark = () => {
     console.log('webViewState', webViewState);
     setIsOpenSetting(false);
@@ -36,7 +35,7 @@ export const BrowserFooterSection: FunctionComponent<{
         id: Date.now(),
         name: webViewState.name,
         logo: oraiLogo,
-        uri: webViewState.url,
+        uri: webViewState.url
       });
     }
   };
@@ -100,7 +99,7 @@ export const BrowserFooterSection: FunctionComponent<{
                 borderRadius: 4,
                 alignItems: 'center',
                 width: 24,
-                height: 24,
+                height: 24
               }}
             >
               <Text style={{ color: '#fff' }}>
@@ -130,7 +129,7 @@ export const BrowserFooterSection: FunctionComponent<{
     <View
       style={[
         {
-          bottom: 0,
+          bottom: 0
         },
         style.flatten([
           'width-full',
@@ -139,8 +138,8 @@ export const BrowserFooterSection: FunctionComponent<{
           'flex-row',
           'items-center',
           'padding-40',
-          'absolute',
-        ]),
+          'absolute'
+        ])
       ]}
     >
       {isOpenSetting && (
@@ -155,7 +154,7 @@ export const BrowserFooterSection: FunctionComponent<{
             borderTopLeftRadius: 4,
             borderTopRightRadius: 4,
             zIndex: 1,
-            padding: 10,
+            padding: 10
           }}
         >
           <BrowserSectionModal
@@ -170,7 +169,7 @@ export const BrowserFooterSection: FunctionComponent<{
           'width-full',
           'height-80',
           'flex-row',
-          'items-center',
+          'items-center'
         ])}
       >
         {arrayIcon.map((e, i) => {

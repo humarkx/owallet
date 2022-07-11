@@ -17,7 +17,7 @@ const MnemonicSeed = ({ styles }) => {
 
   const privateKeyStores = useMemo(() => {
     return keyRingStore.multiKeyStoreInfo.filter(
-      (keyStore) => keyStore.type === 'privateKey' && !keyStore.meta?.email
+      (keyStore) => keyStore.type === 'privateKey'
     );
   }, [keyRingStore.multiKeyStoreInfo]);
 
@@ -67,16 +67,6 @@ const MnemonicSeed = ({ styles }) => {
               marginLeft: spacing['12']
             }}
           >
-            <Text
-              style={{
-                ...typography.h6,
-                color: colors['gray-900'],
-                fontWeight: '900'
-              }}
-              numberOfLines={1}
-            >
-              {item.meta?.name}
-            </Text>
             {item.address && (
               <Text
                 style={{
