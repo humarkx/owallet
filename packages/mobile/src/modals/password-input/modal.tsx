@@ -1,10 +1,18 @@
-import React, { FunctionComponent, useState } from "react";
-import { registerModal } from "../base";
-import { Text } from "react-native";
-import { useStyle } from "../../styles";
-import { CardModal } from "../card";
-import { TextInput } from "../../components/input";
-import { Button } from "../../components/button";
+import React, { FunctionComponent, useState } from 'react';
+import { registerModal } from '../base';
+import { CText as Text } from '../../components/text';
+import { CardModal } from '../card';
+import { TextInput } from '../../components/input';
+import { Button } from '../../components/button';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { colors, typography } from '../../themes';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 export const PasswordInputModal: FunctionComponent<{
   isOpen: boolean;
@@ -18,9 +26,7 @@ export const PasswordInputModal: FunctionComponent<{
   onEnterPassword: (password: string) => Promise<void>;
 }> = registerModal(
   ({ close, title, paragraph, onEnterPassword }) => {
-    const style = useStyle();
-
-    const [password, setPassword] = useState("");
+    const [password, setPassword] = useState('');
     const [isInvalidPassword, setIsInvalidPassword] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -38,39 +44,76 @@ export const PasswordInputModal: FunctionComponent<{
         setIsLoading(false);
       }
     };
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 320 : 0;
 
     return (
       <CardModal title={title}>
-        <Text
-          style={style.flatten([
-            "body2",
-            "color-text-black-medium",
-            "margin-bottom-32",
-          ])}
+        <KeyboardAvoidingView
+          behavior="padding"
+          keyboardVerticalOffset={keyboardVerticalOffset}
         >
-          {paragraph || "Enter your password to continue"}
-        </Text>
-        <TextInput
-          label="Password"
-          error={isInvalidPassword ? "Invalid password" : undefined}
-          onChangeText={(text) => {
-            setPassword(text);
-          }}
-          value={password}
-          returnKeyType="done"
-          secureTextEntry={true}
-          onSubmitEditing={submitPassword}
-        />
-        <Button
-          text="Approve"
-          size="large"
-          loading={isLoading}
-          onPress={submitPassword}
-        />
+          <TouchableWithoutFeedback
+            onPress={() => {
+              Keyboard.dismiss();
+            }}
+          >
+            <Text
+              style={{
+                ...typography['body2'],
+                marginBottom: 32,
+                color: colors['text-black-medium']
+              }}
+            >
+              {paragraph || 'Do not reveal your mnemonic to anyone'} 
+            </Text>
+            <TextInput
+              label="Enter your password"
+              error={isInvalidPassword ? 'Invalid password' : undefined}
+              onChangeText={(text) => {
+                setPassword(text);
+              }}
+              inputStyle={{
+                borderColor: colors['purple-100'],
+                borderWidth: 1,
+                backgroundColor: colors['white'],
+                paddingLeft: 11,
+                paddingRight: 11,
+                paddingTop: 12,
+                borderRadius: 8
+              }}
+              value={password}
+              returnKeyType="done"
+              secureTextEntry={true}
+              onSubmitEditing={submitPassword}
+            />
+          </TouchableWithoutFeedback>
+          <TouchableOpacity
+            onPress={submitPassword}
+            style={{
+              marginBottom: 24,
+              marginTop: 44,
+              backgroundColor: colors['purple-900'],
+              borderRadius: 8
+            }}
+          >
+            <Text
+              style={{
+                color: colors['white'],
+                textAlign: 'center',
+                fontWeight: '700',
+                fontSize: 16,
+                lineHeight: 22,
+                padding: 16
+              }}
+            >
+              Approve
+            </Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </CardModal>
     );
   },
   {
-    disableSafeArea: true,
+    disableSafeArea: true
   }
 );

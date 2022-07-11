@@ -4,15 +4,18 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import { useStore } from '../../../stores';
 import { useStyle } from '../../../styles';
 import { useUndelegateTxConfig } from '@owallet/hooks';
-import { PageWithScrollView } from '../../../components/page';
+import { PageWithScrollView, PageWithScrollViewInBottomTabView } from '../../../components/page';
 import { AmountInput, FeeButtons, MemoInput } from '../../../components/input';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { CText as Text } from '../../../components/text';
 import { Button } from '../../../components/button';
 import { Card, CardBody, CardDivider } from '../../../components/card';
 import { BondStatus } from '@owallet/stores';
 import { ValidatorThumbnail } from '../../../components/thumbnail';
 import { Buffer } from 'buffer';
 import { useSmartNavigation } from '../../../navigation.provider';
+import { colors, spacing } from '../../../themes';
+import { ValidatorThumbnails } from '@owallet/common';
 
 export const UndelegateScreen: FunctionComponent = observer(() => {
   const route = useRoute<
@@ -57,7 +60,8 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
         .getValidatorThumbnail(validatorAddress) ||
       queries.cosmos.queryValidators
         .getQueryStatus(BondStatus.Unbonded)
-        .getValidatorThumbnail(validatorAddress)
+        .getValidatorThumbnail(validatorAddress) ||
+      ValidatorThumbnails[validatorAddress]
     : undefined;
 
   const staked = queries.cosmos.queryDelegations
@@ -86,13 +90,21 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
     sendConfigs.feeConfig.getError();
   const txStateIsValid = sendConfigError == null;
 
+  const isDisable = !account.isReadyToSendMsgs || !txStateIsValid;
+
   return (
-    <PageWithScrollView
+    <PageWithScrollViewInBottomTabView
       style={style.flatten(['padding-x-page'])}
       contentContainerStyle={style.get('flex-grow-1')}
     >
       <View style={style.flatten(['height-page-pad'])} />
-      <Card style={style.flatten(['margin-bottom-12', 'border-radius-8'])}>
+      <View
+        style={{
+          marginBottom: spacing['12'],
+          borderRadius: spacing['8'],
+          backgroundColor: colors['white']
+        }}
+      >
         <CardBody>
           <View style={style.flatten(['flex-row', 'items-center'])}>
             <ValidatorThumbnail
@@ -123,7 +135,7 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
             </Text>
           </View>
         </CardBody>
-      </Card>
+      </View>
       {/*
         // The recipient validator is selected by the route params, so no need to show the address input.
         <AddressInput
@@ -147,11 +159,14 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
         feeConfig={sendConfigs.feeConfig}
         gasConfig={sendConfigs.gasConfig}
       />
-      <View style={style.flatten(['flex-1'])} />
       <Button
         text="Unstake"
         size="large"
-        disabled={!account.isReadyToSendMsgs || !txStateIsValid}
+        style={{
+          backgroundColor: isDisable ? colors['disabled'] : colors['purple-900']
+        }}
+        underlayColor={colors['purple-400']}
+        disabled={isDisable}
         loading={account.isSendingMsg === 'undelegate'}
         onPress={async () => {
           if (account.isReadyToSendMsgs && txStateIsValid) {
@@ -183,13 +198,19 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
               if (e?.message === 'Request rejected') {
                 return;
               }
-              console.log(e);
-              smartNavigation.navigateSmart('Home', {});
+              if (e?.message.includes('Cannot read properties of undefined')) {
+                return;
+              }
+              if (smartNavigation.canGoBack) {
+                smartNavigation.goBack();
+              } else {
+                smartNavigation.navigateSmart('Home', {});
+              }
             }
           }
         }}
       />
       <View style={style.flatten(['height-page-pad'])} />
-    </PageWithScrollView>
+    </PageWithScrollViewInBottomTabView>
   );
 });

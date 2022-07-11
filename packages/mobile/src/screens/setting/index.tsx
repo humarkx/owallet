@@ -1,6 +1,11 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
-import { RightArrow, SettingItem, SettingSectionTitle } from './components';
+import {
+  renderFlag,
+  RightArrow,
+  SettingItem,
+  SettingSectionTitle
+} from './components';
 // import { SettingSelectAccountItem } from "./items/select-account";
 import { useSmartNavigation } from '../../navigation.provider';
 // import { SettingFiatCurrencyItem } from "./items/fiat-currency";
@@ -13,137 +18,168 @@ import { SettingViewPrivateDataItem } from './items/view-private-data';
 import { useStyle } from '../../styles';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
-  Platform
+  Platform,
+  ImageBackground,
+  StatusBar
 } from 'react-native';
+import { CText as Text } from '../../components/text';
+import { colors, metrics, spacing, typography } from '../../themes';
+import { DownArrowIcon } from '../../components/icon';
+import { CountryModal } from './components/country-modal';
 
 export const SettingScreen: FunctionComponent = observer(() => {
-  const { keychainStore, keyRingStore, priceStore } = useStore();
-
+  const { keychainStore, keyRingStore, priceStore, modalStore } = useStore();
+  const currencyItems = useMemo(() => {
+    return Object.keys(priceStore.supportedVsCurrencies).map((key) => {
+      return {
+        key,
+        label: key.toUpperCase()
+      };
+    });
+  }, [priceStore.supportedVsCurrencies]);
   const selected = keyRingStore.multiKeyStoreInfo.find(
     (keyStore) => keyStore.selected
   );
 
-  const style = useStyle();
-
   const smartNavigation = useSmartNavigation();
+  const _onPressCountryModal = () => {
+    modalStore.setOpen();
+    modalStore.setChildren(
+      CountryModal({
+        data: currencyItems,
+        current: priceStore.defaultVsCurrency,
+        priceStore,
+        modalStore
+      })
+    );
+  };
 
   return (
-    <PageWithScrollViewInBottomTabView
-      backgroundColor={style.get('color-setting-screen-background').color}
-    >
-      <View
-        style={style.flatten(
-          [
-            'background-color-primary-400',
-            'padding-24',
-            'padding-top-76',
-            'padding-bottom-101',
-            'margin-bottom-102'
-          ],
-          [
-            Platform.OS === 'ios' && 'border-radius-top-left-32',
-            Platform.OS === 'ios' && 'border-radius-top-right-32'
-          ]
-        )}
+    <PageWithScrollViewInBottomTabView>
+      <StatusBar
+        animated={true}
+        backgroundColor="white"
+        barStyle={'light-content'}
+        showHideTransition={'fade'}
+        hidden={false}
+      />
+      <ImageBackground
+        style={{
+          ...styles.containerScreen
+        }}
+        resizeMode="cover"
+        source={require('../../assets/image/bg_gradient.png')}
       >
-        <Text style={style.flatten(['h1', 'color-white'])}>Setting</Text>
+        <Text
+          style={{
+            ...styles.title
+          }}
+        >
+          Settings
+        </Text>
         <View
-          style={[
-            style.flatten([
-              'absolute-fill',
-              'background-color-white',
-              'height-160',
-              'margin-24',
-              'margin-top-150',
-              'border-radius-12',
-              'padding-20'
-            ]),
-            styles.shadowBox
-          ]}
+          style={{
+            ...styles.containerInfo,
+            ...styles.shadowBox
+          }}
         >
           <TouchableOpacity
             onPress={() =>
               smartNavigation.navigateSmart('SettingSelectAccount', {})
             }
-            style={style.flatten([
-              'flex-row',
-              'items-center',
-              'justify-between'
-            ])}
+            style={{
+              flexDirection: 'row',
+              alignContent: 'center',
+              justifyContent: 'space-between'
+            }}
           >
             <View>
               <Text
-                style={style.flatten([
-                  'text-caption2',
-                  'color-text-black-very-low'
-                ])}
+                style={{
+                  ...typography['text-caption2'],
+                  color: colors['text-black-very-low']
+                }}
               >
                 WALLET
               </Text>
               <Text
-                style={style.flatten([
-                  'text-caption2',
-                  'color-black',
-                  'font-bold',
-                  'subtitle1'
-                ])}
+                style={{
+                  ...typography['h6'],
+                  color: colors['gray-900'],
+                  fontWeight: 'bold'
+                }}
               >
                 {selected
                   ? selected.meta?.name || 'Keplr Account'
                   : 'No Account'}
               </Text>
             </View>
-            <RightArrow />
+            <DownArrowIcon color={colors['black']} height={12} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              smartNavigation.navigateSmart('SettingSelectLang', {})
-            }
-            style={style.flatten([
-              'flex-row',
-              'items-center',
-              'justify-between',
-              'padding-top-20'
-            ])}
+            onPress={_onPressCountryModal}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingTop: spacing['20']
+            }}
           >
             <View>
               <Text
-                style={style.flatten([
-                  'text-caption2',
-                  'color-text-black-very-low'
-                ])}
+                style={{
+                  ...typography['subtitle2'],
+                  color: colors['text-black-very-low']
+                }}
               >
                 CURRENCY
               </Text>
-              <Text
-                style={style.flatten(['text-caption2', 'color-black', 'body1'])}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                {priceStore.defaultVsCurrency.toUpperCase()}
-              </Text>
+                {renderFlag(priceStore.defaultVsCurrency)}
+                <Text
+                  style={{
+                    ...typography['h6'],
+                    color: colors['gray-900'],
+                    marginHorizontal: spacing['8']
+                  }}
+                >
+                  {priceStore.defaultVsCurrency.toUpperCase()}
+                </Text>
+              </View>
             </View>
-            <RightArrow />
+            <DownArrowIcon color={colors['black']} height={12} />
           </TouchableOpacity>
         </View>
-      </View>
+      </ImageBackground>
       {/* <SettingSelectAccountItem /> */}
       {/* <SettingFiatCurrencyItem topBorder={true} /> */}
       {/* <SettingSectionTitle title="General" /> */}
-      <View style={style.flatten(['background-color-white'])}>
+      <View
+        style={{
+          backgroundColor: colors['white'],
+          borderBottomLeftRadius: Platform.OS === 'ios' ? 32 : 0,
+          borderBottomRightRadius: Platform.OS === 'ios' ? 32 : 0
+        }}
+      >
         <SettingSectionTitle title="Security" />
+        {canShowPrivateData(keyRingStore.keyRingType) && (
+          <SettingViewPrivateDataItem />
+        )}
+
         <SettingItem
           label="Address book"
-          right={<RightArrow />}
           onPress={() => {
             smartNavigation.navigateSmart('AddressBook', {});
           }}
         />
-
-        {canShowPrivateData(keyRingStore.keyRingType) && (
-          <SettingViewPrivateDataItem topBorder={false} />
-        )}
         {keychainStore.isBiometrySupported || keychainStore.isBiometryOn ? (
           <SettingBiometricLockItem
           // topBorder={!canShowPrivateData(keyRingStore.keyRingType)}
@@ -152,14 +188,11 @@ export const SettingScreen: FunctionComponent = observer(() => {
         {/* <SettingSectionTitle title="Others" /> */}
         <SettingItem
           label="About OWallet"
-          // topBorder={true}
           onPress={() => {
             smartNavigation.navigateSmart('Setting.Version', {});
           }}
         />
-        <SettingRemoveAccountItem topBorder={true} />
-        {/* Mock element for padding bottom */}
-        <View style={style.get('height-16')} />
+        <SettingRemoveAccountItem />
       </View>
     </PageWithScrollViewInBottomTabView>
   );
@@ -174,5 +207,31 @@ const styles = StyleSheet.create({
     },
     shadowRadius: 5,
     shadowOpacity: 1.0
+  },
+  containerScreen: {
+    padding: 24,
+    paddingTop: 76,
+    paddingBottom: 101,
+    marginBottom: 102,
+    borderTopLeftRadius: Platform.OS === 'ios' ? 32 : 0,
+    borderTopRightRadius: Platform.OS === 'ios' ? 32 : 0
+    // borderBottomLeftRadius: Platform.OS === 'ios' ? 32 : 0,
+    // borderBottomRightRadius: Platform.OS === 'ios' ? 32 : 0
+  },
+  title: {
+    ...typography.h1,
+    color: colors['white'],
+    textAlign: 'center',
+    fontWeight: '700'
+  },
+  containerInfo: {
+    position: 'absolute',
+    backgroundColor: colors['white'],
+    height: 160,
+    margin: 24,
+    marginTop: 150,
+    borderRadius: 12,
+    padding: 20,
+    width: '100%'
   }
 });

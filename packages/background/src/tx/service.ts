@@ -81,7 +81,6 @@ export class BackgroundTxService {
     tx: unknown,
     mode: 'async' | 'sync' | 'block'
   ): Promise<Uint8Array> {
-    console.log('finally, in send tx to broadcast Keplr message');
     const chainInfo = await this.chainsService.getChainInfo(chainId);
 
     const restInstance = Axios.create({
@@ -161,10 +160,12 @@ export class BackgroundTxService {
   }
 
   async request(chainId: string, method: string, params: any[]): Promise<any> {
-    var chainInfo: ChainInfoWithEmbed;
+    let chainInfo: ChainInfoWithEmbed;
     switch (method) {
       case 'eth_accounts':
       case 'eth_requestAccounts':
+        chainInfo = await this.chainsService.getChainInfo(chainId);
+        if (chainInfo.coinType !== 60) return undefined;
         const chainIdOrCoinType = params.length ? parseInt(params[0]) : chainId; // default is cointype 60 for ethereum based
         const key = await this.keyRingService.getKey(chainIdOrCoinType);
         return [`0x${Buffer.from(key.address).toString('hex')}`];

@@ -1,7 +1,8 @@
 import React, { FunctionComponent, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { IFeeConfig, IGasConfig, NotLoadedFeeError } from '@owallet/hooks';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { CText as Text } from '../../components/text';
 import { useStore } from '../../stores';
 import { useStyle } from '../../styles';
 import { CoinPretty, Dec } from '@owallet/unit';
@@ -13,6 +14,7 @@ import { CardModal } from '../card';
 import { FeeButtons, getFeeErrorText } from '../../components/input';
 import { Button } from '../../components/button';
 import { LoadingSpinner } from '../../components/spinner';
+import { colors, typography } from '../../themes';
 
 const FeeButtonsModal: FunctionComponent<{
   isOpen: boolean;
@@ -30,14 +32,27 @@ const FeeButtonsModal: FunctionComponent<{
           feeConfig={feeConfig}
           gasConfig={gasConfig}
         />
-        <Button
-          color="primary"
-          size="large"
-          text="Confirm"
-          onPress={() => {
-            close();
+        <TouchableOpacity
+          onPress={close}
+          style={{
+            marginBottom: 24,
+            marginTop: 32,
+            backgroundColor: colors['purple-900'],
+            borderRadius: 8
           }}
-        />
+        >
+          <Text
+            style={{
+              color: 'white',
+              textAlign: 'center',
+              fontWeight: '700',
+              fontSize: 16,
+              padding: 16
+            }}
+          >
+            Confirm
+          </Text>
+        </TouchableOpacity>
       </CardModal>
     );
   }),
@@ -119,10 +134,10 @@ export const FeeInSign: FunctionComponent<{
             }}
           >
             <Text
-              style={style.flatten(
-                ['subtitle1', 'color-text-black-medium'],
-                [canFeeEditable ? 'color-primary' : false]
-              )}
+              style={{
+                ...typography['subtitle1'],
+                color: canFeeEditable ? colors['purple-700'] : colors['text-black-medium'],
+              }}
             >
               {fee.trim(true).toString()}
             </Text>

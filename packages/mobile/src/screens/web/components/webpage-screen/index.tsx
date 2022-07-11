@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform, View } from 'react-native';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import { useStyle } from '../../../../styles';
 import { OWallet, Ethereum } from '@owallet/provider';
@@ -25,11 +25,18 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../../stores';
 import DeviceInfo from 'react-native-device-info';
 import { InjectedProviderUrl } from '../../config';
+import { BrowserFooterSection } from '../footer-section';
+import { SwtichTab } from '../switch-tabs';
+import { version } from '../../../../../package.json';
 
 export const useInjectedSourceCode = () => {
   const [code, setCode] = useState<string | undefined>();
 
   useEffect(() => {
+    console.log(
+      'InjectedProviderUrl',
+      `${InjectedProviderUrl}/injected-provider.bundle.js`
+    );
     fetch(`${InjectedProviderUrl}/injected-provider.bundle.js`)
       .then((res) => res.text())
       .then(setCode);
@@ -43,8 +50,8 @@ export const WebpageScreen: FunctionComponent<
     name: string;
   }
 > = observer((props) => {
-  const { keyRingStore, chainStore } = useStore();
-
+  const { keyRingStore, chainStore, browserStore } = useStore();
+  const [isSwitchTab, setIsSwitchTab] = useState(false);
   const style = useStyle();
 
   const webviewRef = useRef<WebView | null>(null);
@@ -59,7 +66,7 @@ export const WebpageScreen: FunctionComponent<
   const [owallet] = useState(
     () =>
       new OWallet(
-        DeviceInfo.getVersion(),
+        version,
         'core',
         new RNMessageRequesterExternal(() => {
           if (!webviewRef.current) {
@@ -100,6 +107,17 @@ export const WebpageScreen: FunctionComponent<
         })
       )
   );
+
+  const onPressItem = ({ name, uri }) => {
+    setIsSwitchTab(false);
+    if (browserStore.getSelectedTab?.uri !== uri) {
+      browserStore.updateSelectedTab({ name, uri });
+      navigation.navigate('Web.dApp', {
+        name,
+        uri
+      });
+    }
+  };
 
   const [eventEmitter] = useState(() => new EventEmitter());
   const onMessage = useCallback(
@@ -206,50 +224,77 @@ export const WebpageScreen: FunctionComponent<
 
   return (
     <PageWithView
-      style={style.flatten(['padding-0', 'padding-bottom-0'])}
+      style={{
+        padding: 0,
+        paddingBottom: 80
+      }}
       disableSafeArea
     >
+      {isSwitchTab ? (
+        <SwtichTab onPressItem={onPressItem} />
+      ) : (
+        <>
+          <WebViewStateContext.Provider
+            value={{
+              webView: webviewRef.current,
+              name: props.name,
+              url: currentURL,
+              canGoBack,
+              canGoForward
+            }}
+          >
+            <OnScreenWebpageScreenHeader />
+          </WebViewStateContext.Provider>
+
+          {sourceCode ? (
+            <WebView
+              ref={webviewRef}
+              incognito={true}
+              injectedJavaScriptBeforeContentLoaded={sourceCode}
+              onMessage={onMessage}
+              onNavigationStateChange={(e) => {
+                // Strangely, `onNavigationStateChange` is only invoked whenever page changed only in IOS.
+                // Use two handlers to measure simultaneously in ios and android.
+                setCanGoBack(e.canGoBack);
+                setCanGoForward(e.canGoForward);
+
+                setCurrentURL(e.url);
+              }}
+              onLoadProgress={(e) => {
+                // Strangely, `onLoadProgress` is only invoked whenever page changed only in Android.
+                // Use two handlers to measure simultaneously in ios and android.
+                setCanGoBack(e.nativeEvent.canGoBack);
+                setCanGoForward(e.nativeEvent.canGoForward);
+
+                setCurrentURL(e.nativeEvent.url);
+              }}
+              contentInsetAdjustmentBehavior="never"
+              automaticallyAdjustContentInsets={false}
+              decelerationRate="normal"
+              allowsBackForwardNavigationGestures={true}
+              {...props}
+            />
+          ) : null}
+        </>
+      )}
+
       <WebViewStateContext.Provider
         value={{
           webView: webviewRef.current,
           name: props.name,
           url: currentURL,
           canGoBack,
-          canGoForward
+          canGoForward,
+          clearWebViewContext: () => {
+            webviewRef.current = null;
+          }
         }}
       >
-        <OnScreenWebpageScreenHeader />
-      </WebViewStateContext.Provider>
-
-      {sourceCode ? (
-        <WebView
-          ref={webviewRef}
-          incognito={true}
-          injectedJavaScriptBeforeContentLoaded={sourceCode}
-          onMessage={onMessage}
-          onNavigationStateChange={(e) => {
-            // Strangely, `onNavigationStateChange` is only invoked whenever page changed only in IOS.
-            // Use two handlers to measure simultaneously in ios and android.
-            setCanGoBack(e.canGoBack);
-            setCanGoForward(e.canGoForward);
-
-            setCurrentURL(e.url);
-          }}
-          onLoadProgress={(e) => {
-            // Strangely, `onLoadProgress` is only invoked whenever page changed only in Android.
-            // Use two handlers to measure simultaneously in ios and android.
-            setCanGoBack(e.nativeEvent.canGoBack);
-            setCanGoForward(e.nativeEvent.canGoForward);
-
-            setCurrentURL(e.nativeEvent.url);
-          }}
-          contentInsetAdjustmentBehavior="never"
-          automaticallyAdjustContentInsets={false}
-          decelerationRate="normal"
-          allowsBackForwardNavigationGestures={true}
-          {...props}
+        <BrowserFooterSection
+          isSwitchTab={isSwitchTab}
+          setIsSwitchTab={setIsSwitchTab}
         />
-      ) : null}
+      </WebViewStateContext.Provider>
     </PageWithView>
   );
 });

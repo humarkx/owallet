@@ -1,11 +1,15 @@
+import { useNavigation } from '@react-navigation/core';
 import React, { FunctionComponent } from 'react';
-import { Text, View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { CText as Text} from "../../../../components/text";
+import { HeaderBackButtonIcon } from '../../../../components/header/icon';
 import { useStyle } from '../../../../styles';
 
 export const BrowserSectionTitle: FunctionComponent<{
   title: string;
 }> = ({ title }) => {
   const style = useStyle();
+  const navigation = useNavigation();
 
   return (
     <View
@@ -14,17 +18,21 @@ export const BrowserSectionTitle: FunctionComponent<{
         'padding-top-16',
         'padding-bottom-16',
         'background-color-white',
+        'flex-row',
       ])}
     >
-      <Text style={style.flatten(['h4'])}>{title}</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <HeaderBackButtonIcon />
+      </TouchableOpacity>
+      <Text style={style.flatten(['h4', 'margin-x-10'])}>{title}</Text>
     </View>
   );
 };
 
 export const BrowserSectionModal: FunctionComponent<{
-  title: string;
-  onClose?: () => void
-}> = ({ title , onClose }) => {
+  onClose?: () => void;
+  onPress?: () => void;
+}> = ({ onClose, onPress }) => {
   const style = useStyle();
   return (
     <View
@@ -37,8 +45,11 @@ export const BrowserSectionModal: FunctionComponent<{
         'justify-between',
       ])}
     >
-      <Text style={style.flatten(['h4'])}></Text>
-      <Text onPress={onClose} style={style.flatten(['h4','color-white'])}>X</Text>
+      <TouchableOpacity onPress={onPress}>
+        <Text style={style.flatten(['text-button2', 'color-white'])}>
+          Bookmark
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };

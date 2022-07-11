@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from "react";
-import { Text, View } from "react-native";
-import { useStyle } from "../../styles";
+import React, { FunctionComponent } from 'react';
+import { View } from 'react-native';
+import { colors } from '../../themes';
+import { CText as Text } from '../text';
 
 export const WordChip: FunctionComponent<{
   index: number;
@@ -11,31 +12,30 @@ export const WordChip: FunctionComponent<{
   empty?: boolean;
   dashedBorder?: boolean;
 }> = ({ index, word, hideWord, empty, dashedBorder }) => {
-  const style = useStyle();
-
   return (
     <View
-      style={style.flatten(
-        [
-          "padding-x-12",
-          "padding-y-4",
-          "border-radius-8",
-          "background-color-white",
-          "border-width-2",
-          "border-color-primary",
-          "margin-right-12",
-          "margin-bottom-16",
-        ],
-        [empty && "border-color-primary-100", dashedBorder && "border-dashed"]
-      )}
+      style={{
+        // paddingLeft: 2,
+        // paddingRight: 2,
+        borderRadius: 8,
+        backgroundColor: 'white',
+        borderWidth: 1,
+        margin: 5,
+        borderColor: empty ? colors['primary-100'] : colors['purple-700'],
+        borderStyle: dashedBorder ? 'dashed' : 'dotted'
+      }}
     >
       <Text
-        style={style.flatten(
-          ["subtitle2", "color-primary"],
-          [empty && "color-primary-100", hideWord && "opacity-transparent"]
-        )}
+        style={{
+          // color: empty ? colors['primary-100'] : colors['gray-900'],
+          fontSize: 18,
+          lineHeight: 22,
+          fontWeight: '400',
+          padding: 4,
+          opacity: 1,
+        }}
       >
-        {empty ? `${index}.           ` : `${index}. ${word}`}
+        {empty ? `         ` : ` ${word}`}
       </Text>
     </View>
   );

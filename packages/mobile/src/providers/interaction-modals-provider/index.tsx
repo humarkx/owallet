@@ -11,6 +11,7 @@ import { LoadingScreenModal } from '../loading-screen/modal';
 import { KeyRingStatus } from '@owallet/background';
 import { SignEthereumModal } from '../../modals/sign/sign-ethereum';
 import { navigationRef } from '../../router/root';
+import { HomeBaseModal } from '../../modals/home-base';
 
 export const InteractionModalsProivder: FunctionComponent = observer(
   ({ children }) => {
@@ -19,102 +20,31 @@ export const InteractionModalsProivder: FunctionComponent = observer(
       ledgerInitStore,
       permissionStore,
       signInteractionStore,
-      walletConnectStore,
+      modalStore,
     } = useStore();
 
-    console.log(
-      'signInteractionStore.waitingEthereumData',
-      signInteractionStore.waitingEthereumData
-    );
-
-    console.log(
-      'signInteractionStore.waitingData',
-      signInteractionStore.waitingData
-    );
-
-    useEffect(() => {
-      if (walletConnectStore.needGoBackToBrowser && Platform.OS === 'android') {
-        BackHandler.exitApp();
-      }
-    }, [walletConnectStore.needGoBackToBrowser]);
+    // Example usage
+    // modalStore.setOpen()
+    // modalStore.setChildren(<Text>33333</Text>)
 
     useEffect(() => {
       for (const data of permissionStore.waitingDatas) {
         // Currently, there is no modal to permit the permission of external apps.
         // All apps should be embeded explicitly.
         // If such apps needs the permissions, add these origins to the privileged origins.
-        if (
-          data.data.origins.length !== 1 ||
-          !WCMessageRequester.isVirtualSessionURL(data.data.origins[0])
-        ) {
+        if (data.data.origins.length !== 1) {
           permissionStore.reject(data.id);
         }
       }
     }, [permissionStore, permissionStore.waitingDatas]);
-
     return (
       <React.Fragment>
-        {/*
-         When the wallet connect client from the deep link is creating, show the loading indicator.
-         The user should be able to type password to unlock or create the account if there is no account.
-         So, we shouldn't show the loading indicator if the keyring is not unlocked.
-         */}
-        {keyRingStore.status === KeyRingStatus.UNLOCKED &&
-        walletConnectStore.isPendingClientFromDeepLink ? (
-          <LoadingScreenModal
-            isOpen={true}
-            close={() => {
-              // noop
-            }}
-          />
-        ) : null}
-        {walletConnectStore.needGoBackToBrowser && Platform.OS === 'ios' ? (
-          <WCGoBackToBrowserModal
-            isOpen={walletConnectStore.needGoBackToBrowser}
-            close={() => {
-              walletConnectStore.clearNeedGoBackToBrowser();
-            }}
-          />
-        ) : null}
-        {/*unlockInteractionExists ? (
-          <UnlockModal
-            isOpen={true}
-            close={() => {
-              // noop
-              // Can't close without unlocking.
-            }}
-          />
-        ) : null*/}
         {ledgerInitStore.isInitNeeded ? (
           <LedgerGranterModal
             isOpen={true}
             close={() => ledgerInitStore.abortAll()}
           />
         ) : null}
-        {permissionStore.waitingDatas.map((data) => {
-          if (data.data.origins.length === 1) {
-            if (
-              WCMessageRequester.isVirtualSessionURL(data.data.origins[0]) &&
-              walletConnectStore.getSession(
-                WCMessageRequester.getSessionIdFromVirtualURL(
-                  data.data.origins[0]
-                )
-              )
-            ) {
-              return (
-                <WalletConnectApprovalModal
-                  key={data.id}
-                  isOpen={true}
-                  close={() => permissionStore.reject(data.id)}
-                  id={data.id}
-                  data={data.data}
-                />
-              );
-            }
-          }
-
-          return null;
-        })}
         {signInteractionStore.waitingData ? (
           <SignModal
             isOpen={true}
@@ -130,6 +60,10 @@ export const InteractionModalsProivder: FunctionComponent = observer(
             }}
           />
         ) : null}
+        {modalStore.getState ? (
+          <HomeBaseModal isOpen={true} close={() => modalStore.close()} />
+        ) : null}
+
         {children}
       </React.Fragment>
     );

@@ -20,7 +20,7 @@ export const SettingRemoveAccountItem: FunctionComponent<{
   return (
     <React.Fragment>
       <SettingItem
-        label="Remove wallet"
+        label="Remove current wallet"
         onPress={() => {
           setIsOpenModal(true);
         }}
@@ -33,6 +33,7 @@ export const SettingRemoveAccountItem: FunctionComponent<{
         isOpen={isOpenModal}
         close={() => setIsOpenModal(false)}
         title="Remove Account"
+        paragraph="Please make sure you have saved the correct mnemonic before logging out"
         onEnterPassword={async (password) => {
           const index = keyRingStore.multiKeyStoreInfo.findIndex(
             (keyStore) => keyStore.selected

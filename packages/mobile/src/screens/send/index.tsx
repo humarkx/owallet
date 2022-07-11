@@ -4,7 +4,7 @@ import { useSendTxConfig } from '@owallet/hooks';
 import { useStore } from '../../stores';
 import { EthereumEndpoint } from '@owallet/common';
 import { PageWithScrollView } from '../../components/page';
-import { View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   AddressInput,
   AmountInput,
@@ -12,12 +12,29 @@ import {
   CurrencySelector,
   FeeButtons
 } from '../../components/input';
-import { useStyle } from '../../styles';
 import { Button } from '../../components/button';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { useSmartNavigation } from '../../navigation.provider';
 import { Buffer } from 'buffer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, metrics, spacing, typography } from '../../themes';
+import { CText as Text } from '../../components/text';
+
+const styles = StyleSheet.create({
+  sendInputRoot: {
+    paddingHorizontal: spacing['20'],
+    paddingVertical: spacing['24'],
+    backgroundColor: colors['white'],
+    borderRadius: 24
+  },
+  sendlabelInput: {
+    fontSize: 16,
+    fontWeight: '700',
+    lineHeight: 22,
+    color: colors['gray-900'],
+    marginBottom: spacing['8']
+  }
+});
 
 export const SendScreen: FunctionComponent = observer(() => {
   const { chainStore, accountStore, queriesStore, analyticsStore } = useStore();
@@ -36,13 +53,13 @@ export const SendScreen: FunctionComponent = observer(() => {
     >
   >();
 
-  const style = useStyle();
-
   const smartNavigation = useSmartNavigation();
 
-  const chainId = route.params.chainId
-    ? route.params.chainId
-    : chainStore.current.chainId;
+  const chainId = route?.params?.chainId
+    ? route?.params?.chainId
+    : chainStore?.current?.chainId;
+
+  console.log({ route: route });
 
   const account = accountStore.getAccount(chainId);
   const queries = queriesStore.get(chainId);
@@ -57,21 +74,30 @@ export const SendScreen: FunctionComponent = observer(() => {
   );
 
   useEffect(() => {
-    if (route.params.currency) {
+    if (route?.params?.currency) {
       const currency = sendConfigs.amountConfig.sendableCurrencies.find(
-        (cur) => cur.coinMinimalDenom === route.params.currency
+        (cur) => {
+          if (cur.type === 'cw20') {
+            return cur.coinDenom == route.params.currency;
+          }
+          if (cur.coinDenom === route.params.currency) {
+            return cur.coinDenom === route.params.currency;
+          }
+          return cur.coinMinimalDenom == route.params.currency;
+        }
       );
+
       if (currency) {
         sendConfigs.amountConfig.setSendCurrency(currency);
       }
     }
-  }, [route.params.currency, sendConfigs.amountConfig]);
+  }, [route?.params?.currency, sendConfigs.amountConfig]);
 
   useEffect(() => {
-    if (route.params.recipient) {
+    if (route?.params?.recipient) {
       sendConfigs.recipientConfig.setRawRecipient(route.params.recipient);
     }
-  }, [route.params.recipient, sendConfigs.recipientConfig]);
+  }, [route?.params?.recipient, sendConfigs.recipientConfig]);
 
   const sendConfigError =
     sendConfigs.recipientConfig.getError() ??
@@ -82,77 +108,117 @@ export const SendScreen: FunctionComponent = observer(() => {
   const txStateIsValid = sendConfigError == null;
 
   return (
-    <PageWithScrollView
-      contentContainerStyle={style.get('flex-grow-1')}
-      style={style.flatten(['padding-x-page'])}
-    >
-      <View
-        style={{
-          marginTop: safeAreaInsets.top
-        }}
-      />
-      {/* <View style={style.flatten(['height-page-pad'])} /> */}
-      <AddressInput
-        label="Recipient"
-        recipientConfig={sendConfigs.recipientConfig}
-        memoConfig={sendConfigs.memoConfig}
-      />
-      <CurrencySelector
-        label="Token"
-        placeHolder="Select Token"
-        amountConfig={sendConfigs.amountConfig}
-      />
-      <AmountInput label="Amount" amountConfig={sendConfigs.amountConfig} />
-      <MemoInput label="Memo (Optional)" memoConfig={sendConfigs.memoConfig} />
-      <FeeButtons
-        label="Fee"
-        gasLabel="gas"
-        feeConfig={sendConfigs.feeConfig}
-        gasConfig={sendConfigs.gasConfig}
-      />
-      <View style={style.flatten(['flex-1'])} />
-      <Button
-        text="Send"
-        size="large"
-        disabled={!account.isReadyToSendMsgs || !txStateIsValid}
-        loading={account.isSendingMsg === 'send'}
-        onPress={async () => {
-          if (account.isReadyToSendMsgs && txStateIsValid) {
-            try {
-              await account.sendToken(
-                sendConfigs.amountConfig.amount,
-                sendConfigs.amountConfig.sendCurrency,
-                sendConfigs.recipientConfig.recipient,
-                sendConfigs.memoConfig.memo,
-                sendConfigs.feeConfig.toStdFee(),
-                {
-                  preferNoSetFee: true,
-                  preferNoSetMemo: true
-                },
-                {
-                  onBroadcasted: (txHash) => {
-                    analyticsStore.logEvent('Send token tx broadcasted', {
-                      chainId: chainStore.current.chainId,
-                      chainName: chainStore.current.chainName,
-                      feeType: sendConfigs.feeConfig.feeType
-                    });
-                    smartNavigation.pushSmart('TxPendingResult', {
-                      txHash: Buffer.from(txHash).toString('hex')
-                    });
+    <PageWithScrollView>
+      <View style={{ marginBottom: 99 }}>
+        <View style={{ alignItems: 'center', marginVertical: spacing['16'] }}>
+          <Text
+            style={{
+              fontWeight: '700',
+              fontSize: 24,
+              lineHeight: 34
+            }}
+          >
+            Send
+          </Text>
+        </View>
+        <View style={styles.sendInputRoot}>
+          <CurrencySelector
+            label="Select a token"
+            placeHolder="Select Token"
+            amountConfig={sendConfigs.amountConfig}
+            labelStyle={styles.sendlabelInput}
+          />
+          <AddressInput
+            placeholder="Enter receiving address"
+            label="Send to"
+            recipientConfig={sendConfigs.recipientConfig}
+            memoConfig={sendConfigs.memoConfig}
+            labelStyle={styles.sendlabelInput}
+          />
+          <AmountInput
+            placeholder="ex. 1000 ORAI"
+            label="Amount"
+            amountConfig={sendConfigs.amountConfig}
+            labelStyle={styles.sendlabelInput}
+          />
+          <FeeButtons
+            label="Transaction Fee"
+            gasLabel="gas"
+            feeConfig={sendConfigs.feeConfig}
+            gasConfig={sendConfigs.gasConfig}
+            labelStyle={styles.sendlabelInput}
+          />
+          <MemoInput
+            label="Memo (Optional)"
+            placeholder="Type your memo here"
+            memoConfig={sendConfigs.memoConfig}
+            labelStyle={styles.sendlabelInput}
+          />
+          <TouchableOpacity
+            style={{
+              marginBottom: 24,
+              backgroundColor: colors['purple-900'],
+              borderRadius: 8
+            }}
+            onPress={async () => {
+              if (account.isReadyToSendMsgs && txStateIsValid) {
+                try {
+                  await account.sendToken(
+                    sendConfigs.amountConfig.amount,
+                    sendConfigs.amountConfig.sendCurrency,
+                    sendConfigs.recipientConfig.recipient,
+                    sendConfigs.memoConfig.memo,
+                    sendConfigs.feeConfig.toStdFee(),
+                    {
+                      preferNoSetFee: true,
+                      preferNoSetMemo: true
+                    },
+                    {
+                      onBroadcasted: (txHash) => {
+                        analyticsStore.logEvent('Send token tx broadcasted', {
+                          chainId: chainStore.current.chainId,
+                          chainName: chainStore.current.chainName,
+                          feeType: sendConfigs.feeConfig.feeType
+                        });
+                        smartNavigation.pushSmart('TxPendingResult', {
+                          txHash: Buffer.from(txHash).toString('hex')
+                        });
+                      }
+                    }
+                  );
+                } catch (e) {
+                  if (e?.message === 'Request rejected') {
+                    return;
+                  }
+                  if (
+                    e?.message.includes('Cannot read properties of undefined')
+                  ) {
+                    return;
+                  }
+                  console.log('send error', e);
+                  if (smartNavigation.canGoBack) {
+                    smartNavigation.goBack();
+                  } else {
+                    smartNavigation.navigateSmart('Home', {});
                   }
                 }
-              );
-            } catch (e) {
-              if (e?.message === 'Request rejected') {
-                return;
               }
-              console.log('send error', e);
-              smartNavigation.navigateSmart('Home', {});
-            }
-          }
-        }}
-      />
-      <View style={style.flatten(['height-page-pad', 'margin-bottom-102'])} />
+            }}
+          >
+            <Text
+              style={{
+                color: 'white',
+                textAlign: 'center',
+                fontWeight: '700',
+                fontSize: 16,
+                padding: 16
+              }}
+            >
+              Send
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </PageWithScrollView>
   );
 });

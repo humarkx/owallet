@@ -16,6 +16,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       'Register.Intro': {
         upperScreenName: 'Register'
       },
+      NewUser: {
+        upperScreenName: 'Register.NewUser'
+      },
       'Register.NewUser': {
         upperScreenName: 'Register'
       },
@@ -53,31 +56,40 @@ const { SmartNavigatorProvider, useSmartNavigation } =
         upperScreenName: 'Others'
       },
       Tokens: {
-        upperScreenName: 'Others'
+        upperScreenName: 'Main'
+      },
+      'Tokens.Detail': {
+        upperScreenName: 'Main'
+      },
+      Nfts: {
+        upperScreenName: 'Main'
+      },
+      'Nfts.Detail': {
+        upperScreenName: 'Main'
       },
       Camera: {
-        upperScreenName: 'Others'
-      },
-      ManageWalletConnect: {
         upperScreenName: 'Others'
       },
       'Staking.Dashboard': {
         upperScreenName: 'Others'
       },
       'Validator.Details': {
-        upperScreenName: 'Others'
+        upperScreenName: 'Invest'
       },
       'Validator.List': {
-        upperScreenName: 'Others'
+        upperScreenName: 'Invest'
       },
       Delegate: {
-        upperScreenName: 'Others'
+        upperScreenName: 'Invest'
+      },
+      'Delegate.Detail': {
+        upperScreenName: 'Invest'
       },
       Undelegate: {
-        upperScreenName: 'Others'
+        upperScreenName: 'Invest'
       },
       Redelegate: {
-        upperScreenName: 'Others'
+        upperScreenName: 'Invest'
       },
       Governance: {
         upperScreenName: 'Others'
@@ -87,6 +99,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       },
       Setting: {
         upperScreenName: 'Settings'
+      },
+      Invest: {
+        upperScreenName: 'Invest'
       },
       SettingSelectAccount: {
         upperScreenName: 'Settings'
@@ -118,15 +133,21 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       TxFailedResult: {
         upperScreenName: 'Others'
       },
+      Transactions: {
+        upperScreenName: 'Others'
+      },
+      'Transactions.Detail': {
+        upperScreenName: 'Others'
+      },
       'Web.Intro': {
         upperScreenName: 'Web'
       },
       'Web.dApp': {
         upperScreenName: 'Web'
       },
-      Browser: {
-        upperScreenName: 'Browser'
-      }
+      TransferTokensScreen: {
+        upperScreenName: 'SendNavigation'
+      },
     }).withParams<{
       'Register.NewMnemonic': {
         registerConfig: RegisterConfig;
@@ -188,8 +209,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
         memoConfig?: IMemoConfig;
       };
       AddAddressBook: {
-        chainId: string;
-        addressBookConfig: AddressBookConfig;
+        chainId?: string;
+        addressBookConfig?: AddressBookConfig;
+        recipient?: Object;
       };
       TxPendingResult: {
         chainId?: string;

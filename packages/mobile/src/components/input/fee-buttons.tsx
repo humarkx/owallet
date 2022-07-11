@@ -1,5 +1,12 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { StyleSheet, Text, TextStyle, View, ViewProps } from 'react-native';
+import {
+  StyleSheet,
+  TextStyle,
+  View,
+  ViewProps,
+  ViewStyle
+} from 'react-native';
+import { CText as Text } from '../text';
 import { useStyle } from '../../styles';
 import { observer } from 'mobx-react-lite';
 import { action, makeObservable, observable } from 'mobx';
@@ -14,10 +21,18 @@ import { useStore } from '../../stores';
 import { CoinPretty, PricePretty } from '@owallet/unit';
 import { LoadingSpinner } from '../spinner';
 import { RectButton } from '../rect-button';
-
+import {
+  FastIcon,
+  LowIcon,
+  AverageIcon,
+  LowIconFill,
+  AverageIconFill,
+  FastIconFill
+} from '../icon';
+import { colors, spacing, typography } from '../../themes';
 export interface FeeButtonsProps {
   labelStyle?: TextStyle;
-  containerStyle?: ViewProps;
+  containerStyle?: ViewStyle;
   buttonsContainerStyle?: ViewProps;
   errorLabelStyle?: TextStyle;
 
@@ -51,7 +66,6 @@ export const FeeButtons: FunctionComponent<FeeButtonsProps> = observer(
     // This may be not the good way to handle the states across the components.
     // But, rather than using the context API with boilerplate code, just use the mobx state to simplify the logic.
     const [feeButtonState] = useState(() => new FeeButtonState());
-
     return (
       <React.Fragment>
         {props.feeConfig.feeCurrency ? <FeeButtonsInner {...props} /> : null}
@@ -127,6 +141,58 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
       }
     })();
 
+    const renderIconTypeFee = (
+      label: string,
+      selected?: boolean,
+      size = 16
+    ) => {
+      switch (label) {
+        case 'Slow':
+          return (
+            <View
+              style={{
+                ...styles.containerIcon,
+                backgroundColor: colors['gray-10']
+              }}
+            >
+              <LowIconFill color={'#1E1E1E'} size={size} />
+            </View>
+          );
+        case 'Average':
+          return (
+            <View
+              style={{
+                ...styles.containerIcon,
+                backgroundColor: colors['yellow-10'],
+              }}
+            >
+              <AverageIconFill color={'#1E1E1E'} size={size} />
+            </View>
+          );
+        case 'Fast':
+          return (
+            <View
+              style={{
+                ...styles.containerIcon,
+                backgroundColor: colors['red-10']
+              }}
+            >
+              <FastIconFill color={'#1E1E1E'} size={size} />
+            </View>
+          );
+        default:
+          return (
+            <View
+              style={{
+                ...styles.containerIcon
+              }}
+            >
+              <LowIconFill color={'#1E1E1E'} size={size} />
+            </View>
+          );
+      }
+    };
+
     const renderButton: (
       label: string,
       price: PricePretty | undefined,
@@ -136,54 +202,62 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
     ) => React.ReactElement = (label, price, amount, selected, onPress) => {
       return (
         <RectButton
-          style={style.flatten(
-            [
-              'flex-1',
-              'items-center',
-              'padding-y-14',
-              'background-color-white'
-            ],
-            [selected && 'background-color-primary-50']
-          )}
+          style={{
+            ...styles.containerBtnFee,
+            ...(selected
+              ? {
+                  borderColor: colors['purple-900'],
+                  borderWidth: 1
+                }
+              : {
+                  borderColor: colors['gray-10'],
+                  borderWidth: 1
+                })
+          }}
           rippleColor={style.get('color-primary-100').color}
           onPress={onPress}
         >
-          <Text
-            style={style.flatten(
-              ['h5', 'color-text-black-medium'],
-              [selected && 'color-primary']
-            )}
+          <View
           >
-            {label}
+            {renderIconTypeFee(label)}
+            <Text
+              style={{
+                ...typography.h7,
+                fontWeight: '700'
+              }}
+            >
+              {label}
+            </Text>
+          </View>
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: '700'
+            }}
+          >
+            {amount.maxDecimals(6).trim(true).separator(' ').toString()}
           </Text>
           {price ? (
             <Text
-              style={style.flatten(
-                ['padding-top-2', 'h7', 'color-text-black-medium'],
-                [selected && 'color-primary']
-              )}
+              style={{
+                fontSize: 10.5,
+                color: '#636366',
+                lineHeight: 16
+              }}
             >
               {price.toString()}
             </Text>
           ) : null}
-          <Text
-            style={style.flatten(
-              ['padding-top-2', 'text-caption1', 'color-text-black-low'],
-              [selected && 'color-primary']
-            )}
-          >
-            {amount.maxDecimals(6).trim(true).separator('').toString()}
-          </Text>
         </RectButton>
       );
     };
 
     return (
       <View
-        style={StyleSheet.flatten([
-          style.flatten(['padding-bottom-28']),
-          containerStyle
-        ])}
+        style={{
+          paddingBottom: spacing['28'],
+          ...containerStyle
+        }}
       >
         <Text
           style={StyleSheet.flatten([
@@ -198,20 +272,12 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
           {label}
         </Text>
         <View
-          style={StyleSheet.flatten([
-            style.flatten([
-              'flex-row',
-              'background-color-white',
-              'border-radius-4',
-              'border-width-1',
-              'border-color-border-white',
-              'overflow-hidden'
-            ]),
-            buttonsContainerStyle
-          ])}
+          style={{
+            flexDirection: 'row'
+          }}
         >
           {renderButton(
-            'Low',
+            'Slow',
             lowFeePrice,
             lowFee,
             feeConfig.feeType === 'low',
@@ -219,9 +285,6 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
               feeConfig.setFeeType('low');
             }
           )}
-          <View
-            style={style.flatten(['width-1', 'background-color-border-white'])}
-          />
           {renderButton(
             'Average',
             averageFeePrice,
@@ -231,11 +294,8 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
               feeConfig.setFeeType('average');
             }
           )}
-          <View
-            style={style.flatten(['width-1', 'background-color-border-white'])}
-          />
           {renderButton(
-            'High',
+            'Fast',
             highFeePrice,
             highFee,
             feeConfig.feeType === 'high',
@@ -270,7 +330,7 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
                   'absolute',
                   'text-caption1',
                   'color-error',
-                  'margin-top-2',
+                  'margin-top-6',
                   'margin-left-4'
                 ]),
                 errorLabelStyle
@@ -284,3 +344,22 @@ export const FeeButtonsInner: FunctionComponent<FeeButtonsProps> = observer(
     );
   }
 );
+
+const styles = StyleSheet.create({
+  containerBtnFee: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: spacing['12'],
+    backgroundColor: colors['white'],
+    borderColor: colors['white'],
+    borderRadius: spacing['12'],
+    marginLeft: 5,
+    marginRight: 5
+  },
+  containerIcon: {
+    borderRadius: spacing['8'],
+    padding: spacing['10'],
+    width: 44,
+    alignItems: 'center'
+  }
+});

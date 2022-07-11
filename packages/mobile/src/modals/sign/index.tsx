@@ -1,50 +1,38 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { registerModal } from '../base';
 import { CardModal } from '../card';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
+import { CText as Text } from '../../components/text';
 import { useStyle } from '../../styles';
 import { useStore } from '../../stores';
-import { MemoInput } from '../../components/input';
+import { AmountInput, MemoInput } from '../../components/input';
 import {
   useFeeConfig,
   useGasConfig,
   useMemoConfig,
   useSignDocAmountConfig,
-  useSignDocHelper,
+  useSignDocHelper
 } from '@owallet/hooks';
 import { Button } from '../../components/button';
 import { Msg as AminoMsg } from '@cosmjs/launchpad';
-import { Msg } from './msg';
 import { observer } from 'mobx-react-lite';
 import { useUnmount } from '../../hooks';
 import { FeeInSign } from './fee';
-import { WCMessageRequester } from '../../stores/wallet-connect/msg-requester';
-import { WCAppLogoAndName } from '../../components/wallet-connect';
-import WalletConnect from '@walletconnect/client';
 import { renderAminoMessage } from './amino';
 import { renderDirectMessage } from './direct';
+import { colors } from '../../themes';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 export const SignModal: FunctionComponent<{
   isOpen: boolean;
   close: () => void;
 }> = registerModal(
   observer(() => {
-    const {
-      chainStore,
-      accountStore,
-      queriesStore,
-      walletConnectStore,
-      signInteractionStore,
-    } = useStore();
+    const { chainStore, accountStore, queriesStore, signInteractionStore } =
+      useStore();
     useUnmount(() => {
       signInteractionStore.rejectAll();
     });
-
-    // Check that the request is from the wallet connect.
-    // If this is undefiend, the request is not from the wallet connect.
-    const [wcSession, setWCSession] = useState<
-      WalletConnect['session'] | undefined
-    >();
 
     const style = useStyle();
 
@@ -82,11 +70,6 @@ export const SignModal: FunctionComponent<{
     const [isInternal, setIsInternal] = useState(false);
 
     useEffect(() => {
-      console.log(
-        'signInteractionStore 1',
-        signInteractionStore.waitingEthereumData
-      );
-
       if (signInteractionStore.waitingData) {
         const data = signInteractionStore.waitingData;
         setIsInternal(data.isInternal);
@@ -103,18 +86,6 @@ export const SignModal: FunctionComponent<{
           feeConfig.setFeeType('average');
         }
         setSigner(data.data.signer);
-
-        if (
-          data.data.msgOrigin &&
-          WCMessageRequester.isVirtualSessionURL(data.data.msgOrigin)
-        ) {
-          const sessionId = WCMessageRequester.getSessionIdFromVirtualURL(
-            data.data.msgOrigin
-          );
-          setWCSession(walletConnectStore.getSession(sessionId));
-        } else {
-          setWCSession(undefined);
-        }
       }
 
       if (signInteractionStore.waitingEthereumData) {
@@ -125,9 +96,7 @@ export const SignModal: FunctionComponent<{
       gasConfig,
       memoConfig,
       signDocHelper,
-      signInteractionStore.waitingData,
-      signInteractionStore.waitingEthereumData,
-      walletConnectStore,
+      signInteractionStore.waitingData
     ]);
 
     const mode = signDocHelper.signDocWrapper
@@ -138,6 +107,41 @@ export const SignModal: FunctionComponent<{
         ? signDocHelper.signDocWrapper.aminoSignDoc.msgs
         : signDocHelper.signDocWrapper.protoSignDoc.txMsgs
       : [];
+    const isDisable =
+      signDocWapper == null ||
+      signDocHelper.signDocWrapper == null ||
+      memoConfig.getError() != null ||
+      feeConfig.getError() != null;
+
+    const _onPressApprove = async () => {
+      crashlytics().log('sign - index - _onPressApprove');
+      console.log('on press sign');
+      try {
+        if (signDocHelper.signDocWrapper) {
+          //
+          await signInteractionStore.approveAndWaitEnd(
+            signDocHelper.signDocWrapper
+          );
+        }
+      } catch (error) {
+        crashlytics().recordError(error);
+        console.log(error);
+      }
+    };
+
+    const _onPressReject = () => {
+      crashlytics().log('sign - index - _onPressReject');
+      console.log('on press sign');
+      try {
+        if (signDocHelper.signDocWrapper) {
+          //
+          signInteractionStore.rejectAll();
+        }
+      } catch (error) {
+        crashlytics().recordError(error);
+        console.error(error);
+      }
+    };
 
     const renderedMsgs = (() => {
       if (mode === 'amino') {
@@ -152,32 +156,28 @@ export const SignModal: FunctionComponent<{
 
           return (
             <View key={i.toString()}>
-              <Msg title={title}>
-                {scrollViewHorizontal ? (
-                  <ScrollView horizontal={true}>
-                    <Text
-                      style={style.flatten(['body3', 'color-text-black-low'])}
-                    >
-                      {content}
-                    </Text>
-                  </ScrollView>
-                ) : (
+              {/* <Msg title={title}> */}
+              {scrollViewHorizontal ? (
+                <ScrollView horizontal={true}>
                   <Text
                     style={style.flatten(['body3', 'color-text-black-low'])}
                   >
                     {content}
                   </Text>
-                )}
-              </Msg>
-              {msgs.length - 1 !== i ? (
+                </ScrollView>
+              ) : (
+                <View>{content}</View>
+              )}
+              {/* </Msg> */}
+              {/* {msgs.length - 1 !== i ? (
                 <View
                   style={style.flatten([
                     'height-1',
                     'background-color-border-white',
-                    'margin-x-16',
+                    'margin-x-16'
                   ])}
                 />
-              ) : null}
+              ) : null} */}
             </View>
           );
         });
@@ -191,20 +191,20 @@ export const SignModal: FunctionComponent<{
 
           return (
             <View key={i.toString()}>
-              <Msg title={title}>
-                <Text style={style.flatten(['body3', 'color-text-black-low'])}>
-                  {content}
-                </Text>
-              </Msg>
-              {msgs.length - 1 !== i ? (
+              {content}
+              {/* <Msg title={title}> */}
+              {/* <Text style={style.flatten(['body3', 'color-text-black-low'])}> */}
+              {/* </Text> */}
+              {/* </Msg> */}
+              {/* {msgs.length - 1 !== i ? (
                 <View
                   style={style.flatten([
                     'height-1',
                     'background-color-border-white',
-                    'margin-x-16',
+                    'margin-x-16'
                   ])}
                 />
-              ) : null}
+              ) : null} */}
             </View>
           );
         });
@@ -215,14 +215,8 @@ export const SignModal: FunctionComponent<{
 
     return (
       <CardModal title="Confirm Transaction">
-        {wcSession ? (
-          <WCAppLogoAndName
-            containerStyle={style.flatten(['margin-y-14'])}
-            peerMeta={wcSession.peerMeta}
-          />
-        ) : null}
         <View style={style.flatten(['margin-bottom-16'])}>
-          <Text style={style.flatten(['margin-bottom-3'])}>
+          {/* <Text style={style.flatten(['margin-bottom-3'])}>
             <Text style={style.flatten(['subtitle3', 'color-primary'])}>
               {`${msgs.length.toString()} `}
             </Text>
@@ -231,31 +225,30 @@ export const SignModal: FunctionComponent<{
             >
               Messages
             </Text>
-          </Text>
+          </Text> */}
           <View
             style={style.flatten([
               'border-radius-8',
-              'border-width-1',
-              'border-color-border-white',
-              'overflow-hidden',
+              'border-color-border-white'
+              // 'overflow-hidden'
             ])}
           >
-            <ScrollView
-              style={style.flatten(['max-height-214'])}
-              persistentScrollbar={true}
+            <View
+            // style={style.flatten(['max-height-214'])}
+            // persistentScrollbar={true}
             >
               {renderedMsgs}
-            </ScrollView>
+            </View>
           </View>
         </View>
-        <MemoInput label="Memo" memoConfig={memoConfig} />
+        {/* <MemoInput label="To" memoConfig={memoConfig} /> */}
         <FeeInSign
           feeConfig={feeConfig}
           gasConfig={gasConfig}
           signOptions={signInteractionStore.waitingData?.data.signOptions}
           isInternal={isInternal}
         />
-        <Button
+        {/* <Button
           text="Approve"
           size="large"
           disabled={
@@ -275,14 +268,54 @@ export const SignModal: FunctionComponent<{
               }
             } catch (error) {
               console.log(error);
-            }
+            } */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly'
           }}
-        />
+        >
+          <Button
+            text="Approve"
+            containerStyle={{
+              width: '40%'
+            }}
+            style={{
+              backgroundColor: isDisable
+                ? colors['gray-400']
+                : colors['purple-900']
+            }}
+            textStyle={{
+              color: isDisable ? colors['gray-400'] : colors['white']
+            }}
+            underlayColor={colors['purple-400']}
+            size="large"
+            disabled={isDisable}
+            loading={signInteractionStore.isLoading}
+            onPress={_onPressApprove}
+          />
+          <Button
+            text="Reject"
+            size="large"
+            containerStyle={{
+              width: '40%'
+            }}
+            style={{
+              backgroundColor: colors['red-500']
+            }}
+            textStyle={{
+              color: colors['white']
+            }}
+            underlayColor={colors['danger-400']}
+            loading={signInteractionStore.isLoading}
+            onPress={_onPressReject}
+          />
+        </View>
       </CardModal>
     );
   }),
   {
     disableSafeArea: true,
-    blurBackdropOnIOS: true,
+    blurBackdropOnIOS: true
   }
 );

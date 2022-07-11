@@ -1,15 +1,16 @@
-import React, { FunctionComponent, useMemo, useRef, useState } from "react";
+import React, { FunctionComponent, useMemo, useRef, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
-  Text,
   TextStyle,
   View,
-  ViewStyle,
-} from "react-native";
-import { useStyle } from "../../styles";
-import { registerModal } from "../../modals/base";
-import { RectButton } from "../rect-button";
+  ViewStyle
+} from 'react-native';
+import { CText as Text } from '../text';
+import { useStyle } from '../../styles';
+import { registerModal } from '../../modals/base';
+import { RectButton } from '../rect-button';
+import { colors, spacing, typography } from '../../themes';
 
 export const SelectorModal: FunctionComponent<{
   isOpen: boolean;
@@ -29,7 +30,7 @@ export const SelectorModal: FunctionComponent<{
     selectedKey,
     setSelectedKey,
     maxItemsToShow,
-    modalPersistent,
+    modalPersistent
   }) => {
     const style = useStyle();
 
@@ -37,37 +38,38 @@ export const SelectorModal: FunctionComponent<{
       if (selected) {
         return (
           <View
-            style={style.flatten([
-              "width-24",
-              "height-24",
-              "border-radius-32",
-              "background-color-primary",
-              "items-center",
-              "justify-center",
-            ])}
+            style={{
+              ...styles.ball,
+              backgroundColor: colors['purple-900']
+            }}
           >
             <View
-              style={style.flatten([
-                "width-12",
-                "height-12",
-                "border-radius-32",
-                "background-color-white",
-              ])}
+              style={{
+                height: spacing['12'],
+                width: spacing['12'],
+                borderRadius: spacing['32'],
+                backgroundColor: colors['white']
+              }}
             />
           </View>
         );
       } else {
         return (
           <View
-            style={style.flatten([
-              "width-24",
-              "height-24",
-              "border-radius-32",
-              "background-color-white",
-              "border-width-1",
-              "border-color-text-black-very-low",
-            ])}
-          />
+            style={{
+              ...styles.ball,
+              backgroundColor: colors['gray-100']
+            }}
+          >
+            <View
+              style={{
+                height: spacing['12'],
+                width: spacing['12'],
+                borderRadius: spacing['32'],
+                backgroundColor: colors['white']
+              }}
+            />
+          </View>
         );
       }
     };
@@ -82,7 +84,7 @@ export const SelectorModal: FunctionComponent<{
 
           if (maxItemsToShow) {
             const selectedIndex = items.findIndex(
-              (item) => item.key === selectedKey
+              item => item.key === selectedKey
             );
 
             if (selectedIndex) {
@@ -90,7 +92,7 @@ export const SelectorModal: FunctionComponent<{
 
               scrollViewRef.current.scrollTo({
                 y: selectedIndex * 64 - scrollViewHeight / 2 + 32,
-                animated: false,
+                animated: false
               });
             }
           }
@@ -101,54 +103,58 @@ export const SelectorModal: FunctionComponent<{
     };
 
     return (
-      <View style={style.flatten(["padding-page"])}>
+      <View>
         <View
-          style={style.flatten([
-            "border-radius-8",
-            "overflow-hidden",
-            "background-color-white",
-          ])}
+          style={{
+            borderRadius: spacing['8'],
+            overflow: 'hidden',
+            backgroundColor: colors['white'],
+            paddingVertical: spacing['16']
+          }}
         >
           <ScrollView
             style={{
               maxHeight: maxItemsToShow ? 64 * maxItemsToShow : undefined,
+              paddingHorizontal: spacing['24']
             }}
             ref={scrollViewRef}
             persistentScrollbar={true}
             onLayout={onInit}
           >
-            {items.map((item) => {
+            {items.map(item => {
               return (
-                <RectButton
-                  key={item.key}
-                  style={style.flatten(
-                    [
-                      "height-64",
-                      "padding-left-36",
-                      "padding-right-28",
-                      "flex-row",
-                      "items-center",
-                      "justify-between",
-                    ],
-                    [item.key === selectedKey && "background-color-primary-10"]
-                  )}
-                  onPress={() => {
-                    setSelectedKey(item.key);
-                    if (!modalPersistent) {
-                      close();
-                    }
+                <View
+                  style={{
+                    backgroundColor: colors['gray-100'],
+                    borderRadius: spacing['12'],
+                    marginTop: spacing['8'],
+                    marginBottom: spacing['8'],
+                    paddingHorizontal: spacing['18']
                   }}
                 >
-                  <Text
-                    style={style.flatten([
-                      "subtitle1",
-                      "color-text-black-medium",
-                    ])}
+                  <RectButton
+                    key={item.key}
+                    style={{
+                      height: 64,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                    onPress={() => {
+                      setSelectedKey(item.key);
+                      if (!modalPersistent) {
+                        close();
+                      }
+                    }}
                   >
-                    {item.label}
-                  </Text>
-                  {renderBall(item.key === selectedKey)}
-                </RectButton>
+                    <Text
+                      style={{...styles.label}}
+                    >
+                      {item.label}
+                    </Text>
+                    {renderBall(item.key === selectedKey)}
+                  </RectButton>
+                </View>
               );
             })}
           </ScrollView>
@@ -188,10 +194,10 @@ export const Selector: FunctionComponent<{
   items,
   selectedKey,
   setSelectedKey,
-  modalPersistent,
+  modalPersistent
 }) => {
   const selected = useMemo(() => {
-    return items.find((item) => item.key === selectedKey);
+    return items.find(item => item.key === selectedKey);
   }, [items, selectedKey]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -246,25 +252,25 @@ export const SelectorButtonWithoutModal: FunctionComponent<{
   label,
   placeHolder,
   selected,
-  onPress,
+  onPress
 }) => {
   const style = useStyle();
 
   return (
     <View
       style={StyleSheet.flatten([
-        style.flatten(["padding-bottom-28"]),
-        containerStyle,
+        style.flatten(['padding-bottom-28']),
+        containerStyle
       ])}
     >
       <Text
         style={StyleSheet.flatten([
           style.flatten([
-            "subtitle3",
-            "color-text-black-medium",
-            "margin-bottom-3",
+            'subtitle3',
+            'color-text-black-medium',
+            'margin-bottom-3'
           ]),
-          labelStyle,
+          labelStyle
         ])}
       >
         {label}
@@ -272,29 +278,44 @@ export const SelectorButtonWithoutModal: FunctionComponent<{
       <RectButton
         style={StyleSheet.flatten([
           style.flatten([
-            "background-color-white",
-            "padding-x-11",
-            "padding-y-12",
-            "border-radius-4",
-            "border-width-1",
-            "border-color-border-white",
+            'background-color-white',
+            'padding-x-11',
+            'padding-y-12',
+            'border-radius-4',
+            'border-width-1',
+            'border-color-border-white'
           ]),
-          selectorContainerStyle,
+          selectorContainerStyle
         ])}
         onPress={onPress}
       >
         <Text
           style={StyleSheet.flatten([
             style.flatten(
-              ["body2", "color-text-black-medium", "padding-0"],
-              [!selected && "color-text-black-low"]
+              ['body2', 'color-text-black-medium', 'padding-0'],
+              [!selected && 'color-text-black-low']
             ),
-            textStyle,
+            textStyle
           ])}
         >
-          {selected ? selected.label : placeHolder ?? ""}
+          {selected ? selected.label : placeHolder ?? ''}
         </Text>
       </RectButton>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  ball: {
+    width: spacing['24'],
+    height: spacing['24'],
+    borderRadius: spacing['32'],
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  label: {
+    ...typography.h5,
+    fontWeight: '700',
+    color: colors['gray-900']
+  }
+});
