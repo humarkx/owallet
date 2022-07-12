@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import settle from 'axios/lib/core/settle';
 import AxiosErrorFn from 'axios/lib/core/AxiosError';
