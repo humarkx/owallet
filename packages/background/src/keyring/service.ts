@@ -37,6 +37,7 @@ import { DirectSignResponse, makeSignBytes } from '@cosmjs/proto-signing';
 import { RNG } from '@owallet/crypto';
 import { cosmos } from '@owallet/cosmos';
 import { Buffer } from 'buffer/';
+import { request } from '../tx';
 
 @singleton()
 export class KeyRingService {
@@ -384,27 +385,45 @@ export class KeyRingService {
     const rpc = (await this.chainsService.getChainInfo(chainId)).evmRpc;
 
     // TODO: add UI here so users can change gas, memo & fee
+    const estimatedGasPrice = await request(rpc, 'eth_gasPrice', []);
+    var estimatedGasLimit = '0x30d40';
+    try {
+      estimatedGasLimit = await request(rpc, 'eth_estimateGas', [{
+        ...data,
+        maxFeePerGas: undefined,
+        maxPriorityFeePerGas: undefined
+      }]);
+    } catch (error) {
+      console.log("🚀 ~ file: service.ts ~ line 396 ~ KeyRingService ~ error", error)
+    }
+
+    console.log("🚀 ~ file: service.ts ~ line 389 ~ KeyRingService ~ estimatedGasPrice", estimatedGasPrice)
+    console.log("🚀 ~ file: service.ts ~ line 392 ~ KeyRingService ~ estimatedGasLimit", estimatedGasLimit)
+
     const approveData = (await this.interactionService.waitApprove(
       env,
-      '/sign',
+      '/sign-ethereum',
       'request-sign-ethereum',
       {
         env,
         chainId,
         mode: 'direct',
-        data,
+        data: {
+          ...data,
+          estimatedGasPrice,
+          estimatedGasLimit
+        },
       }
     )) as any;
 
-    console.log(approveData,'zzzzzzzzzzz');
-
-    const { gasPrice, gasLimit, memo } = {
+    const { gasPrice, gasLimit, memo, fees } = {
       gasPrice: approveData.gasPrice ?? '0x0',
       memo: approveData.memo ?? '',
-      gasLimit: 10000000,
+      gasLimit: approveData.gasLimit,
+      fees: approveData.fees,
     };
 
-    const newData = { ...data, gasPrice, gasLimit, memo };
+    const newData = { ...data, gasPrice, gasLimit, memo, fees };
 
     try {
       const rawTxHex = await this.keyRing.signAndBroadcastEthereum(

@@ -60,6 +60,7 @@ import { ExportToMobilePage } from './pages/setting/export-to-mobile';
 import { LogPageViewWrapper } from './components/analytics';
 import { ValidatorListPage } from './pages/stake/validator-list';
 import { IntlProvider } from 'react-intl';
+import { SignEthereumPage } from './pages/sign/sign-ethereum';
 
 const owallet = new OWallet(
   manifest.version,
@@ -266,6 +267,7 @@ ReactDOM.render(
                     component={ValidatorListPage}
                   />
                   <Route path="/sign" component={SignPage} />
+                  <Route path="/sign-ethereum" component={SignEthereumPage} />
                   <Route path="/suggest-chain" component={ChainSuggestedPage} />
                 </LogPageViewWrapper>
               </HashRouter>

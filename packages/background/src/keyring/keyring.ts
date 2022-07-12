@@ -781,116 +781,103 @@ export class KeyRing {
         'latest',
       ]);
 
-      // auto gas
-      const gasPrice = await request(rpc, 'eth_gasPrice', []);
-      var estimatedGas = '0x30d40';
-      try {
-        estimatedGas = await request(rpc, 'eth_estimateGas', [{
-          ...message,
-          gasPrice: gasPrice
-        }]);
-      } catch (error) {
+    let finalMessage: any = {
+      ...message,
+      gas: (message as any).gasLimit,
+      nonce
+    };
 
-      }
-      console.log("🚀 ~ file: keyring.ts ~ line 770 ~ KeyRing ~ estimatedGas", estimatedGas)
-      let finalMessage = { ...message };
-      if (!(message as any).gasPrice || !(message as any).gas) {
-        if (estimatedGas.substring(0, 2) === '0x') {
-          finalMessage = { ...message, gas: estimatedGas, gasPrice };
-        }
-      }
+    console.log("🚀 ~ file: keyring.ts ~ line 790 ~ KeyRing ~ finalMessage", finalMessage)
 
-      finalMessage = { ...finalMessage, nonce };
+    const opts: TransactionOptions = { common: customCommon } as any;
+    const tx = new Transaction(finalMessage, opts);
+    tx.sign(Buffer.from(privKey.toBytes()));
 
-      const opts: TransactionOptions = { common: customCommon } as any;
-      const tx = new Transaction(finalMessage, opts);
-      tx.sign(Buffer.from(privKey.toBytes()));
+    const serializedTx = tx.serialize();
+    const rawTxHex = '0x' + serializedTx.toString('hex');
 
-      const serializedTx = tx.serialize();
-      const rawTxHex = '0x' + serializedTx.toString('hex');
-
-      const response = await request(rpc, 'eth_sendRawTransaction', [rawTxHex]);
-      return response;
-    }
+    const response = await request(rpc, 'eth_sendRawTransaction', [rawTxHex]);
+    return response;
   }
+}
 
   public async signEthereum(
-    chainId: string,
-    defaultCoinType: number,
-    message: Uint8Array
-  ): Promise<Uint8Array> {
-    if (this.status !== KeyRingStatus.UNLOCKED) {
-      throw new Error('Key ring is not unlocked');
-    }
+  chainId: string,
+  defaultCoinType: number,
+  message: Uint8Array
+): Promise < Uint8Array > {
+  if(this.status !== KeyRingStatus.UNLOCKED) {
+  throw new Error('Key ring is not unlocked');
+}
 
-    if (!this.keyStore) {
-      throw new Error('Key Store is empty');
-    }
+if (!this.keyStore) {
+  throw new Error('Key Store is empty');
+}
 
-    if (this.keyStore.type === 'ledger') {
-      // TODO: Ethereum Ledger Integration
-      throw new Error('Ethereum signing with Ledger is not yet supported');
-    } else {
-      const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-      if (coinType !== 60) {
-        throw new Error(
-          'Invalid coin type passed in to Ethereum signing (expected 60)'
-        );
-      }
+if (this.keyStore.type === 'ledger') {
+  // TODO: Ethereum Ledger Integration
+  throw new Error('Ethereum signing with Ledger is not yet supported');
+} else {
+  const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
+  if (coinType !== 60) {
+    throw new Error(
+      'Invalid coin type passed in to Ethereum signing (expected 60)'
+    );
+  }
 
-      const privKey = this.loadPrivKey(coinType);
+  const privKey = this.loadPrivKey(coinType);
 
-      // Use ether js to sign Ethereum tx
-      const ethWallet = new Wallet(privKey.toBytes());
+  // Use ether js to sign Ethereum tx
+  const ethWallet = new Wallet(privKey.toBytes());
 
-      const signature = ethWallet._signingKey().signDigest(keccak256(message));
-      const splitSignature = BytesUtils.splitSignature(signature);
-      return BytesUtils.arrayify(
-        BytesUtils.concat([splitSignature.r, splitSignature.s])
-      );
-    }
+  const signature = ethWallet._signingKey().signDigest(keccak256(message));
+  const splitSignature = BytesUtils.splitSignature(signature);
+  return BytesUtils.arrayify(
+    BytesUtils.concat([splitSignature.r, splitSignature.s])
+  );
+}
   }
 
   public signEthereumTypedData<
-    V extends SignTypedDataVersion,
-    T extends MessageTypes,
-    >({
-      typedMessage,
-      version,
-      chainId,
-      defaultCoinType,
-    }: {
-      typedMessage: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
-      version: V;
-      chainId: string;
-      defaultCoinType: number;
-    }): ECDSASignature {
-    this.validateVersion(version);
-    if (!typedMessage) {
-      throw new Error('Missing data parameter');
-    }
-
-    const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
-    if (coinType !== 60) {
-      throw new Error(
-        'Invalid coin type passed in to Ethereum signing (expected 60)'
-      );
-    }
-
-    const privateKey = this.loadPrivKey(coinType).toBytes();
-
-    const messageHash =
-      version === SignTypedDataVersion.V1
-        ? this._typedSignatureHash(typedMessage as TypedDataV1)
-        : this.eip712Hash(
-          typedMessage as TypedMessage<T>,
-          version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-        );
-    console.log("🚀 ~ file: keyring.ts ~ line 868 ~ KeyRing ~ messageHash", messageHash);
-    const sig = ecsign(messageHash, Buffer.from(privateKey));
-    console.log("🚀 ~ file: keyring.ts ~ line 876 ~ KeyRing ~ sig", sig)
-    return sig;
+  V extends SignTypedDataVersion,
+  T extends MessageTypes,
+>({
+  typedMessage,
+  version,
+  chainId,
+  defaultCoinType,
+}: {
+  typedMessage: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
+  version: V;
+  chainId: string;
+  defaultCoinType: number;
+}): ECDSASignature {
+  this.validateVersion(version);
+  if (!typedMessage) {
+    throw new Error('Missing data parameter');
   }
+
+  const coinType = this.computeKeyStoreCoinType(chainId, defaultCoinType);
+  if (coinType !== 60) {
+    throw new Error(
+      'Invalid coin type passed in to Ethereum signing (expected 60)'
+    );
+  }
+
+  const privateKey = this.loadPrivKey(coinType).toBytes();
+
+  const messageHash =
+    version === SignTypedDataVersion.V1
+      ? this._typedSignatureHash(typedMessage as TypedDataV1)
+      : this.eip712Hash(
+        typedMessage as TypedMessage<T>,
+        version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+      );
+  console.log("🚀 ~ file: keyring.ts ~ line 868 ~ KeyRing ~ messageHash", messageHash);
+  const sig = ecsign(messageHash, Buffer.from(privateKey));
+  console.log("🚀 ~ file: keyring.ts ~ line 876 ~ KeyRing ~ sig", sig)
+  return sig;
+}
 
   /**
   * Generate the "V1" hash for the provided typed message.
@@ -903,602 +890,602 @@ export class KeyRing {
   */
 
   private _typedSignatureHash(typedData: TypedDataV1): Buffer {
-    const error = new Error('Expect argument to be non-empty array');
-    if (
-      typeof typedData !== 'object' ||
-      !('length' in typedData) ||
-      !typedData.length
-    ) {
-      throw error;
-    }
-
-    const data = typedData.map(function (e) {
-      if (e.type !== 'bytes') {
-        return e.value;
-      }
-
-      return typeof e.value === 'string' && !isHexString(e.value)
-        ? Buffer.from(e.value)
-        : toBuffer(e.value);
-    });
-    const types = typedData.map(function (e) {
-      return e.type;
-    });
-    const schema = typedData.map(function (e) {
-      if (!e.name) {
-        throw error;
-      }
-      return `${e.type} ${e.name}`;
-    });
-
-    return soliditySHA3(
-      ['bytes32', 'bytes32'],
-      [
-        soliditySHA3(new Array(typedData.length).fill('string'), schema),
-        soliditySHA3(types, data),
-      ],
-    );
+  const error = new Error('Expect argument to be non-empty array');
+  if (
+    typeof typedData !== 'object' ||
+    !('length' in typedData) ||
+    !typedData.length
+  ) {
+    throw error;
   }
 
-  private eip712Hash<T extends MessageTypes>(
-    typedData: TypedMessage<T>,
-    version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-  ): Buffer {
-    this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+  const data = typedData.map(function (e) {
+    if (e.type !== 'bytes') {
+      return e.value;
+    }
 
-    const sanitizedData = this.sanitizeData(typedData);
-    const parts = [Buffer.from('1901', 'hex')];
+    return typeof e.value === 'string' && !isHexString(e.value)
+      ? Buffer.from(e.value)
+      : toBuffer(e.value);
+  });
+  const types = typedData.map(function (e) {
+    return e.type;
+  });
+  const schema = typedData.map(function (e) {
+    if (!e.name) {
+      throw error;
+    }
+    return `${e.type} ${e.name}`;
+  });
+
+  return soliditySHA3(
+    ['bytes32', 'bytes32'],
+    [
+      soliditySHA3(new Array(typedData.length).fill('string'), schema),
+      soliditySHA3(types, data),
+    ],
+  );
+}
+
+  private eip712Hash<T extends MessageTypes>(
+  typedData: TypedMessage<T>,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+): Buffer {
+  this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+
+  const sanitizedData = this.sanitizeData(typedData);
+  const parts = [Buffer.from('1901', 'hex')];
+  parts.push(
+    this.hashStruct(
+      'EIP712Domain',
+      sanitizedData.domain,
+      sanitizedData.types,
+      version,
+    ),
+  );
+
+  if (sanitizedData.primaryType !== 'EIP712Domain') {
     parts.push(
       this.hashStruct(
-        'EIP712Domain',
-        sanitizedData.domain,
+        // TODO: Validate that this is a string, so this type cast can be removed.
+        sanitizedData.primaryType as string,
+        sanitizedData.message,
         sanitizedData.types,
         version,
       ),
     );
-
-    if (sanitizedData.primaryType !== 'EIP712Domain') {
-      parts.push(
-        this.hashStruct(
-          // TODO: Validate that this is a string, so this type cast can be removed.
-          sanitizedData.primaryType as string,
-          sanitizedData.message,
-          sanitizedData.types,
-          version,
-        ),
-      );
-    }
-    return keccak(Buffer.concat(parts));
   }
+  return keccak(Buffer.concat(parts));
+}
 
   private sanitizeData<T extends MessageTypes>(
-    data: TypedMessage<T>,
-  ): TypedMessage<T> {
-    const sanitizedData: Partial<TypedMessage<T>> = {};
-    for (const key in TYPED_MESSAGE_SCHEMA.properties) {
-      if (data[key]) {
-        sanitizedData[key] = data[key];
-      }
-    }
+  data: TypedMessage<T>,
+): TypedMessage < T > {
+  const sanitizedData: Partial<TypedMessage< T >> = { };
+for (const key in TYPED_MESSAGE_SCHEMA.properties) {
+  if (data[key]) {
+    sanitizedData[key] = data[key];
+  }
+}
 
-    if ('types' in sanitizedData) {
-      sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
-    }
-    return sanitizedData as Required<TypedMessage<T>>;
+if ('types' in sanitizedData) {
+  sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
+}
+return sanitizedData as Required<TypedMessage<T>>;
   }
 
   private hashStruct(
-    primaryType: string,
-    data: Record<string, unknown>,
-    types: Record<string, MessageTypeProperty[]>,
-    version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-  ): Buffer {
-    this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+  primaryType: string,
+  data: Record<string, unknown>,
+  types: Record<string, MessageTypeProperty[]>,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+): Buffer {
+  this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-    return keccak(this.encodeData(primaryType, data, types, version));
-  }
+  return keccak(this.encodeData(primaryType, data, types, version));
+}
 
   private encodeData(
-    primaryType: string,
-    data: Record<string, unknown>,
-    types: Record<string, MessageTypeProperty[]>,
-    version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-  ): Buffer {
-    this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+  primaryType: string,
+  data: Record<string, unknown>,
+  types: Record<string, MessageTypeProperty[]>,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+): Buffer {
+  this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-    const encodedTypes = ['bytes32'];
-    const encodedValues: unknown[] = [this.hashType(primaryType, types)];
+  const encodedTypes = ['bytes32'];
+  const encodedValues: unknown[] = [this.hashType(primaryType, types)];
 
-    for (const field of types[primaryType]) {
-      if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
-        continue;
-      }
-      const [type, value] = this.encodeField(
-        types,
-        field.name,
-        field.type,
-        data[field.name],
-        version,
-      );
-      encodedTypes.push(type);
-      encodedValues.push(value);
+  for (const field of types[primaryType]) {
+    if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
+      continue;
     }
-
-    return rawEncode(encodedTypes, encodedValues);
+    const [type, value] = this.encodeField(
+      types,
+      field.name,
+      field.type,
+      data[field.name],
+      version,
+    );
+    encodedTypes.push(type);
+    encodedValues.push(value);
   }
+
+  return rawEncode(encodedTypes, encodedValues);
+}
 
   private encodeField(
-    types: Record<string, MessageTypeProperty[]>,
-    name: string,
-    type: string,
-    value: any,
-    version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-  ): [type: string, value: any] {
-    this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+  types: Record<string, MessageTypeProperty[]>,
+  name: string,
+  type: string,
+  value: any,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+): [type: string, value: any] {
+  this.validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-    if (types[type] !== undefined) {
-      return [
-        'bytes32',
-        version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
-          ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-          : keccak(this.encodeData(type, value, types, version)),
-      ];
-    }
-
-    if (value === undefined) {
-      throw new Error(`missing value for field ${name} of type ${type}`);
-    }
-
-    if (type === 'bytes') {
-      return ['bytes32', keccak(value)];
-    }
-
-    if (type === 'string') {
-      // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-      if (typeof value === 'string') {
-        value = Buffer.from(value, 'utf8');
-      }
-      return ['bytes32', keccak(value)];
-    }
-
-    if (type.lastIndexOf(']') === type.length - 1) {
-      if (version === SignTypedDataVersion.V3) {
-        throw new Error(
-          'Arrays are unimplemented in encodeData; use V4 extension',
-        );
-      }
-      const parsedType = type.slice(0, type.lastIndexOf('['));
-      const typeValuePairs = value.map((item) =>
-        this.encodeField(types, name, parsedType, item, version),
-      );
-      return [
-        'bytes32',
-        keccak(
-          rawEncode(
-            typeValuePairs.map(([t]) => t),
-            typeValuePairs.map(([, v]) => v),
-          ),
-        ),
-      ];
-    }
-
-    return [type, value];
+  if (types[type] !== undefined) {
+    return [
+      'bytes32',
+      version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
+        ? '0x0000000000000000000000000000000000000000000000000000000000000000'
+        : keccak(this.encodeData(type, value, types, version)),
+    ];
   }
+
+  if (value === undefined) {
+    throw new Error(`missing value for field ${name} of type ${type}`);
+  }
+
+  if (type === 'bytes') {
+    return ['bytes32', keccak(value)];
+  }
+
+  if (type === 'string') {
+    // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+    if (typeof value === 'string') {
+      value = Buffer.from(value, 'utf8');
+    }
+    return ['bytes32', keccak(value)];
+  }
+
+  if (type.lastIndexOf(']') === type.length - 1) {
+    if (version === SignTypedDataVersion.V3) {
+      throw new Error(
+        'Arrays are unimplemented in encodeData; use V4 extension',
+      );
+    }
+    const parsedType = type.slice(0, type.lastIndexOf('['));
+    const typeValuePairs = value.map((item) =>
+      this.encodeField(types, name, parsedType, item, version),
+    );
+    return [
+      'bytes32',
+      keccak(
+        rawEncode(
+          typeValuePairs.map(([t]) => t),
+          typeValuePairs.map(([, v]) => v),
+        ),
+      ),
+    ];
+  }
+
+  return [type, value];
+}
 
   private hashType(
-    primaryType: string,
-    types: Record<string, MessageTypeProperty[]>,
-  ): Buffer {
-    // @ts-ignore
-    return keccak(this.encodeType(primaryType, types));
-  }
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+): Buffer {
+  // @ts-ignore
+  return keccak(this.encodeType(primaryType, types));
+}
 
   private encodeType(
-    primaryType: string,
-    types: Record<string, MessageTypeProperty[]>,
-  ): string {
-    let result = '';
-    const unsortedDeps = this.findTypeDependencies(primaryType, types);
-    unsortedDeps.delete(primaryType);
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+): string {
+  let result = '';
+  const unsortedDeps = this.findTypeDependencies(primaryType, types);
+  unsortedDeps.delete(primaryType);
 
-    const deps = [primaryType, ...Array.from(unsortedDeps).sort()];
-    for (const type of deps) {
-      const children = types[type];
-      if (!children) {
-        throw new Error(`No type definition specified: ${type}`);
-      }
-
-      result += `${type}(${types[type]
-        .map(({ name, type: t }) => `${t} ${name}`)
-        .join(',')})`;
+  const deps = [primaryType, ...Array.from(unsortedDeps).sort()];
+  for (const type of deps) {
+    const children = types[type];
+    if (!children) {
+      throw new Error(`No type definition specified: ${type}`);
     }
 
-    return result;
+    result += `${type}(${types[type]
+      .map(({ name, type: t }) => `${t} ${name}`)
+      .join(',')})`;
   }
 
+  return result;
+}
+
   private findTypeDependencies(
-    primaryType: string,
-    types: Record<string, MessageTypeProperty[]>,
-    results: Set<string> = new Set(),
-  ): Set<string> {
-    [primaryType] = primaryType.match(/^\w*/u);
-    if (results.has(primaryType) || types[primaryType] === undefined) {
-      return results;
-    }
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+  results: Set<string> = new Set(),
+): Set < string > {
+  [primaryType] = primaryType.match(/^\w*/u);
+  if(results.has(primaryType) || types[primaryType] === undefined) {
+  return results;
+}
 
-    results.add(primaryType);
+results.add(primaryType);
 
-    for (const field of types[primaryType]) {
-      this.findTypeDependencies(field.type, types, results);
-    }
-    return results;
+for (const field of types[primaryType]) {
+  this.findTypeDependencies(field.type, types, results);
+}
+return results;
   }
 
   private validateVersion(
-    version: SignTypedDataVersion,
-    allowedVersions?: SignTypedDataVersion[],
-  ) {
-    if (!Object.keys(SignTypedDataVersion).includes(version)) {
-      throw new Error(`Invalid version: '${version}'`);
-    } else if (allowedVersions && !allowedVersions.includes(version)) {
-      throw new Error(
-        `SignTypedDataVersion not allowed: '${version}'. Allowed versions are: ${allowedVersions.join(
-          ', ',
-        )}`,
-      );
-    }
+  version: SignTypedDataVersion,
+  allowedVersions ?: SignTypedDataVersion[],
+) {
+  if (!Object.keys(SignTypedDataVersion).includes(version)) {
+    throw new Error(`Invalid version: '${version}'`);
+  } else if (allowedVersions && !allowedVersions.includes(version)) {
+    throw new Error(
+      `SignTypedDataVersion not allowed: '${version}'. Allowed versions are: ${allowedVersions.join(
+        ', ',
+      )}`,
+    );
   }
+}
 
   // Show private key or mnemonic key if password is valid.
-  public async showKeyRing(index: number, password: string): Promise<string> {
-    if (this.status !== KeyRingStatus.UNLOCKED) {
-      throw new Error('Key ring is not unlocked');
-    }
+  public async showKeyRing(index: number, password: string): Promise < string > {
+  if(this.status !== KeyRingStatus.UNLOCKED) {
+  throw new Error('Key ring is not unlocked');
+}
 
-    if (this.password !== password) {
-      throw new Error('Invalid password');
-    }
+if (this.password !== password) {
+  throw new Error('Invalid password');
+}
 
-    const keyStore = this.multiKeyStore[index];
+const keyStore = this.multiKeyStore[index];
 
-    if (!keyStore) {
-      throw new Error('Empty key store');
-    }
+if (!keyStore) {
+  throw new Error('Empty key store');
+}
 
-    if (keyStore.type === 'mnemonic') {
-      // If password is invalid, error will be thrown.
-      return Buffer.from(
-        await Crypto.decrypt(this.crypto, keyStore, password)
-      ).toString();
-    } else {
-      // If password is invalid, error will be thrown.
-      return Buffer.from(
-        await Crypto.decrypt(this.crypto, keyStore, password)
-      ).toString();
-    }
+if (keyStore.type === 'mnemonic') {
+  // If password is invalid, error will be thrown.
+  return Buffer.from(
+    await Crypto.decrypt(this.crypto, keyStore, password)
+  ).toString();
+} else {
+  // If password is invalid, error will be thrown.
+  return Buffer.from(
+    await Crypto.decrypt(this.crypto, keyStore, password)
+  ).toString();
+}
   }
 
   public get canSetPath(): boolean {
-    return this.type === 'mnemonic' || this.type === 'ledger';
-  }
+  return this.type === 'mnemonic' || this.type === 'ledger';
+}
 
   public async addMnemonicKey(
-    kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-    mnemonic: string,
-    meta: Record<string, string>,
-    bip44HDPath: BIP44HDPath
-  ): Promise<{
-    multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-  }> {
-    if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-      throw new Error('Key ring is locked or not initialized');
-    }
+  kdf: 'scrypt' | 'sha256' | 'pbkdf2',
+  mnemonic: string,
+  meta: Record<string, string>,
+  bip44HDPath: BIP44HDPath
+): Promise < {
+  multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
+} > {
+  if(this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
+  throw new Error('Key ring is locked or not initialized');
+}
 
-    const keyStore = await KeyRing.CreateMnemonicKeyStore(
-      this.rng,
-      this.crypto,
-      kdf,
-      mnemonic,
-      this.password,
-      await this.assignKeyStoreIdMeta(meta),
-      bip44HDPath
-    );
-    this.multiKeyStore.push(keyStore);
+const keyStore = await KeyRing.CreateMnemonicKeyStore(
+  this.rng,
+  this.crypto,
+  kdf,
+  mnemonic,
+  this.password,
+  await this.assignKeyStoreIdMeta(meta),
+  bip44HDPath
+);
+this.multiKeyStore.push(keyStore);
 
-    await this.save();
-    return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
-    };
+await this.save();
+return {
+  multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
+};
   }
 
   public async addPrivateKey(
-    kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-    privateKey: Uint8Array,
-    meta: Record<string, string>
-  ): Promise<{
-    multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-  }> {
-    if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-      throw new Error('Key ring is locked or not initialized');
-    }
+  kdf: 'scrypt' | 'sha256' | 'pbkdf2',
+  privateKey: Uint8Array,
+  meta: Record<string, string>
+): Promise < {
+  multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
+} > {
+  if(this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
+  throw new Error('Key ring is locked or not initialized');
+}
 
-    const keyStore = await KeyRing.CreatePrivateKeyStore(
-      this.rng,
-      this.crypto,
-      kdf,
-      privateKey,
-      this.password,
-      await this.assignKeyStoreIdMeta(meta)
-    );
-    this.multiKeyStore.push(keyStore);
+const keyStore = await KeyRing.CreatePrivateKeyStore(
+  this.rng,
+  this.crypto,
+  kdf,
+  privateKey,
+  this.password,
+  await this.assignKeyStoreIdMeta(meta)
+);
+this.multiKeyStore.push(keyStore);
 
-    await this.save();
-    return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
-    };
+await this.save();
+return {
+  multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
+};
   }
 
   public async addLedgerKey(
-    env: Env,
-    kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-    meta: Record<string, string>,
-    bip44HDPath: BIP44HDPath
-  ): Promise<{
-    multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-  }> {
-    if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-      throw new Error('Key ring is locked or not initialized');
-    }
+  env: Env,
+  kdf: 'scrypt' | 'sha256' | 'pbkdf2',
+  meta: Record<string, string>,
+  bip44HDPath: BIP44HDPath
+): Promise < {
+  multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
+} > {
+  if(this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
+  throw new Error('Key ring is locked or not initialized');
+}
 
-    // Get public key first
-    const publicKey = await this.ledgerKeeper.getPublicKey(env, bip44HDPath);
+// Get public key first
+const publicKey = await this.ledgerKeeper.getPublicKey(env, bip44HDPath);
 
-    const keyStore = await KeyRing.CreateLedgerKeyStore(
-      this.rng,
-      this.crypto,
-      kdf,
-      publicKey,
-      this.password,
-      await this.assignKeyStoreIdMeta(meta),
-      bip44HDPath
-    );
+const keyStore = await KeyRing.CreateLedgerKeyStore(
+  this.rng,
+  this.crypto,
+  kdf,
+  publicKey,
+  this.password,
+  await this.assignKeyStoreIdMeta(meta),
+  bip44HDPath
+);
 
-    this.multiKeyStore.push(keyStore);
+this.multiKeyStore.push(keyStore);
 
-    await this.save();
-    return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
-    };
+await this.save();
+return {
+  multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
+};
   }
 
-  public async changeKeyStoreFromMultiKeyStore(index: number): Promise<{
-    multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
-  }> {
-    if (this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
-      throw new Error('Key ring is locked or not initialized');
-    }
+  public async changeKeyStoreFromMultiKeyStore(index: number): Promise < {
+  multiKeyStoreInfo: MultiKeyStoreInfoWithSelected;
+} > {
+  if(this.status !== KeyRingStatus.UNLOCKED || this.password == '') {
+  throw new Error('Key ring is locked or not initialized');
+}
 
-    const keyStore = this.multiKeyStore[index];
-    if (!keyStore) {
-      throw new Error('Invalid keystore');
-    }
+const keyStore = this.multiKeyStore[index];
+if (!keyStore) {
+  throw new Error('Invalid keystore');
+}
 
-    this.keyStore = keyStore;
+this.keyStore = keyStore;
 
-    await this.unlock(this.password);
+await this.unlock(this.password);
 
-    await this.save();
-    return {
-      multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
-    };
+await this.save();
+return {
+  multiKeyStoreInfo: this.getMultiKeyStoreInfo(),
+};
   }
 
   public getMultiKeyStoreInfo(): MultiKeyStoreInfoWithSelected {
-    const result: MultiKeyStoreInfoWithSelected = [];
+  const result: MultiKeyStoreInfoWithSelected = [];
 
-    for (const keyStore of this.multiKeyStore) {
-      result.push({
-        version: keyStore.version,
-        type: keyStore.type,
-        meta: keyStore.meta,
-        coinTypeForChain: keyStore.coinTypeForChain,
-        bip44HDPath: keyStore.bip44HDPath,
-        selected: this.keyStore
-          ? KeyRing.getKeyStoreId(keyStore) ===
-            KeyRing.getKeyStoreId(this.keyStore)
-          : false,
-      });
-    }
-
-    return result;
-  }
-
-  checkPassword(password: string): boolean {
-    if (!this.password) {
-      throw new Error('Keyring is locked');
-    }
-
-    return this.password === password;
-  }
-
-  async exportKeyRingDatas(password: string): Promise<ExportKeyRingData[]> {
-    if (!this.password) {
-      throw new Error('Keyring is locked');
-    }
-
-    if (this.password !== password) {
-      throw new Error('Invalid password');
-    }
-
-    const result: ExportKeyRingData[] = [];
-
-    for (const keyStore of this.multiKeyStore) {
-      const type = keyStore.type ?? 'mnemonic';
-
-      switch (type) {
-        case 'mnemonic': {
-          const mnemonic = Buffer.from(
-            await Crypto.decrypt(this.crypto, keyStore, password)
-          ).toString();
-
-          result.push({
-            bip44HDPath: keyStore.bip44HDPath ?? {
-              account: 0,
-              change: 0,
-              addressIndex: 0,
-            },
-            coinTypeForChain: keyStore.coinTypeForChain,
-            key: mnemonic,
-            meta: keyStore.meta ?? {},
-            type: 'mnemonic',
-          });
-
-          break;
-        }
-        case 'privateKey': {
-          const privateKey = Buffer.from(
-            await Crypto.decrypt(this.crypto, keyStore, password)
-          ).toString();
-
-          result.push({
-            bip44HDPath: keyStore.bip44HDPath ?? {
-              account: 0,
-              change: 0,
-              addressIndex: 0,
-            },
-            coinTypeForChain: keyStore.coinTypeForChain,
-            key: privateKey,
-            meta: keyStore.meta ?? {},
-            type: 'privateKey',
-          });
-
-          break;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  private static async CreateMnemonicKeyStore(
-    rng: RNG,
-    crypto: CommonCrypto,
-    kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-    mnemonic: string,
-    password: string,
-    meta: Record<string, string>,
-    bip44HDPath: BIP44HDPath
-  ): Promise<KeyStore> {
-    return await Crypto.encrypt(
-      rng,
-      crypto,
-      kdf,
-      'mnemonic',
-      mnemonic,
-      password,
-      meta,
-      bip44HDPath
-    );
-  }
-
-  private static async CreatePrivateKeyStore(
-    rng: RNG,
-    crypto: CommonCrypto,
-    kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-    privateKey: Uint8Array,
-    password: string,
-    meta: Record<string, string>
-  ): Promise<KeyStore> {
-    return await Crypto.encrypt(
-      rng,
-      crypto,
-      kdf,
-      'privateKey',
-      Buffer.from(privateKey).toString('hex'),
-      password,
-      meta
-    );
-  }
-
-  private static async CreateLedgerKeyStore(
-    rng: RNG,
-    crypto: CommonCrypto,
-    kdf: 'scrypt' | 'sha256' | 'pbkdf2',
-    publicKey: Uint8Array,
-    password: string,
-    meta: Record<string, string>,
-    bip44HDPath: BIP44HDPath
-  ): Promise<KeyStore> {
-    return await Crypto.encrypt(
-      rng,
-      crypto,
-      kdf,
-      'ledger',
-      Buffer.from(publicKey).toString('hex'),
-      password,
-      meta,
-      bip44HDPath
-    );
-  }
-
-  private async assignKeyStoreIdMeta(meta: { [key: string]: string }): Promise<{
-    [key: string]: string;
-  }> {
-    // `__id__` is used to distinguish the key store.
-    return Object.assign({}, meta, {
-      __id__: (await this.getIncrementalNumber()).toString(),
+  for (const keyStore of this.multiKeyStore) {
+    result.push({
+      version: keyStore.version,
+      type: keyStore.type,
+      meta: keyStore.meta,
+      coinTypeForChain: keyStore.coinTypeForChain,
+      bip44HDPath: keyStore.bip44HDPath,
+      selected: this.keyStore
+        ? KeyRing.getKeyStoreId(keyStore) ===
+        KeyRing.getKeyStoreId(this.keyStore)
+        : false,
     });
   }
 
-  private static getKeyStoreId(keyStore: KeyStore): string {
-    const id = keyStore.meta?.__id__;
-    if (!id) {
-      throw new Error("Key store's id is empty");
-    }
+  return result;
+}
 
-    return id;
+checkPassword(password: string): boolean {
+  if (!this.password) {
+    throw new Error('Keyring is locked');
   }
+
+  return this.password === password;
+}
+
+  async exportKeyRingDatas(password: string): Promise < ExportKeyRingData[] > {
+  if(!this.password) {
+  throw new Error('Keyring is locked');
+}
+
+if (this.password !== password) {
+  throw new Error('Invalid password');
+}
+
+const result: ExportKeyRingData[] = [];
+
+for (const keyStore of this.multiKeyStore) {
+  const type = keyStore.type ?? 'mnemonic';
+
+  switch (type) {
+    case 'mnemonic': {
+      const mnemonic = Buffer.from(
+        await Crypto.decrypt(this.crypto, keyStore, password)
+      ).toString();
+
+      result.push({
+        bip44HDPath: keyStore.bip44HDPath ?? {
+          account: 0,
+          change: 0,
+          addressIndex: 0,
+        },
+        coinTypeForChain: keyStore.coinTypeForChain,
+        key: mnemonic,
+        meta: keyStore.meta ?? {},
+        type: 'mnemonic',
+      });
+
+      break;
+    }
+    case 'privateKey': {
+      const privateKey = Buffer.from(
+        await Crypto.decrypt(this.crypto, keyStore, password)
+      ).toString();
+
+      result.push({
+        bip44HDPath: keyStore.bip44HDPath ?? {
+          account: 0,
+          change: 0,
+          addressIndex: 0,
+        },
+        coinTypeForChain: keyStore.coinTypeForChain,
+        key: privateKey,
+        meta: keyStore.meta ?? {},
+        type: 'privateKey',
+      });
+
+      break;
+    }
+  }
+}
+
+return result;
+  }
+
+  private static async CreateMnemonicKeyStore(
+  rng: RNG,
+  crypto: CommonCrypto,
+  kdf: 'scrypt' | 'sha256' | 'pbkdf2',
+  mnemonic: string,
+  password: string,
+  meta: Record<string, string>,
+  bip44HDPath: BIP44HDPath
+): Promise < KeyStore > {
+  return await Crypto.encrypt(
+    rng,
+    crypto,
+    kdf,
+    'mnemonic',
+    mnemonic,
+    password,
+    meta,
+    bip44HDPath
+  );
+}
+
+  private static async CreatePrivateKeyStore(
+  rng: RNG,
+  crypto: CommonCrypto,
+  kdf: 'scrypt' | 'sha256' | 'pbkdf2',
+  privateKey: Uint8Array,
+  password: string,
+  meta: Record<string, string>
+): Promise < KeyStore > {
+  return await Crypto.encrypt(
+    rng,
+    crypto,
+    kdf,
+    'privateKey',
+    Buffer.from(privateKey).toString('hex'),
+    password,
+    meta
+  );
+}
+
+  private static async CreateLedgerKeyStore(
+  rng: RNG,
+  crypto: CommonCrypto,
+  kdf: 'scrypt' | 'sha256' | 'pbkdf2',
+  publicKey: Uint8Array,
+  password: string,
+  meta: Record<string, string>,
+  bip44HDPath: BIP44HDPath
+): Promise < KeyStore > {
+  return await Crypto.encrypt(
+    rng,
+    crypto,
+    kdf,
+    'ledger',
+    Buffer.from(publicKey).toString('hex'),
+    password,
+    meta,
+    bip44HDPath
+  );
+}
+
+  private async assignKeyStoreIdMeta(meta: { [key: string]: string }): Promise < {
+  [key: string]: string;
+} > {
+  // `__id__` is used to distinguish the key store.
+  return Object.assign({}, meta, {
+    __id__: (await this.getIncrementalNumber()).toString(),
+  });
+}
+
+  private static getKeyStoreId(keyStore: KeyStore): string {
+  const id = keyStore.meta?.__id__;
+  if (!id) {
+    throw new Error("Key store's id is empty");
+  }
+
+  return id;
+}
 
   private static getKeyStoreBIP44Path(keyStore: KeyStore): BIP44HDPath {
-    if (!keyStore.bip44HDPath) {
-      return {
-        account: 0,
-        change: 0,
-        addressIndex: 0,
-      };
-    }
-    KeyRing.validateBIP44Path(keyStore.bip44HDPath);
-    return keyStore.bip44HDPath;
+  if (!keyStore.bip44HDPath) {
+    return {
+      account: 0,
+      change: 0,
+      addressIndex: 0,
+    };
   }
+  KeyRing.validateBIP44Path(keyStore.bip44HDPath);
+  return keyStore.bip44HDPath;
+}
 
   public static validateBIP44Path(bip44Path: BIP44HDPath): void {
-    if (!Number.isInteger(bip44Path.account) || bip44Path.account < 0) {
-      throw new Error('Invalid account in hd path');
-    }
+  if(!Number.isInteger(bip44Path.account) || bip44Path.account < 0) {
+  throw new Error('Invalid account in hd path');
+}
 
-    if (
-      !Number.isInteger(bip44Path.change) ||
-      !(bip44Path.change === 0 || bip44Path.change === 1)
-    ) {
-      throw new Error('Invalid change in hd path');
-    }
+if (
+  !Number.isInteger(bip44Path.change) ||
+  !(bip44Path.change === 0 || bip44Path.change === 1)
+) {
+  throw new Error('Invalid change in hd path');
+}
 
-    if (
-      !Number.isInteger(bip44Path.addressIndex) ||
-      bip44Path.addressIndex < 0
-    ) {
-      throw new Error('Invalid address index in hd path');
-    }
+if (
+  !Number.isInteger(bip44Path.addressIndex) ||
+  bip44Path.addressIndex < 0
+) {
+  throw new Error('Invalid address index in hd path');
+}
   }
 
-  private async getIncrementalNumber(): Promise<number> {
-    let num = await this.kvStore.get<number>('incrementalNumber');
-    if (num === undefined) {
-      num = 0;
-    }
-    num++;
+  private async getIncrementalNumber(): Promise < number > {
+  let num = await this.kvStore.get<number>('incrementalNumber');
+  if(num === undefined) {
+  num = 0;
+}
+num++;
 
-    await this.kvStore.set('incrementalNumber', num);
-    return num;
+await this.kvStore.set('incrementalNumber', num);
+return num;
   }
 }
