@@ -73,7 +73,12 @@ export const SignPage: FunctionComponent = observer(() => {
   const signDocHelper = useSignDocHelper(feeConfig, memoConfig);
   amountConfig.setSignDocHelper(signDocHelper);
 
+  console.log('REACH SIGN MODAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   useEffect(() => {
+    console.log(
+      '🚀 ~ file: index.tsx ~ line 80 ~ useEffect ~ signInteractionStore.waitingData',
+      signInteractionStore.waitingData
+    );
     if (signInteractionStore.waitingData) {
       const data = signInteractionStore.waitingData;
       chainStore.selectChain(data.data.chainId);
@@ -149,6 +154,12 @@ export const SignPage: FunctionComponent = observer(() => {
     if (!signDocHelper.signDocWrapper) {
       return false;
     }
+
+    console.log(
+      ChainIdHelper.parse(chainStore.current.chainId).identifier,
+      ChainIdHelper.parse(chainStore.selectedChainId).identifier,
+      'CHAIN ID AND SELECTED CHAIN ID!!!!!!!!!!!!!!!!!'
+    );
 
     return (
       ChainIdHelper.parse(chainStore.current.chainId).identifier ===

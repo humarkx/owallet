@@ -386,19 +386,19 @@ export class KeyRingService {
     const rpc = (await this.chainsService.getChainInfo(chainId)).evmRpc;
 
     // TODO: add UI here so users can change gas, memo & fee
-    // const newSignDocBytes = (await this.interactionService.waitApprove(
-    //   env,
-    //   '/sign',
-    //   'request-sign',
-    //   {
-    //     msgOrigin,
-    //     chainId,
-    //     mode: 'direct',
-    //     signDocBytes: cosmos.tx.v1beta1.SignDoc.encode(signDoc).finish(),
-    //     signer,
-    //     signOptions,
-    //   }
-    // )) as Uint8Array;
+    const approveData = (await this.interactionService.waitApprove(
+      env,
+      '/sign',
+      'request-sign-ethereum',
+      {
+        env,
+        chainId,
+        mode: 'direct',
+        data,
+      }
+    )) as any;
+
+    console.log(approveData,'zzzzzzzzzzz');
 
     // TEMP HARDCODE, need to have a pop up here to change gas & fee
     // const newSignDoc = cosmos.tx.v1beta1.SignDoc.decode(newSignDocBytes);
