@@ -1,10 +1,11 @@
-import React, { FunctionComponent, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { SettingItem } from "../components";
-import { useStyle } from "../../../styles";
-import { PasswordInputModal } from "../../../modals/password-input/modal";
-import { useStore } from "../../../stores";
-import { useNavigation } from "@react-navigation/native";
+import React, { FunctionComponent, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { SettingItem } from '../components';
+import { useStyle } from '../../../styles';
+import { PasswordInputModal } from '../../../modals/password-input/modal';
+import { useStore } from '../../../stores';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from '../../../themes';
 
 export const SettingRemoveAccountItem: FunctionComponent<{
   topBorder?: boolean;
@@ -24,16 +25,19 @@ export const SettingRemoveAccountItem: FunctionComponent<{
         onPress={() => {
           setIsOpenModal(true);
         }}
-        containerStyle={style.flatten(["margin-top-16"])}
-        labelStyle={style.flatten(["subtitle1", "color-danger"])}
+        containerStyle={style.flatten(['margin-top-16'])}
+        labelStyle={style.flatten(['subtitle1', 'color-danger'])}
         // style={style.flatten(["justify-center"])}
         topBorder={topBorder}
       />
       <PasswordInputModal
         isOpen={isOpenModal}
         close={() => setIsOpenModal(false)}
-        title="Remove Account"
-        paragraph="Please make sure you have saved the correct mnemonic before logging out"
+        title="Remove wallet"
+        labelStyle={{ color: colors['orange-800'], fontWeight: '700' }}
+        paragraph=""
+        textButtonRight="Remove"
+        buttonRightStyle={{ backgroundColor: colors['orange-800'] }}
         onEnterPassword={async (password) => {
           const index = keyRingStore.multiKeyStoreInfo.findIndex(
             (keyStore) => keyStore.selected
@@ -41,7 +45,7 @@ export const SettingRemoveAccountItem: FunctionComponent<{
 
           if (index >= 0) {
             await keyRingStore.deleteKeyRing(index, password);
-            analyticsStore.logEvent("Account removed");
+            analyticsStore.logEvent('Account removed');
 
             if (keyRingStore.multiKeyStoreInfo.length === 0) {
               await keychainStore.reset();
@@ -50,9 +54,9 @@ export const SettingRemoveAccountItem: FunctionComponent<{
                 index: 0,
                 routes: [
                   {
-                    name: "Unlock",
-                  },
-                ],
+                    name: 'Unlock'
+                  }
+                ]
               });
             }
           }
