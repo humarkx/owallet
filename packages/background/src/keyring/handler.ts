@@ -236,7 +236,7 @@ const handleLockKeyRingMsg: (
 ) => InternalHandler<LockKeyRingMsg> = (service) => {
   return () => {
     return {
-      status: service.lock()
+      status: service.lock(),
     };
   };
 };
@@ -246,7 +246,7 @@ const handleUnlockKeyRingMsg: (
 ) => InternalHandler<UnlockKeyRingMsg> = (service) => {
   return async (_, msg) => {
     return {
-      status: await service.unlock(msg.password)
+      status: await service.unlock(msg.password),
     };
   };
 };
@@ -272,7 +272,7 @@ const handleGetKeyMsg: (
         (await service.chainsService.getChainInfo(msg.chainId)).bech32Config
           .bech32PrefixAccAddr
       ),
-      isNanoLedger: key.isNanoLedger
+      isNanoLedger: key.isNanoLedger,
     };
   };
 };
@@ -339,7 +339,7 @@ const handleRequestSignDirectMsg: (
       chainId: msg.signDoc.chainId,
       accountNumber: msg.signDoc.accountNumber
         ? Long.fromString(msg.signDoc.accountNumber)
-        : undefined
+        : undefined,
     });
 
     const response = await service.requestSignDirect(
@@ -358,9 +358,9 @@ const handleRequestSignDirectMsg: (
         bodyBytes: response.signed.bodyBytes,
         authInfoBytes: response.signed.authInfoBytes,
         chainId: response.signed.chainId,
-        accountNumber: response.signed.accountNumber.toString()
+        accountNumber: response.signed.accountNumber.toString(),
       },
-      signature: response.signature
+      signature: response.signature,
     };
   };
 };
@@ -378,6 +378,15 @@ const handleRequestSignEthereumMsg: (
   service: KeyRingService
 ) => InternalHandler<RequestSignEthereumMsg> = (service) => {
   return async (env, msg) => {
+    // const signDoc = cosmos.tx.v1beta1.SignDoc.create({
+    //   bodyBytes: msg.signDoc.bodyBytes,
+    //   authInfoBytes: msg.signDoc.authInfoBytes,
+    //   chainId: msg.signDoc.chainId,
+    //   accountNumber: msg.signDoc.accountNumber
+    //     ? Long.fromString(msg.signDoc.accountNumber)
+    //     : undefined,
+    // });
+
     await service.permissionService.checkOrGrantBasicAccessPermission(
       env,
       msg.chainId,
@@ -393,6 +402,7 @@ const handleRequestSignEthereumMsg: (
       env,
       msg.chainId,
       msg.data
+      // signDoc
     );
 
     console.log('response sign ethereum msg', response);
@@ -406,7 +416,7 @@ const handleGetMultiKeyStoreInfoMsg: (
 ) => InternalHandler<GetMultiKeyStoreInfoMsg> = (service) => {
   return () => {
     return {
-      multiKeyStoreInfo: service.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: service.getMultiKeyStoreInfo(),
     };
   };
 };

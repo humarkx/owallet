@@ -5,14 +5,14 @@ import {
   Key,
   KeyRing,
   KeyRingStatus,
-  MultiKeyStoreInfoWithSelected
+  MultiKeyStoreInfoWithSelected,
 } from './keyring';
 
 import {
   Bech32Address,
   checkAndValidateADR36AminoSignDoc,
   makeADR36AminoSignDoc,
-  verifyADR36AminoSignDoc
+  verifyADR36AminoSignDoc,
 } from '@owallet/cosmos';
 import { BIP44HDPath, CommonCrypto, ECDSASignature, ExportKeyRingData, MessageTypes, SignEthereumTypedDataObject, SignTypedDataVersion, TypedMessage } from './types';
 
@@ -30,7 +30,7 @@ import {
   serializeSignDoc,
   AminoSignResponse,
   StdSignDoc,
-  StdSignature
+  StdSignature,
 } from '@cosmjs/launchpad';
 import { DirectSignResponse, makeSignBytes } from '@cosmjs/proto-signing';
 
@@ -76,7 +76,7 @@ export class KeyRingService {
     await this.keyRing.restore();
     return {
       status: this.keyRing.status,
-      multiKeyStoreInfo: this.keyRing.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.keyRing.getMultiKeyStoreInfo(),
     };
   }
 
@@ -115,7 +115,7 @@ export class KeyRingService {
       keyStoreChanged = result.keyStoreChanged;
       return {
         multiKeyStoreInfo: result.multiKeyStoreInfo,
-        status: this.keyRing.status
+        status: this.keyRing.status,
       };
     } finally {
       if (keyStoreChanged) {
@@ -136,7 +136,7 @@ export class KeyRingService {
   }> {
     const multiKeyStoreInfo = await this.keyRing.updateNameKeyRing(index, name);
     return {
-      multiKeyStoreInfo
+      multiKeyStoreInfo,
     };
   }
 
@@ -276,7 +276,7 @@ export class KeyRingService {
         signer,
         signOptions,
         isADR36SignDoc,
-        isADR36WithString: signOptions.isADR36WithString
+        isADR36WithString: signOptions.isADR36WithString,
       }
     )) as StdSignDoc;
 
@@ -309,7 +309,7 @@ export class KeyRingService {
 
       return {
         signed: newSignDoc,
-        signature: encodeSecp256k1Signature(key.pubKey, signature)
+        signature: encodeSecp256k1Signature(key.pubKey, signature),
       };
     } finally {
       this.interactionService.dispatchEvent(APP_PORT, 'request-sign-end', {});
@@ -346,15 +346,13 @@ export class KeyRingService {
         mode: 'direct',
         signDocBytes: cosmos.tx.v1beta1.SignDoc.encode(signDoc).finish(),
         signer,
-        signOptions
+        signOptions,
       }
     )) as Uint8Array;
 
     const newSignDoc = cosmos.tx.v1beta1.SignDoc.decode(newSignDocBytes);
 
     try {
-      // it stuck here in ledger
-      console.log('ledger stuck');
       const signature = await this.keyRing.sign(
         env,
         chainId,
@@ -364,7 +362,7 @@ export class KeyRingService {
 
       return {
         signed: newSignDoc,
-        signature: encodeSecp256k1Signature(key.pubKey, signature)
+        signature: encodeSecp256k1Signature(key.pubKey, signature),
       };
     } catch (e) {
       console.log('e', e.message);
@@ -400,25 +398,29 @@ export class KeyRingService {
 
     console.log(approveData,'zzzzzzzzzzz');
 
-    // TEMP HARDCODE, need to have a pop up here to change gas & fee
-    // const newSignDoc = cosmos.tx.v1beta1.SignDoc.decode(newSignDocBytes);
-    // const newData = { ...data };
+    const { gasPrice, gasLimit, memo } = {
+      gasPrice: approveData.gasPrice ?? '0x0',
+      memo: approveData.memo ?? '',
+      gasLimit: 10000000,
+    };
+
+    const newData = { ...data, gasPrice, gasLimit, memo };
 
     try {
-      // it stuck here in ledger
-      // console.log('ledger stuck');
       const rawTxHex = await this.keyRing.signAndBroadcastEthereum(
         chainId,
         coinType,
         rpc,
-        data
+        newData
       );
 
       return rawTxHex;
-    } catch (e) {
-      console.log('e', e.message);
     } finally {
-      this.interactionService.dispatchEvent(APP_PORT, 'request-sign-end', {});
+      this.interactionService.dispatchEvent(
+        APP_PORT,
+        'request-sign-ethereum-end',
+        {}
+      );
     }
   }
 
@@ -589,7 +591,7 @@ export class KeyRingService {
 
       result.push({
         path,
-        bech32Address
+        bech32Address,
       });
     }
 

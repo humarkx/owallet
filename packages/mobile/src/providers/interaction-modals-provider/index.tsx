@@ -3,7 +3,14 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
 import { SignModal } from '../../modals/sign';
 import { LedgerGranterModal } from '../../modals/ledger';
-import { HomeBaseModal } from '../../modals/home-base';
+import { WalletConnectApprovalModal } from '../../modals/wallet-connect-approval';
+import { WCMessageRequester } from '../../stores/wallet-connect/msg-requester';
+import { WCGoBackToBrowserModal } from '../../modals/wc-go-back-to-browser';
+import { BackHandler, Platform } from 'react-native';
+import { LoadingScreenModal } from '../loading-screen/modal';
+import { KeyRingStatus } from '@owallet/background';
+import { SignEthereumModal } from '../../modals/sign/sign-ethereum';
+import { navigationRef } from '../../router/root';
 
 export const InteractionModalsProivder: FunctionComponent = observer(
   ({ children }) => {
@@ -12,12 +19,24 @@ export const InteractionModalsProivder: FunctionComponent = observer(
       ledgerInitStore,
       permissionStore,
       signInteractionStore,
-      modalStore,
+      walletConnectStore,
     } = useStore();
 
-    // Example usage
-    // modalStore.setOpen()
-    // modalStore.setChildren(<Text>33333</Text>)
+    console.log(
+      'signInteractionStore.waitingEthereumData',
+      signInteractionStore.waitingEthereumData
+    );
+
+    console.log(
+      'signInteractionStore.waitingData',
+      signInteractionStore.waitingData
+    );
+
+    useEffect(() => {
+      if (walletConnectStore.needGoBackToBrowser && Platform.OS === 'android') {
+        BackHandler.exitApp();
+      }
+    }, [walletConnectStore.needGoBackToBrowser]);
 
     useEffect(() => {
       for (const data of permissionStore.waitingDatas) {
@@ -43,10 +62,15 @@ export const InteractionModalsProivder: FunctionComponent = observer(
             close={() => signInteractionStore.rejectAll()}
           />
         ) : null}
-        {modalStore.getState ? (
-          <HomeBaseModal isOpen={true} close={() => modalStore.close()} />
+        {signInteractionStore.waitingEthereumData ? (
+          <SignEthereumModal
+            isOpen={true}
+            close={() => {
+              signInteractionStore.rejectAll();
+              navigationRef.current.goBack();
+            }}
+          />
         ) : null}
-
         {children}
       </React.Fragment>
     );
