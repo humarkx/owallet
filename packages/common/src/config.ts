@@ -314,36 +314,38 @@ export const EmbedChainInfos: AppChainInfo[] = [
     },
     features: ['ibc-transfer', 'ibc-go', 'stargate']
   },
-  // {
-  //   rpc: 'https://tendermint-testnet.bignft.app/',
-  //   evmRpc: 'https://endpoint-testnet.bignft.app/',
-  //   rest: 'https://cosmos-testnet.bignft.app/',
-  //   // chainId: '888888',
-  //   chainId: 'balcony_888888-1',
-  //   chainName: 'Balcony Subnet\n(Testnet)',
-  //   stakeCurrency: {
-  //     coinDenom: 'ORAIN',
-  //     coinMinimalDenom: 'orain',
-  //     coinDecimals: 18,
-  //     coinGeckoId: 'orain'
-  //   },
-  //   bip44: {
-  //     coinType: 60
-  //   },
-  //   bech32Config: Bech32Address.defaultBech32Config('orain'),
-  //   get currencies() {
-  //     return [this.stakeCurrency];
-  //   },
-  //   get feeCurrencies() {
-  //     return [this.stakeCurrency];
-  //   },
-  //   gasPriceStep: {
-  //     low: 0,
-  //     average: 0.000025,
-  //     high: 0.00004
-  //   },
-  //   features: ['ibc-transfer', 'ibc-go', 'stargate']
-  // },
+  {
+    rpc: 'https://tendermint-testnet.bignft.app/',
+    evmRpc: 'https://endpoint-testnet.bignft.app/',
+    rest: 'https://cosmos-testnet.bignft.app/',
+    chainId: '888888',
+    networkType: "evm",
+    // chainId: 'balcony_888888-1',
+    coinType: 60,
+    chainName: 'Balcony Subnet\n(Testnet)',
+    stakeCurrency: {
+      coinDenom: 'ORAIN',
+      coinMinimalDenom: 'orain',
+      coinDecimals: 18,
+      coinGeckoId: 'orain'
+    },
+    bip44: {
+      coinType: 60
+    },
+    bech32Config: Bech32Address.defaultBech32Config('orain'),
+    get currencies() {
+      return [this.stakeCurrency];
+    },
+    get feeCurrencies() {
+      return [this.stakeCurrency];
+    },
+    gasPriceStep: {
+      low: 0,
+      average: 0.000025,
+      high: 0.00004
+    },
+    features: ['ibc-transfer', 'ibc-go', 'stargate']
+  },
   {
     rpc: 'https://rpc-cosmoshub.keplr.app',
     rest: 'https://lcd-cosmoshub.keplr.app',
@@ -498,7 +500,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
       name: 'Mintscan',
       txUrl: 'https://www.mintscan.io/juno/txs/{txHash}'
     }
-  }
+  },
 
   {
     rest: "https://data-seed-prebsc-1-s1.binance.org:8545/",
@@ -508,6 +510,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     bip44: {
       coinType: 60,
     },
+    coinType: 60,
     stakeCurrency: {
       coinDenom: "BNB",
       coinMinimalDenom: "bnb",
@@ -586,6 +589,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     bip44: {
       coinType: 60,
     },
+    coinType: 60,
     stakeCurrency: {
       coinDenom: 'BNB',
       coinMinimalDenom: 'bnb',

@@ -36,7 +36,6 @@ export async function request(
     adapter: fetchAdapter
   });
 
-  try {
     const response = await restInstance.post(
       '/',
       {
@@ -52,15 +51,15 @@ export async function request(
         }
       }
     );
+    console.log("🚀 ~ file: service.ts ~ line 48 ~ params", params)
+    console.log("🚀 ~ file: service.ts ~ line 48 ~ method", method)
+    console.log("🚀 ~ file: service.ts ~ line 55 ~ response", response)
     if (response.data.result) return response.data.result;
     if (response.data.error)
       throw new Error(JSON.stringify(response.data.error));
     throw new Error(
       `Unexpected error from the network: ${JSON.stringify(response.data)}`
     );
-  } catch (error) {
-    console.error('error calling request from ethereum provider: ', error);
-  }
 }
 
 @singleton()
@@ -74,7 +73,7 @@ export class BackgroundTxService {
     public readonly permissionService: PermissionService,
     @inject(TYPES.Notification)
     protected readonly notification: Notification
-  ) {}
+  ) { }
 
   async sendTx(
     chainId: string,
@@ -101,24 +100,24 @@ export class BackgroundTxService {
 
     const params = isProtoTx
       ? {
-          tx_bytes: Buffer.from(tx as any).toString('base64'),
-          mode: (() => {
-            switch (mode) {
-              case 'async':
-                return 'BROADCAST_MODE_ASYNC';
-              case 'block':
-                return 'BROADCAST_MODE_BLOCK';
-              case 'sync':
-                return 'BROADCAST_MODE_SYNC';
-              default:
-                return 'BROADCAST_MODE_UNSPECIFIED';
-            }
-          })()
-        }
+        tx_bytes: Buffer.from(tx as any).toString('base64'),
+        mode: (() => {
+          switch (mode) {
+            case 'async':
+              return 'BROADCAST_MODE_ASYNC';
+            case 'block':
+              return 'BROADCAST_MODE_BLOCK';
+            case 'sync':
+              return 'BROADCAST_MODE_SYNC';
+            default:
+              return 'BROADCAST_MODE_UNSPECIFIED';
+          }
+        })()
+      }
       : {
-          tx,
-          mode: mode
-        };
+        tx,
+        mode: mode
+      };
 
     try {
       const result = await restInstance.post(
@@ -161,16 +160,22 @@ export class BackgroundTxService {
 
   async request(chainId: string, method: string, params: any[]): Promise<any> {
     let chainInfo: ChainInfoWithEmbed;
+    console.log('method in request: ', method)
     switch (method) {
       case 'eth_accounts':
       case 'eth_requestAccounts':
+        console.log("🚀 ~ file: service.ts ~ line 163 ~ BackgroundTxService ~ request ~ chainId", chainId)
         chainInfo = await this.chainsService.getChainInfo(chainId);
+        console.log("🚀 ~ file: service.ts ~ line 169 ~ BackgroundTxService ~ request ~ chainInfo", chainInfo)
         if (chainInfo.coinType !== 60) return undefined;
         const chainIdOrCoinType = params.length ? parseInt(params[0]) : chainId; // default is cointype 60 for ethereum based
         const key = await this.keyRingService.getKey(chainIdOrCoinType);
         return [`0x${Buffer.from(key.address).toString('hex')}`];
       case 'wallet_switchEthereumChain' as any:
+        console.log("=================================== sadasdsadsadasdas")
+        console.log("🚀 ~ file: service.ts ~ line 178 ~ BackgroundTxService ~ request ~ params", params[0])
         const { chainId: inputChainId, isEvm } = this.parseChainId(params[0]);
+        console.log("🚀 ~ file: service.ts ~ line 178 ~ BackgroundTxService ~ request ~ inputChainId", inputChainId, isEvm)
         chainInfo = isEvm
           ? await this.chainsService.getChainInfo(inputChainId, 'evm')
           : await this.chainsService.getChainInfo(inputChainId);

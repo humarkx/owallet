@@ -5,7 +5,7 @@ import {
   KeyRingStatus,
   MultiKeyStoreInfoWithSelected
 } from './keyring';
-import { BIP44HDPath, ExportKeyRingData } from './types';
+import { BIP44HDPath, ExportKeyRingData, SignEthereumTypedDataObject } from './types';
 
 import {
   Bech32Address,
@@ -633,6 +633,47 @@ export class RequestSignEthereumMsg extends Message<{
   constructor(
     public readonly chainId: string,
     public readonly data: object // public readonly signOptions: OWalletSignOptions = {}
+  ) {
+    super();
+  }
+
+  validateBasic(): void {
+    if (!this.chainId) {
+      throw new OWalletError('keyring', 270, 'chain id not set');
+    }
+
+    if (!this.data) {
+      throw new OWalletError('keyring', 231, 'dât not set');
+    }
+
+    // if (!this.signOptions) {
+    //   throw new Error('Sign options are null');
+    // }
+  }
+
+  approveExternal(): boolean {
+    return true;
+  }
+
+  route(): string {
+    return ROUTE;
+  }
+
+  type(): string {
+    return RequestSignEthereumMsg.type();
+  }
+}
+
+export class RequestSignEthereumTypedDataMsg extends Message<{
+  readonly result: string; // raw tx signature to broadcast
+}> {
+  public static type() {
+    return 'request-sign-ethereum-typed-data';
+  }
+
+  constructor(
+    public readonly chainId: string,
+    public readonly data: SignEthereumTypedDataObject // public readonly signOptions: OWalletSignOptions = {}
   ) {
     super();
   }

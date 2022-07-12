@@ -14,7 +14,7 @@ import {
   makeADR36AminoSignDoc,
   verifyADR36AminoSignDoc
 } from '@owallet/cosmos';
-import { BIP44HDPath, CommonCrypto, ExportKeyRingData } from './types';
+import { BIP44HDPath, CommonCrypto, ECDSASignature, ExportKeyRingData, MessageTypes, SignEthereumTypedDataObject, SignTypedDataVersion, TypedMessage } from './types';
 
 import { KVStore } from '@owallet/common';
 
@@ -412,6 +412,31 @@ export class KeyRingService {
         coinType,
         rpc,
         data
+      );
+
+      return rawTxHex;
+    } catch (e) {
+      console.log('e', e.message);
+    } finally {
+      this.interactionService.dispatchEvent(APP_PORT, 'request-sign-end', {});
+    }
+  }
+
+  async requestSignEthereumTypedData(
+    env: Env,
+    chainId: string,
+    data: SignEthereumTypedDataObject,
+  ): Promise<ECDSASignature> {
+    console.log(
+      'in request sign ethereum typed data: ',
+      chainId, data.typedMessage, data.version, data.defaultCoinType
+    );
+
+    try {
+      // it stuck here in ledger
+      // console.log('ledger stuck');
+      const rawTxHex = await this.keyRing.signEthereumTypedData(
+        { typedMessage: data.typedMessage, version: data.version, chainId, defaultCoinType: data.defaultCoinType }
       );
 
       return rawTxHex;

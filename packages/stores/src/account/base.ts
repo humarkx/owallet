@@ -1,7 +1,5 @@
-import { Transaction, TransactionOptions } from 'ethereumjs-tx';
-import { Wallet } from '@ethersproject/wallet';
-import Common from '@ethereumjs/common';
-import Web3 from 'web3';
+
+// import Web3 from 'web3';
 import "reflect-metadata";
 import {
   action,
@@ -193,6 +191,13 @@ export class AccountSetBase<MsgOpts, Queries> {
   ): Promise<void> {
 
     await owallet.experimentalSuggestChain(chainInfo.raw);
+  }
+
+  protected async evmSuggestChain(
+    ethereum: Ethereum,
+    chainInfo: ReturnType<ChainGetter['getChain']>
+  ): Promise<void> {
+    await ethereum.experimentalSuggestChain(chainInfo.raw);
   }
 
   private readonly handleInit = () => this.init();
@@ -406,14 +411,11 @@ export class AccountSetBase<MsgOpts, Queries> {
 
     let txHash: string;
 
-    console.log("REACH sendMgs in base!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
     try {
       const result = await this.broadcastEvmMsgs(
         msgs,
       );
       txHash = result.txHash;
-      console.log(txHash, "TXHASH!!!!!!!!!!!!!!!!!!")
     } catch (e: any) {
       runInAction(() => {
         this._isSendingMsg = false;

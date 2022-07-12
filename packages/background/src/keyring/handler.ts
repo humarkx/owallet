@@ -22,12 +22,14 @@ import {
   CheckPasswordMsg,
   ExportKeyRingDatasMsg,
   RequestVerifyADR36AminoSignDoc,
-  RequestSignEthereumMsg
+  RequestSignEthereumMsg,
+  RequestSignEthereumTypedDataMsg
 } from './messages';
 import { KeyRingService } from './service';
 import { Bech32Address, cosmos } from '@owallet/cosmos';
 
 import Long from 'long';
+import { SignEthereumTypedDataObject } from './types';
 
 export const getHandler: (service: KeyRingService) => Handler = (
   service: KeyRingService
@@ -91,6 +93,11 @@ export const getHandler: (service: KeyRingService) => Handler = (
         return handleRequestSignEthereumMsg(service)(
           env,
           msg as RequestSignEthereumMsg
+        );
+      case RequestSignEthereumTypedDataMsg:
+        return handleRequestSignEthereumTypedData(service)(
+          env,
+          msg as RequestSignEthereumTypedDataMsg
         );
       case GetMultiKeyStoreInfoMsg:
         return handleGetMultiKeyStoreInfoMsg(service)(
@@ -356,6 +363,15 @@ const handleRequestSignDirectMsg: (
       signature: response.signature
     };
   };
+};
+
+const handleRequestSignEthereumTypedData: (
+  service: KeyRingService
+) => InternalHandler<RequestSignEthereumTypedDataMsg> = (service) => {
+  return async (env, msg) => {
+    const response = await service.requestSignEthereumTypedData(env, msg.chainId, msg.data)
+    return { result: JSON.stringify(response) };
+  }
 };
 
 const handleRequestSignEthereumMsg: (

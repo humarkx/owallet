@@ -10,6 +10,7 @@ import {
 import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { SecretUtils } from 'secretjs/types/enigmautils';
 import Long from 'long';
+import { SignEthereumTypedDataObject } from '../typedMessage';
 
 export interface Key {
   // Name of the selected key store.
@@ -158,6 +159,8 @@ export interface Ethereum {
   // send(): Promise<void>;
   request(args: RequestArguments): Promise<any>;
   signAndBroadcastEthereum(chainId: string, data: object): Promise<{ rawTxHex: string }>;
+  experimentalSuggestChain(chainInfo: ChainInfo): Promise<void>;
+  signEthereumTypeData(chainId: string, data: SignEthereumTypedDataObject): Promise<void>;
   // asyncRequest(): Promise<void>;
   // getKey(chainId: string): Promise<Key>;
 }

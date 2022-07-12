@@ -25,7 +25,7 @@ InjectedOWallet.startProxy(
 );
 
 InjectedEthereum.startProxy(
-  new Ethereum(manifest.version, 'core', "", new InExtensionMessageRequester())
+  new Ethereum(manifest.version, 'core', "56", new InExtensionMessageRequester())
 );
 
 const router = new ExtensionRouter(ContentScriptEnv.produceEnv);
