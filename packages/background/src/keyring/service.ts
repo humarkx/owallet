@@ -5,16 +5,16 @@ import {
   Key,
   KeyRing,
   KeyRingStatus,
-  MultiKeyStoreInfoWithSelected
+  MultiKeyStoreInfoWithSelected,
 } from './keyring';
 
 import {
   Bech32Address,
   checkAndValidateADR36AminoSignDoc,
   makeADR36AminoSignDoc,
-  verifyADR36AminoSignDoc
+  verifyADR36AminoSignDoc,
 } from '@owallet/cosmos';
-import { BIP44HDPath, CommonCrypto, ExportKeyRingData } from './types';
+import { BIP44HDPath, CommonCrypto, ECDSASignature, ExportKeyRingData, MessageTypes, SignEthereumTypedDataObject, SignTypedDataVersion, TypedMessage } from './types';
 
 import { KVStore } from '@owallet/common';
 
@@ -30,13 +30,14 @@ import {
   serializeSignDoc,
   AminoSignResponse,
   StdSignDoc,
-  StdSignature
+  StdSignature,
 } from '@cosmjs/launchpad';
 import { DirectSignResponse, makeSignBytes } from '@cosmjs/proto-signing';
 
 import { RNG } from '@owallet/crypto';
 import { cosmos } from '@owallet/cosmos';
 import { Buffer } from 'buffer/';
+import { request } from '../tx';
 
 @singleton()
 export class KeyRingService {
@@ -76,7 +77,7 @@ export class KeyRingService {
     await this.keyRing.restore();
     return {
       status: this.keyRing.status,
-      multiKeyStoreInfo: this.keyRing.getMultiKeyStoreInfo()
+      multiKeyStoreInfo: this.keyRing.getMultiKeyStoreInfo(),
     };
   }
 
@@ -115,7 +116,7 @@ export class KeyRingService {
       keyStoreChanged = result.keyStoreChanged;
       return {
         multiKeyStoreInfo: result.multiKeyStoreInfo,
-        status: this.keyRing.status
+        status: this.keyRing.status,
       };
     } finally {
       if (keyStoreChanged) {
@@ -136,7 +137,7 @@ export class KeyRingService {
   }> {
     const multiKeyStoreInfo = await this.keyRing.updateNameKeyRing(index, name);
     return {
-      multiKeyStoreInfo
+      multiKeyStoreInfo,
     };
   }
 
@@ -276,7 +277,7 @@ export class KeyRingService {
         signer,
         signOptions,
         isADR36SignDoc,
-        isADR36WithString: signOptions.isADR36WithString
+        isADR36WithString: signOptions.isADR36WithString,
       }
     )) as StdSignDoc;
 
@@ -309,7 +310,7 @@ export class KeyRingService {
 
       return {
         signed: newSignDoc,
-        signature: encodeSecp256k1Signature(key.pubKey, signature)
+        signature: encodeSecp256k1Signature(key.pubKey, signature),
       };
     } finally {
       this.interactionService.dispatchEvent(APP_PORT, 'request-sign-end', {});
@@ -346,15 +347,13 @@ export class KeyRingService {
         mode: 'direct',
         signDocBytes: cosmos.tx.v1beta1.SignDoc.encode(signDoc).finish(),
         signer,
-        signOptions
+        signOptions,
       }
     )) as Uint8Array;
 
     const newSignDoc = cosmos.tx.v1beta1.SignDoc.decode(newSignDocBytes);
 
     try {
-      // it stuck here in ledger
-      console.log('ledger stuck');
       const signature = await this.keyRing.sign(
         env,
         chainId,
@@ -364,7 +363,7 @@ export class KeyRingService {
 
       return {
         signed: newSignDoc,
-        signature: encodeSecp256k1Signature(key.pubKey, signature)
+        signature: encodeSecp256k1Signature(key.pubKey, signature),
       };
     } catch (e) {
       console.log('e', e.message);
@@ -386,32 +385,79 @@ export class KeyRingService {
     const rpc = (await this.chainsService.getChainInfo(chainId)).evmRpc;
 
     // TODO: add UI here so users can change gas, memo & fee
-    // const newSignDocBytes = (await this.interactionService.waitApprove(
-    //   env,
-    //   '/sign',
-    //   'request-sign',
-    //   {
-    //     msgOrigin,
-    //     chainId,
-    //     mode: 'direct',
-    //     signDocBytes: cosmos.tx.v1beta1.SignDoc.encode(signDoc).finish(),
-    //     signer,
-    //     signOptions,
-    //   }
-    // )) as Uint8Array;
+    const estimatedGasPrice = await request(rpc, 'eth_gasPrice', []);
+    var estimatedGasLimit = '0x30d40';
+    try {
+      estimatedGasLimit = await request(rpc, 'eth_estimateGas', [{
+        ...data,
+        maxFeePerGas: undefined,
+        maxPriorityFeePerGas: undefined
+      }]);
+    } catch (error) {
+      console.log("🚀 ~ file: service.ts ~ line 396 ~ KeyRingService ~ error", error)
+    }
 
-    // TEMP HARDCODE, need to have a pop up here to change gas & fee
-    // const newSignDoc = cosmos.tx.v1beta1.SignDoc.decode(newSignDocBytes);
-    // const newData = { ...data };
+    console.log("🚀 ~ file: service.ts ~ line 389 ~ KeyRingService ~ estimatedGasPrice", estimatedGasPrice)
+    console.log("🚀 ~ file: service.ts ~ line 392 ~ KeyRingService ~ estimatedGasLimit", estimatedGasLimit)
+
+    const approveData = (await this.interactionService.waitApprove(
+      env,
+      '/sign-ethereum',
+      'request-sign-ethereum',
+      {
+        env,
+        chainId,
+        mode: 'direct',
+        data: {
+          ...data,
+          estimatedGasPrice,
+          estimatedGasLimit
+        },
+      }
+    )) as any;
+
+    const { gasPrice, gasLimit, memo, fees } = {
+      gasPrice: approveData.gasPrice ?? '0x0',
+      memo: approveData.memo ?? '',
+      gasLimit: approveData.gasLimit,
+      fees: approveData.fees,
+    };
+
+    const newData = { ...data, gasPrice, gasLimit, memo, fees };
 
     try {
-      // it stuck here in ledger
-      // console.log('ledger stuck');
       const rawTxHex = await this.keyRing.signAndBroadcastEthereum(
         chainId,
         coinType,
         rpc,
-        data
+        newData
+      );
+
+      return rawTxHex;
+    } finally {
+      this.interactionService.dispatchEvent(
+        APP_PORT,
+        'request-sign-ethereum-end',
+        {}
+      );
+    }
+  }
+
+  async requestSignEthereumTypedData(
+    env: Env,
+    chainId: string,
+    data: SignEthereumTypedDataObject,
+  ): Promise<ECDSASignature> {
+    console.log(
+      'in request sign ethereum typed data: ',
+      chainId, data.typedMessage, data.version, data.defaultCoinType
+    );
+
+    try {
+      // it stuck here in ledger
+      // console.log('ledger stuck');
+      const rawTxHex = await this.keyRing.signEthereumTypedData(
+        { typedMessage: data.typedMessage, version: data.version, chainId, defaultCoinType: data.defaultCoinType }
       );
 
       return rawTxHex;
@@ -564,7 +610,7 @@ export class KeyRingService {
 
       result.push({
         path,
-        bech32Address
+        bech32Address,
       });
     }
 

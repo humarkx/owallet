@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import {
   AddressInput,
   FeeButtons,
@@ -54,14 +54,17 @@ export const SendPage: FunctionComponent = observer(() => {
   const current = chainStore.current;
 
   const accountInfo = accountStore.getAccount(current.chainId);
-
+  const accountEthInfo = accountStore.getAccount(current.chainId);
+ 
   const sendConfigs = useSendTxConfig(
     chainStore,
     current.chainId,
     accountInfo.msgOpts.send,
     accountInfo.bech32Address,
     queriesStore.get(current.chainId).queryBalances,
-    EthereumEndpoint
+    EthereumEndpoint,
+    chainStore.current.networkType === "evm" && queriesStore.get(current.chainId).evm.queryEvmBalance,
+    chainStore.current.networkType === "evm" && accountInfo.evmosHexAddress,
   );
 
   useEffect(() => {
@@ -187,7 +190,8 @@ export const SendPage: FunctionComponent = observer(() => {
                 stdFee,
                 {
                   preferNoSetFee: true,
-                  preferNoSetMemo: true
+                  preferNoSetMemo: true,
+                  networkType: chainStore.current.networkType,
                 },
                 {
                   onBroadcasted: () => {
@@ -196,16 +200,40 @@ export const SendPage: FunctionComponent = observer(() => {
                       chainName: chainStore.current.chainName,
                       feeType: sendConfigs.feeConfig.feeType
                     });
+                  },
+                  onFulfill: (tx) => {
+                    console.log(tx,"TX INFO ON SEND PAGE!!!!!!!!!!!!!!!!!!!!!")
+                    notification.push({
+                      placement: 'top-center',
+                      type: tx?.status === "0x1" ? 'success' : 'danger',
+                      duration: 5,
+                      content: tx?.status === "0x1" ? `Transaction successful with tx: ${tx?.transactionHash}`: `Transaction failed with tx: ${tx?.transactionHash}`,
+                      canDelete: true,
+                      transition: {
+                        duration: 0.25
+                      }
+                    });
                   }
                 }
               );
               if (!isDetachedPage) {
                 history.replace('/');
               }
+              notification.push({
+                placement: 'top-center',
+                type: 'success',
+                duration: 5,
+                content: 'Transaction submitted!',
+                canDelete: true,
+                transition: {
+                  duration: 0.25
+                }
+              });
             } catch (e: any) {
               if (!isDetachedPage) {
                 history.replace('/');
               }
+              console.log(e.message,'Catch Error on send!!!')
               notification.push({
                 type: 'warning',
                 placement: 'top-center',

@@ -218,7 +218,7 @@ export const Browser: FunctionComponent<any> = observer(props => {
                 }
               />
             </View>
-            <View
+            {/* <View
               style={style.flatten([
                 'background-color-white',
                 'height-full',
@@ -267,7 +267,7 @@ export const Browser: FunctionComponent<any> = observer(props => {
                   </TouchableOpacity>
                 ))}
               </View>
-            </View>
+            </View> */}
           </View>
         </View>
       </TouchableWithoutFeedback>

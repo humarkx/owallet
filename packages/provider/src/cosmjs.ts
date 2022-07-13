@@ -68,6 +68,7 @@ export class CosmJSOfflineSigner
     signerAddress: string,
     signDoc: cosmos.tx.v1beta1.SignDoc
   ): Promise<DirectSignResponse> {
+    console.log("Sign direct in provider")
     if (this.chainId !== signDoc.chainId) {
       throw new Error('Unmatched chain id with the offline signer');
     }

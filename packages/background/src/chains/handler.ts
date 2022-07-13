@@ -45,7 +45,9 @@ const handleSuggestChainInfoMsg: (
   service: ChainsService
 ) => InternalHandler<SuggestChainInfoMsg> = (service) => {
   return async (env, msg) => {
+    console.log("🚀 ~ file: handler.ts ~ line 49 ~ return ~ msg", msg)
     if (await service.hasChainInfo(msg.chainInfo.chainId)) {
+      // throw new Error("This chain is already registered");
       // If suggested chain info is already registered, just return.
       return;
     }

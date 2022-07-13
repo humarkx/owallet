@@ -7,7 +7,7 @@ import { Card, CardBody } from 'reactstrap';
 import style from './style.module.scss';
 import { Menu } from './menu';
 import { AccountView } from './account';
-import { TxButtonView } from './tx-button';
+import { TxButtonEvmView, TxButtonView } from './tx-button';
 import { AssetView, AssetViewEvm } from './asset';
 import { StakeView } from './stake';
 
@@ -43,14 +43,14 @@ export const MainPage: FunctionComponent = observer(() => {
           if (
             await confirm.confirm({
               paragraph: intl.formatMessage({
-                id: 'main.update-chain.confirm.paragraph'
+                id: 'main.update-chain.confirm.paragraph',
               }),
               yes: intl.formatMessage({
-                id: 'main.update-chain.confirm.yes'
+                id: 'main.update-chain.confirm.yes',
               }),
               no: intl.formatMessage({
-                id: 'main.update-chain.confirm.no'
-              })
+                id: 'main.update-chain.confirm.no',
+              }),
             })
           ) {
             await chainStore.tryUpdateChain(chainStore.current.chainId);
@@ -86,14 +86,14 @@ export const MainPage: FunctionComponent = observer(() => {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            paddingRight: '20px'
+            paddingRight: '20px',
           }}
         >
           <i
             className="fas fa-user"
             style={{
               cursor: 'pointer',
-              padding: '4px'
+              padding: '4px',
             }}
             onClick={(e) => {
               e.preventDefault();
@@ -110,11 +110,16 @@ export const MainPage: FunctionComponent = observer(() => {
           <div className={style.containerAccountInner}>
             <AccountView />
             {chainStore.current.networkType === 'evm' ? (
-              <AssetViewEvm />
+              <>
+                <AssetViewEvm />
+                <TxButtonEvmView />
+              </>
             ) : (
-              <AssetView />
+              <>
+                <AssetView />
+                <TxButtonView />
+              </>
             )}
-            <TxButtonView />
           </div>
         </CardBody>
       </Card>

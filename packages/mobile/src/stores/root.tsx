@@ -20,7 +20,7 @@ import { ChainStore } from './chain';
 import { DeepLinkStore, BrowserStore, browserStore } from './browser';
 import { AppInit, appInit } from './app_init';
 import EventEmitter from 'eventemitter3';
-import { OWallet } from '@owallet/provider';
+import { OWallet, Ethereum } from '@owallet/provider';
 import { KeychainStore } from './keychain';
 import { FeeType } from '@owallet/hooks';
 import {
@@ -153,12 +153,13 @@ export class RootStore {
           suggestChain: false,
           autoInit: true,
           getOWallet: async () => {
-            return new OWallet(
-              version,
-              'core',
-              new RNMessageRequesterInternal()
-            );
-          }
+            // TOOD: Set version for OWallet API
+            return new OWallet(version, "core", new RNMessageRequesterInternal());
+          },
+          getEthereum: async () => {
+            // TOOD: Set version for OWallet API
+            return new Ethereum("", "core", this.chainStore.current.chainId, new RNMessageRequesterInternal());
+          },
         },
         chainOpts: this.chainStore.chainInfos.map(chainInfo => {
           if (chainInfo.chainId.startsWith('osmosis')) {

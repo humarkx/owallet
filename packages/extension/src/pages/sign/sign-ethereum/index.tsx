@@ -1,15 +1,15 @@
 import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { Button } from 'reactstrap';
 
-import { HeaderLayout } from '../../layouts';
+import { HeaderLayout } from '../../../layouts';
 
-import style from './style.module.scss';
+import style from '../style.module.scss';
 
-import { useStore } from '../../stores';
+import { useStore } from '../../../stores';
 
 import classnames from 'classnames';
-import { DataTab } from './data-tab';
-import { DetailsTab } from './details-tab';
+import { EthereumDataTab } from './ethereum-data-tab';
+import { EthereumDetailsTab } from './ethereum-details-tab';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useHistory } from 'react-router';
@@ -20,9 +20,11 @@ import {
   useGasConfig,
   useFeeConfig,
   useMemoConfig,
-  useSignDocAmountConfig
+  useSignDocAmountConfig,
+  useFeeEthereumConfig,
+  useGasEthereumConfig
 } from '@owallet/hooks';
-import { ADR36SignDocDetailsTab } from './adr-36';
+import { ADR36SignDocDetailsTab } from '../adr-36';
 import { ChainIdHelper } from '@owallet/cosmos';
 
 enum Tab {
@@ -30,7 +32,7 @@ enum Tab {
   Data
 }
 
-export const SignPage: FunctionComponent = observer(() => {
+export const SignEthereumPage: FunctionComponent = observer(() => {
   const history = useHistory();
 
   const [tab, setTab] = useState<Tab>(Tab.Details);
@@ -53,90 +55,119 @@ export const SignPage: FunctionComponent = observer(() => {
 
   const current = chainStore.current;
   // Make the gas config with 1 gas initially to prevent the temporary 0 gas error at the beginning.
-  const gasConfig = useGasConfig(chainStore, current.chainId, 1);
-  const amountConfig = useSignDocAmountConfig(
+  const [dataSign, setDataSign] = useState(null);
+  const gasConfig = useGasEthereumConfig(
     chainStore,
     current.chainId,
-    accountStore.getAccount(current.chainId).msgOpts,
-    signer
+    parseInt(dataSign?.data?.data?.data?.estimatedGasLimit, 16)
   );
-  const feeConfig = useFeeConfig(
-    chainStore,
-    current.chainId,
-    signer,
-    queriesStore.get(current.chainId).queryBalances,
-    amountConfig,
-    gasConfig
-  );
+  const feeConfig = useFeeEthereumConfig(chainStore, current.chainId);
+
+  useEffect(() => {
+    gasConfig.setGas(
+      parseInt(dataSign?.data?.data?.data?.estimatedGasLimit, 16)
+    );
+    feeConfig.setFee(
+      parseInt(dataSign?.data?.data?.data?.estimatedGasLimit, 16) * parseInt(dataSign?.data?.data?.data?.estimatedGasPrice, 16)
+    );
+  }, [dataSign]);
+
+  // const amountConfig = useSignDocAmountConfig(
+  //   chainStore,
+  //   current.chainId,
+  //   accountStore.getAccount(current.chainId).msgOpts,
+  //   signer
+  // );
+  // const feeConfig = useFeeConfig(
+  //   chainStore,
+  //   current.chainId,
+  //   signer,
+  //   queriesStore.get(current.chainId).queryBalances,
+  //   amountConfig,
+  //   gasConfig
+  // );
   const memoConfig = useMemoConfig(chainStore, current.chainId);
 
-  const signDocHelper = useSignDocHelper(feeConfig, memoConfig);
-  amountConfig.setSignDocHelper(signDocHelper);
+  // const signDocHelper = useSignDocHelper(feeConfig, memoConfig);
+  // amountConfig.setSignDocHelper(signDocHelper);
 
-  console.log('REACH SIGN MODAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+  // useEffect(() => {
+  //   console.log(
+  //     '🚀 ~ file: index.tsx ~ line 80 ~ useEffect ~ signInteractionStore.waitingData',
+  //     signInteractionStore.waitingData
+  //   );
+  //   if (signInteractionStore.waitingData) {
+  //     const data = signInteractionStore.waitingData;
+  //     chainStore.selectChain(data.data.chainId);
+  //     if (data.data.signDocWrapper.isADR36SignDoc) {
+  //       setIsADR36WithString(data.data.isADR36WithString);
+  //     }
+  //     setOrigin(data.data.msgOrigin);
+  //     if (
+  //       !data.data.signDocWrapper.isADR36SignDoc &&
+  //       data.data.chainId !== data.data.signDocWrapper.chainId
+  //     ) {
+  //       // Validate the requested chain id and the chain id in the sign doc are same.
+  //       // If the sign doc is for ADR-36, there is no chain id in the sign doc, so no need to validate.
+  //       throw new Error('Chain id unmatched');
+  //     }
+  //     signDocHelper.setSignDocWrapper(data.data.signDocWrapper);
+  //     gasConfig.setGas(data.data.signDocWrapper.gas);
+  //     memoConfig.setMemo(data.data.signDocWrapper.memo);
+  //     if (
+  //       data.data.signOptions.preferNoSetFee &&
+  //       data.data.signDocWrapper.fees[0]
+  //     ) {
+  //       feeConfig.setManualFee(data.data.signDocWrapper.fees[0]);
+  //     }
+  //     amountConfig.setDisableBalanceCheck(
+  //       !!data.data.signOptions.disableBalanceCheck
+  //     );
+  //     feeConfig.setDisableBalanceCheck(
+  //       !!data.data.signOptions.disableBalanceCheck
+  //     );
+  //     setSigner(data.data.signer);
+  //   }
+  // }, [
+  //   amountConfig,
+  //   chainStore,
+  //   gasConfig,
+  //   memoConfig,
+  //   feeConfig,
+  //   signDocHelper,
+  //   signInteractionStore.waitingData
+  // ]);
+
   useEffect(() => {
     console.log(
-      '🚀 ~ file: index.tsx ~ line 80 ~ useEffect ~ signInteractionStore.waitingData',
-      signInteractionStore.waitingData
+      '🚀 ~ file: index.tsx ~ line 126 ~ useEffect ~ signInteractionStore.waitingEthereumData',
+      signInteractionStore.waitingEthereumData
     );
-    if (signInteractionStore.waitingData) {
-      const data = signInteractionStore.waitingData;
-      chainStore.selectChain(data.data.chainId);
-      if (data.data.signDocWrapper.isADR36SignDoc) {
-        setIsADR36WithString(data.data.isADR36WithString);
-      }
-      setOrigin(data.data.msgOrigin);
-      if (
-        !data.data.signDocWrapper.isADR36SignDoc &&
-        data.data.chainId !== data.data.signDocWrapper.chainId
-      ) {
-        // Validate the requested chain id and the chain id in the sign doc are same.
-        // If the sign doc is for ADR-36, there is no chain id in the sign doc, so no need to validate.
-        throw new Error('Chain id unmatched');
-      }
-      signDocHelper.setSignDocWrapper(data.data.signDocWrapper);
-      gasConfig.setGas(data.data.signDocWrapper.gas);
-      memoConfig.setMemo(data.data.signDocWrapper.memo);
-      if (
-        data.data.signOptions.preferNoSetFee &&
-        data.data.signDocWrapper.fees[0]
-      ) {
-        feeConfig.setManualFee(data.data.signDocWrapper.fees[0]);
-      }
-      amountConfig.setDisableBalanceCheck(
-        !!data.data.signOptions.disableBalanceCheck
-      );
-      feeConfig.setDisableBalanceCheck(
-        !!data.data.signOptions.disableBalanceCheck
-      );
-      setSigner(data.data.signer);
+    if (signInteractionStore.waitingEthereumData) {
+      setDataSign(signInteractionStore.waitingEthereumData);
     }
-  }, [
-    amountConfig,
-    chainStore,
-    gasConfig,
-    memoConfig,
-    feeConfig,
-    signDocHelper,
-    signInteractionStore.waitingData
-  ]);
+  }, [signInteractionStore.waitingEthereumData]);
 
   // If the preferNoSetFee or preferNoSetMemo in sign options is true,
   // don't show the fee buttons/memo input by default
   // But, the sign options would be removed right after the users click the approve/reject button.
   // Thus, without this state, the fee buttons/memo input would be shown after clicking the approve buttion.
   const [isProcessing, setIsProcessing] = useState(false);
-  const needSetIsProcessing =
-    signInteractionStore.waitingData?.data.signOptions.preferNoSetFee ===
-      true ||
-    signInteractionStore.waitingData?.data.signOptions.preferNoSetMemo === true;
+  // const needSetIsProcessing =
+  //   signInteractionStore.waitingData?.data.signOptions.preferNoSetFee ===
+  //     true ||
+  //   signInteractionStore.waitingData?.data.signOptions.preferNoSetMemo === true;
 
-  const preferNoSetFee =
-    signInteractionStore.waitingData?.data.signOptions.preferNoSetFee ===
-      true || isProcessing;
-  const preferNoSetMemo =
-    signInteractionStore.waitingData?.data.signOptions.preferNoSetMemo ===
-      true || isProcessing;
+  // const preferNoSetFee =
+  //   signInteractionStore.waitingData?.data.signOptions.preferNoSetFee ===
+  //     true || isProcessing;
+  // const preferNoSetMemo =
+  //   signInteractionStore.waitingData?.data.signOptions.preferNoSetMemo ===
+  //     true || isProcessing;
+
+  const needSetIsProcessing = false;
+  const preferNoSetFee = false;
+  const preferNoSetMemo = false;
 
   const interactionInfo = useInteractionInfo(() => {
     if (needSetIsProcessing) {
@@ -151,9 +182,9 @@ export const SignPage: FunctionComponent = observer(() => {
   // The chain store loads the saved chain infos including the suggested chain asynchronously on init.
   // So, it can be different the current chain and the expected selected chain for a moment.
   const isLoaded = useMemo(() => {
-    if (!signDocHelper.signDocWrapper) {
-      return false;
-    }
+    // if (!signDocHelper.signDocWrapper) {
+    //   return false;
+    // }
 
     console.log(
       ChainIdHelper.parse(chainStore.current.chainId).identifier,
@@ -166,7 +197,7 @@ export const SignPage: FunctionComponent = observer(() => {
       ChainIdHelper.parse(chainStore.selectedChainId).identifier
     );
   }, [
-    signDocHelper.signDocWrapper,
+    // signDocHelper.signDocWrapper,
     chainStore.current.chainId,
     chainStore.selectedChainId
   ]);
@@ -178,32 +209,32 @@ export const SignPage: FunctionComponent = observer(() => {
       return '';
     }
 
-    if (
-      signDocHelper.signDocWrapper &&
-      signDocHelper.signDocWrapper.isADR36SignDoc
-    ) {
-      return 'Prove Ownership';
-    }
+    // if (
+    //   signDocHelper.signDocWrapper &&
+    //   signDocHelper.signDocWrapper.isADR36SignDoc
+    // ) {
+    //   return 'Prove Ownership';
+    // }
 
     return undefined;
   })();
 
   const approveIsDisabled = (() => {
-    if (!isLoaded) {
-      return true;
-    }
+    // if (!isLoaded) {
+    //   return true;
+    // }
 
-    if (!signDocHelper.signDocWrapper) {
-      return true;
-    }
+    // if (!signDocHelper.signDocWrapper) {
+    //   return true;
+    // }
 
-    // If the sign doc is for ADR-36,
-    // there is no error related to the fee or memo...
-    if (signDocHelper.signDocWrapper.isADR36SignDoc) {
-      return false;
-    }
+    // // If the sign doc is for ADR-36,
+    // // there is no error related to the fee or memo...
+    // if (signDocHelper.signDocWrapper.isADR36SignDoc) {
+    //   return false;
+    // }
 
-    return memoConfig.getError() != null || feeConfig.getError() != null;
+    return feeConfig.getError() != null;
   })();
 
   return (
@@ -259,19 +290,19 @@ export const SignPage: FunctionComponent = observer(() => {
                 [style.dataTab]: tab === Tab.Data
               })}
             >
-              {tab === Tab.Data ? (
-                <DataTab signDocHelper={signDocHelper} />
-              ) : null}
-              {tab === Tab.Details ? (
-                signDocHelper.signDocWrapper?.isADR36SignDoc ? (
-                  <ADR36SignDocDetailsTab
-                    signDocWrapper={signDocHelper.signDocWrapper}
-                    isADR36WithString={isADR36WithString}
-                    origin={origin}
-                  />
-                ) : (
-                  <DetailsTab
-                    signDocHelper={signDocHelper}
+              {tab === Tab.Data ? <EthereumDataTab data={dataSign} /> : null}
+              {
+                tab === Tab.Details && (
+                  // signDocHelper.signDocWrapper?.isADR36SignDoc ? (
+                  //   <ADR36SignDocDetailsTab
+                  //     signDocWrapper={signDocHelper.signDocWrapper}
+                  //     isADR36WithString={isADR36WithString}
+                  //     origin={origin}
+                  //   />
+                  // ) : (
+                  <EthereumDetailsTab
+                    dataSign={dataSign}
+                    // signDocHelper={signDocHelper}
                     memoConfig={memoConfig}
                     feeConfig={feeConfig}
                     gasConfig={gasConfig}
@@ -283,7 +314,8 @@ export const SignPage: FunctionComponent = observer(() => {
                     preferNoSetMemo={preferNoSetMemo}
                   />
                 )
-              ) : null}
+                // ) : null}
+              }
             </div>
             <div style={{ flex: 1 }} />
             <div className={style.buttons}>
@@ -303,7 +335,7 @@ export const SignPage: FunctionComponent = observer(() => {
                   <Button
                     className={style.button}
                     color="danger"
-                    disabled={signDocHelper.signDocWrapper == null}
+                    // disabled={}
                     data-loading={signInteractionStore.isLoading}
                     onClick={async (e) => {
                       e.preventDefault();
@@ -339,11 +371,18 @@ export const SignPage: FunctionComponent = observer(() => {
                         setIsProcessing(true);
                       }
 
-                      if (signDocHelper.signDocWrapper) {
-                        await signInteractionStore.approveAndWaitEnd(
-                          signDocHelper.signDocWrapper
-                        );
-                      }
+                      // if (signDocHelper.signDocWrapper) {
+                      await signInteractionStore.approveEthereumAndWaitEnd({
+                        gasPrice: `0x${(
+                          parseInt(feeConfig.feeRaw) /
+                          parseInt(gasConfig.gasRaw)
+                        ).toString(16)}`,
+                        gasLimit: `0x${parseInt(gasConfig.gasRaw).toString(
+                          16
+                        )}`,
+                        fees: `0x${parseInt(feeConfig.feeRaw).toString(16)}`
+                      });
+                      // }
 
                       if (
                         interactionInfo.interaction &&

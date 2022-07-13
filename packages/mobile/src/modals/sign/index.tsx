@@ -70,6 +70,11 @@ export const SignModal: FunctionComponent<{
     const [isInternal, setIsInternal] = useState(false);
 
     useEffect(() => {
+      console.log(
+        'signInteractionStore 1',
+        signInteractionStore.waitingEthereumData
+      );
+
       if (signInteractionStore.waitingData) {
         const data = signInteractionStore.waitingData;
         setIsInternal(data.isInternal);
@@ -87,12 +92,18 @@ export const SignModal: FunctionComponent<{
         }
         setSigner(data.data.signer);
       }
+
+      if (signInteractionStore.waitingEthereumData) {
+        const data = signInteractionStore.waitingEthereumData;
+      }
     }, [
       feeConfig,
       gasConfig,
       memoConfig,
       signDocHelper,
-      signInteractionStore.waitingData
+      signInteractionStore.waitingData,
+      signInteractionStore.waitingEthereumData,
+      walletConnectStore,
     ]);
 
     const mode = signDocHelper.signDocWrapper
@@ -244,10 +255,27 @@ export const SignModal: FunctionComponent<{
           signOptions={signInteractionStore.waitingData?.data.signOptions}
           isInternal={isInternal}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-evenly'
+        <Button
+          text="Approve"
+          size="large"
+          disabled={
+            signDocWapper == null ||
+            signDocHelper.signDocWrapper == null ||
+            memoConfig.getError() != null ||
+            feeConfig.getError() != null
+          }
+          loading={signInteractionStore.isLoading}
+          onPress={async () => {
+            console.log('on press sign');
+            try {
+              if (signDocHelper.signDocWrapper) {
+                await signInteractionStore.approveAndWaitEnd(
+                  signDocHelper.signDocWrapper
+                );
+              }
+            } catch (error) {
+              console.log(error);
+            }
           }}
         >
           <Button
