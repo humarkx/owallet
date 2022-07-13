@@ -36,30 +36,30 @@ export async function request(
     adapter: fetchAdapter
   });
 
-    const response = await restInstance.post(
-      '/',
-      {
-        jsonrpc: '2.0',
-        id: 1,
-        method,
-        params
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
+  const response = await restInstance.post(
+    '/',
+    {
+      jsonrpc: '2.0',
+      id: 1,
+      method,
+      params
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       }
-    );
-    console.log("🚀 ~ file: service.ts ~ line 48 ~ params", params)
-    console.log("🚀 ~ file: service.ts ~ line 48 ~ method", method)
-    console.log("🚀 ~ file: service.ts ~ line 55 ~ response", response)
-    if (response.data.result) return response.data.result;
-    if (response.data.error)
-      throw new Error(JSON.stringify(response.data.error));
-    throw new Error(
-      `Unexpected error from the network: ${JSON.stringify(response.data)}`
-    );
+    }
+  );
+  console.log("🚀 ~ file: service.ts ~ line 48 ~ params", params)
+  console.log("🚀 ~ file: service.ts ~ line 48 ~ method", method)
+  console.log("🚀 ~ file: service.ts ~ line 55 ~ response", response)
+  if (response.data.result) return response.data.result;
+  if (response.data.error)
+    throw new Error(JSON.stringify(response.data.error));
+  throw new Error(
+    `Unexpected error from the network: ${JSON.stringify(response.data)}`
+  );
 }
 
 @singleton()
@@ -154,7 +154,7 @@ export class BackgroundTxService {
     if (!chainId)
       throw new Error('Invalid empty chain id when switching Ethereum chain');
     if (chainId.substring(0, 2) === '0x')
-      return { chainId: parseInt(chainId, 16).toString(), isEvm: true };
+      return { chainId: chainId, isEvm: true };
     return { chainId, isEvm: false };
   }
 
@@ -164,21 +164,20 @@ export class BackgroundTxService {
     switch (method) {
       case 'eth_accounts':
       case 'eth_requestAccounts':
-        console.log("🚀 ~ file: service.ts ~ line 163 ~ BackgroundTxService ~ request ~ chainId", chainId)
         chainInfo = await this.chainsService.getChainInfo(chainId);
-        console.log("🚀 ~ file: service.ts ~ line 169 ~ BackgroundTxService ~ request ~ chainInfo", chainInfo)
         if (chainInfo.coinType !== 60) return undefined;
         const chainIdOrCoinType = params.length ? parseInt(params[0]) : chainId; // default is cointype 60 for ethereum based
         const key = await this.keyRingService.getKey(chainIdOrCoinType);
         return [`0x${Buffer.from(key.address).toString('hex')}`];
       case 'wallet_switchEthereumChain' as any:
-        console.log("=================================== sadasdsadsadasdas")
         console.log("🚀 ~ file: service.ts ~ line 178 ~ BackgroundTxService ~ request ~ params", params[0])
         const { chainId: inputChainId, isEvm } = this.parseChainId(params[0]);
         console.log("🚀 ~ file: service.ts ~ line 178 ~ BackgroundTxService ~ request ~ inputChainId", inputChainId, isEvm)
         chainInfo = isEvm
           ? await this.chainsService.getChainInfo(inputChainId, 'evm')
           : await this.chainsService.getChainInfo(inputChainId);
+        console.log("🚀 ~ file: service.ts ~ line 180 ~ BackgroundTxService ~ request ~ chainInfo", chainInfo)
+
         return chainInfo.chainId;
       default:
         chainInfo = await this.chainsService.getChainInfo(chainId);

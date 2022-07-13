@@ -318,7 +318,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     rpc: 'https://tendermint-testnet.bignft.app/',
     evmRpc: 'https://endpoint-testnet.bignft.app/',
     rest: 'https://cosmos-testnet.bignft.app/',
-    chainId: '888888',
+    chainId: '0xd9038',
     networkType: "evm",
     // chainId: 'balcony_888888-1',
     coinType: 60,

@@ -125,8 +125,8 @@ export class PermissionService {
   ) {
     for (const chainId of chainIds) {
       // Make sure that the chain info is registered.
-      const parsedChainId = this.parseChainId({ chainId }).chainId
-      await this.chainsService.getChainInfo(parsedChainId);
+      // const parsedChainId = this.parseChainId({ chainId }).chainId
+      await this.chainsService.getChainInfo(chainId);
     }
 
     await this.grantPermission(
@@ -155,8 +155,8 @@ export class PermissionService {
   ) {
     for (const chainId of chainIds) {
       // Make sure that the chain info is registered.
-      const parsedChainId = this.parseChainId({ chainId }).chainId
-      await this.chainsService.getChainInfo(parsedChainId);
+      // const parsedChainId = this.parseChainId({ chainId }).chainId
+      await this.chainsService.getChainInfo(chainId);
 
       this.checkPermission(
         env,

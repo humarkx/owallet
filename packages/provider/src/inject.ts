@@ -554,6 +554,7 @@ export class InjectedEthereum implements Ethereum {
               params: message.args[0],
               chainId
             });
+            result = this.chainId;
             break;
           case 'eth_getTransactionReceipt' as any:
             try {
