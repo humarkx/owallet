@@ -71,7 +71,7 @@ export const TransactionItem: FunctionComponent<TransactionItemProps> = ({
               ...styles.textAmount,
               marginTop: spacing['8'],
               textTransform: 'uppercase',
-              color: amount.includes('-')
+              color: amount?.includes?.('-')
                 ? colors['red-500']
                 : colors['green-500']
             }}
