@@ -554,7 +554,18 @@ export class InjectedEthereum implements Ethereum {
               params: message.args[0],
               chainId
             });
-            console.log(this.chainId, chainId, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            break;
+          case 'eth_getTransactionReceipt' as any:
+            try {
+              result = await ethereum.request({
+                method: message.method as string,
+                params: message.args[0],
+                chainId
+              });
+            } catch (error) {
+              // Will catch here if receipt is not ready yet
+              console.log("Error on getting receipt: ", error);
+            }
             break;
           default:
             result = await ethereum.request({
