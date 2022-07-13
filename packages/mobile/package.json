@@ -21,8 +21,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "jest --detectOpenHandles",
     "postinstall": "patch-package && cd ../../ && yarn patch-package",
-    "code-push-ios": "appcenter codepush release-react -a Oraichain/Owallet -t 0.0.5 --output-dir build",
-    "code-push-android": "appcenter codepush release-react -a Oraichain/Owallet-1 -t 1.0.1 --output-dir build"
+    "code-push-ios": "appcenter codepush release-react -a Oraichain/Owallet -t 0.0.6 --output-dir build",
+    "code-push-android": "appcenter codepush release-react -a Oraichain/Owallet-1 -t 1.0.2 --output-dir build"
   },
   "dependencies": {
     "@amplitude/react-native": "^2.7.0",
@@ -62,6 +62,7 @@
     "@react-navigation/stack": "^5.14.3",
     "@rneui/base": "^4.0.0-rc.4",
     "@rneui/themed": "^4.0.0-rc.4",
+    "@umijs/hooks": "^1.9.3",
     "appcenter": "^4.1.0",
     "appcenter-analytics": "^4.1.0",
     "bip39": "^3.0.4",

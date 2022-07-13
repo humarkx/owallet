@@ -37,6 +37,8 @@ const bindStyleTxInfo = (
   switch (label) {
     case 'Transaction hash':
       return { color: colors['purple-700'], textTransform: 'uppercase' };
+    case 'Fee':
+      return { color: colors['purple-700'], textTransform: 'uppercase' };
     case 'Amount':
       return value.includes('-')
         ? {
@@ -70,8 +72,9 @@ const InfoItems: FunctionComponent<{
   label: string;
   value: string;
   topBorder?: boolean;
+  title?: string;
   onPress?: () => void;
-}> = ({ label, value, topBorder }) => {
+}> = ({ label, value, topBorder, title }) => {
   const style = useStyle();
   const { isTimedOut, setTimer } = useSimpleTimer();
   const renderChildren = () => {
@@ -92,12 +95,18 @@ const InfoItems: FunctionComponent<{
           </Text>
           <Text
             style={{
-              ...bindStyleTxInfo(label, value),
+              ...bindStyleTxInfo(
+                label,
+                (title === 'Received Token' ? '+' : '-') + value
+              ),
               marginTop: spacing['2'],
               ...typography.body2
             }}
           >
-            {bindValueTxInfo(label, value)}
+            {label !== 'Amount'
+              ? bindValueTxInfo(label, value)
+              : (title === 'Received Token' ? '+' : '-') +
+                bindValueTxInfo(label, value)}
           </Text>
         </View>
         {label !== 'Amount' && (
@@ -261,7 +270,7 @@ export const TransactionDetail: FunctionComponent<any> = () => {
     },
     {
       label: 'Amount',
-      value: `${convertAmount(amount)} ${denom.toUpperCase()}`
+      value: `${convertAmount(amount)} ${denom}`
     }
   ];
 
@@ -307,6 +316,7 @@ export const TransactionDetail: FunctionComponent<any> = () => {
             label={item.label}
             topBorder={true}
             value={item.value}
+            title={title}
           />
         ))}
       </View>

@@ -8,7 +8,7 @@ import { useSmartNavigation } from '../../navigation.provider';
 import { useStore } from '../../stores';
 import { API } from '../../common/api';
 import crashlytics from '@react-native-firebase/crashlytics';
-
+import { NewsTab } from './news';
 export const Transactions: FunctionComponent = () => {
   const { chainStore, accountStore } = useStore();
   const account = accountStore.getAccount(chainStore.current.chainId);
@@ -21,12 +21,14 @@ export const Transactions: FunctionComponent = () => {
   const fetchData = async (isLoadMore = false) => {
     crashlytics().log('transactions - home - fetchData');
     const isRecipient = indexChildren === 2;
+    const isAll = indexChildren === 0;
     try {
       const res = await API.getHistory(
         {
           address: account.bech32Address,
           offset: 0,
-          isRecipient
+          isRecipient,
+          isAll
         },
         { baseURL: chainStore.current.rest }
       );
@@ -57,7 +59,14 @@ export const Transactions: FunctionComponent = () => {
         address={account.bech32Address}
         item={item}
         key={index}
-        onPress={() => smartNavigation.navigateSmart('Transactions.Detail', {})}
+        onPress={() =>
+          smartNavigation.navigateSmart('Transactions.Detail', {
+            item: {
+              ...item,
+              address: account.bech32Address
+            }
+          })
+        }
         containerStyle={{
           backgroundColor: colors['gray-10']
         }} // customize item transaction
@@ -110,78 +119,84 @@ export const Transactions: FunctionComponent = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <View
-        style={{
-          backgroundColor: colors['white'],
-          borderRadius: spacing['24']
-        }}
-      >
+      {indexParent == 0 && (
         <View
           style={{
-            marginTop: spacing['12'],
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center'
+            backgroundColor: colors['white'],
+            borderRadius: spacing['24']
           }}
         >
-          {['All', 'Transfer', 'Receive'].map((title: string, i: number) => (
-            <TouchableOpacity
-              key={i}
-              style={{
-                ...styles.tabSelected,
-                width: (metrics.screenWidth - 60) / 3,
-                alignItems: 'center',
-                paddingVertical: spacing['12']
-              }}
-              onPress={() => {
-                setIndexChildren(i);
-              }}
-            >
-              <Text
+          <View
+            style={{
+              marginTop: spacing['12'],
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            {['All', 'Transfer', 'Receive'].map((title: string, i: number) => (
+              <TouchableOpacity
+                key={i}
                 style={{
-                  fontSize: 16,
-                  fontWeight: '700',
-                  color:
-                    indexChildren === i
-                      ? colors['gray-900']
-                      : colors['gray-300']
+                  ...styles.tabSelected,
+                  width: (metrics.screenWidth - 60) / 3,
+                  alignItems: 'center',
+                  paddingVertical: spacing['12']
+                }}
+                onPress={() => {
+                  setIndexChildren(i);
                 }}
               >
-                {title}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <TransactionSectionTitle
-          title={'Transfer list'}
-          containerStyle={{
-            paddingTop: spacing['4']
-          }}
-        />
-        <View style={styles.transactionList}>
-          <FlatList
-            contentContainerStyle={{ flexGrow: 1 }}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={_keyExtract}
-            data={data}
-            renderItem={_renderItem}
-            ListFooterComponent={<View style={{ height: spacing['12'] }} />}
-            ListEmptyComponent={
-              <View style={styles.transactionListEmpty}>
                 <Text
                   style={{
-                    ...typography.subtitle1,
-                    color: colors['gray-300'],
-                    marginTop: spacing['8']
+                    fontSize: 16,
+                    fontWeight: '700',
+                    color:
+                      indexChildren === i
+                        ? colors['gray-900']
+                        : colors['gray-300']
                   }}
                 >
-                  {'Not found transaction'}
+                  {title}
                 </Text>
-              </View>
-            }
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TransactionSectionTitle
+            title={'Transfer list'}
+            containerStyle={{
+              paddingTop: spacing['4']
+            }}
+            onPress={() => {
+              fetchData();
+            }}
           />
+          <View style={styles.transactionList}>
+            <FlatList
+              contentContainerStyle={{ flexGrow: 1 }}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={_keyExtract}
+              data={data}
+              renderItem={_renderItem}
+              ListFooterComponent={<View style={{ height: spacing['12'] }} />}
+              ListEmptyComponent={
+                <View style={styles.transactionListEmpty}>
+                  <Text
+                    style={{
+                      ...typography.subtitle1,
+                      color: colors['gray-300'],
+                      marginTop: spacing['8']
+                    }}
+                  >
+                    {'Not found transaction'}
+                  </Text>
+                </View>
+              }
+            />
+          </View>
         </View>
-      </View>
+      )}
+      {indexParent == 1 && <NewsTab />}
     </View>
   );
 };

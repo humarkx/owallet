@@ -33,6 +33,25 @@ export const TransactionItem: FunctionComponent<TransactionItemProps> = ({
     logs: item.logs
   });
 
+  const amountDataCell = (amount: any, denom: string, title: string) => {
+    return (
+      <Text
+        style={{
+          ...styles.textAmount,
+          marginTop: spacing['8'],
+          textTransform: 'uppercase',
+          color:
+            amount == 0 || title === 'Received Token'
+              ? colors['green-500']
+              : colors['red-500']
+        }}
+      >
+        {amount == 0 || title === 'Received Token' ? '+' : '-'}
+        {amount} {denom}
+      </Text>
+    );
+  };
+
   const renderChildren = () => {
     return (
       <View
@@ -66,18 +85,7 @@ export const TransactionItem: FunctionComponent<TransactionItemProps> = ({
           >
             {date}
           </Text>
-          <Text
-            style={{
-              ...styles.textAmount,
-              marginTop: spacing['8'],
-              textTransform: 'uppercase',
-              color: amount.includes('-')
-                ? colors['red-500']
-                : colors['green-500']
-            }}
-          >
-            {convertAmount(amount)} {denom}
-          </Text>
+          {amountDataCell(convertAmount(amount), denom, title)}
         </View>
       </View>
     );
