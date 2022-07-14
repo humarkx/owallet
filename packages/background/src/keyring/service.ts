@@ -382,7 +382,7 @@ export class KeyRingService {
       data
     );
     const coinType = await this.chainsService.getChainCoinType(chainId);
-    const rpc = (await this.chainsService.getChainInfo(chainId)).evmRpc;
+    const rpc = (await this.chainsService.getChainInfo(chainId)).rest;
 
     // TODO: add UI here so users can change gas, memo & fee
     const estimatedGasPrice = await request(rpc, 'eth_gasPrice', []);

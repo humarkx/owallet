@@ -703,6 +703,12 @@ export class InjectedEthereum implements Ethereum {
     console.log("WILL NOT USE")
   }
 
+  // async on(method: string, cb: any): Promise<void> {
+  //   // await this.requestMethod('evmSuggestChain', [chainInfo]);
+  //   console.log("WILL NOT USE")
+  //   window.addEventListener(method, cb)
+  // }
+
   async signEthereumTypeData(chainId: string,
     data: SignEthereumTypedDataObject): Promise<void> {
     console.log("WILL NOT USE")
