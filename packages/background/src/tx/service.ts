@@ -165,9 +165,12 @@ export class BackgroundTxService {
       case 'eth_accounts':
       case 'eth_requestAccounts':
         chainInfo = await this.chainsService.getChainInfo(chainId);
+        console.log("🚀 ~ file: service.ts ~ line 169 ~ BackgroundTxService ~ request ~ chainInfo", chainInfo)
         if (chainInfo.coinType !== 60) return undefined;
         const chainIdOrCoinType = params.length ? parseInt(params[0]) : chainId; // default is cointype 60 for ethereum based
+        console.log("🚀 ~ file: service.ts ~ line 172 ~ BackgroundTxService ~ request ~ chainIdOrCoinType", chainIdOrCoinType)
         const key = await this.keyRingService.getKey(chainIdOrCoinType);
+        console.log("🚀 ~ file: service.ts ~ line 171 ~ BackgroundTxService ~ request ~ key", key)
         return [`0x${Buffer.from(key.address).toString('hex')}`];
       case 'wallet_switchEthereumChain' as any:
         console.log("🚀 ~ file: service.ts ~ line 178 ~ BackgroundTxService ~ request ~ params", params[0])

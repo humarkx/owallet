@@ -505,7 +505,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
   {
     rest: "https://data-seed-prebsc-1-s1.binance.org:8545/",
     evmRpc: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-    chainId: "97",
+    chainId: "0x61",
     chainName: "BNB Smart Chain Testnet",
     bip44: {
       coinType: 60,
@@ -584,7 +584,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
   {
     rest: "https://bsc-dataseed1.ninicoin.io",
     evmRpc: "https://bsc-dataseed1.ninicoin.io",
-    chainId: "56",
+    chainId: "0x38",
     chainName: "BNB Smart Chain\n(Coming soon)",
     bip44: {
       coinType: 60,

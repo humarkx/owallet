@@ -324,6 +324,8 @@ export const AssetChartViewEvm: FunctionComponent = observer(() => {
   const accountInfo = accountStore.getAccount(current.chainId);
 
   // wait for account to be
+  console.log("account infor: ",accountInfo.bech32Address)
+  console.log("account infor evmos: ",accountInfo.evmosHexAddress)
   if (!accountInfo.evmosHexAddress) return null;
 
   const balance = queries.evm.queryEvmBalance.getQueryBalance(

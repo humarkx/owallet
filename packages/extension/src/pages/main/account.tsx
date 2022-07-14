@@ -86,14 +86,20 @@ export const AccountView: FunctionComponent = observer(() => {
           <div style={{ flex: 1 }} />
         </div>
       )}
-      {accountInfo.hasEvmosHexAddress && (
+      {(accountInfo.hasEvmosHexAddress ||
+        chainStore.current.networkType === 'evm') && (
         <div
           className={styleAccount.containerAccount}
-          style={{ marginTop: '2px' }}
+          style={{
+            marginTop: '2px',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}
         >
           <div style={{ flex: 1 }} />
           <div
             className={styleAccount.address}
+            style={{ marginBottom: '6px' }}
             onClick={() => copyAddress(accountInfo.evmosHexAddress)}
           >
             <Address isRaw={true} tooltipAddress={accountInfo.evmosHexAddress}>
@@ -105,6 +111,22 @@ export const AccountView: FunctionComponent = observer(() => {
                       10
                     )}...${accountInfo.evmosHexAddress.slice(-8)}`
                   : accountInfo.evmosHexAddress
+                : '...'}
+            </Address>
+          </div>
+          <div
+            className={styleAccount.address}
+            onClick={() => copyAddress(accountInfo.evmosHexAddress)}
+          >
+            <Address isRaw={true} tooltipAddress={accountInfo.bech32Address}>
+              {accountInfo.walletStatus === WalletStatus.Loaded &&
+              accountInfo.bech32Address
+                ? accountInfo.bech32Address.length === 42
+                  ? `${accountInfo.bech32Address.slice(
+                      0,
+                      10
+                    )}...${accountInfo.bech32Address.slice(-8)}`
+                  : accountInfo.bech32Address
                 : '...'}
             </Address>
           </div>

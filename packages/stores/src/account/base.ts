@@ -11,6 +11,7 @@ import {
 } from 'mobx';
 import { AppCurrency, OWallet, OWalletSignOptions, Ethereum } from '@owallet/types';
 import { DeepReadonly } from 'utility-types';
+import bech32, { fromWords } from 'bech32';
 import { ChainGetter } from '../common';
 import { QueriesSetBase, QueriesStore } from '../query';
 import { DenomHelper, toGenerator, fetchAdapter } from '@owallet/common';
@@ -35,7 +36,7 @@ import Long from 'long';
 import ICoin = cosmos.base.v1beta1.ICoin;
 import SignMode = cosmos.tx.signing.v1beta1.SignMode;
 
-import { evmosToEth } from '@hanchon/ethermint-address-converter';
+import { ETH } from '@hanchon/ethermint-address-converter';
 import { request } from '@owallet/background/build/tx';
 
 export enum WalletStatus {
@@ -797,7 +798,8 @@ export class AccountSetBase<MsgOpts, Queries> {
 
   get evmosHexAddress(): string {
     if (!this.bech32Address) return;
-    return evmosToEth(this.bech32Address);
+    const address = Buffer.from(fromWords(bech32.decode(this.bech32Address).words));
+    return ETH.encoder(address);
   }
 
   protected get queries(): DeepReadonly<QueriesSetBase & Queries> {
