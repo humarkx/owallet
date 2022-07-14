@@ -59,7 +59,6 @@ export const RecoverMnemonicIntro: FunctionComponent<{
   return (
     <Button
       color="primary"
-      outline
       block
       onClick={(e) => {
         e.preventDefault();
@@ -69,6 +68,7 @@ export const RecoverMnemonicIntro: FunctionComponent<{
           registerType: 'seed'
         });
       }}
+      className={style.importWalletBtn}
     >
       <FormattedMessage id="register.intro.button.import-account.title" />
     </Button>

@@ -167,7 +167,7 @@ export const AssetStakedChartView: FunctionComponent = observer(() => {
               ? totalPrice.toString()
               : total.shrink(true).trim(true).maxDecimals(6).toString()}
           </div>
-          <div className={styleAsset.indicatorIcon}>
+          {/* <div className={styleAsset.indicatorIcon}>
             <React.Fragment>
               {balanceStakableQuery.isFetching ? (
                 <i className="fas fa-spinner fa-spin" />
@@ -187,9 +187,9 @@ export const AssetStakedChartView: FunctionComponent = observer(() => {
                 </ToolTip>
               ) : null}
             </React.Fragment>
-          </div>
+          </div> */}
         </div>
-        <React.Suspense fallback={<div style={{ height: '150px' }} />}>
+        {/* <React.Suspense fallback={<div style={{ height: '150px' }} />}>
           <LazyDoughnut
             data={{
               datasets: [
@@ -264,43 +264,7 @@ export const AssetStakedChartView: FunctionComponent = observer(() => {
               }
             }}
           />
-        </React.Suspense>
-      </div>
-      <div style={{ marginTop: '12px', width: '100%' }}>
-        <div className={styleAsset.legend}>
-          <div className={styleAsset.label} style={{ color: '#5e72e4' }}>
-            <span className="badge-dot badge badge-secondary">
-              <i className="bg-primary" />
-            </span>
-            <FormattedMessage id="main.account.chart.available-balance" />
-          </div>
-          <div style={{ minWidth: '16px' }} />
-          <div
-            className={styleAsset.value}
-            style={{
-              color: '#D6CCF4'
-            }}
-          >
-            {stakable.shrink(true).maxDecimals(6).toString()}
-          </div>
-        </div>
-        <div className={styleAsset.legend}>
-          <div className={styleAsset.label} style={{ color: '#11cdef' }}>
-            <span className="badge-dot badge badge-secondary">
-              <i className="bg-info" />
-            </span>
-            <FormattedMessage id="main.account.chart.staked-balance" />
-          </div>
-          <div style={{ minWidth: '16px' }} />
-          <div
-            className={styleAsset.value}
-            style={{
-              color: '#D6CCF4'
-            }}
-          >
-            {stakedSum.shrink(true).maxDecimals(6).toString()}
-          </div>
-        </div>
+        </React.Suspense> */}
       </div>
     </React.Fragment>
   );

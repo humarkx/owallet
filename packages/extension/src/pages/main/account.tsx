@@ -52,7 +52,7 @@ export const AccountView: FunctionComponent = observer(() => {
             : 'Loading...'}
         </div>
         <div style={{ flex: 1, textAlign: 'right' }}>
-          {chainStore.current.raw.txExplorer?.accountUrl && (
+          {/* {chainStore.current.raw.txExplorer?.accountUrl && (
             <a
               target="_blank"
               href={chainStore.current.raw.txExplorer.accountUrl.replace(
@@ -66,7 +66,7 @@ export const AccountView: FunctionComponent = observer(() => {
             >
               <i className="fas fa-external-link-alt"></i>
             </a>
-          )}
+          )} */}
         </div>
       </div>
       {chainStore.current.networkType === 'cosmos' && (
@@ -76,12 +76,14 @@ export const AccountView: FunctionComponent = observer(() => {
             className={styleAccount.address}
             onClick={() => copyAddress(accountInfo.bech32Address)}
           >
-            <Address maxCharacters={22} lineBreakBeforePrefix={false}>
-              {accountInfo.walletStatus === WalletStatus.Loaded &&
-              accountInfo.bech32Address
-                ? accountInfo.bech32Address
-                : '...'}
-            </Address>
+            <span className={styleAccount.addressText}>
+              <Address maxCharacters={22} lineBreakBeforePrefix={false}>
+                {accountInfo.walletStatus === WalletStatus.Loaded &&
+                accountInfo.bech32Address
+                  ? accountInfo.bech32Address
+                  : '...'}
+              </Address>
+            </span>
           </div>
           <div style={{ flex: 1 }} />
         </div>

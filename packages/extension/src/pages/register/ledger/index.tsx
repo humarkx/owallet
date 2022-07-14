@@ -25,7 +25,6 @@ export const ImportLedgerIntro: FunctionComponent<{
   return (
     <Button
       color="primary"
-      outline
       block
       onClick={(e) => {
         e.preventDefault();
@@ -35,6 +34,7 @@ export const ImportLedgerIntro: FunctionComponent<{
           registerType: 'ledger'
         });
       }}
+      className={style.importWalletBtn}
     >
       <FormattedMessage id="register.ledger.title" />
     </Button>

@@ -78,18 +78,20 @@ export const RegisterPage: FunctionComponent = observer(() => {
   return (
     <EmptyLayout
       className={style.container}
-      style={{ height: '100%', padding: 0}}
+      style={{ height: '100%', padding: 0 }}
     >
       <div className={style.logoContainer}>
-        <img
-          className={style.icon}
-          src={require('../../public/assets/orai_wallet_logo.png')}
-          alt="logo"
-        />
+        <div>
+          <img
+            className={style.icon}
+            src={require('../../public/assets/orai_wallet_logo.png')}
+            alt="logo"
+          />
+        </div>
         <div className={style.logoInnerContainer}>
           <img
             className={style.logo}
-            src={require('../../public/assets/logo-temp.png')}
+            src={require('../../public/assets/img/oraichain-pro.svg')}
             alt="logo"
           />
           <div className={style.paragraph}>Cosmos x EVM in one Wallet</div>

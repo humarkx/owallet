@@ -55,7 +55,7 @@ export const SendPage: FunctionComponent = observer(() => {
 
   const accountInfo = accountStore.getAccount(current.chainId);
   const accountEthInfo = accountStore.getAccount(current.chainId);
- 
+
   const sendConfigs = useSendTxConfig(
     chainStore,
     current.chainId,
@@ -63,8 +63,9 @@ export const SendPage: FunctionComponent = observer(() => {
     accountInfo.bech32Address,
     queriesStore.get(current.chainId).queryBalances,
     EthereumEndpoint,
-    chainStore.current.networkType === "evm" && queriesStore.get(current.chainId).evm.queryEvmBalance,
-    chainStore.current.networkType === "evm" && accountInfo.evmosHexAddress,
+    chainStore.current.networkType === 'evm' &&
+      queriesStore.get(current.chainId).evm.queryEvmBalance,
+    chainStore.current.networkType === 'evm' && accountInfo.evmosHexAddress
   );
 
   useEffect(() => {
@@ -191,7 +192,7 @@ export const SendPage: FunctionComponent = observer(() => {
                 {
                   preferNoSetFee: true,
                   preferNoSetMemo: true,
-                  networkType: chainStore.current.networkType,
+                  networkType: chainStore.current.networkType
                 },
                 {
                   onBroadcasted: () => {
@@ -202,12 +203,18 @@ export const SendPage: FunctionComponent = observer(() => {
                     });
                   },
                   onFulfill: (tx) => {
-                    console.log(tx,"TX INFO ON SEND PAGE!!!!!!!!!!!!!!!!!!!!!")
+                    console.log(
+                      tx,
+                      'TX INFO ON SEND PAGE!!!!!!!!!!!!!!!!!!!!!'
+                    );
                     notification.push({
                       placement: 'top-center',
-                      type: tx?.status === "0x1" ? 'success' : 'danger',
+                      type: tx?.status === '0x1' ? 'success' : 'danger',
                       duration: 5,
-                      content: tx?.status === "0x1" ? `Transaction successful with tx: ${tx?.transactionHash}`: `Transaction failed with tx: ${tx?.transactionHash}`,
+                      content:
+                        tx?.status === '0x1'
+                          ? `Transaction successful with tx: ${tx?.transactionHash}`
+                          : `Transaction failed with tx: ${tx?.transactionHash}`,
                       canDelete: true,
                       transition: {
                         duration: 0.25
@@ -233,7 +240,7 @@ export const SendPage: FunctionComponent = observer(() => {
               if (!isDetachedPage) {
                 history.replace('/');
               }
-              console.log(e.message,'Catch Error on send!!!')
+              console.log(e.message, 'Catch Error on send!!!');
               notification.push({
                 type: 'warning',
                 placement: 'top-center',
@@ -294,10 +301,13 @@ export const SendPage: FunctionComponent = observer(() => {
             block
             data-loading={accountInfo.isSendingMsg === 'send'}
             disabled={!accountInfo.isReadyToSendMsgs || !txStateIsValid}
+            className={style.sendBtn}
           >
-            {intl.formatMessage({
-              id: 'send.button.send'
-            })}
+            <span className={style.sendBtnText}>
+              {intl.formatMessage({
+                id: 'send.button.send'
+              })}
+            </span>
           </Button>
         </div>
       </form>
