@@ -68,8 +68,8 @@ export const TxButtonView: FunctionComponent = observer(() => {
             width: '330px',
             minWidth: '330px',
             minHeight: 'unset',
-            maxHeight: 'unset',
-          },
+            maxHeight: 'unset'
+          }
         }}
         isOpen={isDepositOpen}
         onRequestClose={() => {
@@ -80,15 +80,15 @@ export const TxButtonView: FunctionComponent = observer(() => {
       </Modal>
       <Button
         className={styleTxButton.button}
-        color="primary"
-        outline
         onClick={(e) => {
           e.preventDefault();
 
           setIsDepositOpen(true);
         }}
       >
-        <FormattedMessage id="main.account.button.deposit" />
+        <span style={{ color: '#000000' }}>
+          <FormattedMessage id="main.account.button.deposit" />
+        </span>
       </Button>
       {/*
         "Disabled" property in button tag will block the mouse enter/leave events.
@@ -98,10 +98,8 @@ export const TxButtonView: FunctionComponent = observer(() => {
       <Button
         innerRef={sendBtnRef}
         className={classnames(styleTxButton.button, {
-          disabled: !hasAssets,
+          disabled: !hasAssets
         })}
-        color="primary"
-        outline
         data-loading={accountInfo.isSendingMsg === 'send'}
         onClick={(e) => {
           e.preventDefault();
@@ -111,7 +109,9 @@ export const TxButtonView: FunctionComponent = observer(() => {
           }
         }}
       >
-        <FormattedMessage id="main.account.button.send" />
+        <span style={{ color: '#000000' }}>
+          <FormattedMessage id="main.account.button.send" />
+        </span>
       </Button>
       {!hasAssets ? (
         <Tooltip
@@ -152,8 +152,8 @@ export const TxButtonEvmView: FunctionComponent = observer(() => {
   ).balance;
 
   const hasAssets =
-  parseFloat(evmBalance?.trim(true).shrink(true).maxDecimals(6).toString()) >
-  0;
+    parseFloat(evmBalance?.trim(true).shrink(true).maxDecimals(6).toString()) >
+    0;
 
   return (
     <div className={styleTxButton.containerTxButton}>
@@ -163,8 +163,8 @@ export const TxButtonEvmView: FunctionComponent = observer(() => {
             width: '330px',
             minWidth: '330px',
             minHeight: 'unset',
-            maxHeight: 'unset',
-          },
+            maxHeight: 'unset'
+          }
         }}
         isOpen={isDepositOpen}
         onRequestClose={() => {
@@ -193,7 +193,7 @@ export const TxButtonEvmView: FunctionComponent = observer(() => {
       <Button
         innerRef={sendBtnRef}
         className={classnames(styleTxButton.button, {
-          disabled: !hasAssets,
+          disabled: !hasAssets
         })}
         color="primary"
         outline

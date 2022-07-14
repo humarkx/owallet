@@ -21,6 +21,7 @@ import { useIntl } from 'react-intl';
 import { useConfirm } from '../../components/confirm';
 import { ChainUpdaterService } from '@owallet/background';
 import { IBCTransferView } from './ibc-transfer';
+import AmountOraiN from './amount-orain';
 
 export const MainPage: FunctionComponent = observer(() => {
   const history = useHistory();
@@ -43,14 +44,14 @@ export const MainPage: FunctionComponent = observer(() => {
           if (
             await confirm.confirm({
               paragraph: intl.formatMessage({
-                id: 'main.update-chain.confirm.paragraph',
+                id: 'main.update-chain.confirm.paragraph'
               }),
               yes: intl.formatMessage({
-                id: 'main.update-chain.confirm.yes',
+                id: 'main.update-chain.confirm.yes'
               }),
               no: intl.formatMessage({
-                id: 'main.update-chain.confirm.no',
-              }),
+                id: 'main.update-chain.confirm.no'
+              })
             })
           ) {
             await chainStore.tryUpdateChain(chainStore.current.chainId);
@@ -86,14 +87,14 @@ export const MainPage: FunctionComponent = observer(() => {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            paddingRight: '20px',
+            paddingRight: '20px'
           }}
         >
           <i
             className="fas fa-user"
             style={{
               cursor: 'pointer',
-              padding: '4px',
+              padding: '4px'
             }}
             onClick={(e) => {
               e.preventDefault();
@@ -108,28 +109,38 @@ export const MainPage: FunctionComponent = observer(() => {
       <Card className={classnames(style.card, 'shadow')}>
         <CardBody>
           <div className={style.containerAccountInner}>
-            <AccountView />
+            <div className={style.imageWrap}>
+              <AccountView />
+              {chainStore.current.networkType === 'evm' ? (
+                <>
+                  <AssetViewEvm />
+                </>
+              ) : (
+                <>
+                  <AssetView />
+                </>
+              )}
+            </div>
+            <AmountOraiN />
             {chainStore.current.networkType === 'evm' ? (
               <>
-                <AssetViewEvm />
                 <TxButtonEvmView />
               </>
             ) : (
               <>
-                <AssetView />
                 <TxButtonView />
               </>
             )}
           </div>
         </CardBody>
       </Card>
-      {chainStore.current.networkType === 'cosmos' && (
+      {/* {chainStore.current.networkType === 'cosmos' && (
         <Card className={classnames(style.card, 'shadow')}>
           <CardBody>
             <StakeView />
           </CardBody>
         </Card>
-      )}
+      )} */}
       {hasTokens ? (
         <Card className={classnames(style.card, 'shadow')}>
           <CardBody>{<TokensView tokens={tokens} />}</CardBody>

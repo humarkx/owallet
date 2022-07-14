@@ -14,7 +14,7 @@ $menu-icon-gap: 14px;
 
 .menu-img {
   width: $menu-icon-size;
-  height: $menu-icon-size;  
+  height: $menu-icon-size;
   margin-left: $menu-icon-gap;
   margin-bottom: 4px;
 
@@ -29,8 +29,8 @@ $menu-icon-gap: 14px;
   align-items: center;
 
   .title {
-    font-size: 24px;
-
+    font-size: 20px;
+    font-weight: 200;
     margin-right: 6px;
   }
 
@@ -43,7 +43,7 @@ $menu-icon-gap: 14px;
       height: 16px;
 
       margin-top: -6px;
-      fill: #8f8f8f;
+      fill: $color;
     }
   }
 

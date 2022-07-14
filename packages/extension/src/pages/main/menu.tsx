@@ -65,7 +65,7 @@ export const Menu: FunctionComponent = observer(() => {
       {/* Empty div for separating last item */}
       <div style={{ flex: 1 }} />
       <div
-        className={styleMenu.item}
+        className={`${styleMenu.item} ${styleMenu.signOut}`}
         onClick={() => {
           keyRingStore.lock();
         }}

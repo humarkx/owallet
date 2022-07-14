@@ -270,7 +270,7 @@ export const FeeButtonsInner: FunctionComponent<
         {errorText != null ? (
           <FormFeedback style={{ display: 'block' }}>{errorText}</FormFeedback>
         ) : null}
-        <div style={{ float: 'right' }}>
+        <div style={{ textAlign: 'right', marginTop: 8 }}>
           <Button
             size="sm"
             color="link"
@@ -278,6 +278,7 @@ export const FeeButtonsInner: FunctionComponent<
               e.preventDefault();
               feeButtonState.setIsGasInputOpen(!feeButtonState.isGasInputOpen);
             }}
+            className={styleFeeButtons.gasBtn}
           >
             {!feeButtonState.isGasInputOpen
               ? intl.formatMessage({
