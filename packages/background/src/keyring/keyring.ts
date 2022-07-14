@@ -469,7 +469,7 @@ export class KeyRing {
       [ChainIdHelper.parse(chainId).identifier]: coinType
     };
 
-    const keyStoreInMulti = this.multiKeyStore.find((keyStore) => {
+    const keyStoreInMulti = this.multiKeyStore.find(keyStore => {
       return (
         KeyRing.getKeyStoreId(keyStore) ===
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -635,7 +635,8 @@ export class KeyRing {
     const bip44HDPath = KeyRing.getKeyStoreBIP44Path(this.keyStore);
 
     if (this.type === 'mnemonic') {
-      const path = `m/44'/${coinType}'/${bip44HDPath.account}'/${bip44HDPath.change}/${bip44HDPath.addressIndex}`;
+      const coinTypeModified = bip44HDPath.coinType ?? coinType;
+      const path = `m/44'/${coinTypeModified}'/${bip44HDPath.account}'/${bip44HDPath.change}/${bip44HDPath.addressIndex}`;
       const cachedKey = this.cached.get(path);
       if (cachedKey) {
         return new PrivKeySecp256k1(cachedKey);
