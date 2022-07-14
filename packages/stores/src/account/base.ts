@@ -461,27 +461,35 @@ export class AccountSetBase<MsgOpts, Queries> {
       this._isSendingMsg = false;
     });
 
-    const waitForPendingTransaction = async (rpc, txHash, onFulfill) => {
-      let expectedBlockTime = 3000;
-      const sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-      }
+    const sleep = (milliseconds) => {
+      return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
 
-      let transactionReceipt = null;
-      let retryCount = 0;
-      while (transactionReceipt == null) { // Waiting expectedBlockTime until the transaction is mined
-        transactionReceipt = await request(rpc, "eth_getTransactionReceipt", [txHash]);
-        retryCount += 1;
-        if (retryCount === 10) break;
-        await sleep(expectedBlockTime);
-      }
+    const waitForPendingTransaction = async (rpc, txHash, onFulfill, count = 0) => {
+      if (count > 10) return;
 
-      if (this.opts.preTxEvents?.onFulfill) {
-        this.opts.preTxEvents.onFulfill(transactionReceipt);
-      }
-
-      if (onFulfill) {
-        onFulfill(transactionReceipt);
+      try {
+        let expectedBlockTime = 3000;
+        let transactionReceipt = null;
+        let retryCount = 0;
+        while (!transactionReceipt) { // Waiting expectedBlockTime until the transaction is mined
+          transactionReceipt = await request(rpc, "eth_getTransactionReceipt", [txHash]);
+          console.log("🚀 ~ file: base.ts ~ lin ~ transactionReceipt", transactionReceipt)
+          retryCount += 1;
+          if (retryCount === 10) break;
+          await sleep(expectedBlockTime);
+        }
+  
+        if (this.opts.preTxEvents?.onFulfill) {
+          this.opts.preTxEvents.onFulfill(transactionReceipt);
+        }
+  
+        if (onFulfill) {
+          onFulfill(transactionReceipt);
+        }
+      } catch (error) {
+        await sleep(3000);
+        waitForPendingTransaction(rpc, txHash, onFulfill, count + 1)
       }
     }
 
