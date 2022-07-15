@@ -270,7 +270,7 @@ export const FeeButtonsInner: FunctionComponent<
         {errorText != null ? (
           <FormFeedback style={{ display: 'block' }}>{errorText}</FormFeedback>
         ) : null}
-        <div style={{ textAlign: 'right', marginTop: 8 }}>
+        <div style={{ textAlign: 'right' }}>
           <Button
             size="sm"
             color="link"

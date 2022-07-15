@@ -23,6 +23,7 @@ import queryString from 'querystring';
 import { useSendTxConfig } from '@owallet/hooks';
 import { fitPopupWindow, openPopupWindow, PopupSize } from '@owallet/popup';
 import { EthereumEndpoint } from '@owallet/common';
+import classNames from 'classnames';
 
 export const SendPage: FunctionComponent = observer(() => {
   const history = useHistory();
@@ -267,6 +268,7 @@ export const SendPage: FunctionComponent = observer(() => {
               recipientConfig={sendConfigs.recipientConfig}
               memoConfig={sendConfigs.memoConfig}
               label={intl.formatMessage({ id: 'send.input.recipient' })}
+              placeholder="Enter recipient address"
             />
             <CoinInput
               amountConfig={sendConfigs.amountConfig}
@@ -274,10 +276,12 @@ export const SendPage: FunctionComponent = observer(() => {
               balanceText={intl.formatMessage({
                 id: 'send.input-button.balance'
               })}
+              placeholder="Enter your amount"
             />
             <MemoInput
               memoConfig={sendConfigs.memoConfig}
               label={intl.formatMessage({ id: 'send.input.memo' })}
+              placeholder="Enter your memo message"
             />
             <FeeButtons
               feeConfig={sendConfigs.feeConfig}
@@ -297,7 +301,6 @@ export const SendPage: FunctionComponent = observer(() => {
           <div style={{ flex: 1 }} />
           <Button
             type="submit"
-            color="primary"
             block
             data-loading={accountInfo.isSendingMsg === 'send'}
             disabled={!accountInfo.isReadyToSendMsgs || !txStateIsValid}
