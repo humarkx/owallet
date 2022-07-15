@@ -11,7 +11,7 @@ import {
   FormFeedback,
   FormGroup,
   Input,
-  Label,
+  Label
 } from 'reactstrap';
 import { observer } from 'mobx-react-lite';
 import {
@@ -20,7 +20,7 @@ import {
   ZeroAmountError,
   NegativeAmountError,
   InsufficientAmountError,
-  IAmountConfig,
+  IAmountConfig
 } from '@owallet/hooks';
 import { CoinPretty, Dec, DecUtils, Int } from '@owallet/unit';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -34,12 +34,13 @@ export interface CoinInputProps {
 
   className?: string;
   label?: string;
+  placeholder?: string;
 
   disableAllBalance?: boolean;
 }
 
 export const CoinInput: FunctionComponent<CoinInputProps> = observer(
-  ({ amountConfig, className, label, disableAllBalance }) => {
+  ({ amountConfig, className, label, disableAllBalance, placeholder }) => {
     const intl = useIntl();
 
     const [randomId] = useState(() => {
@@ -57,19 +58,19 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
             return;
           case InvalidNumberAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.invalid-number',
+              id: 'input.amount.error.invalid-number'
             });
           case ZeroAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.is-zero',
+              id: 'input.amount.error.is-zero'
             });
           case NegativeAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.is-negative',
+              id: 'input.amount.error.is-negative'
             });
           case InsufficientAmountError:
             return intl.formatMessage({
-              id: 'input.amount.error.insufficient',
+              id: 'input.amount.error.insufficient'
             });
           default:
             return intl.formatMessage({ id: 'input.amount.error.unknown' });
@@ -127,7 +128,7 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
 
     return (
       <React.Fragment>
-        <FormGroup className={className}>
+        {/* <FormGroup className={className}>
           <Label
             for={`selector-${randomId}`}
             className="form-control-label"
@@ -138,7 +139,7 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
           <ButtonDropdown
             id={`selector-${randomId}`}
             className={classnames(styleCoinInput.tokenSelector, {
-              disabled: amountConfig.fraction === 1,
+              disabled: amountConfig.fraction === 1
             })}
             isOpen={isOpenTokenSelector}
             toggle={() => setIsOpenTokenSelector((value) => !value)}
@@ -173,22 +174,24 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
               })}
             </DropdownMenu>
           </ButtonDropdown>
-        </FormGroup>
+        </FormGroup> */}
         <FormGroup className={className}>
           {label ? (
             <Label
               for={`input-${randomId}`}
-              className="form-control-label"
-              style={{ width: '100%' }}
+              className={classnames(
+                'form-control-label',
+                styleCoinInput.labelBalance
+              )}
             >
-              {label}
+              <div>{label}</div>
               {!disableAllBalance ? (
                 <div
                   className={classnames(
                     styleCoinInput.balance,
                     styleCoinInput.clickable,
                     {
-                      [styleCoinInput.clicked]: amountConfig.isMax,
+                      [styleCoinInput.clicked]: amountConfig.isMax
                     }
                   )}
                   onClick={(e) => {
@@ -197,7 +200,10 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
                     amountConfig.toggleIsMax();
                   }}
                 >
-                  {`Balance: ${balance.trim(true).maxDecimals(6).toString()}`}
+                  <span>{`Balance: ${balance
+                    .trim(true)
+                    .maxDecimals(6)
+                    .toString()}`}</span>
                 </div>
               ) : null}
             </Label>
@@ -225,9 +231,10 @@ export const CoinInput: FunctionComponent<CoinInputProps> = observer(
             min={0}
             disabled={amountConfig.isMax}
             autoComplete="off"
+            placeholder={placeholder}
           />
           {errorText != null ? (
-            <FormFeedback style={{ display: 'block' }}>
+            <FormFeedback style={{ display: 'block', position: 'sticky' }}>
               {errorText}
             </FormFeedback>
           ) : null}

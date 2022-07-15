@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import React, {
+  CSSProperties,
+  FunctionComponent,
+  useMemo,
+  useState
+} from 'react';
 import {
   FormGroup,
   Label,
@@ -8,7 +13,7 @@ import {
   Modal,
   InputGroup,
   Button,
-  FormText,
+  FormText
 } from 'reactstrap';
 import { AddressBookPage } from '../../pages/setting/address-book';
 
@@ -23,7 +28,7 @@ import {
   ENSFailedToFetchError,
   ENSIsFetchingError,
   IIBCChannelConfig,
-  InvalidEvmAddressError,
+  InvalidEvmAddressError
 } from '@owallet/hooks';
 import { observer } from 'mobx-react-lite';
 import { useIntl } from 'react-intl';
@@ -36,6 +41,8 @@ export interface AddressInputProps {
 
   className?: string;
   label?: string;
+  placeholder?: string;
+  inputStyle?: CSSProperties;
 
   disableAddressBook?: boolean;
 
@@ -51,6 +58,8 @@ export const AddressInput: FunctionComponent<AddressInputProps> = observer(
     label,
     disableAddressBook,
     disabled = false,
+    placeholder,
+    inputStyle
   }) => {
     const intl = useIntl();
 
@@ -75,19 +84,19 @@ export const AddressInput: FunctionComponent<AddressInputProps> = observer(
             return;
           case InvalidBech32Error:
             return intl.formatMessage({
-              id: 'input.recipient.error.invalid-bech32',
+              id: 'input.recipient.error.invalid-bech32'
             });
           case InvalidEvmAddressError:
             return intl.formatMessage({
-              id: 'input.recipient.error.invalid-evm-address',
+              id: 'input.recipient.error.invalid-evm-address'
             });
           case ENSNotSupportedError:
             return intl.formatMessage({
-              id: 'input.recipient.error.ens-not-supported',
+              id: 'input.recipient.error.ens-not-supported'
             });
           case ENSFailedToFetchError:
             return intl.formatMessage({
-              id: 'input.recipient.error.ens-failed-to-fetch',
+              id: 'input.recipient.error.ens-failed-to-fetch'
             });
           case ENSIsFetchingError:
             return;
@@ -107,7 +116,7 @@ export const AddressInput: FunctionComponent<AddressInputProps> = observer(
         if (memoConfig) {
           memoConfig.setMemo(memo);
         }
-      },
+      }
     };
 
     return (
@@ -149,17 +158,20 @@ export const AddressInput: FunctionComponent<AddressInputProps> = observer(
               }}
               autoComplete="off"
               disabled={disabled}
+              placeholder={placeholder}
             />
             {!disableAddressBook && memoConfig ? (
               <Button
                 className={styleAddressInput.addressBookButton}
-                color="primary"
                 type="button"
-                outline
                 onClick={() => setIsAddressBookOpen(true)}
                 disabled={disabled}
               >
-                <i className="fas fa-address-book" />
+                {/* <i className="fas fa-address-book" /> */}
+                <img
+                  src={require('../../public/assets/svg/address-book.svg')}
+                  alt="logo"
+                />
               </Button>
             ) : null}
           </InputGroup>
