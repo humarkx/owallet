@@ -321,12 +321,13 @@ export const EmbedChainInfos: AppChainInfo[] = [
     networkType: "evm",
     // chainId: 'balcony_888888-1',
     coinType: 60,
-    chainName: 'Balcony Subnet\n(Testnet)',
+    chainName: 'Balcony Subnet EVM',
     stakeCurrency: {
       coinDenom: 'ORAIN',
       coinMinimalDenom: 'orain',
       coinDecimals: 18,
-      coinGeckoId: 'orain'
+      coinGeckoId: 'orain',
+      coinImageUrl: "https://lh3.googleusercontent.com/twKOuHzO99pGFTECRdjBfBQrbSpB9z_T5cTRgEMkY7_a6NW7fa5KGxYhX3Rr7o0PyUiR_GUzZxwvDzydU2vKaLm3pfnW0njUHTbS8EQlg-Lu0dk_8sWxyge5aQww7BVl8rpP5GOUvDgrDtCxiAu3Wgl4ET3BF76CrIKzee8bkdEoACYaFBQiX01yjB2LGf6DRR2x3CKWNySKV_Z0PnqOVOr9pE0M8cCYy3_CuHPK-GJL6QZa1pCafzt4TITaqbiwQRAlaGkIemntp-lFj6u-rgM8ArVBUddC3Rn9k6y1fdjprRTYkxvVbiDkz7OZmgc_AjR5h12FjJurZMN28s5-bDBffDygccKkG_0eB8GEgYoWeOh2GkRrCAtrH7kcMoFkqLkS75yZDLgjPk2YWMgG3pfF8lXY04AUsHNBLO99l_2L-_k8vdbE1KZabgGC7LXNuX6hS_aVESl_vMwfWC530iIbZ6966YyJMh7auJjMeHTxJELyE7zcjnnu9ozS2sHwP6v3DrtRA6SoHFA7s9b2lvQHWxrisHHoRl_rscY7_q9yV_76isHogKlu1LWIJHalD65UcdIACKLT0HuID2we9UADSbMyAvLMlEqmc_xx_E_4aHVNWt39mioUxVwpia_qVa63VZJcfjkJdIBXTfHqmFBLQkOmljJWR3kCmWggkY4krbU2fIAf8RB2Woc0vutQ5jedI5uV6lPs--7E6P_5ByqzYcfcnS_fxDoXps088BEJ8uw5AY_EsTSz4jInk_kdR9ZBk-C9AiK4zA3sLCdcDYs559QGRXtjvQ=w108-h109-no?authuser=0",
     },
     bip44: {
       coinType: 60
@@ -353,7 +354,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
     // networkType: "evm",
     chainId: 'balcony_888888-1',
     coinType: 60,
-    chainName: 'Balcony Subnet\n(Testnet)',
+    chainName: 'Balcony Subnet Cosmos',
     stakeCurrency: {
       coinDenom: 'ORAIN',
       coinMinimalDenom: 'orain',

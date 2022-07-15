@@ -84,6 +84,7 @@
   .legend {
     display: flex;
     width: 100%;
+    align-items: center;
 
     .label {
       letter-spacing: -0.3px;
@@ -107,3 +108,36 @@
     }
   }
 }
+
+.amount-evm-wrap {
+  margin: 16px auto;
+
+  .legend {
+    display: flex;
+    width: 100%;
+    align-items: center;
+
+    .label {
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      color: $color-gray-50;
+      font-size: 16px;
+    }
+
+    .value {
+      letter-spacing: -0.3px;
+      flex: 1;
+      display: flex;
+      font-weight: bold;
+    }
+
+    img {
+      width: 44px;
+      height: auto;
+    }
+  }
+}
+

@@ -298,10 +298,10 @@ export const AssetChartViewEvm: FunctionComponent = observer(() => {
 
   return (
     <React.Fragment>
-      <div style={{ marginTop: '12px', width: '100%' }}>
+      <div className={styleAsset.amountEvmWrap} style={{ marginTop: '12px', width: '100%' }}>
         <div
           className={styleAsset.legend}
-          style={{ flexDirection: 'column', alignItems: 'center' }}
+          style={{ flexDirection: 'column', alignItems: 'center', display: 'flex' }}
         >
           <div className={styleAsset.label}>
             <img src={chainInfo.stakeCurrency.coinImageUrl} />
