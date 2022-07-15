@@ -195,8 +195,8 @@ export const TxButtonEvmView: FunctionComponent = observer(() => {
         className={classnames(styleTxButton.button, {
           disabled: !hasAssets
         })}
+        style={{cursor: !hasAssets ? "default" : "pointer" }}
         color="primary"
-        outline
         data-loading={accountInfo.isSendingMsg === 'send'}
         onClick={(e) => {
           e.preventDefault();
@@ -206,7 +206,9 @@ export const TxButtonEvmView: FunctionComponent = observer(() => {
           }
         }}
       >
-        <FormattedMessage id="main.account.button.send" />
+        <span >
+          <FormattedMessage id="main.account.button.send" />
+        </span>
       </Button>
       {!hasAssets ? (
         <Tooltip

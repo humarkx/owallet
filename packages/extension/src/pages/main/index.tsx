@@ -114,16 +114,29 @@ export const MainPage: FunctionComponent = observer(() => {
               {chainStore.current.networkType === 'evm' ? (
                 <>
                   <AssetViewEvm />
-                  <TxButtonEvmView />
                 </>
               ) : (
                 <>
                   <AssetView />
-                  <TxButtonView />
-                  <AmountOraiN />
                 </>
               )}
             </div>
+            {chainStore.current.networkType === 'evm' ? (
+              <></>
+            ) : (
+              <>
+                <AmountOraiN />
+              </>
+            )}
+            {chainStore.current.networkType === 'evm' ? (
+              <div style={{marginTop: 24}}>
+                <TxButtonEvmView />
+              </div>
+            ) : (
+              <>
+                <TxButtonView />
+              </>
+            )}
           </div>
         </CardBody>
       </Card>

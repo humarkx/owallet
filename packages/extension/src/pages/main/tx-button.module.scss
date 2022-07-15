@@ -13,6 +13,11 @@
     &:last-child {
       margin-right: 0;
     }
+    color: $color-darker;
+
+    &:hover {
+      color: $color-darker;;
+    }
   }
 }
 

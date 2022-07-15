@@ -123,13 +123,11 @@ export const AccountView: FunctionComponent = observer(() => {
             <Address isRaw={true} tooltipAddress={accountInfo.bech32Address}>
               {accountInfo.walletStatus === WalletStatus.Loaded &&
               accountInfo.bech32Address
-                ? accountInfo.bech32Address.length === 42
-                  ? `${accountInfo.bech32Address.slice(
-                      0,
-                      10
-                    )}...${accountInfo.bech32Address.slice(-8)}`
-                  : accountInfo.bech32Address
-                : '...'}
+                ? `${accountInfo.bech32Address.slice(
+                    0,
+                    15
+                  )}...${accountInfo.bech32Address.slice(-10)}`
+                : accountInfo.bech32Address}
             </Address>
           </div>
           <div style={{ flex: 1 }} />
