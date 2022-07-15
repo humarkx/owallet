@@ -202,10 +202,10 @@ export const EmbedChainInfos: AppChainInfo[] = [
     beta: true // use v1beta1
   },
   {
-    chainId: 'oraibridge-subnet',
+    chainId: 'oraibridge-subnet-2',
     chainName: 'OraiBridge',
-    rpc: 'https://bridge.rpc.orai.io',
-    rest: 'https://bridge.lcd.orai.io',
+    rpc: 'https://bridge-v2.rpc.orai.io',
+    rest: 'https://bridge-v2.lcd.orai.io',
     stakeCurrency: {
       coinDenom: 'ORAIB',
       coinMinimalDenom: 'uoraib',
@@ -298,8 +298,10 @@ export const EmbedChainInfos: AppChainInfo[] = [
       coinGeckoId: 'oraie'
     },
     bip44: {
-      coinType: 60
+      coinType: 60,
+      algo: 'ethsecp256k1'
     },
+    coinType: 60,
     bech32Config: Bech32Address.defaultBech32Config('oraie'),
     get currencies() {
       return [this.stakeCurrency];
@@ -314,36 +316,37 @@ export const EmbedChainInfos: AppChainInfo[] = [
     },
     features: ['ibc-transfer', 'ibc-go', 'stargate']
   },
-  {
-    rpc: 'https://tendermint-testnet.bignft.app/',
-    evmRpc: 'https://endpoint-testnet.bignft.app/',
-    rest: 'https://cosmos-testnet.bignft.app/',
-    // chainId: '888888',
-    chainId: 'balcony_888888-1',
-    chainName: 'Balcony Subnet\n(Testnet)',
-    stakeCurrency: {
-      coinDenom: 'ORAIN',
-      coinMinimalDenom: 'orain',
-      coinDecimals: 18,
-      coinGeckoId: 'orain'
-    },
-    bip44: {
-      coinType: 60
-    },
-    bech32Config: Bech32Address.defaultBech32Config('orain'),
-    get currencies() {
-      return [this.stakeCurrency];
-    },
-    get feeCurrencies() {
-      return [this.stakeCurrency];
-    },
-    gasPriceStep: {
-      low: 0,
-      average: 0.000025,
-      high: 0.00004
-    },
-    features: ['ibc-transfer', 'ibc-go', 'stargate']
-  },
+  // {
+  //   rpc: 'https://tendermint-testnet.bignft.app/',
+  //   evmRpc: 'https://endpoint-testnet.bignft.app/',
+  //   rest: 'https://cosmos-testnet.bignft.app/',
+  //   // chainId: '888888',
+  //   chainId: 'balcony_888888-1',
+  //   chainName: 'Balcony Subnet\n(Testnet)',
+  //   stakeCurrency: {
+  //     coinDenom: 'ORAIN',
+  //     coinMinimalDenom: 'orain',
+  //     coinDecimals: 18,
+  //     coinGeckoId: 'orain'
+  //   },
+  //   bip44: {
+  //     coinType: 60,
+  //     algo: 'ethsecp256k1'
+  //   },
+  //   bech32Config: Bech32Address.defaultBech32Config('orain'),
+  //   get currencies() {
+  //     return [this.stakeCurrency];
+  //   },
+  //   get feeCurrencies() {
+  //     return [this.stakeCurrency];
+  //   },
+  //   gasPriceStep: {
+  //     low: 0,
+  //     average: 0.000025,
+  //     high: 0.00004
+  //   },
+  //   features: ['ibc-transfer', 'ibc-go', 'stargate']
+  // },
   {
     rpc: 'https://rpc-cosmoshub.keplr.app',
     rest: 'https://lcd-cosmoshub.keplr.app',
@@ -506,7 +509,8 @@ export const EmbedChainInfos: AppChainInfo[] = [
   //   chainId: '56',
   //   chainName: 'BNB Chain\n(Coming soon)',
   //   bip44: {
-  //     coinType: 60
+  //     coinType: 60,
+  //     algo: 'ethsecp256k1'
   //   },
   //   stakeCurrency: {
   //     coinDenom: 'BNB',
