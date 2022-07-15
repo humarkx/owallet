@@ -43,8 +43,14 @@
 
 .send-btn {
   background: linear-gradient(90deg, $primary-color 0%, $second-color 100%);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
 
   &-text {
     color: $color-darker;
+    &:hover {
+      color: $color-darker;
+    }
   }
 }

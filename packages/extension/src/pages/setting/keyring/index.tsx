@@ -52,10 +52,15 @@ export const SetKeyRingPage: FunctionComponent = observer(() => {
                   url: '/popup.html#/register'
                 });
               }}
+              style={{
+                display: 'flex',
+                alignItems: 'center'
+              }}
             >
-              <i
-                className="fas fa-plus"
-                style={{ marginRight: '4px', fontSize: '8px' }}
+              <img
+                src={require('../../../public/assets/svg/add-account.svg')}
+                alt=""
+                style={{ marginRight: '4px', width: 16, height: 16 }}
               />
               <FormattedMessage id="setting.keyring.button.add" />
             </Button>
@@ -148,6 +153,8 @@ const KeyRingToolsIcon: FunctionComponent<{
         isOpen={isOpen}
         toggle={toggleOpen}
         placement="bottom"
+        className={style.popoverContainer}
+        hideArrow
       >
         <PopoverBody
           onClick={(e) => {
@@ -156,6 +163,7 @@ const KeyRingToolsIcon: FunctionComponent<{
 
             history.push('');
           }}
+          className={style.popoverContainer}
         >
           {keyStore.type === 'mnemonic' || keyStore.type === 'privateKey' ? (
             <div
