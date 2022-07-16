@@ -104,31 +104,38 @@ export const AccountView: FunctionComponent = observer(() => {
             style={{ marginBottom: '6px' }}
             onClick={() => copyAddress(accountInfo.evmosHexAddress)}
           >
-            <Address isRaw={true} tooltipAddress={accountInfo.evmosHexAddress}>
-              {accountInfo.walletStatus === WalletStatus.Loaded &&
-              accountInfo.evmosHexAddress
-                ? accountInfo.evmosHexAddress.length === 42
-                  ? `${accountInfo.evmosHexAddress.slice(
-                      0,
-                      10
-                    )}...${accountInfo.evmosHexAddress.slice(-8)}`
-                  : accountInfo.evmosHexAddress
-                : '...'}
-            </Address>
+            <span className={styleAccount.addressText}>
+              <Address
+                isRaw={true}
+                tooltipAddress={accountInfo.evmosHexAddress}
+              >
+                {accountInfo.walletStatus === WalletStatus.Loaded &&
+                accountInfo.evmosHexAddress
+                  ? accountInfo.evmosHexAddress.length === 42
+                    ? `${accountInfo.evmosHexAddress.slice(
+                        0,
+                        10
+                      )}...${accountInfo.evmosHexAddress.slice(-8)}`
+                    : accountInfo.evmosHexAddress
+                  : '...'}
+              </Address>
+            </span>
           </div>
           <div
             className={styleAccount.address}
             onClick={() => copyAddress(accountInfo.evmosHexAddress)}
           >
-            <Address isRaw={true} tooltipAddress={accountInfo.bech32Address}>
-              {accountInfo.walletStatus === WalletStatus.Loaded &&
-              accountInfo.bech32Address
-                ? `${accountInfo.bech32Address.slice(
-                    0,
-                    15
-                  )}...${accountInfo.bech32Address.slice(-10)}`
-                : accountInfo.bech32Address}
-            </Address>
+            <span className={styleAccount.addressText}>
+              <Address isRaw={true} tooltipAddress={accountInfo.bech32Address}>
+                {accountInfo.walletStatus === WalletStatus.Loaded &&
+                accountInfo.bech32Address
+                  ? `${accountInfo.bech32Address.slice(
+                      0,
+                      15
+                    )}...${accountInfo.bech32Address.slice(-10)}`
+                  : accountInfo.bech32Address}
+              </Address>
+            </span>
           </div>
           <div style={{ flex: 1 }} />
         </div>

@@ -7,6 +7,7 @@ import { useLanguage } from '@owallet/common';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
+import classNames from 'classnames';
 
 export const SettingPage: FunctionComponent = observer(() => {
   const { uiConfigStore } = useStore();
@@ -124,8 +125,7 @@ export const SettingPage: FunctionComponent = observer(() => {
           icons={[
             <label
               key="toggle"
-              className="custom-toggle"
-              style={{ marginBottom: 0 }}
+              className={classNames('custom-toggle', style.toggleBtn)}
             >
               <input
                 type="checkbox"
@@ -136,7 +136,12 @@ export const SettingPage: FunctionComponent = observer(() => {
                   );
                 }}
               />
-              <span className="custom-toggle-slider rounded-circle" />
+              <span
+                className={classNames(
+                  'custom-toggle-slider rounded-circle',
+                  style.toggleSlider
+                )}
+              />
             </label>
           ]}
         />

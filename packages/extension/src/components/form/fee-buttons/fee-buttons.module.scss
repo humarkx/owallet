@@ -4,6 +4,7 @@
   display: flex;
   background-color: $background-color-lighter;
   border-radius: 8px;
+  margin-bottom: 0px;
 
   .button {
     flex: 1;
@@ -36,13 +37,30 @@
   }
 }
 
+.gas-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 24px;
+}
+
 .gas-btn {
   text-align: right;
-  margin-top: 12px;
-  margin-bottom: 0px;
+  margin-top: -12px;
   color: $primary-color;
+}
 
-  &:hover {
-    color: $second-color;
-  }
+.toggle-slider {
+  background-color: $color-gray-toggle;
+  border: 1px solid $color-gray-toggle;
+}
+
+.toggle-btn input:checked + .toggle-slider {
+  background: linear-gradient(90deg, $primary-color 0%, $second-color 100%);
+  border: 1px solid $primary-color;
+}
+
+.toggle-btn input:checked + .toggle-slider:before {
+  background: #ffffff;
+  transform: translateX(1.625rem);
 }

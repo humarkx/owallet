@@ -56,9 +56,10 @@ $container-width: 420px;
       }
 
       .paragraph {
-        font-size: 16px;
+        font-size: 20px;
         line-height: 1;
         color: $color-gray-50;
+        font-weight: 400;
       }
     }
   }
@@ -139,11 +140,13 @@ $container-width: 420px;
 
 .import-wallet-btn {
   background: $color-gray-80;
+  color: $color;
   border-radius: 4px;
   outline: none;
   border: none;
   &:hover {
-    background: $color-gray-80;
+    color: $color;
+    background: linear-gradient(90deg, $primary-color 0%, $second-color 100%);
   }
   &:active {
     color: $color-darker;

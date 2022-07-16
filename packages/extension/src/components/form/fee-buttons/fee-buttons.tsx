@@ -29,6 +29,7 @@ import { useLanguage } from '@owallet/common';
 import { useIntl } from 'react-intl';
 import { GasInput } from '../gas-input';
 import { action, makeObservable, observable } from 'mobx';
+import classNames from 'classnames';
 
 export interface FeeButtonsProps {
   feeConfig: IFeeConfig;
@@ -171,7 +172,7 @@ export const FeeButtonsInner: FunctionComponent<
     })();
 
     return (
-      <FormGroup style={{ position: 'relative' }}>
+      <FormGroup style={{ position: 'relative', marginBottom: '0px' }}>
         {label ? (
           <Label for={inputId} className="form-control-label">
             {label}
@@ -270,7 +271,12 @@ export const FeeButtonsInner: FunctionComponent<
         {errorText != null ? (
           <FormFeedback style={{ display: 'block' }}>{errorText}</FormFeedback>
         ) : null}
-        <div style={{ textAlign: 'right' }}>
+        <div className={styleFeeButtons.gasWrap}>
+          <span className={styleFeeButtons.gasBtn}>
+            {intl.formatMessage({
+              id: 'input.fee.toggle.set-gas'
+            })}
+          </span>
           <Button
             size="sm"
             color="link"
@@ -278,15 +284,34 @@ export const FeeButtonsInner: FunctionComponent<
               e.preventDefault();
               feeButtonState.setIsGasInputOpen(!feeButtonState.isGasInputOpen);
             }}
-            className={styleFeeButtons.gasBtn}
           >
-            {!feeButtonState.isGasInputOpen
+            <label
+              key="toggle"
+              className={classNames('custom-toggle', styleFeeButtons.toggleBtn)}
+            >
+              <input
+                type="checkbox"
+                checked={feeButtonState.isGasInputOpen}
+                onChange={() => {
+                  feeButtonState.setIsGasInputOpen(
+                    !feeButtonState.isGasInputOpen
+                  );
+                }}
+              />
+              <span
+                className={classNames(
+                  'custom-toggle-slider rounded-circle',
+                  styleFeeButtons.toggleSlider
+                )}
+              />
+            </label>
+            {/* {!feeButtonState.isGasInputOpen
               ? intl.formatMessage({
                   id: 'input.fee.toggle.set-gas'
                 })
               : intl.formatMessage({
                   id: 'input.fee.toggle.set-gas.close'
-                })}
+                })} */}
           </Button>
         </div>
       </FormGroup>
