@@ -288,13 +288,14 @@ export const AssetChartViewEvm: FunctionComponent = observer(() => {
   const accountInfo = accountStore.getAccount(current.chainId);
 
   // get total amount
-  const total = queries.evm.queryEvmBalance.getQueryBalance(
-    accountInfo.evmosHexAddress
-  ).balance;
 
   let totalPrice;
-  if (total) {
-    totalPrice = priceStore?.calculatePrice(total, fiatCurrency);
+  let total;
+  if (accountInfo.evmosHexAddress) {
+    total = queries.evm.queryEvmBalance.getQueryBalance(
+      accountInfo.evmosHexAddress
+    )?.balance;
+    if (total) totalPrice = priceStore?.calculatePrice(total, fiatCurrency);
   }
 
   // wait for account to be
