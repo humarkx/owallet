@@ -123,6 +123,10 @@ export const SetKeyRingPage: FunctionComponent = observer(() => {
               icons={[
                 <KeyRingToolsIcon key="tools" index={i} keyStore={keyStore} />
               ]}
+              styleTitle={{
+                fontWeight: 400,
+                fontSize: 14
+              }}
             />
           );
         })}

@@ -287,32 +287,32 @@ export const AssetChartViewEvm: FunctionComponent = observer(() => {
 
   const accountInfo = accountStore.getAccount(current.chainId);
 
-  // wait for account to be
-  console.log("account infor: ",accountInfo.bech32Address)
-  console.log("account infor evmos: ",accountInfo.evmosHexAddress)
-  if (!accountInfo.evmosHexAddress) return null;
-
-  const balance = queries.evm.queryEvmBalance.getQueryBalance(
+  // get total amount
+  const total = queries.evm.queryEvmBalance.getQueryBalance(
     accountInfo.evmosHexAddress
   ).balance;
 
+  let totalPrice;
+  if (total) {
+    totalPrice = priceStore?.calculatePrice(total, fiatCurrency);
+  }
+
+  // wait for account to be
+  console.log('account infor: ', accountInfo.bech32Address);
+  console.log('account infor evmos: ', accountInfo.evmosHexAddress);
+  if (!accountInfo.evmosHexAddress) return null;
+
   return (
     <React.Fragment>
-      <div className={styleAsset.amountEvmWrap} style={{ marginTop: '12px', width: '100%' }}>
-        <div
-          className={styleAsset.legend}
-          style={{ flexDirection: 'column', alignItems: 'center', display: 'flex' }}
-        >
-          <div className={styleAsset.label}>
-            <img src={chainInfo.stakeCurrency.coinImageUrl} />
+      <div className={styleAsset.containerChart}>
+        <div className={styleAsset.centerText}>
+          <div className={styleAsset.big}>
+            <FormattedMessage id="main.account.chart.total-balance" />
           </div>
-          <div
-            className={styleAsset.value}
-            style={{
-              color: '#D6CCF4'
-            }}
-          >
-            {balance?.trim(true).shrink(true).maxDecimals(6).toString()}
+          <div className={styleAsset.small}>
+            {totalPrice
+              ? totalPrice.toString()
+              : total?.trim(true).shrink(true).maxDecimals(6).toString()}
           </div>
         </div>
       </div>

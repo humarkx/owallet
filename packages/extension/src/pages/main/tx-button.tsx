@@ -32,7 +32,7 @@ const DepositModal: FunctionComponent<{
 
   return (
     <div className={styleTxButton.depositModal}>
-      <h1 style={{ marginBottom: 0 }}>Scan QR code</h1>
+      <h1 className={styleTxButton.title}>Scan QR code</h1>
       <canvas className={styleTxButton.qrcode} id="qrcode" ref={qrCodeRef} />
     </div>
   );
@@ -68,7 +68,10 @@ export const TxButtonView: FunctionComponent = observer(() => {
             width: '330px',
             minWidth: '330px',
             minHeight: 'unset',
-            maxHeight: 'unset'
+            maxHeight: 'unset',
+            backgroundColor: '#29292d',
+            border: '1px solid #68687A',
+            borderRadius: '8px'
           }
         }}
         isOpen={isDepositOpen}
@@ -195,7 +198,7 @@ export const TxButtonEvmView: FunctionComponent = observer(() => {
         className={classnames(styleTxButton.button, {
           disabled: !hasAssets
         })}
-        style={{cursor: !hasAssets ? "default" : "pointer" }}
+        style={{ cursor: !hasAssets ? 'default' : 'pointer' }}
         color="primary"
         data-loading={accountInfo.isSendingMsg === 'send'}
         onClick={(e) => {
@@ -206,7 +209,7 @@ export const TxButtonEvmView: FunctionComponent = observer(() => {
           }
         }}
       >
-        <span >
+        <span>
           <FormattedMessage id="main.account.button.send" />
         </span>
       </Button>

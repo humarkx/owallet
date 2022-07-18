@@ -21,7 +21,7 @@ import { useIntl } from 'react-intl';
 import { useConfirm } from '../../components/confirm';
 import { ChainUpdaterService } from '@owallet/background';
 import { IBCTransferView } from './ibc-transfer';
-import AmountOraiN from './amount-orain';
+import { AmountTokenCosmos, AmountTokenEvm } from './amount-tokens';
 
 export const MainPage: FunctionComponent = observer(() => {
   const history = useHistory();
@@ -122,14 +122,16 @@ export const MainPage: FunctionComponent = observer(() => {
               )}
             </div>
             {chainStore.current.networkType === 'evm' ? (
-              <></>
+              <>
+                <AmountTokenEvm />
+              </>
             ) : (
               <>
-                <AmountOraiN />
+                <AmountTokenCosmos />
               </>
             )}
             {chainStore.current.networkType === 'evm' ? (
-              <div style={{marginTop: 24}}>
+              <div style={{ marginTop: 24 }}>
                 <TxButtonEvmView />
               </div>
             ) : (

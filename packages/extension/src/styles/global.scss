@@ -80,12 +80,12 @@ hr {
 }
 
 .form-control {
-  color: $primary-color;
+  color: $color;
   background-color: $background-color-lighter;
   padding: 0.625rem 0.75rem;
   &:focus {
     background-color: $background-color-lighter;
-    color: $second-color;
+    color: $color;
   }
 }
 
@@ -113,6 +113,7 @@ textarea.form-control {
 .btn-secondary:not(:disabled):not(.disabled).active,
 .show > .btn-secondary.dropdown-toggle {
   color: $color-lighter;
+  outline: none;
 }
 
 .ReactModalPortal {
@@ -158,13 +159,15 @@ button[data-loading="true"] {
   white-space: break-spaces;
   word-break: break-word;
   padding: 0.625rem 0.75rem;
+  outline: none;
+  border: 0;
 }
 
 .btn-primary {
   color: $color-darker;
   background: linear-gradient(90deg, $primary-color 0%, $second-color 100%);
   outline: none;
-  border: none;
+  border: 0;
 
   &:hover {
     background: $second-color;
@@ -176,6 +179,8 @@ button[data-loading="true"] {
   color: $color;
   border: 0 !important;
   background-color: transparent !important;
+  outline: none;
+
   &:hover {
     color: $color;
   }
