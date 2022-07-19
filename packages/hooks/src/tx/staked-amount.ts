@@ -16,6 +16,7 @@ import {
 } from './errors';
 import { Dec, DecUtils } from '@owallet/unit';
 import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export class StakedAmountConfig extends TxChainSetter implements IAmountConfig {
   @observable.ref
@@ -48,6 +49,7 @@ export class StakedAmountConfig extends TxChainSetter implements IAmountConfig {
     this._validatorAddress = initialValidatorAddress;
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

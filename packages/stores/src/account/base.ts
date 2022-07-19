@@ -32,6 +32,7 @@ import ICoin = cosmos.base.v1beta1.ICoin;
 import SignMode = cosmos.tx.signing.v1beta1.SignMode;
 
 import { evmosToEth } from '@hanchon/ethermint-address-converter';
+import { makeLoggable } from 'mobx-log';
 
 export enum WalletStatus {
   NotInit = 'NotInit',
@@ -127,6 +128,7 @@ export class AccountSetBase<MsgOpts, Queries> {
     protected readonly opts: AccountSetOpts<MsgOpts>
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.pubKey = new Uint8Array();
 

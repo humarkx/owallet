@@ -10,6 +10,7 @@ import {
 import { Result } from './types';
 import { ObservableEvmContractChainQuery } from './contract-query';
 import { evmosToEth } from '@hanchon/ethermint-address-converter';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryErc20Balance extends ObservableEvmContractChainQuery<Result> {
   constructor(
@@ -58,6 +59,7 @@ export class ObservableQueryErc20BalanceInner extends ObservableQueryBalanceInne
     );
 
     makeObservable(this);
+    makeLoggable(this);
 
     this.queryErc20Balance = new ObservableQueryErc20Balance(
       kvStore,

@@ -16,6 +16,7 @@ import { computed, flow, makeObservable, observable } from 'mobx';
 import { HasMapStore } from '../../common';
 import { BACKGROUND_PORT, MessageRequester } from '@owallet/router';
 import { toGenerator } from '@owallet/common';
+import { makeLoggable } from 'mobx-log';
 
 export class Secret20ViewingKeyPermissionInnerStore {
   @observable.ref
@@ -27,6 +28,7 @@ export class Secret20ViewingKeyPermissionInnerStore {
     protected readonly requester: MessageRequester
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.refreshOrigins();
   }
@@ -71,6 +73,7 @@ export class BasicAccessPermissionInnerStore {
     protected readonly requester: MessageRequester
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.refreshOrigins();
   }
@@ -151,6 +154,7 @@ export class PermissionStore extends HasMapStore<
       }
     });
     makeObservable(this);
+    makeLoggable(this);
   }
 
   getBasicAccessInfo(chainId: string): BasicAccessPermissionInnerStore {

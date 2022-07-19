@@ -13,6 +13,7 @@ import { ChainStore } from '../chain';
 import { InteractionStore } from './interaction';
 import { toGenerator } from '@owallet/common';
 import { ChainIdHelper } from '@owallet/cosmos';
+import { makeLoggable } from 'mobx-log';
 
 export class TokensStoreInner {
   @observable.ref
@@ -27,6 +28,7 @@ export class TokensStoreInner {
     protected readonly requester: MessageRequester
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.refreshTokens();
 
@@ -104,6 +106,7 @@ export class TokensStore<
       );
     });
     makeObservable(this);
+    makeLoggable(this);
 
     this.chainStore.addSetChainInfoHandler((chainInfoInner) => {
       autorun(() => {

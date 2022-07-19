@@ -13,6 +13,7 @@ import { DeepReadonly } from 'utility-types';
 import { Dec, DecUtils, Int, IntPretty } from '@owallet/unit';
 import { computedFn } from 'mobx-utils';
 import { ObservableQueryProposal } from './proposal';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryGovernance extends ObservableChainQuery<GovProposals> {
   @observable.ref
@@ -30,6 +31,7 @@ export class ObservableQueryGovernance extends ObservableChainQuery<GovProposals
   ) {
     super(kvStore, chainId, chainGetter, '/gov/proposals?limit=1000');
     makeObservable(this);
+    makeLoggable(this);
   }
 
   getQueryPool(): DeepReadonly<ObservableChainQuery<StakingPool>> {

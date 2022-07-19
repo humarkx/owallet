@@ -15,6 +15,7 @@ import {
   flow,
   toJS
 } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 export class InteractionStore implements InteractionForegroundHandler {
   @observable.shallow
@@ -31,6 +32,7 @@ export class InteractionStore implements InteractionForegroundHandler {
     protected readonly msgRequester: MessageRequester
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     const service = new InteractionForegroundService(this);
     interactionForegroundInit(router, service);

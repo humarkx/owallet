@@ -6,6 +6,7 @@ import { CoinPretty, Dec, Int } from '@owallet/unit';
 import { AppCurrency, NetworkType } from '@owallet/types';
 import { HasMapStore } from '../common';
 import { computedFn } from 'mobx-utils';
+import { makeLoggable } from 'mobx-log';
 
 export abstract class ObservableQueryBalanceInner<
   T = unknown,
@@ -20,6 +21,7 @@ export abstract class ObservableQueryBalanceInner<
   ) {
     super(kvStore, chainId, chainGetter, url);
     makeObservable(this);
+    makeLoggable(this);
   }
 
   abstract get balance(): CoinPretty;
@@ -66,6 +68,7 @@ export class ObservableQueryBalancesInner {
     bech32Address: string
   ) {
     makeObservable(this);
+    makeLoggable(this);
     this.bech32Address = bech32Address;
   }
 

@@ -10,6 +10,7 @@ import { CoinPretty, Dec, Int } from '@owallet/unit';
 import { Currency } from '@owallet/types';
 import { StoreUtils } from '../../../common';
 import { computedFn } from 'mobx-utils';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
   protected bech32Address: string;
@@ -27,6 +28,7 @@ export class ObservableQueryRewardsInner extends ObservableChainQuery<Rewards> {
       `/distribution/delegators/${bech32Address}/rewards`
     );
     makeObservable(this);
+    makeLoggable(this);
 
     this.bech32Address = bech32Address;
   }

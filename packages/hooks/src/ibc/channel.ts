@@ -1,7 +1,8 @@
-import { IIBCChannelConfig, Channel } from "./types";
-import { action, makeObservable, observable } from "mobx";
-import { ChannelNotSetError } from "./errors";
-import { useState } from "react";
+import { IIBCChannelConfig, Channel } from './types';
+import { action, makeObservable, observable } from 'mobx';
+import { ChannelNotSetError } from './errors';
+import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export class IBCChannelConfig implements IIBCChannelConfig {
   @observable.ref
@@ -9,6 +10,7 @@ export class IBCChannelConfig implements IIBCChannelConfig {
 
   constructor() {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get channel(): Channel | undefined {
@@ -17,7 +19,7 @@ export class IBCChannelConfig implements IIBCChannelConfig {
 
   getError(): Error | undefined {
     if (!this._channel) {
-      return new ChannelNotSetError("Channel not set");
+      return new ChannelNotSetError('Channel not set');
     }
     return undefined;
   }

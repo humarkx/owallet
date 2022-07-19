@@ -6,6 +6,7 @@ import {
   LedgerSetWebHIDFlagMsg
 } from '@owallet/background';
 import { toGenerator } from '@owallet/common';
+import { makeLoggable } from 'mobx-log';
 
 export type LedgerInitDataType =
   | {
@@ -36,6 +37,7 @@ export class LedgerInitStore {
     protected readonly msgRequester: MessageRequester
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.fetchIsWebHID();
   }

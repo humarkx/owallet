@@ -7,6 +7,7 @@ import { KVStore } from '@owallet/common';
 import { ChainGetter } from '../../../common';
 import { computed, makeObservable } from 'mobx';
 import { Int } from '@owallet/unit';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryBlockInner extends ObservableChainQuery<{
   block: Block;
@@ -20,6 +21,7 @@ export class ObservableQueryBlockInner extends ObservableChainQuery<{
     super(kvStore, chainId, chainGetter, `/blocks/${paramHeight}`);
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   /**

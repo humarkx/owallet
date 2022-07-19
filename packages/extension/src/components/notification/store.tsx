@@ -1,10 +1,10 @@
-import React, { FunctionComponent } from "react";
-import { NotificationProperty } from "./index";
-import { action, observable, IObservableArray, makeObservable } from "mobx";
+import React, { FunctionComponent } from 'react';
+import { NotificationProperty } from './index';
+import { action, observable, IObservableArray, makeObservable } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
-export const NotificationStoreContext = React.createContext<NotificationStore | null>(
-  null
-);
+export const NotificationStoreContext =
+  React.createContext<NotificationStore | null>(null);
 
 export const NotificationStoreProvider: FunctionComponent = ({ children }) => (
   <NotificationStoreContext.Provider value={new NotificationStore()}>
@@ -15,7 +15,7 @@ export const NotificationStoreProvider: FunctionComponent = ({ children }) => (
 export const useNotificationStore = () => {
   const store = React.useContext(NotificationStoreContext);
   if (!store) {
-    throw new Error("You have forgot to use StoreProvider");
+    throw new Error('You have forgot to use StoreProvider');
   }
   return store;
 };
@@ -30,6 +30,7 @@ export class NotificationStore {
 
   constructor() {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

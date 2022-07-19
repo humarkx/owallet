@@ -7,6 +7,7 @@ import { KVStore } from '@owallet/common';
 import { ChainGetter } from '../../../common';
 import { CoinPretty, Int } from '@owallet/unit';
 import { computed, makeObservable } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryUnbondingDelegationsInner extends ObservableChainQuery<UnbondingDelegations> {
   protected bech32Address: string;
@@ -24,6 +25,7 @@ export class ObservableQueryUnbondingDelegationsInner extends ObservableChainQue
       `/staking/delegators/${bech32Address}/unbonding_delegations`
     );
     makeObservable(this);
+    makeLoggable(this);
 
     this.bech32Address = bech32Address;
   }

@@ -4,12 +4,14 @@ import { MintParmas } from './types';
 import { KVStore } from '@owallet/common';
 import { computed, makeObservable } from 'mobx';
 import { Dec } from '@owallet/unit';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryOsmosisMintParmas extends ObservableChainQuery<MintParmas> {
   constructor(kvStore: KVStore, chainId: string, chainGetter: ChainGetter) {
     super(kvStore, chainId, chainGetter, `/osmosis/mint/v1beta1/params`);
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get mintDenom(): string | undefined {

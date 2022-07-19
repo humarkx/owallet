@@ -18,6 +18,7 @@ import {
 import { Bech32Address } from '@owallet/cosmos';
 import { useState } from 'react';
 import { ObservableEnsFetcher } from '@owallet/ens';
+import { makeLoggable } from 'mobx-log';
 
 export class RecipientConfig extends TxChainSetter implements IRecipientConfig {
   @observable
@@ -36,6 +37,7 @@ export class RecipientConfig extends TxChainSetter implements IRecipientConfig {
     super(chainGetter, initialChainId);
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @computed

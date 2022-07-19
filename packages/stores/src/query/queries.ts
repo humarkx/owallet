@@ -4,6 +4,7 @@ import { DeepReadonly } from 'utility-types';
 import { ObservableQueryBalances } from './balances';
 import { ChainGetter } from '../common';
 import { OWallet } from '@owallet/types';
+import { makeLoggable } from 'mobx-log';
 
 export class QueriesSetBase {
   public readonly queryBalances: DeepReadonly<ObservableQueryBalances>;
@@ -33,6 +34,7 @@ export class QueriesStore<QueriesSet extends QueriesSetBase> {
     ) => QueriesSet
   ) {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get(chainId: string): DeepReadonly<QueriesSet> {

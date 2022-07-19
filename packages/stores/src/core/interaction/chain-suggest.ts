@@ -2,6 +2,7 @@ import { InteractionStore } from './interaction';
 import { ChainInfo } from '@owallet/types';
 import { SuggestChainInfoMsg } from '@owallet/background';
 import { flow, makeObservable, observable } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 export class ChainSuggestStore {
   @observable
@@ -9,6 +10,7 @@ export class ChainSuggestStore {
 
   constructor(protected readonly interactionStore: InteractionStore) {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get waitingSuggestedChainInfo() {

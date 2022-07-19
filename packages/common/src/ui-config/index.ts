@@ -2,6 +2,7 @@
  * Store the config related to UI.
  */
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 import { KVStore } from '../kv-store/interface';
 
 export interface UIConfigOptions {
@@ -16,6 +17,7 @@ export class UIConfigStore {
 
   constructor(protected readonly kvStore: KVStore) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.init();
   }

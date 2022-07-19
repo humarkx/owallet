@@ -9,6 +9,7 @@ import {
 import { IAmountConfig } from './types';
 import { useState } from 'react';
 import { action, makeObservable, observable } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 type MsgOpts = CosmosMsgOpts & SecretMsgOpts & CosmwasmMsgOpts;
 
@@ -27,6 +28,7 @@ export class SendGasConfig extends GasConfig {
     this.sendMsgOpts = sendMsgOpts;
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

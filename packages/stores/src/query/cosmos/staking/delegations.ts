@@ -8,6 +8,7 @@ import { ChainGetter } from '../../../common';
 import { CoinPretty, Int } from '@owallet/unit';
 import { computed, makeObservable } from 'mobx';
 import { computedFn } from 'mobx-utils';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryDelegationsInner extends ObservableChainQuery<
   Delegations | DelegationsStargate
@@ -27,6 +28,7 @@ export class ObservableQueryDelegationsInner extends ObservableChainQuery<
       `/staking/delegators/${bech32Address}/delegations`
     );
     makeObservable(this);
+    makeLoggable(this);
 
     this.bech32Address = bech32Address;
   }

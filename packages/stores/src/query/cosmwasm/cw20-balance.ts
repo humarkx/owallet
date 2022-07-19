@@ -9,6 +9,7 @@ import {
 } from '../balances';
 import { Cw20ContractBalance } from './types';
 import { ObservableCosmwasmContractChainQuery } from './contract-query';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryCw20Balance extends ObservableCosmwasmContractChainQuery<Cw20ContractBalance> {
   constructor(
@@ -48,6 +49,7 @@ export class ObservableQueryCw20BalanceInner extends ObservableQueryBalanceInner
     );
 
     makeObservable(this);
+    makeLoggable(this);
 
     this.queryCw20Balance = new ObservableQueryCw20Balance(
       kvStore,

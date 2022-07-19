@@ -3,6 +3,7 @@ import { AppCurrency, ChainInfo } from '@owallet/types';
 import { ChainInfoInner, ChainStore } from '../chain';
 import { HasCosmosQueries, HasCosmwasmQueries, QueriesSetBase } from '../query';
 import { DenomHelper, KVStore, toGenerator } from '@owallet/common';
+import { makeLoggable } from 'mobx-log';
 
 type CacheIBCDenomData = {
   denomTrace: {
@@ -70,6 +71,7 @@ export class IBCCurrencyRegsitrarInner<C extends ChainInfo = ChainInfo> {
     ) => string
   ) {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @flow

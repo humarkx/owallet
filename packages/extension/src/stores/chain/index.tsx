@@ -15,6 +15,7 @@ import { BACKGROUND_PORT } from '@owallet/router';
 
 import { MessageRequester } from '@owallet/router';
 import { toGenerator } from '@owallet/common';
+import { makeLoggable } from 'mobx-log';
 
 export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
   @observable
@@ -42,6 +43,7 @@ export class ChainStore extends BaseChainStore<ChainInfoWithEmbed> {
     this._selectedChainId = embedChainInfos[0].chainId;
 
     makeObservable(this);
+    makeLoggable(this);
 
     this.init();
   }

@@ -19,6 +19,7 @@ import { ChainIdHelper } from '@owallet/cosmos';
 import { DeepReadonly } from 'utility-types';
 import { AxiosRequestConfig } from 'axios';
 import { keepAlive } from 'mobx-utils';
+import { makeLoggable } from 'mobx-log';
 
 type CurrencyRegistrar = (
   coinMinimalDenom: string
@@ -51,6 +52,7 @@ export class ChainInfoInner<C extends ChainInfo = ChainInfo>
     this._chainInfo = chainInfo;
 
     makeObservable(this);
+    makeLoggable(this);
 
     keepAlive(this, 'currencyMap');
   }
@@ -296,6 +298,7 @@ export class ChainStore<C extends ChainInfo = ChainInfo>
     this.setChainInfos(embedChainInfos);
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get chainInfos(): ChainInfoInner<C>[] {

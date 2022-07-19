@@ -13,6 +13,7 @@ import {
 } from './errors';
 import { Dec, DecUtils } from '@owallet/unit';
 import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export class AmountConfig extends TxChainSetter implements IAmountConfig {
   @observable.ref
@@ -48,6 +49,7 @@ export class AmountConfig extends TxChainSetter implements IAmountConfig {
     this._amount = '';
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

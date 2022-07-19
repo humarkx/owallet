@@ -13,6 +13,7 @@ import { ObservableSecretContractChainQuery } from './contract-query';
 import { CancelToken } from 'axios';
 import { WrongViewingKeyError } from './errors';
 import { OWallet } from '@owallet/types';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQuerySecret20Balance extends ObservableSecretContractChainQuery<{
   balance: { amount: string };
@@ -40,6 +41,7 @@ export class ObservableQuerySecret20Balance extends ObservableSecretContractChai
       querySecretContractCodeHash
     );
     makeObservable(this);
+    makeLoggable(this);
 
     if (!this.viewingKey) {
       this.setError({
@@ -105,6 +107,7 @@ export class ObservableQuerySecret20BalanceInner extends ObservableQueryBalanceI
     );
 
     makeObservable(this);
+    makeLoggable(this);
 
     this.querySecret20Balance = new ObservableQuerySecret20Balance(
       kvStore,

@@ -3,6 +3,7 @@ import { action, makeObservable, observable } from 'mobx';
 import { ChainGetter } from '@owallet/stores';
 import { TxChainSetter } from './chain';
 import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export class MemoConfig extends TxChainSetter implements IMemoConfig {
   @observable
@@ -11,6 +12,7 @@ export class MemoConfig extends TxChainSetter implements IMemoConfig {
   constructor(chainGetter: ChainGetter, initialChainId: string) {
     super(chainGetter, initialChainId);
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get memo(): string {

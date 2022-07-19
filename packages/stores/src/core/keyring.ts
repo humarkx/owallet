@@ -32,6 +32,7 @@ import { ChainGetter } from '../common';
 import { BIP44 } from '@owallet/types';
 import { DeepReadonly } from 'utility-types';
 import { toGenerator } from '@owallet/common';
+import { makeLoggable } from 'mobx-log';
 
 export class KeyRingSelectablesStore {
   @observable
@@ -53,6 +54,7 @@ export class KeyRingSelectablesStore {
     protected readonly keyRingStore: KeyRingStore
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.refresh();
   }
@@ -144,6 +146,7 @@ export class KeyRingStore {
     protected readonly interactionStore: InteractionStore
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.restore();
   }

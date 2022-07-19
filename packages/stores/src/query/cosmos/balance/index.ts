@@ -10,6 +10,7 @@ import {
 } from '../../balances';
 import { ObservableChainQuery } from '../../chain-query';
 import { Balances } from './types';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryBalanceNative extends ObservableQueryBalanceInner {
   constructor(
@@ -29,6 +30,7 @@ export class ObservableQueryBalanceNative extends ObservableQueryBalanceInner {
     );
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   protected canFetch(): boolean {
@@ -83,6 +85,7 @@ export class ObservableQueryCosmosBalances extends ObservableChainQuery<Balances
     this.bech32Address = bech32Address;
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   protected canFetch(): boolean {

@@ -15,6 +15,7 @@ import { KVStore, toGenerator } from '@owallet/common';
 import { DeepReadonly } from 'utility-types';
 import { HasMapStore } from '../map';
 import EventEmitter from 'eventemitter3';
+import { makeLoggable } from 'mobx-log';
 
 export type QueryOptions = {
   // millisec
@@ -94,6 +95,7 @@ export abstract class ObservableQueryBase<T = unknown, E = unknown> {
     this._instance = instance;
 
     makeObservable(this);
+    makeLoggable(this);
 
     onBecomeObserved(this, '_response', this.becomeObserved);
     onBecomeObserved(this, '_isFetching', this.becomeObserved);
@@ -429,6 +431,7 @@ export class ObservableQuery<
   ) {
     super(instance, options);
     makeObservable(this);
+    makeLoggable(this);
 
     // reload when change url
     this.setUrl(url, options?.data);

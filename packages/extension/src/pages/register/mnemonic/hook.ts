@@ -2,6 +2,7 @@ import { action, flow, makeObservable, observable } from 'mobx';
 import { RegisterConfig } from '@owallet/hooks';
 import { useState } from 'react';
 import { toGenerator } from '@owallet/common';
+import { makeLoggable } from 'mobx-log';
 
 export type NewMnemonicMode = 'generate' | 'verify';
 
@@ -28,6 +29,7 @@ export class NewMnemonicConfig {
 
   constructor(protected readonly registerConfig: RegisterConfig) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.setNumWords(this.numWords);
   }

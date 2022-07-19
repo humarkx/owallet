@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { IFeeConfig, IMemoConfig } from '../tx';
 import { cosmos, SignDocWrapper } from '@owallet/cosmos';
 import Long from 'long';
+import { makeLoggable } from 'mobx-log';
 
 export * from './amount';
 
@@ -15,6 +16,7 @@ export class SignDocHelper {
     protected readonly memoConfig: IMemoConfig
   ) {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @computed

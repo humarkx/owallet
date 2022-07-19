@@ -4,6 +4,7 @@ import { ChainInfo } from '@owallet/types';
 import { ChainGetter, HasMapStore } from '@owallet/stores';
 import { DeepReadonly } from 'utility-types';
 import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export interface AddressBookSelectHandler {
   setRecipient(recipient: string): void;
@@ -30,6 +31,7 @@ export class AddressBookConfig {
     protected readonly chainId: string
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.loadAddressBookDatas();
   }

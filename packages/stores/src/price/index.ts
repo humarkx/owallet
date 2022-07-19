@@ -8,6 +8,7 @@ import { PricePretty } from '@owallet/unit';
 import { DeepReadonly } from 'utility-types';
 import deepmerge from 'deepmerge';
 import { action, flow, makeObservable, observable } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 export class CoinGeckoPriceStore extends ObservableQuery<CoinGeckoSimplePrice> {
   protected coinIds: string[];
@@ -41,6 +42,7 @@ export class CoinGeckoPriceStore extends ObservableQuery<CoinGeckoSimplePrice> {
     this._supportedVsCurrencies = supportedVsCurrencies;
 
     makeObservable(this);
+    makeLoggable(this);
 
     this.restoreDefaultVsCurrency();
   }

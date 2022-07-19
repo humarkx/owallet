@@ -2,6 +2,7 @@ import { GasConfig } from '../tx';
 import { ChainGetter, CosmosMsgOpts } from '@owallet/stores';
 import { action, makeObservable, observable } from 'mobx';
 import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export class IBCTransferGasConfig extends GasConfig {
   @observable.ref
@@ -17,6 +18,7 @@ export class IBCTransferGasConfig extends GasConfig {
     this.msgOpts = msgOpts;
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

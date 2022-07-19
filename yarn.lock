@@ -16124,6 +16124,11 @@ mkdirp@*, mkdirp@1.0.4, mkdirp@1.x, mkdirp@^1.0.3, mkdirp@^1.0.4:
   dependencies:
     minimist "^1.2.6"
 
+mobx-log@^0.9.2:
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/mobx-log/-/mobx-log-0.9.2.tgz#3766d9118b470070bd77648665f5566c9ab50af4"
+  integrity sha512-p3ralO67NoflSiezf3IkCV1FXbeg2g4IzUfjAz9rOXxvZl4ExZ6GHMyHtxt91Iz5+e2TrivWn/e3+yM/qHJb7w==
+
 mobx-persist@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/mobx-persist/-/mobx-persist-0.4.1.tgz#fe5790eda04e0ee0b91c512d1347104e09363f9a"

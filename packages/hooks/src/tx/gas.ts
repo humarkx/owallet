@@ -3,6 +3,7 @@ import { TxChainSetter } from './chain';
 import { ChainGetter } from '@owallet/stores';
 import { action, makeObservable, observable } from 'mobx';
 import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export class GasConfig extends TxChainSetter implements IGasConfig {
   /*
@@ -23,6 +24,7 @@ export class GasConfig extends TxChainSetter implements IGasConfig {
     this._gasRaw = initialGas?.toString();
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get gasRaw(): string {

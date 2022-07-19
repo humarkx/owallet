@@ -5,6 +5,7 @@ import { AppCurrency } from '@owallet/types';
 import { computed, makeObservable } from 'mobx';
 import { DenomHelper } from '@owallet/common';
 import { useState } from 'react';
+import { makeLoggable } from 'mobx-log';
 
 export class IBCAmountConfig extends AmountConfig {
   constructor(
@@ -17,6 +18,7 @@ export class IBCAmountConfig extends AmountConfig {
     super(chainGetter, initialChainId, sender, feeConfig, queryBalances);
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @computed

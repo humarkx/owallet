@@ -6,6 +6,7 @@ import { toGenerator } from '@owallet/common';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { hash as nameHash } from '@ensdomains/eth-ens-namehash';
+import { makeLoggable } from 'mobx-log';
 
 const ensRegistryInterface: Interface = new Interface([
   {
@@ -87,6 +88,7 @@ export class ObservableEnsFetcher {
     public readonly ensRegistryContract: string = '0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e'
   ) {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

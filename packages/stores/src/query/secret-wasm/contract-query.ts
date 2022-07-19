@@ -8,6 +8,7 @@ import Axios, { CancelToken } from 'axios';
 import { QueryResponse } from '../../common';
 
 import { Buffer } from 'buffer';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableSecretContractChainQuery<
   T
@@ -33,6 +34,7 @@ export class ObservableSecretContractChainQuery<
     // Don't need to set the url initially because it can't request without encyption.
     super(kvStore, chainId, chainGetter, ``);
     makeObservable(this);
+    makeLoggable(this);
 
     // Try to get the owallet API.
     this.initOWallet();

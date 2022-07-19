@@ -3,6 +3,7 @@ import { KeyRingStore } from '@owallet/stores';
 import { action, computed, flow, makeObservable, observable } from 'mobx';
 import { Mnemonic, RNG } from '@owallet/crypto';
 import { BIP44HDPath } from '@owallet/background';
+import { makeLoggable } from 'mobx-log';
 
 export type RegisterMode = 'create' | 'add';
 
@@ -39,6 +40,7 @@ export class RegisterConfig {
   ) {
     this.keyRingStore = keyRingStore;
     makeObservable(this);
+    makeLoggable(this);
 
     for (const option of options) {
       this.addRegisterOption(option.type, option.intro, option.page);

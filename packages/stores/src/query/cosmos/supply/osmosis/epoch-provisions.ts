@@ -5,6 +5,7 @@ import { KVStore } from '@owallet/common';
 import { computed, makeObservable } from 'mobx';
 import { CoinPretty, Int } from '@owallet/unit';
 import { ObservableQueryOsmosisMintParmas } from './params';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryOsmosisEpochProvisions extends ObservableChainQuery<EpochProvisions> {
   constructor(
@@ -21,6 +22,7 @@ export class ObservableQueryOsmosisEpochProvisions extends ObservableChainQuery<
     );
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @computed

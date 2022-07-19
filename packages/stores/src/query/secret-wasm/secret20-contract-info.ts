@@ -6,6 +6,7 @@ import { ObservableQuerySecretContractCodeHash } from './contract-hash';
 import { computed, makeObservable } from 'mobx';
 import { ObservableSecretContractChainQuery } from './contract-query';
 import { OWallet } from '@owallet/types';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQuerySecret20ContactInfoInner extends ObservableSecretContractChainQuery<Secret20ContractTokenInfo> {
   protected nonce?: Uint8Array;
@@ -29,6 +30,7 @@ export class ObservableQuerySecret20ContactInfoInner extends ObservableSecretCon
       querySecretContractCodeHash
     );
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get error(): Readonly<QueryError<unknown>> | undefined {

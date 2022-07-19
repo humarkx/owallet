@@ -11,6 +11,7 @@ import { computed, makeObservable } from 'mobx';
 import { DeepReadonly } from 'utility-types';
 import { CoinPretty, Dec, DecUtils, Int, IntPretty } from '@owallet/unit';
 import { ObservableQueryGovernance } from './proposals';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryProposal extends ObservableChainQuery<ProposalTally> {
   constructor(
@@ -22,6 +23,7 @@ export class ObservableQueryProposal extends ObservableChainQuery<ProposalTally>
   ) {
     super(kvStore, chainId, chainGetter, `/gov/proposals/${_raw.id}/tally`);
     makeObservable(this);
+    makeLoggable(this);
   }
 
   protected canFetch(): boolean {

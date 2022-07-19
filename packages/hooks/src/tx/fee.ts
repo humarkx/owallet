@@ -15,6 +15,7 @@ import { StdFee } from '@cosmjs/launchpad';
 import { useState } from 'react';
 import { ObservableQueryBalances } from '@owallet/stores';
 import { InsufficientFeeError, NotLoadedFeeError } from './errors';
+import { makeLoggable } from 'mobx-log';
 
 export class FeeConfig extends TxChainSetter implements IFeeConfig {
   @observable.ref
@@ -58,6 +59,7 @@ export class FeeConfig extends TxChainSetter implements IFeeConfig {
     this.additionAmountToNeedFee = additionAmountToNeedFee;
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

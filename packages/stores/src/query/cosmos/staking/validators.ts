@@ -17,6 +17,7 @@ import Axios, { CancelToken } from 'axios';
 import PQueue from 'p-queue';
 import { CoinPretty, Dec } from '@owallet/unit';
 import { computedFn } from 'mobx-utils';
+import { makeLoggable } from 'mobx-log';
 
 interface KeybaseResult {
   status: {
@@ -62,6 +63,7 @@ export class ObservableQueryValidatorThumbnail extends ObservableQuery<KeybaseRe
       `_/api/1.0/user/lookup.json?fields=pictures&key_suffix=${validator.description.identity}`
     );
     makeObservable(this);
+    makeLoggable(this);
 
     this.validator = validator;
   }
@@ -110,6 +112,7 @@ export class ObservableQueryValidatorsInner extends ObservableChainQuery<Validat
       `/staking/validators?status=${status}`
     );
     makeObservable(this);
+    makeLoggable(this);
 
     autorun(() => {
       const chainInfo = this.chainGetter.getChain(this.chainId);

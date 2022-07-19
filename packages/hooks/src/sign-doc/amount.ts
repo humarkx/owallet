@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { computedFn } from 'mobx-utils';
 import { Msg } from '@cosmjs/launchpad';
 import { cosmos } from '@owallet/cosmos';
+import { makeLoggable } from 'mobx-log';
 
 // This config helps the fee config to calculate that the fee is enough to send with considering
 // the amount in the sign doc.
@@ -40,6 +41,7 @@ export class SignDocAmountConfig
     this._sender = sender;
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @action

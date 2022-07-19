@@ -12,6 +12,7 @@ import {
   ObservableQueryOsmosisEpochs,
   ObservableQueryOsmosisMintParmas
 } from './osmosis';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryInflation {
   constructor(
@@ -27,6 +28,7 @@ export class ObservableQueryInflation {
     protected readonly _queryOsmosisMintParams: ObservableQueryOsmosisMintParmas
   ) {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get error() {

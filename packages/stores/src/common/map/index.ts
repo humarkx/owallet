@@ -1,4 +1,5 @@
-import { makeObservable, observable, runInAction } from "mobx";
+import { makeObservable, observable, runInAction } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 export class HasMapStore<T> {
   @observable.shallow
@@ -6,6 +7,7 @@ export class HasMapStore<T> {
 
   constructor(protected readonly creater: (key: string) => T) {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   protected get(key: string): T {

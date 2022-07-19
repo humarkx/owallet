@@ -3,6 +3,7 @@ import { KVStore } from '@owallet/common';
 import { fetchAdapter } from '@owallet/common';
 import Axios from 'axios';
 import { computed, makeObservable } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 export type SifchainLiquidityAPYResult = { rate: number };
 
@@ -19,6 +20,7 @@ export class ObservableQuerySifchainLiquidityAPY extends ObservableQuery<Sifchai
 
     this.chainId = chainId;
     makeObservable(this);
+    makeLoggable(this);
   }
 
   protected canFetch(): boolean {

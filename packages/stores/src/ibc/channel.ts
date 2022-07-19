@@ -4,6 +4,7 @@ import { computedFn } from 'mobx-utils';
 import { Channel } from './types';
 import { HasMapStore } from '../common';
 import { ChainIdHelper } from '@owallet/cosmos';
+import { makeLoggable } from 'mobx-log';
 
 export class IBCChannelStoreInner {
   // channelMap[portId][channelId]
@@ -15,6 +16,7 @@ export class IBCChannelStoreInner {
     protected readonly chainId: string
   ) {
     makeObservable(this);
+    makeLoggable(this);
 
     this.loadChannels();
   }

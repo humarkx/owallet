@@ -7,6 +7,7 @@ import { ChainGetter } from '../../../common';
 import { AuthAccount } from './types';
 import { computed, makeObservable } from 'mobx';
 import { BaseAccount } from '@owallet/cosmos';
+import { makeLoggable } from 'mobx-log';
 
 export class ObservableQueryAccountInner extends ObservableChainQuery<AuthAccount> {
   constructor(
@@ -18,6 +19,7 @@ export class ObservableQueryAccountInner extends ObservableChainQuery<AuthAccoun
     super(kvStore, chainId, chainGetter, `/auth/accounts/${bech32Address}`);
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @computed

@@ -2,6 +2,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import { ChainGetter } from '@owallet/stores';
 import { ChainInfo } from '@owallet/types';
 import { ITxChainSetter } from './types';
+import { makeLoggable } from 'mobx-log';
 
 export class TxChainSetter implements ITxChainSetter {
   @observable
@@ -14,6 +15,7 @@ export class TxChainSetter implements ITxChainSetter {
     this._chainId = initialChainId;
 
     makeObservable(this);
+    makeLoggable(this);
   }
 
   @computed

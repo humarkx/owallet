@@ -29,6 +29,7 @@ import { useLanguage } from '@owallet/common';
 import { useIntl } from 'react-intl';
 import { GasInput } from '../gas-input';
 import { action, makeObservable, observable } from 'mobx';
+import { makeLoggable } from 'mobx-log';
 
 export interface FeeButtonsProps {
   feeConfig: IFeeConfig;
@@ -52,6 +53,7 @@ class FeeButtonState {
 
   constructor() {
     makeObservable(this);
+    makeLoggable(this);
   }
 
   get isGasInputOpen(): boolean {
