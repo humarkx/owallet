@@ -61,7 +61,7 @@ export const SettingScreen: FunctionComponent = observer(() => {
       <StatusBar
         animated={true}
         backgroundColor="white"
-        barStyle={'light-content'}
+        barStyle={Platform.OS == 'ios' ? 'light-content' : 'dark-content'}
         showHideTransition={'fade'}
         hidden={false}
       />

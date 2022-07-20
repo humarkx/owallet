@@ -35,12 +35,12 @@ const styles = StyleSheet.create({
     paddingTop: spacing['16'],
     paddingHorizontal: spacing['8'],
     backgroundColor: colors['white'],
-    shadowColor: '#18274B1F',
+    shadowColor: '#18274B',
     shadowOffset: {
       width: 0,
       height: 12
     },
-    shadowOpacity: 1,
+    shadowOpacity: 0.12,
     shadowRadius: 16.0
   },
   iconSendToken: {
@@ -105,7 +105,7 @@ const TransferTokensOptions: FunctionComponent = () => {
     <>
       <View style={styles.sendTokenCardbody}>
         {tokenTransferInfo.map((val, i) => (
-          <View style={styles.sendTokenCardContent} key={i}>
+          <View style={styles.sendTokenCardContent} key={i} >
             <TouchableOpacity
               style={styles.sendTokenCardText}
               onPress={() => onPress(val.type)}

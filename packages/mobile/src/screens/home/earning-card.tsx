@@ -327,12 +327,12 @@ const styles = StyleSheet.create({
     padding: 16,
     display: 'flex',
     justifyContent: 'space-around',
-    shadowColor: '#18274B1F',
+    shadowColor: '#18274B',
     shadowOffset: {
       width: 0,
       height: 12
     },
-    shadowOpacity: 1,
+    shadowOpacity: 0.12,
     shadowRadius: 16.0
   }
 });

@@ -171,3 +171,25 @@ export const getUnbondInfo = (events = []) => {
     value: unbondValue?.value
   };
 };
+
+export const convertAmount = (amount: any) => {
+  switch (typeof amount) {
+    case 'string':
+    case 'number':
+      return Number(amount) / Math.pow(10, 6);
+    default:
+      return 0;
+  }
+};
+
+export const getDomainFromUrl = url => {
+  if (!url) {
+    return '';
+  }
+  return `${url?.match?.(
+    // eslint-disable-next-line no-useless-escape
+    /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/gim
+  )}`
+    .replace('https://', '')
+    .replace('http://', '');
+};

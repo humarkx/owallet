@@ -1,5 +1,10 @@
 /* eslint-disable react/display-name */
-import React, { FunctionComponent, useCallback, useEffect } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState
+} from 'react';
 import {
   Image,
   Linking,
@@ -105,7 +110,7 @@ import {
   useSmartNavigation
 } from './navigation.provider';
 import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
-// import { OnboardingIntroScreen } from './screens/onboarding';
+import { OnboardingIntroScreen } from './screens/onboarding';
 import { NftsScreen, NftDetailScreen } from './screens/nfts';
 import { DelegateDetailScreen } from './screens/stake/delegate/delegate-detail';
 import { NetworkModal } from './screens/home/components';
@@ -389,8 +394,7 @@ export const MainNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: '',
-          headerLeft: null
+          header: () => <CustomHeader />
         }}
         name="Nfts"
         component={NftsScreen}
@@ -436,6 +440,7 @@ export const SendNavigation: FunctionComponent = () => {
 
 export const RegisterNavigation: FunctionComponent = () => {
   const style = useStyle();
+  const { appInitStore } = useStore();
 
   return (
     <Stack.Navigator
@@ -452,8 +457,13 @@ export const RegisterNavigation: FunctionComponent = () => {
           title: ''
         }}
         name="Register.Intro"
-        component={RegisterIntroScreen}
+        component={
+          appInitStore.initApp.status
+            ? OnboardingIntroScreen
+            : RegisterIntroScreen
+        }
       />
+
       <Stack.Screen
         options={{
           title: 'Create a New Wallet'
