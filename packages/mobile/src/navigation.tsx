@@ -1,5 +1,10 @@
 /* eslint-disable react/display-name */
-import React, { FunctionComponent, useCallback, useEffect } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState
+} from 'react';
 import {
   Image,
   Linking,
@@ -23,7 +28,8 @@ import {
   GovernanceDetailsScreen,
   GovernanceScreen
 } from './screens/governance';
-
+import { createDrawerNavigator } from '@react-navigation/drawer';
+// import { DrawerContent } from './components/drawer';
 import { useStyle } from './styles';
 import { BorderlessButton } from 'react-native-gesture-handler';
 
@@ -104,6 +110,7 @@ import {
   useSmartNavigation
 } from './navigation.provider';
 import TransferTokensScreen from './screens/transfer-tokens/transfer-screen';
+import { OnboardingIntroScreen } from './screens/onboarding';
 import { NftsScreen, NftDetailScreen } from './screens/nfts';
 import { DelegateDetailScreen } from './screens/stake/delegate/delegate-detail';
 import { NetworkModal } from './screens/home/components';
@@ -113,7 +120,28 @@ import { Hash } from '@owallet/crypto';
 import { useRoute } from '@react-navigation/core';
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
+
+const HomeScreenHeaderLeft: FunctionComponent = observer(() => {
+  const style = useStyle();
+
+  const navigation = useNavigation();
+
+  return (
+    <HeaderLeftButton
+      onPress={() => {
+        if (navigation.canGoBack) navigation.goBack();
+      }}
+    >
+      <View style={style.flatten(['flex-row', 'items-center'])}>
+        <Text style={style.flatten(['h4', 'color-text-black-low'])}>
+          <HeaderBackButtonIcon />
+        </Text>
+      </View>
+    </HeaderLeftButton>
+  );
+});
 
 const HomeScreenHeaderRight: FunctionComponent = observer(() => {
   const navigation = useNavigation();
@@ -156,7 +184,7 @@ const HomeScreenHeaderRight: FunctionComponent = observer(() => {
 const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
   const { chainStore, modalStore } = useStore();
 
-  const deterministicNumber = useCallback((chainInfo) => {
+  const deterministicNumber = useCallback(chainInfo => {
     const bytes = Hash.sha256(
       Buffer.from(chainInfo.stakeCurrency.coinMinimalDenom)
     );
@@ -166,10 +194,10 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
   }, []);
 
   const profileColor = useCallback(
-    (chainInfo) => {
-      const colors = ['red', 'green', 'orange', 'yellow'];
+    chainInfo => {
+      const random = [colors['purple-400']];
 
-      return colors[deterministicNumber(chainInfo) % colors.length];
+      return random[deterministicNumber(chainInfo) % random.length];
     },
     [deterministicNumber]
   );
@@ -185,7 +213,7 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
     );
   };
   return (
-    <>
+    <React.Fragment>
       <View
         style={{
           display: 'flex',
@@ -215,7 +243,7 @@ const HomeScreenHeaderTitle: FunctionComponent = observer(() => {
           </View>
         </TouchableWithoutFeedback>
       </View>
-    </>
+    </React.Fragment>
   );
 });
 
@@ -238,7 +266,7 @@ export const CustomHeader: FunctionComponent = observer(() => {
   };
 
   return (
-    <>
+    <React.Fragment>
       <View
         style={{
           backgroundColor: colors['white'],
@@ -267,7 +295,7 @@ export const CustomHeader: FunctionComponent = observer(() => {
           <HomeScreenHeaderRight />
         </View>
       </View>
-    </>
+    </React.Fragment>
   );
 });
 const ScreenHeaderLeft: FunctionComponent<{ uri?: string }> = observer(({}) => {
@@ -366,8 +394,7 @@ export const MainNavigation: FunctionComponent = () => {
       />
       <Stack.Screen
         options={{
-          title: '',
-          headerLeft: null
+          header: () => <CustomHeader />
         }}
         name="Nfts"
         component={NftsScreen}
@@ -413,6 +440,7 @@ export const SendNavigation: FunctionComponent = () => {
 
 export const RegisterNavigation: FunctionComponent = () => {
   const style = useStyle();
+  const { appInitStore } = useStore();
 
   return (
     <Stack.Navigator
@@ -429,8 +457,13 @@ export const RegisterNavigation: FunctionComponent = () => {
           title: ''
         }}
         name="Register.Intro"
-        component={RegisterIntroScreen}
+        component={
+          appInitStore.initApp.status
+            ? OnboardingIntroScreen
+            : RegisterIntroScreen
+        }
       />
+
       <Stack.Screen
         options={{
           title: 'Create a New Wallet'
@@ -792,7 +825,20 @@ export const InvestNavigation: FunctionComponent = () => {
 
 export const MainTabNavigation: FunctionComponent = () => {
   const style = useStyle();
+
+  const navigation = useNavigation();
   const { chainStore } = useStore();
+
+  const focusedScreen = useFocusedScreen();
+
+  useEffect(() => {
+    // When the focused screen is not "Home" screen and the drawer is open,
+    // try to close the drawer forcely.
+    // navigate("Browser")
+    // if (focusedScreen.name !== 'Home' && isDrawerOpen) {
+    //   navigation.dispatch(DrawerActions.toggleDrawer());
+    // }
+  }, [focusedScreen.name, navigation]);
 
   const checkActiveTabBottom = (color: string) => {
     return color == '#C6C6CD';
@@ -892,7 +938,7 @@ export const MainTabNavigation: FunctionComponent = () => {
               return <RenderTabsBarIcon color={color} name={'Settings'} />;
           }
         },
-        tabBarButton: (props) => (
+        tabBarButton: props => (
           <View
             style={{
               display: 'flex',
@@ -929,7 +975,7 @@ export const MainTabNavigation: FunctionComponent = () => {
         },
         showLabel: false
       }}
-      tabBar={(props) => (
+      tabBar={props => (
         <BlurredBottomTabBar {...props} enabledScreens={['Home']} />
       )}
     >
@@ -958,11 +1004,33 @@ export const MainTabNavigation: FunctionComponent = () => {
   );
 };
 
+// export const MainTabNavigationWithDrawer: FunctionComponent = () => {
+//   const focused = useFocusedScreen();
+
+//   return (
+//     <Drawer.Navigator
+//       drawerType="slide"
+//       drawerContent={(props) => <DrawerContent {...props} />}
+//       screenOptions={{
+//         // If the focused screen is not "Home" screen,
+//         // disable the gesture to open drawer.
+//         swipeEnabled: focused.name === 'Home',
+//         gestureEnabled: focused.name === 'Home'
+//       }}
+//       gestureHandlerProps={{
+//         hitSlop: {}
+//       }}
+//     >
+//       <Drawer.Screen name="MainTab" component={MainTabNavigation} />
+//     </Drawer.Navigator>
+//   );
+// };
+
 export const AppNavigation: FunctionComponent = observer(() => {
   const { keyRingStore, deepLinkUriStore } = useStore();
   useEffect(() => {
     Linking.getInitialURL()
-      .then((url) => {
+      .then(url => {
         if (url) {
           const SCHEME_IOS = 'owallet://open_url?url=';
           const SCHEME_ANDROID = 'app.owallet.oauth://google/open_url?url=';
@@ -971,7 +1039,7 @@ export const AppNavigation: FunctionComponent = observer(() => {
           );
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.warn('Deeplinking error', err);
       });
     Linking.addEventListener('url', handleDeepLink);

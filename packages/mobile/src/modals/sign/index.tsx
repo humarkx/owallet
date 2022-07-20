@@ -15,13 +15,13 @@ import {
 } from '@owallet/hooks';
 import { Button } from '../../components/button';
 import { Msg as AminoMsg } from '@cosmjs/launchpad';
-import { Msg } from './msg';
 import { observer } from 'mobx-react-lite';
 import { useUnmount } from '../../hooks';
 import { FeeInSign } from './fee';
 import { renderAminoMessage } from './amino';
 import { renderDirectMessage } from './direct';
-import { colors, metrics, spacing } from '../../themes';
+import { colors } from '../../themes';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 export const SignModal: FunctionComponent<{
   isOpen: boolean;
@@ -109,6 +109,36 @@ export const SignModal: FunctionComponent<{
       memoConfig.getError() != null ||
       feeConfig.getError() != null;
 
+    const _onPressApprove = async () => {
+      crashlytics().log('sign - index - _onPressApprove');
+      console.log('on press sign');
+      try {
+        if (signDocHelper.signDocWrapper) {
+          //
+          await signInteractionStore.approveAndWaitEnd(
+            signDocHelper.signDocWrapper
+          );
+        }
+      } catch (error) {
+        crashlytics().recordError(error);
+        console.log(error);
+      }
+    };
+
+    const _onPressReject = () => {
+      crashlytics().log('sign - index - _onPressReject');
+      console.log('on press sign');
+      try {
+        if (signDocHelper.signDocWrapper) {
+          //
+          signInteractionStore.rejectAll();
+        }
+      } catch (error) {
+        crashlytics().recordError(error);
+        console.error(error);
+      }
+    };
+
     const renderedMsgs = (() => {
       if (mode === 'amino') {
         return (msgs as readonly AminoMsg[]).map((msg, i) => {
@@ -132,9 +162,7 @@ export const SignModal: FunctionComponent<{
                   </Text>
                 </ScrollView>
               ) : (
-                <Text style={style.flatten(['body3', 'color-text-black-low'])}>
-                  {content}
-                </Text>
+                <View>{content}</View>
               )}
               {/* </Msg> */}
               {/* {msgs.length - 1 !== i ? (
@@ -235,22 +263,11 @@ export const SignModal: FunctionComponent<{
             textStyle={{
               color: isDisable ? colors['gray-400'] : colors['white']
             }}
+            underlayColor={colors['purple-400']}
             size="large"
             disabled={isDisable}
             loading={signInteractionStore.isLoading}
-            onPress={async () => {
-              console.log('on press sign');
-              try {
-                if (signDocHelper.signDocWrapper) {
-                  //
-                  await signInteractionStore.approveAndWaitEnd(
-                    signDocHelper.signDocWrapper
-                  );
-                }
-              } catch (error) {
-                console.log(error);
-              }
-            }}
+            onPress={_onPressApprove}
           />
           <Button
             text="Reject"
@@ -264,18 +281,9 @@ export const SignModal: FunctionComponent<{
             textStyle={{
               color: colors['white']
             }}
+            underlayColor={colors['danger-400']}
             loading={signInteractionStore.isLoading}
-            onPress={() => {
-              console.log('on press sign');
-              try {
-                if (signDocHelper.signDocWrapper) {
-                  //
-                  signInteractionStore.reject();
-                }
-              } catch (error) {
-                console.log(error);
-              }
-            }}
+            onPress={_onPressReject}
           />
         </View>
       </CardModal>

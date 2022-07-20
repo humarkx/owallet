@@ -55,19 +55,14 @@ export const TokenSymbol: FunctionComponent<{
 
   const profileColor = useMemo(() => {
     const colors = [
-      'sky-blue',
-      'mint',
-      'green',
-      'yellow-green',
-      'purple',
-      'red',
-      'orange',
-      'yellow'
+      'red-10',
+      'yellow-10',
+      'gray-10',
     ]
 
     return colors[deterministicNumber % colors.length]
   }, [deterministicNumber])
-
+  
   return (
     <View
       style={{
@@ -78,8 +73,8 @@ export const TokenSymbol: FunctionComponent<{
         justifyContent: 'center',
         overflow: 'hidden',
         backgroundColor: isStakeCurrency
-          ? colors['primary']
-          : colors[`profile-${profileColor}`],
+          ? colors['red-10']
+          : colors[`${profileColor}`],
         ...propStyle
       }}
     >
@@ -87,7 +82,8 @@ export const TokenSymbol: FunctionComponent<{
         <FastImage
           style={{
             width: size * imageScale,
-            height: size * imageScale
+            height: size * imageScale,
+            backgroundColor: colors['gray-10']
           }}
           resizeMode={FastImage.resizeMode.contain}
           source={{
@@ -98,7 +94,7 @@ export const TokenSymbol: FunctionComponent<{
         <VectorCharacter
           char={currency.coinDenom[0]}
           height={Math.floor(size * 0.35)}
-          color="white"
+          color="black"
         />
       )}
     </View>

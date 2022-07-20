@@ -10,7 +10,7 @@ export type DAppInfo = {
   logo?: ImageSourcePropType;
 };
 
-export const oraiLogo = require('../../assets/image/webpage/orai_logo.png');
+const oraiLogo = require('../../assets/image/webpage/orai_logo.png');
 const balconyLogo = require('../../assets/image/webpage/balcony.png');
 
 export const DAppInfos: DAppInfo[] = [
@@ -49,18 +49,18 @@ export const DAppInfos: DAppInfo[] = [
   //   uri: 'https://bignft.web.app',
   //   logo: balconyLogo,
   // },
-  {
-    id: 6,
-    name: 'Balcony Subnet',
-    uri: 'https://re.bignft.app',
-    logo: balconyLogo
-  },
+  // {
+  //   id: 6,
+  //   name: 'Balcony Subnet',
+  //   uri: 'https://re.bignft.app',
+  //   logo: balconyLogo
+  // },
   {
     id: 7,
-    name: 'Info Oraidex',
+    name: 'OraiDEX Info',
     uri: 'https://info.oraidex.io',
     logo: oraiLogo
-  },
+  }
 ];
 
 if (__DEV__) {

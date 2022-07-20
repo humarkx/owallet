@@ -2,7 +2,7 @@ import React, { FunctionComponent, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../stores';
 import { PageWithSectionList } from '../../../components/page';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { CText as Text } from '../../../components/text';
 import { BondStatus, Validator } from '@owallet/stores';
 import { SelectorModal, TextInput } from '../../../components/input';
@@ -49,7 +49,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
   const data = useMemo(() => {
     let data = bondedValidators.validators;
     if (search) {
-      data = data.filter((val) =>
+      data = data.filter(val =>
         val.description.moniker?.toLowerCase().includes(search.toLowerCase())
       );
     }
@@ -93,7 +93,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
   }, []);
 
   const sortItem = useMemo(() => {
-    const item = items.find((item) => item.key === sort);
+    const item = items.find(item => item.key === sort);
     if (!item) {
       throw new Error(`Can't find the item for sort (${sort})`);
     }
@@ -101,7 +101,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
   }, [items, sort]);
 
   return (
-    <>
+    <React.Fragment>
       <SelectorModal
         close={() => {
           setIsSortModalOpen(false);
@@ -109,7 +109,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
         isOpen={isSortModalOpen}
         items={items}
         selectedKey={sort}
-        setSelectedKey={(key) => setSort(key as Sort)}
+        setSelectedKey={key => setSort(key as Sort)}
       />
 
       <PageWithSectionList
@@ -175,7 +175,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                     padding: 0
                   }}
                   value={search}
-                  onChangeText={(text) => {
+                  onChangeText={text => {
                     setSearch(text);
                   }}
                   paragraph={
@@ -205,11 +205,13 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                           {`Validator list`}
                         </Text>
                       </View>
-                      <RectButton
+                      <TouchableOpacity
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
-                          paddingHorizontal: spacing['2']
+                          paddingHorizontal: spacing['2'],
+                          position: 'absolute',
+                          right: -25
                         }}
                         onPress={() => {
                           setIsSortModalOpen(true);
@@ -219,7 +221,8 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                           style={{
                             ...styles.title,
                             marginRight: spacing['10'],
-                            textTransform: 'uppercase'
+                            textTransform: 'uppercase',
+                            marginBottom: spacing['8']
                           }}
                         >
                           {sortItem.label}
@@ -228,7 +231,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
                           size={24}
                           color={colors['gray-900']}
                         />
-                      </RectButton>
+                      </TouchableOpacity>
                     </View>
                   }
                 />
@@ -237,7 +240,7 @@ export const ValidatorListScreen: FunctionComponent = observer(() => {
           );
         }}
       />
-    </>
+    </React.Fragment>
   );
 });
 

@@ -7,17 +7,17 @@ import React, {
 } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../stores';
-import { StyleSheet, View, ViewStyle, Image } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  FlatList
+} from 'react-native';
 import { Text } from '@rneui/base';
-import { CoinPretty } from '@owallet/unit';
 import { useSmartNavigation } from '../../navigation.provider';
-import { Currency } from '@owallet/types';
 import { TokenSymbol } from '../../components/token-symbol';
-import { DenomHelper } from '@owallet/common';
-import { Bech32Address } from '@owallet/cosmos';
 import { colors, metrics, spacing, typography } from '../../themes';
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { _keyExtract } from '../../utils/helper';
 import { TransactionMinusIcon } from '../../components/icon';
 import LinearGradient from 'react-native-linear-gradient';
@@ -33,21 +33,17 @@ import {
 import { PageWithScrollViewInBottomTabView } from '../../components/page';
 import { navigate } from '../../router/root';
 import { API } from '../../common/api';
-import { useRoute } from '@react-navigation/native';
+import { useLoadingScreen } from '../../providers/loading-screen';
+import { AddressQRCodeModal } from '../home/components';
 
-export const TokenDetailScreen: FunctionComponent = observer(() => {
-  const { chainStore, queriesStore, accountStore } = useStore();
+export const TokenDetailScreen: FunctionComponent = observer(props => {
+  const { chainStore, queriesStore, accountStore, modalStore } = useStore();
   const smartNavigation = useSmartNavigation();
-  const route = useRoute();
 
-  const { amountBalance, balanceCoinDenom, priceBalance } = route.params ?? {};
+  const { amountBalance, balanceCoinDenom, priceBalance, balanceCoinFull } =
+    props?.route?.params ?? {};
   const account = accountStore.getAccount(chainStore.current.chainId);
   const queries = queriesStore.get(chainStore.current.chainId);
-
-  const queryStakable = queries.queryBalances.getQueryBech32Address(
-    account.bech32Address
-  ).stakable;
-  const stakable = queryStakable.balance;
 
   const queryDelegated = queries.cosmos.queryDelegations.getQueryBech32Address(
     account.bech32Address
@@ -61,7 +57,6 @@ export const TokenDetailScreen: FunctionComponent = observer(() => {
 
   const unbonding = queryUnbonding.total;
   const stakedSum = delegated.add(unbonding);
-  const total = stakable.add(stakedSum);
   const queryBalances = queriesStore
     .get(chainStore.current.chainId)
     .queryBalances.getQueryBech32Address(
@@ -102,27 +97,42 @@ export const TokenDetailScreen: FunctionComponent = observer(() => {
   useEffect(() => {
     offset.current = 0;
     fetchData();
-  }, [account.bech32Address]);
+  }, [account.bech32Address, chainStore.current.chainId]);
+  const loadingScreen = useLoadingScreen();
 
-  const _onPressBtnMain = (name) => {
+  const _onPressReceiveModal = () => {
+    modalStore.setOpen();
+    modalStore.setChildren(
+      AddressQRCodeModal({
+        account
+      })
+    );
+  };
+
+  const _onPressBtnMain = name => {
     if (name === 'Buy') {
       navigate('MainTab', { screen: 'Browser', path: 'https://oraidex.io' });
     }
-    if (name === 'Deposit') {
+    if (name === 'Receive') {
+      _onPressReceiveModal();
     }
     if (name === 'Send') {
       smartNavigation.navigateSmart('Send', {
-        currency: chainStore.current.stakeCurrency.coinMinimalDenom
+        currency:
+          balanceCoinFull ??
+          balanceCoinDenom ??
+          chainStore.current.stakeCurrency.coinMinimalDenom
       });
     }
   };
+
   const RenderBtnMain = ({ name }) => {
     let icon: ReactElement;
     switch (name) {
       case 'Buy':
         icon = <BuyIcon />;
         break;
-      case 'Deposit':
+      case 'Receive':
         icon = <DepositIcon />;
         break;
       case 'Send':
@@ -246,7 +256,7 @@ export const TokenDetailScreen: FunctionComponent = observer(() => {
               paddingBottom: spacing['24']
             }}
           >
-            {['Buy', 'Deposit', 'Send'].map((e, i) => (
+            {['Buy', 'Receive', 'Send'].map((e, i) => (
               <RenderBtnMain key={i} name={e} />
             ))}
           </View>
@@ -273,7 +283,14 @@ export const TokenDetailScreen: FunctionComponent = observer(() => {
           height: metrics.screenHeight / 2
         }}
       >
-        <TransactionSectionTitle title={'Transaction list'} />
+        <TransactionSectionTitle
+          title={'Transaction list'}
+          onPress={async () => {
+            await loadingScreen.openAsync();
+            await fetchData();
+            loadingScreen.setIsLoading(false);
+          }}
+        />
         <FlatList
           data={data}
           renderItem={({ item, index }) => (

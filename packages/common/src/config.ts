@@ -249,7 +249,7 @@ export const EmbedChainInfos: AppChainInfo[] = [
           coinGeckoId: 'tether',
           coinImageUrl:
             'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png'
-        },
+        }
       ];
     },
     get feeCurrencies() {

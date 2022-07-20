@@ -2,7 +2,7 @@ import React, { FunctionComponent, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../stores';
 import { BondStatus } from '@owallet/stores';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleSheet, View, ViewStyle , TouchableOpacity } from 'react-native';
 import { CText as Text } from '../../../components/text';
 import { CoinPretty, Dec, IntPretty } from '@owallet/unit';
 import { Button } from '../../../components/button';
@@ -15,6 +15,7 @@ import {
   ValidatorCommissionIcon,
   ValidatorVotingIcon
 } from '../../../components/icon';
+import { ValidatorThumbnails } from '@owallet/common';
 
 const renderIconValidator = (label: string, size?: number) => {
   switch (label) {
@@ -80,7 +81,7 @@ export const ValidatorDetailsCard: FunctionComponent<{
     return bondedValidators.validators
       .concat(unbondingValidators.validators)
       .concat(unbondedValidators.validators)
-      .find(val => val.operator_address === validatorAddress);
+      .find((val) => val.operator_address === validatorAddress);
   }, [
     bondedValidators.validators,
     unbondingValidators.validators,
@@ -91,7 +92,8 @@ export const ValidatorDetailsCard: FunctionComponent<{
   const thumbnail =
     bondedValidators.getValidatorThumbnail(validatorAddress) ||
     unbondingValidators.getValidatorThumbnail(validatorAddress) ||
-    unbondedValidators.getValidatorThumbnail(validatorAddress);
+    unbondedValidators.getValidatorThumbnail(validatorAddress) || 
+    ValidatorThumbnails[validatorAddress]
 
   const renderTextDetail = (label: string) => {
     switch (label) {
@@ -230,17 +232,30 @@ export const ValidatorDetailsCard: FunctionComponent<{
               {validator.description.details}
             </Text>
           </View>
-          <Button
-            text="Stake now"
-            containerStyle={{
-              backgroundColor: colors['purple-900']
+          <TouchableOpacity
+            style={{
+              marginBottom: 16,
+              backgroundColor: colors['purple-900'],
+              borderRadius: 8
             }}
             onPress={() => {
               smartNavigation.navigateSmart('Delegate', {
                 validatorAddress
               });
             }}
-          />
+          >
+            <Text
+              style={{
+                color: colors['white'],
+                textAlign: 'center',
+                fontWeight: '700',
+                fontSize: 16,
+                padding: 16
+              }}
+            >
+              Stake now
+            </Text>
+          </TouchableOpacity>
         </View>
       ) : null}
     </>

@@ -4,7 +4,7 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import { useStore } from '../../../stores';
 import { useStyle } from '../../../styles';
 import { useUndelegateTxConfig } from '@owallet/hooks';
-import { PageWithScrollView } from '../../../components/page';
+import { PageWithScrollView, PageWithScrollViewInBottomTabView } from '../../../components/page';
 import { AmountInput, FeeButtons, MemoInput } from '../../../components/input';
 import { View } from 'react-native';
 import { CText as Text } from '../../../components/text';
@@ -93,7 +93,7 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
   const isDisable = !account.isReadyToSendMsgs || !txStateIsValid;
 
   return (
-    <PageWithScrollView
+    <PageWithScrollViewInBottomTabView
       style={style.flatten(['padding-x-page'])}
       contentContainerStyle={style.get('flex-grow-1')}
     >
@@ -165,6 +165,7 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
         style={{
           backgroundColor: isDisable ? colors['disabled'] : colors['purple-900']
         }}
+        underlayColor={colors['purple-400']}
         disabled={isDisable}
         loading={account.isSendingMsg === 'undelegate'}
         onPress={async () => {
@@ -210,6 +211,6 @@ export const UndelegateScreen: FunctionComponent = observer(() => {
         }}
       />
       <View style={style.flatten(['height-page-pad'])} />
-    </PageWithScrollView>
+    </PageWithScrollViewInBottomTabView>
   );
 });

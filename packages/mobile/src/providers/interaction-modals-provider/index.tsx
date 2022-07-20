@@ -8,11 +8,16 @@ import { HomeBaseModal } from '../../modals/home-base';
 export const InteractionModalsProivder: FunctionComponent = observer(
   ({ children }) => {
     const {
+      keyRingStore,
       ledgerInitStore,
       permissionStore,
       signInteractionStore,
-      modalStore
+      modalStore,
     } = useStore();
+
+    // Example usage
+    // modalStore.setOpen()
+    // modalStore.setChildren(<Text>33333</Text>)
 
     useEffect(() => {
       for (const data of permissionStore.waitingDatas) {
@@ -25,7 +30,7 @@ export const InteractionModalsProivder: FunctionComponent = observer(
       }
     }, [permissionStore, permissionStore.waitingDatas]);
     return (
-      <>
+      <React.Fragment>
         {ledgerInitStore.isInitNeeded ? (
           <LedgerGranterModal
             isOpen={true}
@@ -43,7 +48,7 @@ export const InteractionModalsProivder: FunctionComponent = observer(
         ) : null}
 
         {children}
-      </>
+      </React.Fragment>
     );
   }
 );

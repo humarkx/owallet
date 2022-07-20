@@ -52,7 +52,10 @@ export const MyRewardCard: FunctionComponent<{
           }}
         >
           My Pending Rewards (
-          <Text style={style.flatten(['h7', 'color-primary'])}>
+          <Text style={{
+            ...typography['h7'],
+            color: colors['purple-700']
+          }}>
             {`${apy.maxDecimals(2).trim(true).toString()}% per year`}
           </Text>
           )

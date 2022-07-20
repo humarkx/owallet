@@ -8,6 +8,7 @@
 /* eslint-disable */
 
 const { getDefaultConfig } = require('metro-config');
+
 const blacklist = require('metro-config/src/defaults/exclusionList');
 const getWorkspaces = require('get-yarn-workspaces');
 const path = require('path');
@@ -54,8 +55,6 @@ module.exports = (async () => {
       }
     },
     transformer: {
-      minifierPath: require.resolve('metro-minify-esbuild'),
-      minifierConfig: {},
       babelTransformerPath: require.resolve('react-native-svg-transformer'),
       getTransformOptions: () => ({
         transform: {

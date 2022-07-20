@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import { PageWithScrollViewInBottomTabView } from '../../../components/page';
 import { StyleSheet, View, Image } from 'react-native';
 import { colors, typography, spacing, metrics } from '../../../themes';
@@ -11,8 +11,9 @@ import { useSmartNavigation } from '../../../navigation.provider';
 import { MyRewardCard } from './reward-card';
 import { DelegationsCard } from './delegations-card';
 import { useStore } from '../../../stores';
+import { observer } from 'mobx-react-lite';
 
-export const StakingDashboardScreen: FunctionComponent = () => {
+export const StakingDashboardScreen: FunctionComponent = observer(() => {
   const smartNavigation = useSmartNavigation();
   const safeAreaInsets = useSafeAreaInsets();
   const { chainStore, accountStore, queriesStore } = useStore();
@@ -98,47 +99,25 @@ export const StakingDashboardScreen: FunctionComponent = () => {
             <Text
               style={{
                 ...typography.h6,
-                fontWeight: '400'
-              }}
-            >
-              {`Total: ${staked
-                .maxDecimals(6)
-                .trim(true)
-                .shrink(true)
-                .toString()}`}
-            </Text>
-
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row'
+                fontWeight: '600'
               }}
             >
               <Text
                 style={{
-                  ...typography.h6,
-                  fontWeight: '400',
-                  marginRight: spacing['10']
+                  fontWeight: '400'
                 }}
               >
-                Amount
+                Total stake:{' '}
               </Text>
-              <View
-                style={{
-                  marginTop: spacing['5']
-                }}
-              >
-                <ArrowOpsiteUpDownIcon size={24} color={colors['gray-900']} />
-              </View>
-            </View>
+              {`${staked.maxDecimals(6).trim(true).shrink(true).toString()}`}
+            </Text>
           </View>
           <DelegationsCard />
         </View>
       </View>
     </PageWithScrollViewInBottomTabView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {},
@@ -170,7 +149,7 @@ const styles = StyleSheet.create({
     marginTop: spacing['32'],
     marginBottom: spacing['16'],
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center'
   }
 });
