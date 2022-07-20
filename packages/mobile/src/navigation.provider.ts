@@ -139,6 +139,9 @@ const { SmartNavigatorProvider, useSmartNavigation } =
       'Transactions.Detail': {
         upperScreenName: 'Others'
       },
+      'Network.select': {
+        upperScreenName: 'Others'
+      },
       'Web.Intro': {
         upperScreenName: 'Web'
       },
