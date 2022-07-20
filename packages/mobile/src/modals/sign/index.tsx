@@ -251,6 +251,22 @@ export const SignModal: FunctionComponent<{
           }}
         >
           <Button
+            text="Reject"
+            size="large"
+            containerStyle={{
+              width: '40%'
+            }}
+            style={{
+              backgroundColor: colors['red-500']
+            }}
+            textStyle={{
+              color: colors['white']
+            }}
+            underlayColor={colors['danger-400']}
+            loading={signInteractionStore.isLoading}
+            onPress={_onPressReject}
+          />
+          <Button
             text="Approve"
             containerStyle={{
               width: '40%'
@@ -268,22 +284,6 @@ export const SignModal: FunctionComponent<{
             disabled={isDisable}
             loading={signInteractionStore.isLoading}
             onPress={_onPressApprove}
-          />
-          <Button
-            text="Reject"
-            size="large"
-            containerStyle={{
-              width: '40%'
-            }}
-            style={{
-              backgroundColor: colors['red-500']
-            }}
-            textStyle={{
-              color: colors['white']
-            }}
-            underlayColor={colors['danger-400']}
-            loading={signInteractionStore.isLoading}
-            onPress={_onPressReject}
           />
         </View>
       </CardModal>
